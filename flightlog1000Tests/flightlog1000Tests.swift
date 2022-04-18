@@ -32,6 +32,12 @@ class flightlog1000Tests: XCTestCase {
             let loglist = FlightLogList(logs: logs)
             print( "\(loglist)" )
             XCTAssertGreaterThan(loglist.flightLogs.count, 0)
+            
+            if let one = loglist.flightLogs.first {
+                one.parse()
+                print( one )
+            }
+            
             expectation.fulfill()
         }
 
