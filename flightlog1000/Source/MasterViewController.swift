@@ -33,7 +33,16 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
+            _ in
+            self.buildList()
+        }
         self.buildList()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -63,6 +72,9 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         self.logFileOrganizer.flightLogListFromLocal(){
             logList in
             self.logList = logList
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
     }
 
@@ -76,7 +88,6 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
 
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        //FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
         self.logFileOrganizer.copyMissingToLocal(urls: urls)
         
         controller.dismiss(animated: true)

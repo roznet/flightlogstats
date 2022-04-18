@@ -8,9 +8,14 @@
 import Foundation
 import RZUtils
 import RZUtilsSwift
+import UIKit
+
+extension Notification.Name {
+    static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
+}
 
 class LogFileOrganizer {
-
+    
     private let queue = OperationQueue()
     
     var destFolder : URL {
@@ -33,6 +38,7 @@ class LogFileOrganizer {
         
         FlightLog.search(in: urls ){
             logs in
+            var someNew : Bool = false
             for log in logs {
                 let file = log.url
                 let dest = destFolder.appendingPathComponent(file.lastPathComponent)
@@ -40,6 +46,7 @@ class LogFileOrganizer {
                     do {
                         try FileManager.default.copyItem(at: file, to: dest)
                         RZSLog.info("copied \(file.lastPathComponent) to \(dest)")
+                        someNew = true
                     } catch {
                         RZSLog.error("failed to copy \(file.lastPathComponent) to \(dest)")
                     }
@@ -47,6 +54,9 @@ class LogFileOrganizer {
                 }else{
                     RZSLog.info("Already copied \(file.lastPathComponent)")
                 }
+            }
+            if someNew {
+                NotificationCenter.default.post(name: .localFileListChanged, object: nil)
             }
         }
     }
@@ -139,6 +149,7 @@ class LogFileOrganizer {
                                 for intent in copyCloudToLocal {
                                     try FileManager.default.copyItem(at: intent.url, to: self.destFolder.appendingPathComponent(intent.url.lastPathComponent))
                                 }
+                                NotificationCenter.default.post(name: .localFileListChanged, object: nil)
                             }catch{
                                 RZSLog.error("Failed to copy from cloud \(error)")
                             }
