@@ -25,6 +25,7 @@
 		4280C8CF280D4AD300A0FB32 /* RZUtilsUniversal in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8CE280D4AD300A0FB32 /* RZUtilsUniversal */; };
 		4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */; };
 		4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */; };
+		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		4280C8C0280D467400A0FB32 /* FlightData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightData.swift; path = Source/FlightData.swift; sourceTree = "<group>"; };
 		4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210623_141501_TEST1.csv; sourceTree = "<group>"; };
 		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
+		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */,
 				4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */,
 				4280C8CF280D4AD300A0FB32 /* RZUtilsUniversal in Frameworks */,
 				4280C8CD280D4AD300A0FB32 /* RZUtilsSwift in Frameworks */,
@@ -104,6 +107,7 @@
 				4280C893280D43E500A0FB32 /* flightlog1000Tests */,
 				4280C89D280D43E500A0FB32 /* flightlog1000UITests */,
 				4280C87B280D43E400A0FB32 /* Products */,
+				4280C8D5280D70CB00A0FB32 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -184,6 +188,14 @@
 				4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */,
 			);
 			path = TestAssets;
+			sourceTree = "<group>";
+		};
+		4280C8D5280D70CB00A0FB32 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4280C8D6280D70CB00A0FB32 /* CloudKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -513,7 +525,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = FlightLog1000/FlightLog1000.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlog1000/Info.plist;
@@ -546,7 +558,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = FlightLog1000/FlightLog1000.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlog1000/Info.plist;

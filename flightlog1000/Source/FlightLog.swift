@@ -9,6 +9,7 @@ import Foundation
 
 class FlightLog {
     let url : URL
+    var name : String { return url.lastPathComponent }
     
     var data : FlightData? = nil
     

@@ -12,6 +12,9 @@ class FlightLogList {
     let directory : URL
     var flightLogs : [FlightLog]
     
+    var description : String {
+        return "<FlightLogList:\(directory.lastPathComponent):\(flightLogs.count)>"
+    }
     
     init(directory : URL) {
         self.directory = directory
@@ -26,5 +29,22 @@ class FlightLogList {
             }
         }
         self.flightLogs = logs
+    }
+    
+    init(cloud : URL){
+        
+        self.directory = cloud
+        self.flightLogs = []
+        let query = NSMetadataQuery()
+        query.notificationBatchingInterval = 1
+        query.searchScopes = [NSMetadataQueryUbiquitousDataScope, NSMetadataQueryUbiquitousDocumentsScope]
+        
+        //NotificationCenter.default.addObserver(forName: NSMetadataQuery.didfin NSMetadataQueryDidFinishGathering, object: <#T##Any?#>, queue: <#T##OperationQueue?#>, using: <#T##(Notification) -> Void#>)
+        
+        query.start()
+    }
+    
+    func finishedGathering(query : NSMetadataQuery) {
+        
     }
 }
