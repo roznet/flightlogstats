@@ -1,0 +1,733 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4280C885280D43E400A0FB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C883280D43E400A0FB32 /* Main.storyboard */; };
+		4280C887280D43E500A0FB32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4280C886280D43E500A0FB32 /* Assets.xcassets */; };
+		4280C88A280D43E500A0FB32 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C888280D43E500A0FB32 /* LaunchScreen.storyboard */; };
+		4280C895280D43E500A0FB32 /* flightlog1000Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C894280D43E500A0FB32 /* flightlog1000Tests.swift */; };
+		4280C89F280D43E500A0FB32 /* flightlog1000UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C89E280D43E500A0FB32 /* flightlog1000UITests.swift */; };
+		4280C8A1280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8A0280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift */; };
+		4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8B8280D460500A0FB32 /* AppDelegate.swift */; };
+		4280C8BC280D460600A0FB32 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8B9280D460500A0FB32 /* MasterViewController.swift */; };
+		4280C8BD280D460600A0FB32 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BA280D460600A0FB32 /* SceneDelegate.swift */; };
+		4280C8C1280D467400A0FB32 /* FlightLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BE280D467400A0FB32 /* FlightLog.swift */; };
+		4280C8C2280D467400A0FB32 /* FlightLogList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BF280D467400A0FB32 /* FlightLogList.swift */; };
+		4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8C0280D467400A0FB32 /* FlightData.swift */; };
+		4280C8C8280D48E700A0FB32 /* log_210623_141501_TEST1.csv in Resources */ = {isa = PBXBuildFile; fileRef = 4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */; };
+		4280C8CB280D4AD300A0FB32 /* RZUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8CA280D4AD300A0FB32 /* RZUtils */; };
+		4280C8CD280D4AD300A0FB32 /* RZUtilsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8CC280D4AD300A0FB32 /* RZUtilsSwift */; };
+		4280C8CF280D4AD300A0FB32 /* RZUtilsUniversal in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8CE280D4AD300A0FB32 /* RZUtilsUniversal */; };
+		4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */; };
+		4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4280C891280D43E500A0FB32 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4280C872280D43E400A0FB32 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4280C879280D43E400A0FB32;
+			remoteInfo = flightlog1000;
+		};
+		4280C89B280D43E500A0FB32 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4280C872280D43E400A0FB32 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4280C879280D43E400A0FB32;
+			remoteInfo = flightlog1000;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4280C87A280D43E400A0FB32 /* FlightLog1000.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightLog1000.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4280C884280D43E400A0FB32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4280C886280D43E500A0FB32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4280C889280D43E500A0FB32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		4280C88B280D43E500A0FB32 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4280C890280D43E500A0FB32 /* flightlog1000Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = flightlog1000Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4280C894280D43E500A0FB32 /* flightlog1000Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = flightlog1000Tests.swift; sourceTree = "<group>"; };
+		4280C89A280D43E500A0FB32 /* flightlog1000UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = flightlog1000UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4280C89E280D43E500A0FB32 /* flightlog1000UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = flightlog1000UITests.swift; sourceTree = "<group>"; };
+		4280C8A0280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = flightlog1000UITestsLaunchTests.swift; sourceTree = "<group>"; };
+		4280C8AD280D448600A0FB32 /* FlightLog1000.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = FlightLog1000.entitlements; path = FlightLog1000/FlightLog1000.entitlements; sourceTree = "<group>"; };
+		4280C8B7280D460500A0FB32 /* FlightLog1000-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FlightLog1000-Bridging-Header.h"; sourceTree = "<group>"; };
+		4280C8B8280D460500A0FB32 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Source/AppDelegate.swift; sourceTree = "<group>"; };
+		4280C8B9280D460500A0FB32 /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MasterViewController.swift; path = Source/MasterViewController.swift; sourceTree = "<group>"; };
+		4280C8BA280D460600A0FB32 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = Source/SceneDelegate.swift; sourceTree = "<group>"; };
+		4280C8BE280D467400A0FB32 /* FlightLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightLog.swift; path = Source/FlightLog.swift; sourceTree = "<group>"; };
+		4280C8BF280D467400A0FB32 /* FlightLogList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightLogList.swift; path = Source/FlightLogList.swift; sourceTree = "<group>"; };
+		4280C8C0280D467400A0FB32 /* FlightData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightData.swift; path = Source/FlightData.swift; sourceTree = "<group>"; };
+		4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210623_141501_TEST1.csv; sourceTree = "<group>"; };
+		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4280C877280D43E400A0FB32 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */,
+				4280C8CF280D4AD300A0FB32 /* RZUtilsUniversal in Frameworks */,
+				4280C8CD280D4AD300A0FB32 /* RZUtilsSwift in Frameworks */,
+				4280C8CB280D4AD300A0FB32 /* RZUtils in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4280C88D280D43E500A0FB32 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4280C897280D43E500A0FB32 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4280C871280D43E400A0FB32 = {
+			isa = PBXGroup;
+			children = (
+				4280C8AD280D448600A0FB32 /* FlightLog1000.entitlements */,
+				4280C87C280D43E400A0FB32 /* flightlog1000 */,
+				4280C893280D43E500A0FB32 /* flightlog1000Tests */,
+				4280C89D280D43E500A0FB32 /* flightlog1000UITests */,
+				4280C87B280D43E400A0FB32 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4280C87B280D43E400A0FB32 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4280C87A280D43E400A0FB32 /* FlightLog1000.app */,
+				4280C890280D43E500A0FB32 /* flightlog1000Tests.xctest */,
+				4280C89A280D43E500A0FB32 /* flightlog1000UITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4280C87C280D43E400A0FB32 /* flightlog1000 */ = {
+			isa = PBXGroup;
+			children = (
+				4280C8C4280D467A00A0FB32 /* Model */,
+				4280C8AE280D458B00A0FB32 /* UserInterface */,
+				4280C8C5280D46C900A0FB32 /* App */,
+				4280C88B280D43E500A0FB32 /* Info.plist */,
+			);
+			path = flightlog1000;
+			sourceTree = "<group>";
+		};
+		4280C893280D43E500A0FB32 /* flightlog1000Tests */ = {
+			isa = PBXGroup;
+			children = (
+				4280C8C6280D48E700A0FB32 /* TestAssets */,
+				4280C894280D43E500A0FB32 /* flightlog1000Tests.swift */,
+			);
+			path = flightlog1000Tests;
+			sourceTree = "<group>";
+		};
+		4280C89D280D43E500A0FB32 /* flightlog1000UITests */ = {
+			isa = PBXGroup;
+			children = (
+				4280C89E280D43E500A0FB32 /* flightlog1000UITests.swift */,
+				4280C8A0280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift */,
+			);
+			path = flightlog1000UITests;
+			sourceTree = "<group>";
+		};
+		4280C8AE280D458B00A0FB32 /* UserInterface */ = {
+			isa = PBXGroup;
+			children = (
+				4280C886280D43E500A0FB32 /* Assets.xcassets */,
+				4280C883280D43E400A0FB32 /* Main.storyboard */,
+				4280C8B9280D460500A0FB32 /* MasterViewController.swift */,
+				4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */,
+			);
+			name = UserInterface;
+			sourceTree = "<group>";
+		};
+		4280C8C4280D467A00A0FB32 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4280C8C0280D467400A0FB32 /* FlightData.swift */,
+				4280C8BE280D467400A0FB32 /* FlightLog.swift */,
+				4280C8BF280D467400A0FB32 /* FlightLogList.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		4280C8C5280D46C900A0FB32 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				4280C888280D43E500A0FB32 /* LaunchScreen.storyboard */,
+				4280C8B8280D460500A0FB32 /* AppDelegate.swift */,
+				4280C8BA280D460600A0FB32 /* SceneDelegate.swift */,
+				4280C8B7280D460500A0FB32 /* FlightLog1000-Bridging-Header.h */,
+			);
+			name = App;
+			sourceTree = "<group>";
+		};
+		4280C8C6280D48E700A0FB32 /* TestAssets */ = {
+			isa = PBXGroup;
+			children = (
+				4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */,
+			);
+			path = TestAssets;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4280C879280D43E400A0FB32 /* FlightLog1000 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4280C8A4280D43E500A0FB32 /* Build configuration list for PBXNativeTarget "FlightLog1000" */;
+			buildPhases = (
+				4280C876280D43E400A0FB32 /* Sources */,
+				4280C877280D43E400A0FB32 /* Frameworks */,
+				4280C878280D43E400A0FB32 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FlightLog1000;
+			packageProductDependencies = (
+				4280C8CA280D4AD300A0FB32 /* RZUtils */,
+				4280C8CC280D4AD300A0FB32 /* RZUtilsSwift */,
+				4280C8CE280D4AD300A0FB32 /* RZUtilsUniversal */,
+				4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */,
+			);
+			productName = flightlog1000;
+			productReference = 4280C87A280D43E400A0FB32 /* FlightLog1000.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4280C88F280D43E500A0FB32 /* flightlog1000Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4280C8A7280D43E500A0FB32 /* Build configuration list for PBXNativeTarget "flightlog1000Tests" */;
+			buildPhases = (
+				4280C88C280D43E500A0FB32 /* Sources */,
+				4280C88D280D43E500A0FB32 /* Frameworks */,
+				4280C88E280D43E500A0FB32 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4280C892280D43E500A0FB32 /* PBXTargetDependency */,
+			);
+			name = flightlog1000Tests;
+			productName = flightlog1000Tests;
+			productReference = 4280C890280D43E500A0FB32 /* flightlog1000Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4280C899280D43E500A0FB32 /* flightlog1000UITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4280C8AA280D43E500A0FB32 /* Build configuration list for PBXNativeTarget "flightlog1000UITests" */;
+			buildPhases = (
+				4280C896280D43E500A0FB32 /* Sources */,
+				4280C897280D43E500A0FB32 /* Frameworks */,
+				4280C898280D43E500A0FB32 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4280C89C280D43E500A0FB32 /* PBXTargetDependency */,
+			);
+			name = flightlog1000UITests;
+			productName = flightlog1000UITests;
+			productReference = 4280C89A280D43E500A0FB32 /* flightlog1000UITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4280C872280D43E400A0FB32 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1330;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					4280C879280D43E400A0FB32 = {
+						CreatedOnToolsVersion = 13.3.1;
+						LastSwiftMigration = 1330;
+					};
+					4280C88F280D43E500A0FB32 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 4280C879280D43E400A0FB32;
+					};
+					4280C899280D43E500A0FB32 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 4280C879280D43E400A0FB32;
+					};
+				};
+			};
+			buildConfigurationList = 4280C875280D43E400A0FB32 /* Build configuration list for PBXProject "flightlog1000" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4280C871280D43E400A0FB32;
+			packageReferences = (
+				4280C8C9280D4AD300A0FB32 /* XCRemoteSwiftPackageReference "rzutils" */,
+				4280C8D0280D4BE400A0FB32 /* XCRemoteSwiftPackageReference "rzutils-touch" */,
+			);
+			productRefGroup = 4280C87B280D43E400A0FB32 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4280C879280D43E400A0FB32 /* FlightLog1000 */,
+				4280C88F280D43E500A0FB32 /* flightlog1000Tests */,
+				4280C899280D43E500A0FB32 /* flightlog1000UITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4280C878280D43E400A0FB32 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4280C88A280D43E500A0FB32 /* LaunchScreen.storyboard in Resources */,
+				4280C887280D43E500A0FB32 /* Assets.xcassets in Resources */,
+				4280C885280D43E400A0FB32 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4280C88E280D43E500A0FB32 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4280C8C8280D48E700A0FB32 /* log_210623_141501_TEST1.csv in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4280C898280D43E500A0FB32 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4280C876280D43E400A0FB32 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4280C8BC280D460600A0FB32 /* MasterViewController.swift in Sources */,
+				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
+				4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */,
+				4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */,
+				4280C8C1280D467400A0FB32 /* FlightLog.swift in Sources */,
+				4280C8BD280D460600A0FB32 /* SceneDelegate.swift in Sources */,
+				4280C8C2280D467400A0FB32 /* FlightLogList.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4280C88C280D43E500A0FB32 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4280C895280D43E500A0FB32 /* flightlog1000Tests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4280C896280D43E500A0FB32 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4280C8A1280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift in Sources */,
+				4280C89F280D43E500A0FB32 /* flightlog1000UITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4280C892280D43E500A0FB32 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4280C879280D43E400A0FB32 /* FlightLog1000 */;
+			targetProxy = 4280C891280D43E500A0FB32 /* PBXContainerItemProxy */;
+		};
+		4280C89C280D43E500A0FB32 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4280C879280D43E400A0FB32 /* FlightLog1000 */;
+			targetProxy = 4280C89B280D43E500A0FB32 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		4280C883280D43E400A0FB32 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4280C884280D43E400A0FB32 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		4280C888280D43E500A0FB32 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4280C889280D43E500A0FB32 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4280C8A2280D43E500A0FB32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4280C8A3280D43E500A0FB32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4280C8A5280D43E500A0FB32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = FlightLog1000/FlightLog1000.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7QSSF3624;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = flightlog1000/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlog1000";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "flightlog1000/FlightLog1000-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4280C8A6280D43E500A0FB32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = FlightLog1000/FlightLog1000.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7QSSF3624;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = flightlog1000/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlog1000";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "flightlog1000/FlightLog1000-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4280C8A8280D43E500A0FB32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7QSSF3624;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlog1000Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlightLog1000.app/FlightLog1000";
+			};
+			name = Debug;
+		};
+		4280C8A9280D43E500A0FB32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7QSSF3624;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlog1000Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlightLog1000.app/FlightLog1000";
+			};
+			name = Release;
+		};
+		4280C8AB280D43E500A0FB32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7QSSF3624;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlog1000UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = flightlog1000;
+			};
+			name = Debug;
+		};
+		4280C8AC280D43E500A0FB32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7QSSF3624;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlog1000UITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = flightlog1000;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4280C875280D43E400A0FB32 /* Build configuration list for PBXProject "flightlog1000" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4280C8A2280D43E500A0FB32 /* Debug */,
+				4280C8A3280D43E500A0FB32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4280C8A4280D43E500A0FB32 /* Build configuration list for PBXNativeTarget "FlightLog1000" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4280C8A5280D43E500A0FB32 /* Debug */,
+				4280C8A6280D43E500A0FB32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4280C8A7280D43E500A0FB32 /* Build configuration list for PBXNativeTarget "flightlog1000Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4280C8A8280D43E500A0FB32 /* Debug */,
+				4280C8A9280D43E500A0FB32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4280C8AA280D43E500A0FB32 /* Build configuration list for PBXNativeTarget "flightlog1000UITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4280C8AB280D43E500A0FB32 /* Debug */,
+				4280C8AC280D43E500A0FB32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4280C8C9280D4AD300A0FB32 /* XCRemoteSwiftPackageReference "rzutils" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/roznet/rzutils";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		4280C8D0280D4BE400A0FB32 /* XCRemoteSwiftPackageReference "rzutils-touch" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/roznet/rzutils-touch";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4280C8CA280D4AD300A0FB32 /* RZUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4280C8C9280D4AD300A0FB32 /* XCRemoteSwiftPackageReference "rzutils" */;
+			productName = RZUtils;
+		};
+		4280C8CC280D4AD300A0FB32 /* RZUtilsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4280C8C9280D4AD300A0FB32 /* XCRemoteSwiftPackageReference "rzutils" */;
+			productName = RZUtilsSwift;
+		};
+		4280C8CE280D4AD300A0FB32 /* RZUtilsUniversal */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4280C8C9280D4AD300A0FB32 /* XCRemoteSwiftPackageReference "rzutils" */;
+			productName = RZUtilsUniversal;
+		};
+		4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4280C8D0280D4BE400A0FB32 /* XCRemoteSwiftPackageReference "rzutils-touch" */;
+			productName = RZUtilsTouch;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 4280C872280D43E400A0FB32 /* Project object */;
+}
