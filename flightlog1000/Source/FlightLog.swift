@@ -47,7 +47,7 @@ class FlightLog {
                 var found : [FlightLog] = []
                 
                 for case let file as URL in fileList {
-                    if file.pathExtension == "csv" && file.lastPathComponent.hasPrefix("log") {
+                    if file.isLogFile {
                         found.append(FlightLog(url: file))
                     }
                     if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
@@ -62,4 +62,12 @@ class FlightLog {
         }
     }
 
+}
+
+extension String {
+    var isLogFile : Bool { return self.hasPrefix("log_") && self.hasSuffix(".csv") }
+}
+
+extension URL {
+    var isLogFile : Bool { return self.lastPathComponent.isLogFile }
 }

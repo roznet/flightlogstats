@@ -14,10 +14,8 @@ import UniformTypeIdentifiers
 class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
 
     var logList : FlightLogList? = nil
-    var destFolder : URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    }
-
+    var logFileOrganizer = LogFileOrganizer()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -25,12 +23,17 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         let editButton = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(editLogList(button:)))
         self.navigationItem.leftBarButtonItem = addButton
         self.navigationItem.rightBarButtonItem = editButton
+        self.logFileOrganizer.flightLogListFromLocal(){
+            logList in
+            self.logList = logList
+            self.logFileOrganizer.syncCloud(with: logList)
+        }
+
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.buildList()
-        self.syncCloud()
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -57,42 +60,11 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     //MARK: - build list functionality
     
     func buildList() {
-        FlightLog.search(in: [self.destFolder]){
-            logs in
-            self.logList = FlightLogList(logs: logs)
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
+        self.logFileOrganizer.flightLogListFromLocal(){
+            logList in
+            self.logList = logList
         }
     }
-    
-    var query : NSMetadataQuery? = nil
-    
-    func syncCloud() {
-        // look in cloud what we are missing locally
-        if self.query != nil {
-            self.query?.stop()
-        }
-        if let cloud = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents") {
-            self.query = NSMetadataQuery()
-            if let query = self.query {
-                NotificationCenter.default.addObserver(self, selector: #selector(didFinishGathering), name: .NSMetadataQueryDidFinishGathering, object: nil)
-                
-                query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
-                query.predicate = NSPredicate(format: "%K LIKE '*'", NSMetadataItemPathKey)
-                query.start()
-            }
-        }
-
-    }
-
-    @objc func didFinishGathering() {
-        if let query = self.query {
-            let names = query.results.map{($0 as? NSMetadataItem)?.value(forAttribute: NSMetadataItemURLKey)}
-            print("Count: ", query.resultCount, "names: ", names) // Expected
-        }
-    }
-
 
     //MARK: - add functionality
     
@@ -100,40 +72,12 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder])
         documentPicker.delegate = self
         present(documentPicker, animated: true)
-        
     }
 
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         //FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
-        let destFolder = self.destFolder
-        
-        FlightLog.search(in: urls ){
-            logs in
-            var localLogs : [FlightLog] = []
-            for log in logs {
-                let file = log.url
-                let dest = destFolder.appendingPathComponent(file.lastPathComponent)
-                if !FileManager.default.fileExists(atPath: dest.path) {
-                    do {
-                        try FileManager.default.copyItem(at: file, to: dest)
-                        RZSLog.info("copied \(file.lastPathComponent) to \(dest)")
-                    } catch {
-                        RZSLog.error("failed to copy \(file.lastPathComponent) to \(dest)")
-                    }
-                    
-                }else{
-                    RZSLog.info("Already copied \(file.lastPathComponent)")
-                }
-                localLogs.append(FlightLog(url: file))
-                
-            }
-            self.logList = FlightLogList(logs: localLogs)
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-
-        }
+        self.logFileOrganizer.copyMissingToLocal(urls: urls)
         
         controller.dismiss(animated: true)
     }

@@ -36,6 +36,14 @@ class flightlog1000Tests: XCTestCase {
             if let one = loglist.flightLogs.first {
                 one.parse()
                 print( one )
+                if let speed = one.data?.timeSeries(for: ["GndSpd","E1 %Pwr","AltMSL"]) {
+                    XCTAssertGreaterThan(speed.1.count,0)
+                }
+                
+                if let speed = one.data?.timeSeries(for: ["GndSpd","E1 %Pwr","AltMSL","WndSpd","WndDr"]) {
+                    XCTAssertGreaterThan(speed.1.count,0)
+                } q
+                
             }
             
             expectation.fulfill()
