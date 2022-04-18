@@ -11,9 +11,11 @@ class FlightLog {
     let url : URL
     var name : String { return url.lastPathComponent }
     
+    var description : String { return "<FlightLog:\(name)>" }
+    
     var data : FlightData? = nil
     
-    init(url : URL) throws {
+    init(url : URL) {
         self.url = url
     }
     
@@ -27,4 +29,37 @@ class FlightLog {
         self.data?.parseLines(lines: lines)
         
     }
+    
+    static public func search(in urls: [URL], completion : (_ : [FlightLog]) -> Void){
+        for url in urls {
+            guard url.startAccessingSecurityScopedResource() else {
+                return
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
+            
+            var error :NSError? = nil
+            NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &error){
+                (dirurl) in
+                let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
+                guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
+                    return
+                }
+                var found : [FlightLog] = []
+                
+                for case let file as URL in fileList {
+                    if file.pathExtension == "csv" && file.lastPathComponent.hasPrefix("log") {
+                        found.append(FlightLog(url: file))
+                    }
+                    if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
+                        self.search(in: [file]) {
+                            logs in
+                            found.append(contentsOf: logs)
+                        }
+                    }
+                }
+                completion(found)
+            }
+        }
+    }
+
 }
