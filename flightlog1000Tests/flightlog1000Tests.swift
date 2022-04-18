@@ -21,20 +21,18 @@ class flightlog1000Tests: XCTestCase {
     func testLogParsing() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        guard let url = Bundle(for: type(of: self)).url(forResource: "log_210623_141501_TEST1", withExtension: "csv")
+        guard let url = Bundle(for: type(of: self)).resourceURL
         else {
             XCTAssertTrue(false)
             return
         }
-        
-        let loglist = FlightLogList(directory: url.deletingLastPathComponent())
-        print( "\(loglist)" )
-        
-        do {
-            let log = try FlightLog(url:url)
-            log.parse()
-        }catch{
-            XCTAssertTrue(false)
+        let expectation = XCTestExpectation(description: "found files")
+        FlightLog.search(in: [url]){
+            logs in
+            let loglist = FlightLogList(logs: logs)
+            print( "\(loglist)" )
+            XCTAssertGreaterThan(loglist.flightLogs.count, 0)
+            expectation.fulfill()
         }
 
     }
