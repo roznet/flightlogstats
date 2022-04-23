@@ -64,10 +64,7 @@ class FlightLog {
 
 }
 
-extension String {
-    var isLogFile : Bool { return self.hasPrefix("log_") && self.hasSuffix(".csv") }
-}
-
-extension URL {
-    var isLogFile : Bool { return self.lastPathComponent.isLogFile }
+//MARK: - interpretation
+extension FlightLog {
+    
 }

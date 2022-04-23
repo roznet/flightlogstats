@@ -26,7 +26,8 @@
 		4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */; };
 		4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
-		42D154DB280DE413000A0BB9 /* LogFileOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* LogFileOrganizer.swift */; };
+		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
+		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,7 +69,8 @@
 		4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210623_141501_TEST1.csv; sourceTree = "<group>"; };
 		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		42D154DA280DE413000A0BB9 /* LogFileOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogFileOrganizer.swift; path = Source/LogFileOrganizer.swift; sourceTree = "<group>"; };
+		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
+		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +128,7 @@
 		4280C87C280D43E400A0FB32 /* flightlog1000 */ = {
 			isa = PBXGroup;
 			children = (
+				42E13B8B2813DBA100AF38AC /* Storage */,
 				4280C8C4280D467A00A0FB32 /* Model */,
 				4280C8AE280D458B00A0FB32 /* UserInterface */,
 				4280C8C5280D46C900A0FB32 /* App */,
@@ -169,7 +172,6 @@
 				4280C8C0280D467400A0FB32 /* FlightData.swift */,
 				4280C8BE280D467400A0FB32 /* FlightLog.swift */,
 				4280C8BF280D467400A0FB32 /* FlightLogList.swift */,
-				42D154DA280DE413000A0BB9 /* LogFileOrganizer.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -199,6 +201,15 @@
 				4280C8D6280D70CB00A0FB32 /* CloudKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		42E13B8B2813DBA100AF38AC /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */,
+				42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */,
+			);
+			name = Storage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -348,7 +359,8 @@
 				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
 				4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */,
 				4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */,
-				42D154DB280DE413000A0BB9 /* LogFileOrganizer.swift in Sources */,
+				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
+				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,
 				4280C8C1280D467400A0FB32 /* FlightLog.swift in Sources */,
 				4280C8BD280D460600A0FB32 /* SceneDelegate.swift in Sources */,
 				4280C8C2280D467400A0FB32 /* FlightLogList.swift in Sources */,
@@ -744,6 +756,20 @@
 			productName = RZUtilsTouch;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */,
+			);
+			currentVersion = 42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */;
+			name = FlightLogModel.xcdatamodeld;
+			path = Source/FlightLogModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 4280C872280D43E400A0FB32 /* Project object */;
 }

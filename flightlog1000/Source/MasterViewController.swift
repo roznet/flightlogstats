@@ -14,7 +14,7 @@ import UniformTypeIdentifiers
 class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
 
     var logList : FlightLogList? = nil
-    var logFileOrganizer = LogFileOrganizer()
+    var logFileOrganizer = FlightLogOrganizer.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()

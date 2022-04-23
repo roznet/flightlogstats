@@ -9,21 +9,49 @@ import Foundation
 import RZUtils
 import RZUtilsSwift
 import UIKit
+import CoreData
 
 extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
 }
 
-class LogFileOrganizer {
+class FlightLogOrganizer {
+    public static var shared = FlightLogOrganizer()
     
     private let queue = OperationQueue()
+    private init(){
+    }
     
+    //MARK: - containers
+    lazy var persistentContainer : NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "FlightLogModel")
+        container.loadPersistentStores() {
+            (storeDescription,error) in
+            if let error = error {
+                RZSLog.error("Failed to load \(error)")
+            }
+        }
+        return container
+    }()
+    
+    func saveContext() {
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
+            do {
+                try context.save()
+            }catch{
+                let nserror = error as NSError
+                RZSLog.error("Failed to save \(nserror)")
+            }
+        }
+    }
+    
+    //MARK: - Log Files management
     var destFolder : URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
     
     let cloud = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
-
     
     func flightLogListFromLocal(completion : (_ : FlightLogList) -> Void) {
         FlightLog.search(in: [self.destFolder]){
@@ -166,3 +194,10 @@ class LogFileOrganizer {
 
 }
 
+extension String {
+    var isLogFile : Bool { return self.hasPrefix("log_") && self.hasSuffix(".csv") }
+}
+
+extension URL {
+    var isLogFile : Bool { return self.lastPathComponent.isLogFile }
+}
