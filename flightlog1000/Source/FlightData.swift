@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import OSLog
 import RZUtils
 import RZUtilsSwift
+
 
 struct FlightData {
     var meta : [String:String] = [:]
@@ -94,7 +96,7 @@ struct FlightData {
                 if let date = formatter.date(from: dateString) {
                     dates.append(date)
                 }else{
-                    RZSLog.error("Failed to parse date")
+                    Logger.app.error("Failed to parse date")
                 }
                 var doubleLine : [Double] = []
                 var stringLine : [String] = []
@@ -140,36 +142,9 @@ struct FlightData {
         return rv
     }
     
-    /**
-        * return series for each field
-     */
-    func series(for doubleFields : [String]) -> [String:[Double]] {
+    func datesDoubles(for doubleFields : [String]) -> DatesValuesByField<Double> {
         let fieldToIndex : [String:Int] = self.doubleFieldToIndex
-        var rv : [String:[Double]] = [:]
-        
-        for field in doubleFields {
-            rv[ field ] = []
-        }
-        
-        for row in values {
-            for field in doubleFields {
-                if let idx = fieldToIndex[field] {
-                    let val = row[idx]
-                    rv[field]!.append(val)
-                }
-            }
-        }
-        return rv
-    }
-    
-    func timeSeries(for doubleFields : [String]) -> ([String:[Double]],[Date]) {
-        let fieldToIndex : [String:Int] = self.doubleFieldToIndex
-        var rv : [String:[Double]] = [:]
-        var validDates : [Date] = []
-        
-        for field in doubleFields {
-            rv[ field ] = []
-        }
+        var rv = DatesValuesByField<Double>(fields: doubleFields)
         
         for (date,row) in zip(dates,values) {
             var valid : Bool = true
@@ -185,26 +160,26 @@ struct FlightData {
                 for field in doubleFields {
                     if let idx = fieldToIndex[field] {
                         let val = row[idx]
-                        rv[field]!.append(val)
+                        do {
+                            try rv.append(field: field, element: val, for: date)
+                        }catch{
+                            Logger.app.error("Failed to create serie for \(field) at \(date)")
+                            continue
+                        }
                     }
                 }
-                validDates.append(date)
             }
         }
-        return (rv,validDates)
+        return rv
     }
 
     /***
         return each strings changes and corresponding date
      */
-    func strings(for stringFields : [String]) -> ([String:[String]],[Date]) {
+    func datesStrings(for stringFields : [String]) -> DatesValuesByField<String> {
         let fieldToIndex : [String:Int] = self.stringFieldToIndex
-        var rv : [String:[String]] = [:]
-        var validDates : [Date] = []
+        var rv = DatesValuesByField<String>(fields: stringFields)
         
-        for field in stringFields {
-            rv[ field ] = []
-        }
         var first = true
         
         for (date,row) in zip(dates,strings) {
@@ -223,7 +198,7 @@ struct FlightData {
                     for field in stringFields {
                         if let idx = fieldToIndex[field] {
                             let val = row[idx]
-                            if rv[field]!.last! != val {
+                            if rv.last(field: field)?.value != val {
                                 changed = true
                             }
                         }
@@ -234,26 +209,36 @@ struct FlightData {
                     for field in stringFields {
                         if let idx = fieldToIndex[field] {
                             let val = row[idx]
-                            rv[field]!.append(val)
+                            do {
+                                try rv.append(field: field, element: val, for: date)
+                            }catch{
+                                Logger.app.error("Failed to create serie for \(field) at \(date)")
+                                continue
+                            }
                         }
                     }
-                    validDates.append(date)
                     first = false
                 }
             }
         }
-        return (rv,validDates)
+        return rv
     }
     
-    func coordinates(latitudeField : String = "Latitude", longitudeField : String = "Longitude") -> [CLLocationCoordinate2D] {
-        var rv : [CLLocationCoordinate2D] = []
+    static let coordinateField = "coordinate"
+    
+    func coordinates(latitudeField : String = "Latitude", longitudeField : String = "Longitude") -> DatesValuesByField<CLLocationCoordinate2D> {
+        var rv = DatesValuesByField<CLLocationCoordinate2D>(fields: [Self.coordinateField])
         if let latitudeIndex = self.doubleFieldToIndex[latitudeField],
            let longitudeIndex = self.doubleFieldToIndex[longitudeField] {
-            for row in values {
+            for (date,row) in zip(dates,values) {
                 let latitude = row[latitudeIndex]
                 let longitude = row[longitudeIndex]
                 if latitude.isFinite && longitude.isFinite {
-                    rv.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                    do {
+                        try rv.append(field: Self.coordinateField, element: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), for: date)
+                    }catch{
+                        Logger.app.error("Failed to create coordinate for \(date)")
+                    }
                 }
             }
         }

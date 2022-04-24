@@ -10,6 +10,7 @@ import RZUtils
 import RZUtilsSwift
 import UIKit
 import CoreData
+import OSLog
 
 extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
@@ -28,7 +29,7 @@ class FlightLogOrganizer {
         container.loadPersistentStores() {
             (storeDescription,error) in
             if let error = error {
-                RZSLog.error("Failed to load \(error)")
+                Logger.app.error("Failed to load \(error.localizedDescription)")
             }
         }
         return container
@@ -41,9 +42,14 @@ class FlightLogOrganizer {
                 try context.save()
             }catch{
                 let nserror = error as NSError
-                RZSLog.error("Failed to save \(nserror)")
+                Logger.app.error("Failed to load \(nserror)")
             }
         }
+    }
+    
+    func add(flightLog : FlightLog){
+        let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
+        
     }
     
     //MARK: - Log Files management
@@ -73,14 +79,14 @@ class FlightLogOrganizer {
                 if !FileManager.default.fileExists(atPath: dest.path) {
                     do {
                         try FileManager.default.copyItem(at: file, to: dest)
-                        RZSLog.info("copied \(file.lastPathComponent) to \(dest)")
+                        Logger.app.info("copied \(file.lastPathComponent) to \(dest)")
                         someNew = true
                     } catch {
-                        RZSLog.error("failed to copy \(file.lastPathComponent) to \(dest)")
+                        Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest)")
                     }
                     
                 }else{
-                    RZSLog.info("Already copied \(file.lastPathComponent)")
+                    Logger.app.info("Already copied \(file.lastPathComponent)")
                 }
             }
             if someNew {
@@ -145,7 +151,7 @@ class FlightLogOrganizer {
                     let lastComponent = cloudUrl.lastPathComponent
                     if lastComponent.isLogFile {
                         if !existingInLocal.contains(lastComponent) {
-                            RZSLog.info( "copy to local \(cloudUrl)")
+                            Logger.app.info( "copy to local \(cloudUrl)")
                             copyCloudToLocal.append(NSFileAccessIntent.readingIntent(with: cloudUrl))
                         }
                     }
@@ -157,11 +163,11 @@ class FlightLogOrganizer {
                         if !existingInCloud.contains(lastComponent) {
                             copyLocalToCloud.append(localUrl)
                             if let cloud = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents").appendingPathComponent(localUrl.lastPathComponent) {
-                                RZSLog.info( "copy to cloud \(localUrl)")
+                                Logger.app.info( "copy to cloud \(localUrl)")
                                 do {
                                     try FileManager.default.copyItem(at: localUrl, to: cloud)
                                 }catch{
-                                    RZSLog.error("Failed to copy to cloud \(error)")
+                                    Logger.app.error("Failed to copy to cloud \(error.localizedDescription)")
                                 }
                             }
                         }
@@ -179,11 +185,11 @@ class FlightLogOrganizer {
                                 }
                                 NotificationCenter.default.post(name: .localFileListChanged, object: nil)
                             }catch{
-                                RZSLog.error("Failed to copy from cloud \(error)")
+                                Logger.app.error("Failed to copy from cloud \(error.localizedDescription)")
                             }
                         }else{
                             if let error = error {
-                                RZSLog.error("Failed to coordinate \(error)")
+                                Logger.app.error("Failed to coordinate \(error.localizedDescription)")
                             }
                         }
                     }

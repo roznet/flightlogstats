@@ -27,8 +27,27 @@ class flightlog1000Tests: XCTestCase {
 
         let log = FlightLog(url: url)
         log.parse()
-        let identifiers = log.data?.strings(for: ["AtvWpt"])
-        print( identifiers )
+        if let data = log.data {
+            let identifiers = data.datesStrings(for: ["AtvWpt"])
+            print( identifiers )
+        
+            
+            let speedPower = data.datesDoubles(for: [FlightLog.Field.GndSpd.rawValue,
+                                                     FlightLog.Field.IAS.rawValue,
+                                                     FlightLog.Field.E1_PctPwr.rawValue,
+                                                     FlightLog.Field.AltMSL.rawValue])
+            let speedWind = data.datesDoubles(for: ["GndSpd","E1 %Pwr","AltMSL","WndSpd","WndDr"])
+
+            let engineOn = speedPower.dropFirst(field: "E1 %Pwr") { $0 > 0 }
+            let moving = engineOn?.dropFirst(field: "GndSpd") { $0 > 0 }
+            
+            print( "Start: \(data.dates.first)")
+            print( "End: \(data.dates.last)")
+            print( "Moved: \(moving?.first(field: "GndSpd"))")
+            
+        }
+        
+        
     }
     
     func testLogParsingSearch() throws {
@@ -47,13 +66,9 @@ class flightlog1000Tests: XCTestCase {
             
             if let one = loglist.flightLogs.first {
                 one.parse()
-                print( one )
-                if let speed = one.data?.timeSeries(for: ["GndSpd","E1 %Pwr","AltMSL"]) {
-                    XCTAssertGreaterThan(speed.1.count,0)
-                }
-                
-                if let speed = one.data?.timeSeries(for: ["GndSpd","E1 %Pwr","AltMSL","WndSpd","WndDr"]) {
-                    XCTAssertGreaterThan(speed.1.count,0)
+                if let data = one.data {
+                    let speedPower = data.datesDoubles(for: ["GndSpd","E1 %Pwr","AltMSL"])
+                    let speedWind = data.datesDoubles(for: ["GndSpd","E1 %Pwr","AltMSL","WndSpd","WndDr"])
                 }
             }
             expectation.fulfill()

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42478A5128153EF300212BF2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42478A5028153EF300212BF2 /* Log.swift */; };
 		4280C885280D43E400A0FB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C883280D43E400A0FB32 /* Main.storyboard */; };
 		4280C887280D43E500A0FB32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4280C886280D43E500A0FB32 /* Assets.xcassets */; };
 		4280C88A280D43E500A0FB32 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C888280D43E500A0FB32 /* LaunchScreen.storyboard */; };
@@ -26,6 +27,9 @@
 		4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */; };
 		4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
+		42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */; };
+		42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */; };
+		42A7A0C32815898C00DF4495 /* FlightLog+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLog+Field.swift */; };
 		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
@@ -48,6 +52,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
 		4280C87A280D43E400A0FB32 /* FlightLog1000.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightLog1000.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4280C884280D43E400A0FB32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4280C886280D43E500A0FB32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -69,6 +74,9 @@
 		4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210623_141501_TEST1.csv; sourceTree = "<group>"; };
 		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
+		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
+		42A7A0C22815898C00DF4495 /* FlightLog+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLog+Field.swift"; path = "Source/FlightLog+Field.swift"; sourceTree = "<group>"; };
 		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -103,6 +111,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		42478A4F28153EBE00212BF2 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				42478A5028153EF300212BF2 /* Log.swift */,
+				42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
@@ -128,6 +145,7 @@
 		4280C87C280D43E400A0FB32 /* flightlog1000 */ = {
 			isa = PBXGroup;
 			children = (
+				42478A4F28153EBE00212BF2 /* Utils */,
 				42E13B8B2813DBA100AF38AC /* Storage */,
 				4280C8C4280D467A00A0FB32 /* Model */,
 				4280C8AE280D458B00A0FB32 /* UserInterface */,
@@ -172,6 +190,7 @@
 				4280C8C0280D467400A0FB32 /* FlightData.swift */,
 				4280C8BE280D467400A0FB32 /* FlightLog.swift */,
 				4280C8BF280D467400A0FB32 /* FlightLogList.swift */,
+				42A7A0C22815898C00DF4495 /* FlightLog+Field.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -208,6 +227,7 @@
 			children = (
 				42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */,
 				42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */,
+				42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */,
 			);
 			name = Storage;
 			sourceTree = "<group>";
@@ -356,8 +376,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				4280C8BC280D460600A0FB32 /* MasterViewController.swift in Sources */,
+				42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */,
+				42A7A0C32815898C00DF4495 /* FlightLog+Field.swift in Sources */,
 				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
+				42478A5128153EF300212BF2 /* Log.swift in Sources */,
 				4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */,
+				42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */,
 				4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,

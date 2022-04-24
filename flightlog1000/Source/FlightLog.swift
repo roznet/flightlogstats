@@ -30,6 +30,16 @@ class FlightLog {
         
     }
     
+    func update(info : FlightLogFileInfo){
+        info.log_file_name = self.name
+        if let data = self.data {
+            info.system_id = data.meta["system_id"]
+            info.airframe_name = data.meta["airframe_name"]
+            
+            
+        }
+    }
+    
     static public func search(in urls: [URL], completion : (_ : [FlightLog]) -> Void){
         for url in urls {
             guard url.startAccessingSecurityScopedResource() else {
