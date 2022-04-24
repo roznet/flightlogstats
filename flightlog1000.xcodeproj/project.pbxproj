@@ -17,8 +17,8 @@
 		4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8B8280D460500A0FB32 /* AppDelegate.swift */; };
 		4280C8BC280D460600A0FB32 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8B9280D460500A0FB32 /* MasterViewController.swift */; };
 		4280C8BD280D460600A0FB32 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BA280D460600A0FB32 /* SceneDelegate.swift */; };
-		4280C8C1280D467400A0FB32 /* FlightLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BE280D467400A0FB32 /* FlightLog.swift */; };
-		4280C8C2280D467400A0FB32 /* FlightLogList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BF280D467400A0FB32 /* FlightLogList.swift */; };
+		4280C8C1280D467400A0FB32 /* FlightLogFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BE280D467400A0FB32 /* FlightLogFile.swift */; };
+		4280C8C2280D467400A0FB32 /* FlightLogFileList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */; };
 		4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8C0280D467400A0FB32 /* FlightData.swift */; };
 		4280C8C8280D48E700A0FB32 /* log_210623_141501_TEST1.csv in Resources */ = {isa = PBXBuildFile; fileRef = 4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */; };
 		4280C8CB280D4AD300A0FB32 /* RZUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8CA280D4AD300A0FB32 /* RZUtils */; };
@@ -29,7 +29,7 @@
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
 		42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */; };
 		42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */; };
-		42A7A0C32815898C00DF4495 /* FlightLog+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLog+Field.swift */; };
+		42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */; };
 		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
@@ -68,15 +68,15 @@
 		4280C8B8280D460500A0FB32 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Source/AppDelegate.swift; sourceTree = "<group>"; };
 		4280C8B9280D460500A0FB32 /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MasterViewController.swift; path = Source/MasterViewController.swift; sourceTree = "<group>"; };
 		4280C8BA280D460600A0FB32 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = Source/SceneDelegate.swift; sourceTree = "<group>"; };
-		4280C8BE280D467400A0FB32 /* FlightLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightLog.swift; path = Source/FlightLog.swift; sourceTree = "<group>"; };
-		4280C8BF280D467400A0FB32 /* FlightLogList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightLogList.swift; path = Source/FlightLogList.swift; sourceTree = "<group>"; };
+		4280C8BE280D467400A0FB32 /* FlightLogFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightLogFile.swift; path = Source/FlightLogFile.swift; sourceTree = "<group>"; };
+		4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightLogFileList.swift; path = Source/FlightLogFileList.swift; sourceTree = "<group>"; };
 		4280C8C0280D467400A0FB32 /* FlightData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightData.swift; path = Source/FlightData.swift; sourceTree = "<group>"; };
 		4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210623_141501_TEST1.csv; sourceTree = "<group>"; };
 		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
 		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
-		42A7A0C22815898C00DF4495 /* FlightLog+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLog+Field.swift"; path = "Source/FlightLog+Field.swift"; sourceTree = "<group>"; };
+		42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLogFile+Field.swift"; path = "Source/FlightLogFile+Field.swift"; sourceTree = "<group>"; };
 		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -188,9 +188,9 @@
 			isa = PBXGroup;
 			children = (
 				4280C8C0280D467400A0FB32 /* FlightData.swift */,
-				4280C8BE280D467400A0FB32 /* FlightLog.swift */,
-				4280C8BF280D467400A0FB32 /* FlightLogList.swift */,
-				42A7A0C22815898C00DF4495 /* FlightLog+Field.swift */,
+				4280C8BE280D467400A0FB32 /* FlightLogFile.swift */,
+				4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */,
+				42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -377,7 +377,7 @@
 			files = (
 				4280C8BC280D460600A0FB32 /* MasterViewController.swift in Sources */,
 				42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */,
-				42A7A0C32815898C00DF4495 /* FlightLog+Field.swift in Sources */,
+				42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */,
 				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
 				42478A5128153EF300212BF2 /* Log.swift in Sources */,
 				4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */,
@@ -385,9 +385,9 @@
 				4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,
-				4280C8C1280D467400A0FB32 /* FlightLog.swift in Sources */,
+				4280C8C1280D467400A0FB32 /* FlightLogFile.swift in Sources */,
 				4280C8BD280D460600A0FB32 /* SceneDelegate.swift in Sources */,
-				4280C8C2280D467400A0FB32 /* FlightLogList.swift in Sources */,
+				4280C8C2280D467400A0FB32 /* FlightLogFileList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

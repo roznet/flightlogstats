@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import FlightLog1000
+import CoreData
 
 class flightlog1000Tests: XCTestCase {
 
@@ -25,17 +26,17 @@ class flightlog1000Tests: XCTestCase {
             return
         }
 
-        let log = FlightLog(url: url)
+        let log = FlightLogFile(url: url)
         log.parse()
         if let data = log.data {
             let identifiers = data.datesStrings(for: ["AtvWpt"])
             print( identifiers )
         
             
-            let speedPower = data.datesDoubles(for: [FlightLog.Field.GndSpd.rawValue,
-                                                     FlightLog.Field.IAS.rawValue,
-                                                     FlightLog.Field.E1_PctPwr.rawValue,
-                                                     FlightLog.Field.AltMSL.rawValue])
+            let speedPower = data.datesDoubles(for: [FlightLogFile.Field.GndSpd.rawValue,
+                                                     FlightLogFile.Field.IAS.rawValue,
+                                                     FlightLogFile.Field.E1_PctPwr.rawValue,
+                                                     FlightLogFile.Field.AltMSL.rawValue])
             let speedWind = data.datesDoubles(for: ["GndSpd","E1 %Pwr","AltMSL","WndSpd","WndDr"])
 
             let engineOn = speedPower.dropFirst(field: "E1 %Pwr") { $0 > 0 }
@@ -58,21 +59,33 @@ class flightlog1000Tests: XCTestCase {
             XCTAssertTrue(false)
             return
         }
+        
         let expectation = XCTestExpectation(description: "found files")
-        FlightLog.search(in: [url]){
+        FlightLogOrganizer.search(in: [url]){
             logs in
-            let loglist = FlightLogList(logs: logs)
-            XCTAssertGreaterThan(loglist.flightLogs.count, 0)
+            let loglist = FlightLogFileList(urls: logs)
+            XCTAssertGreaterThan(loglist.flightLogFiles.count, 0)
             
-            if let one = loglist.flightLogs.first {
-                one.parse()
-                if let data = one.data {
-                    let speedPower = data.datesDoubles(for: ["GndSpd","E1 %Pwr","AltMSL"])
-                    let speedWind = data.datesDoubles(for: ["GndSpd","E1 %Pwr","AltMSL","WndSpd","WndDr"])
-                }
+            expectation.fulfill()
+        }
+    }
+    
+    func testOrganizer() throws {
+        let organizer = FlightLogOrganizer()
+        let container = NSPersistentContainer(name: "FlightLogModel")
+        let description = NSPersistentStoreDescription()
+        description.url = URL(fileURLWithPath: "/dev/null")
+        container.persistentStoreDescriptions = [description]
+        let expectation = XCTestExpectation(description: "container loaded")
+        
+        container.loadPersistentStores() {
+            (storeDescription,error) in
+            if let error = error {
+                XCTAssertNil(error)
             }
             expectation.fulfill()
         }
+
     }
 
 

@@ -146,8 +146,16 @@ struct FlightData {
         let fieldToIndex : [String:Int] = self.doubleFieldToIndex
         var rv = DatesValuesByField<Double>(fields: doubleFields)
         
+        var lastDate : Date? = nil
+        
         for (date,row) in zip(dates,values) {
             var valid : Bool = true
+            
+            // skip if twice the same date
+            if let lastDate = lastDate, date == lastDate {
+                continue
+            }
+            lastDate = date
             for field in doubleFields {
                 if let idx = fieldToIndex[field] {
                     if row[idx].isNaN {

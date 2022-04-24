@@ -7,7 +7,15 @@
 
 import Foundation
 
-extension FlightLog {
+extension FlightLogFile {
+    static func fields(_ fs : [Field]) -> [String] {
+        return fs.map { $0.rawValue }
+    }
+    
+    static func field(_ f : Field) -> String {
+        return f.rawValue
+    }
+    
     enum Field : String {
         case AtvWpt = "AtvWpt"
         case Latitude = "Latitude"

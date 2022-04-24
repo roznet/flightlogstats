@@ -10,4 +10,5 @@ import OSLog
 
 extension Logger {
     public static let app = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "app")
+    public static let sync = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "sync")
 }

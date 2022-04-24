@@ -13,7 +13,7 @@ import UniformTypeIdentifiers
 
 class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
 
-    var logList : FlightLogList? = nil
+    var logList : FlightLogFileList? = nil
     var logFileOrganizer = FlightLogOrganizer.shared
     
     override func viewDidLoad() {
@@ -23,11 +23,7 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         let editButton = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(editLogList(button:)))
         self.navigationItem.leftBarButtonItem = addButton
         self.navigationItem.rightBarButtonItem = editButton
-        self.logFileOrganizer.flightLogListFromLocal(){
-            logList in
-            self.logList = logList
-            self.logFileOrganizer.syncCloud(with: logList)
-        }
+        
 
     }
 
@@ -47,7 +43,7 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let list = self.logList {
-            return list.flightLogs.count
+            return list.flightLogFiles.count
         }else{
             return 0
         }
@@ -55,7 +51,7 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let list = self.logList,
-           let log = list.flightLogs[safe: indexPath.row] {
+           let log = list.flightLogFiles[safe: indexPath.row] {
             if let cell = GCCellGrid(tableView) {
                 cell.setup(forRows: 1, andCols: 1)
                 cell.label(forRow: 0, andCol: 0).text = log.name
@@ -69,13 +65,6 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     //MARK: - build list functionality
     
     func buildList() {
-        self.logFileOrganizer.flightLogListFromLocal(){
-            logList in
-            self.logList = logList
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-        }
     }
 
     //MARK: - add functionality

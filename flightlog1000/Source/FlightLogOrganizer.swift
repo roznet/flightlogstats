@@ -17,13 +17,25 @@ extension Notification.Name {
 }
 
 class FlightLogOrganizer {
+    private var managedFlightLogList : [FlightLogFileInfo] = []
+    
     public static var shared = FlightLogOrganizer()
     
     private let queue = OperationQueue()
-    private init(){
-    }
     
     //MARK: - containers
+    
+    func loadFromContainer() {
+        let fetchRequest = FlightLogFileInfo.fetchRequest()
+        
+        do {
+            let found : [FlightLogFileInfo] = try self.persistentContainer.viewContext.fetch(fetchRequest)
+            self.managedFlightLogList = found
+        }catch{
+            Logger.app.error("Failed to query for files")
+        }
+    }
+    
     lazy var persistentContainer : NSPersistentContainer = {
         let container = NSPersistentContainer(name: "FlightLogModel")
         container.loadPersistentStores() {
@@ -47,34 +59,66 @@ class FlightLogOrganizer {
         }
     }
     
-    func add(flightLog : FlightLog){
+    func add(flightLog : FlightLogFile){
+        for one in self.managedFlightLogList {
+            if one.log_file_name == flightLog.name {
+                one.flightLog = flightLog
+                return
+            }
+        }
+
         let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
-        
+        flightLog.updateFlightLogFileInfo(info: fileInfo)
+        self.managedFlightLogList.append(fileInfo)
     }
     
-    //MARK: - Log Files management
-    var destFolder : URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    }
+    //MARK: - Log Files discovery
+    var localFolder : URL { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }
+    let cloudFolder : URL? = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
     
-    let cloud = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
-    
-    func flightLogListFromLocal(completion : (_ : FlightLogList) -> Void) {
-        FlightLog.search(in: [self.destFolder]){
-            logs in
-            let list = FlightLogList(logs: logs)
-            completion(list)
+    static public func search(in urls: [URL], completion : (_ : [URL]) -> Void){
+        for url in urls {
+            guard url.startAccessingSecurityScopedResource() else {
+                return
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
+            
+            var error :NSError? = nil
+            NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &error){
+                (dirurl) in
+                let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
+                guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
+                    return
+                }
+                var found : [URL] = []
+                
+                for case let file as URL in fileList {
+                    if file.isLogFile {
+                        found.append(file)
+                    }
+                    if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
+                        self.search(in: [file]) {
+                            logs in
+                            found.append(contentsOf: logs)
+                        }
+                    }
+                }
+                completion(found)
+            }
         }
     }
+
+    
+    //MARK: - Update local file list
     
     func copyMissingToLocal(urls : [URL]) {
-        let destFolder = self.destFolder
+        let destFolder = self.localFolder
         
-        FlightLog.search(in: urls ){
-            logs in
+        Self.search(in: urls ){
+            logurls in
             var someNew : Bool = false
-            for log in logs {
-                let file = log.url
+            for url in logurls {
+                let file = url
                 let dest = destFolder.appendingPathComponent(file.lastPathComponent)
                 if !FileManager.default.fileExists(atPath: dest.path) {
                     do {
@@ -84,7 +128,6 @@ class FlightLogOrganizer {
                     } catch {
                         Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest)")
                     }
-                    
                 }else{
                     Logger.app.info("Already copied \(file.lastPathComponent)")
                 }
@@ -95,18 +138,19 @@ class FlightLogOrganizer {
         }
     }
     
-    private var query : NSMetadataQuery? = nil
-    private var localFlightLogList : FlightLogList? = nil
+    //MARK: - sync with cloud
+    private var cachedQuery : NSMetadataQuery? = nil
+    private var cachedLocalFlightLogList : FlightLogFileList? = nil
     
-    func syncCloud(with local : FlightLogList) {
+    func syncCloud(with local : FlightLogFileList) {
         // look in cloud what we are missing locally
-        if self.query != nil {
-            self.query?.stop()
+        if self.cachedQuery != nil {
+            self.cachedQuery?.stop()
         }
-        self.localFlightLogList = local
+        self.cachedLocalFlightLogList = local
         
-        self.query = NSMetadataQuery()
-        if let query = self.query {
+        self.cachedQuery = NSMetadataQuery()
+        if let query = self.cachedQuery {
             NotificationCenter.default.addObserver(self, selector: #selector(didFinishGathering), name: .NSMetadataQueryDidFinishGathering, object: nil)
             
             query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
@@ -116,9 +160,9 @@ class FlightLogOrganizer {
     }
 
     @objc func didFinishGathering() {
-        if let query = self.query {
+        if let query = self.cachedQuery {
             
-            if let localUrls = (self.localFlightLogList?.flightLogs.map{$0.url}) {
+            if let localUrls = self.cachedLocalFlightLogList?.urls {
                 var cloudUrls : [URL] = []
                 
                 for item in query.results {
@@ -181,7 +225,7 @@ class FlightLogOrganizer {
                         if error == nil {
                             do {
                                 for intent in copyCloudToLocal {
-                                    try FileManager.default.copyItem(at: intent.url, to: self.destFolder.appendingPathComponent(intent.url.lastPathComponent))
+                                    try FileManager.default.copyItem(at: intent.url, to: self.localFolder.appendingPathComponent(intent.url.lastPathComponent))
                                 }
                                 NotificationCenter.default.post(name: .localFileListChanged, object: nil)
                             }catch{
@@ -197,7 +241,6 @@ class FlightLogOrganizer {
             }
         }
     }
-
 }
 
 extension String {
