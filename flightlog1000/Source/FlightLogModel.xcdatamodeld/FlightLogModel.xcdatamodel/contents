@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="FlightLogFileInfo" representedClassName="FlightLogFileInfo" syncable="YES" codeGenerationType="category">
+    <entity name="FlightLogFileInfo" representedClassName=".FlightLogFileInfo" syncable="YES" codeGenerationType="category">
         <attribute name="airframe_name" optional="YES" attributeType="String"/>
         <attribute name="end_fuel_quantity_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="end_fuel_quantity_right" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>

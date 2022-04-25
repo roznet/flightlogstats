@@ -72,20 +72,24 @@ class flightlog1000Tests: XCTestCase {
     
     func testOrganizer() throws {
         let organizer = FlightLogOrganizer()
+        /*
         let container = NSPersistentContainer(name: "FlightLogModel")
         let description = NSPersistentStoreDescription()
         description.url = URL(fileURLWithPath: "/dev/null")
         container.persistentStoreDescriptions = [description]
+        organizer.persistentContainer = container
+         */
         let expectation = XCTestExpectation(description: "container loaded")
         
-        container.loadPersistentStores() {
-            (storeDescription,error) in
-            if let error = error {
-                XCTAssertNil(error)
-            }
-            expectation.fulfill()
+        guard let url = Bundle(for: type(of: self)).url(forResource: "log_210623_141501_TEST1", withExtension: "csv")
+        else {
+            XCTAssertTrue(false)
+            return
         }
 
+        let log = FlightLogFile(url: url)
+        log.parse()
+        organizer.add(flightLog: log)
     }
 
 
