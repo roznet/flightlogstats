@@ -17,24 +17,13 @@ extension Notification.Name {
 }
 
 class FlightLogOrganizer {
-    private var managedFlightLogList : [FlightLogFileInfo] = []
+    private(set) var managedFlightLogList : [String:FlightLogFileInfo] = [:]
     
     public static var shared = FlightLogOrganizer()
     
     private let queue = OperationQueue()
     
     //MARK: - containers
-    
-    func loadFromContainer() {
-        let fetchRequest = FlightLogFileInfo.fetchRequest()
-        
-        do {
-            let found : [FlightLogFileInfo] = try self.persistentContainer.viewContext.fetch(fetchRequest)
-            self.managedFlightLogList = found
-        }catch{
-            Logger.app.error("Failed to query for files")
-        }
-    }
     
     lazy var persistentContainer : NSPersistentContainer = {
         let container = NSPersistentContainer(name: "FlightLogModel")
@@ -59,17 +48,41 @@ class FlightLogOrganizer {
         }
     }
     
+    func loadFromContainer() {
+        let fetchRequest = FlightLogFileInfo.fetchRequest()
+        
+        do {
+            let fetchedInfo : [FlightLogFileInfo] = try self.persistentContainer.viewContext.fetch(fetchRequest)
+            var added = 0
+            let existing = self.managedFlightLogList.count
+            for info in fetchedInfo {
+                if let filename = info.log_file_name {
+                    if self.managedFlightLogList[filename] == nil {
+                        added += 1
+                        self.managedFlightLogList[filename] = info
+                    }
+                }
+            }
+            Logger.app.info("Loaded \(fetchedInfo.count) existing \(existing) added \(added) ")
+        }catch{
+            Logger.app.error("Failed to query for files")
+        }
+    }
+
     func add(flightLog : FlightLogFile){
-        for one in self.managedFlightLogList {
-            if one.log_file_name == flightLog.name {
-                one.flightLog = flightLog
-                return
+        let filename = flightLog.name
+        if filename.isLogFile {
+            if let existing = self.managedFlightLogList[filename] {
+                // replace if parsed or if flightlog not populated
+                if flightLog.isParsed || existing.flightLog == nil {
+                    existing.flightLog = flightLog
+                }
+            }else{
+                let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
+                flightLog.updateFlightLogFileInfo(info: fileInfo)
+                self.managedFlightLogList[ filename ] = fileInfo
             }
         }
-
-        let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
-        flightLog.updateFlightLogFileInfo(info: fileInfo)
-        self.managedFlightLogList.append(fileInfo)
     }
     
     //MARK: - Log Files discovery

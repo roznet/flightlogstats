@@ -18,6 +18,8 @@ class FlightLogFile {
     var description : String { return "<FlightLog:\(name)>" }
     
     var data : FlightData? = nil
+    var isParsed : Bool { return data != nil }
+    
     
     init(url : URL) {
         self.url = url
@@ -49,6 +51,7 @@ class FlightLogFile {
 extension FlightLogFile {
     
     func updateFlightLogFileInfo(info : FlightLogFileInfo){
+        info.flightLog = self
         info.log_file_name = self.name
         
         
@@ -63,8 +66,10 @@ extension FlightLogFile {
                 info.airframe_name = airframe_name
             }
 
-            let engineOn = values.dropFirst(field: FlightLogFile.field(.E1_PctPwr)) { $0 > 0 }
-            let moving = engineOn?.dropFirst(field: FlightLogFile.field(.GndSpd)) { $0 > 0 }
+            let engineOn = values.dropFirst(field: FlightLogFile.field(.E1_PctPwr)) { $0 > 0.0 }?.dropLast(field: FlightLogFile.field(.E1_PctPwr)) { $0 > 0.0 }
+            
+            let moving = engineOn?.dropFirst(field: FlightLogFile.field(.GndSpd)) { $0 > 0.0 }?.dropLast(field: FlightLogFile.field(.GndSpd)) { $0 > 0.0 }
+            let flying = engineOn?.dropFirst(field: FlightLogFile.field(.IAS)) { $0 > 35.0 }?.dropLast(field: FlightLogFile.field(.IAS)) { $0 > 35.0 }
             
             info.start_time = data.dates.first
             info.end_time = data.dates.last
@@ -79,7 +84,18 @@ extension FlightLogFile {
             }else{
                 info.end_time_moving = info.end_time
             }
-            
+
+            if let flying_start = flying?.first(field: FlightLogFile.field(.GndSpd))?.date {
+                info.start_time_flying = flying_start
+            }else{
+                info.start_time_flying = info.start_time
+            }
+            if let flying_end = flying?.last(field: FlightLogFile.field(.GndSpd))?.date {
+                info.end_time_flying = flying_end
+            }else{
+                info.end_time_flying = info.end_time
+            }
+
             if let fuel_start_l = values.first(field: FlightLogFile.field(.FQtyL))?.value {
                 info.start_fuel_quantity_left = fuel_start_l
             }

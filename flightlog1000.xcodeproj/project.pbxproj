@@ -189,8 +189,8 @@
 			children = (
 				4280C8C0280D467400A0FB32 /* FlightData.swift */,
 				4280C8BE280D467400A0FB32 /* FlightLogFile.swift */,
-				4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */,
 				42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */,
+				4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";

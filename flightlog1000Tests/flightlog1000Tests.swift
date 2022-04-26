@@ -8,6 +8,11 @@
 import XCTest
 @testable import FlightLog1000
 import CoreData
+import OSLog
+
+extension Logger {
+    public static let test = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "test")
+}
 
 class flightlog1000Tests: XCTestCase {
 
@@ -72,13 +77,19 @@ class flightlog1000Tests: XCTestCase {
     
     func testOrganizer() throws {
         let organizer = FlightLogOrganizer()
-        /*
+        
         let container = NSPersistentContainer(name: "FlightLogModel")
         let description = NSPersistentStoreDescription()
         description.url = URL(fileURLWithPath: "/dev/null")
         container.persistentStoreDescriptions = [description]
+        container.loadPersistentStores() {
+            (storeDescription,error) in
+            if let error = error {
+                Logger.test.error("Failed to load \(error.localizedDescription)")
+            }
+        }
         organizer.persistentContainer = container
-         */
+
         let expectation = XCTestExpectation(description: "container loaded")
         
         guard let url = Bundle(for: type(of: self)).url(forResource: "log_210623_141501_TEST1", withExtension: "csv")
@@ -90,6 +101,16 @@ class flightlog1000Tests: XCTestCase {
         let log = FlightLogFile(url: url)
         log.parse()
         organizer.add(flightLog: log)
+        organizer.saveContext()
+        XCTAssertEqual(organizer.managedFlightLogList.count,1)
+        let reload = FlightLogOrganizer()
+        reload.persistentContainer = container
+        XCTAssertEqual(reload.managedFlightLogList.count,0)
+        reload.loadFromContainer()
+        XCTAssertEqual(reload.managedFlightLogList.count,1)
+        organizer.loadFromContainer()
+        XCTAssertEqual(reload.managedFlightLogList.count,1)
+        expectation.fulfill()
     }
 
 
