@@ -56,7 +56,7 @@ class flightlog1000Tests: XCTestCase {
         
     }
     
-    func testLogParsingSearch() throws {
+    func testLogFileDiscovery() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         guard let url = Bundle(for: type(of: self)).resourceURL
@@ -67,13 +67,26 @@ class flightlog1000Tests: XCTestCase {
         
         let expectation = XCTestExpectation(description: "found files")
         FlightLogOrganizer.search(in: [url]){
-            logs in
-            let loglist = FlightLogFileList(urls: logs)
+            urls in
+            
+            let loglist = FlightLogFileList(urls: urls)
             XCTAssertGreaterThan(loglist.flightLogFiles.count, 0)
             
+            XCTAssertNotNil(urls.last)
+            if let last = urls.last {
+                let urlsMinusLast = [URL](urls.dropLast())
+                let incompleteLogList = FlightLogFileList(urls: urlsMinusLast)
+                let missingLogList = incompleteLogList.missing(from: loglist)
+                XCTAssertEqual(missingLogList.flightLogFiles.count, 1)
+                if let missingLog = missingLogList.flightLogFiles.last {
+                    XCTAssertEqual(last.lastPathComponent, missingLog.name)
+                }
+            }
             expectation.fulfill()
         }
     }
+    
+
     
     func testOrganizer() throws {
         let organizer = FlightLogOrganizer()
@@ -112,6 +125,5 @@ class flightlog1000Tests: XCTestCase {
         XCTAssertEqual(reload.managedFlightLogList.count,1)
         expectation.fulfill()
     }
-
-
 }
+

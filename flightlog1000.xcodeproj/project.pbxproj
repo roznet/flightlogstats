@@ -30,6 +30,10 @@
 		42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */; };
 		42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */; };
 		42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */; };
+		42CEA370281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36C281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv */; };
+		42CEA371281C2F7400AB7B5F /* log_220417_125002_LFQA.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36D281C2F7400AB7B5F /* log_220417_125002_LFQA.csv */; };
+		42CEA372281C2F7400AB7B5F /* log_220416_161856_LFQA.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36E281C2F7400AB7B5F /* log_220416_161856_LFQA.csv */; };
+		42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */; };
 		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
@@ -77,6 +81,10 @@
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
 		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
 		42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLogFile+Field.swift"; path = "Source/FlightLogFile+Field.swift"; sourceTree = "<group>"; };
+		42CEA36C281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220417_135002_LFAQ.csv; sourceTree = "<group>"; };
+		42CEA36D281C2F7400AB7B5F /* log_220417_125002_LFQA.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220417_125002_LFQA.csv; sourceTree = "<group>"; };
+		42CEA36E281C2F7400AB7B5F /* log_220416_161856_LFQA.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220416_161856_LFQA.csv; sourceTree = "<group>"; };
+		42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_211204_102045_EGLL.csv; sourceTree = "<group>"; };
 		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -209,6 +217,10 @@
 		4280C8C6280D48E700A0FB32 /* TestAssets */ = {
 			isa = PBXGroup;
 			children = (
+				42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */,
+				42CEA36E281C2F7400AB7B5F /* log_220416_161856_LFQA.csv */,
+				42CEA36D281C2F7400AB7B5F /* log_220417_125002_LFQA.csv */,
+				42CEA36C281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv */,
 				4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */,
 			);
 			path = TestAssets;
@@ -357,7 +369,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42CEA371281C2F7400AB7B5F /* log_220417_125002_LFQA.csv in Resources */,
+				42CEA372281C2F7400AB7B5F /* log_220416_161856_LFQA.csv in Resources */,
+				42CEA370281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv in Resources */,
 				4280C8C8280D48E700A0FB32 /* log_210623_141501_TEST1.csv in Resources */,
+				42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
