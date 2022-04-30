@@ -17,6 +17,10 @@ extension Notification.Name {
 }
 
 class FlightLogOrganizer {
+    
+    enum OrganizerError : Error {
+        case failedToReadFolder
+    }
     private(set) var managedFlightLogList : [String:FlightLogFileInfo] = [:]
     
     public static var shared = FlightLogOrganizer()
@@ -86,10 +90,10 @@ class FlightLogOrganizer {
     }
     
     //MARK: - Log Files discovery
-    var localFolder : URL { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }
-    let cloudFolder : URL? = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
+    var localFolder : URL = { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }()
+    var cloudFolder : URL? = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
     
-    static public func search(in urls: [URL], completion : (_ : [URL]) -> Void){
+    static public func search(in urls: [URL], completion: (Result<[URL],Error>) -> Void){
         for url in urls {
             guard url.startAccessingSecurityScopedResource() else {
                 return
@@ -101,6 +105,7 @@ class FlightLogOrganizer {
                 (dirurl) in
                 let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
                 guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
+                    completion(Result.failure(OrganizerError.failedToReadFolder))
                     return
                 }
                 var found : [URL] = []
@@ -111,12 +116,17 @@ class FlightLogOrganizer {
                     }
                     if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
                         self.search(in: [file]) {
-                            logs in
-                            found.append(contentsOf: logs)
+                            result in
+                            switch result {
+                            case .success(let more):
+                                found.append(contentsOf: more)
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
                         }
                     }
                 }
-                completion(found)
+                completion(Result.success(found))
             }
         }
     }
@@ -128,25 +138,30 @@ class FlightLogOrganizer {
         let destFolder = self.localFolder
         
         Self.search(in: urls ){
-            logurls in
-            var someNew : Bool = false
-            for url in logurls {
-                let file = url
-                let dest = destFolder.appendingPathComponent(file.lastPathComponent)
-                if !FileManager.default.fileExists(atPath: dest.path) {
-                    do {
-                        try FileManager.default.copyItem(at: file, to: dest)
-                        Logger.app.info("copied \(file.lastPathComponent) to \(dest)")
-                        someNew = true
-                    } catch {
-                        Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest)")
+            result in
+            switch result {
+            case .success(let logurls):
+                var someNew : Bool = false
+                for url in logurls {
+                    let file = url
+                    let dest = destFolder.appendingPathComponent(file.lastPathComponent)
+                    if !FileManager.default.fileExists(atPath: dest.path) {
+                        do {
+                            try FileManager.default.copyItem(at: file, to: dest)
+                            Logger.app.info("copied \(file.lastPathComponent) to \(dest)")
+                            someNew = true
+                        } catch {
+                            Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest)")
+                        }
+                    }else{
+                        Logger.app.info("Already copied \(file.lastPathComponent)")
                     }
-                }else{
-                    Logger.app.info("Already copied \(file.lastPathComponent)")
                 }
-            }
-            if someNew {
-                NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+                if someNew {
+                    NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+                }
+            case .failure(let error):
+                Logger.app.error("Failed to find url \(error.localizedDescription)")
             }
         }
     }
@@ -219,7 +234,7 @@ class FlightLogOrganizer {
                     if lastComponent.isLogFile {
                         if !existingInCloud.contains(lastComponent) {
                             copyLocalToCloud.append(localUrl)
-                            if let cloud = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents").appendingPathComponent(localUrl.lastPathComponent) {
+                            if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
                                 Logger.app.info( "copy to cloud \(localUrl)")
                                 do {
                                     try FileManager.default.copyItem(at: localUrl, to: cloud)

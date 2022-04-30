@@ -38,19 +38,15 @@ class flightlog1000Tests: XCTestCase {
             print( identifiers )
         
             
-            let speedPower = data.datesDoubles(for: [FlightLogFile.Field.GndSpd.rawValue,
-                                                     FlightLogFile.Field.IAS.rawValue,
-                                                     FlightLogFile.Field.E1_PctPwr.rawValue,
-                                                     FlightLogFile.Field.AltMSL.rawValue])
-            let speedWind = data.datesDoubles(for: ["GndSpd","E1 %Pwr","AltMSL","WndSpd","WndDr"])
+            let speedPower = data.datesDoubles(for: FlightLogFile.fields([.GndSpd,.IAS,.E1_PctPwr,.AltMSL]))
 
-            let engineOn = speedPower.dropFirst(field: "E1 %Pwr") { $0 > 0 }
-            let moving = engineOn?.dropFirst(field: "GndSpd") { $0 > 0 }
-            
-            print( "Start: \(data.dates.first)")
-            print( "End: \(data.dates.last)")
-            print( "Moved: \(moving?.first(field: "GndSpd"))")
-            
+            if let engineOn = speedPower.dropFirst(field: FlightLogFile.field(.E1_PctPwr), matching: { $0 > 0 }),
+               let moving = engineOn.dropFirst(field: FlightLogFile.field(.GndSpd),matching: { $0 > 0 }) {
+                XCTAssertLessThan(engineOn.count, data.count)
+                XCTAssertLessThan(moving.count, engineOn.count)
+            }else{
+                XCTAssertTrue(false)
+            }
         }
         
         
@@ -67,26 +63,71 @@ class flightlog1000Tests: XCTestCase {
         
         let expectation = XCTestExpectation(description: "found files")
         FlightLogOrganizer.search(in: [url]){
-            urls in
-            
-            let loglist = FlightLogFileList(urls: urls)
-            XCTAssertGreaterThan(loglist.flightLogFiles.count, 0)
-            
-            XCTAssertNotNil(urls.last)
-            if let last = urls.last {
-                let urlsMinusLast = [URL](urls.dropLast())
-                let incompleteLogList = FlightLogFileList(urls: urlsMinusLast)
-                let missingLogList = incompleteLogList.missing(from: loglist)
-                XCTAssertEqual(missingLogList.flightLogFiles.count, 1)
-                if let missingLog = missingLogList.flightLogFiles.last {
-                    XCTAssertEqual(last.lastPathComponent, missingLog.name)
+            result in
+            switch result {
+                
+            case .failure(let error):
+                Logger.test.error("failed to search \(error.localizedDescription)")
+                XCTAssertTrue(false)
+            case .success(let urls):
+                let loglist = FlightLogFileList(urls: urls)
+                XCTAssertGreaterThan(loglist.flightLogFiles.count, 0)
+                
+                XCTAssertNotNil(urls.last)
+                if let last = urls.last {
+                    let urlsMinusLast = [URL](urls.dropLast())
+                    let incompleteLogList = FlightLogFileList(urls: urlsMinusLast)
+                    let missingLogList = incompleteLogList.missing(from: loglist)
+                    XCTAssertEqual(missingLogList.flightLogFiles.count, 1)
+                    if let missingLog = missingLogList.flightLogFiles.last {
+                        XCTAssertEqual(last.lastPathComponent, missingLog.name)
+                    }
                 }
+                expectation.fulfill()
             }
-            expectation.fulfill()
         }
     }
     
+    func testOrganizerSyncCloud() throws {
+        guard let bundleUrl = Bundle(for: type(of: self)).resourceURL
+        else {
+            XCTAssertTrue(false)
+            return
+        }
 
+        
+        let organizer = FlightLogOrganizer()
+        let writeableUrl = organizer.localFolder.appendingPathComponent("testLocal")
+        
+        do {
+            if FileManager.default.fileExists(atPath: writeableUrl.path) {
+                try FileManager.default.removeItem(at: writeableUrl)
+            }
+        }catch{
+            Logger.test.error("Failed to remove directory for testing \(error.localizedDescription)")
+            XCTAssertNil(error)
+        }
+        
+        let container = NSPersistentContainer(name: "FlightLogModel")
+        let description = NSPersistentStoreDescription()
+        description.url = URL(fileURLWithPath: "/dev/null")
+        container.persistentStoreDescriptions = [description]
+        container.loadPersistentStores() {
+            (storeDescription,error) in
+            if let error = error {
+                Logger.test.error("Failed to load \(error.localizedDescription)")
+            }
+        }
+        organizer.persistentContainer = container
+        
+        let expectation = XCTestExpectation(description: "container cloud loaded")
+
+        // set up cloud folder to be bundle, should copy eveyrthing locally
+        organizer.localFolder = writeableUrl
+        organizer.cloudFolder = bundleUrl
+        
+        //organizer.syncCloud(with: )
+    }
     
     func testOrganizer() throws {
         let organizer = FlightLogOrganizer()

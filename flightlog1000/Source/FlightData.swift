@@ -24,6 +24,8 @@ struct FlightData {
 
     private(set) var dates : [Date] = []
     
+    var count : Int { return dates.count }
+    
     var doubleFields : [String] {
         var rv : [String] = []
         for (field,isDouble) in zip(fields, columnIsDouble) {
