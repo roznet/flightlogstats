@@ -61,16 +61,28 @@ struct FlightData {
         }
         return rv
     }
-
-    mutating func parseLines(lines : [String.SubSequence]){
+    
+    private init() {}
+    
+    init(lines : [String.SubSequence]) {
+        self.init()
+        self.parseLines(lines: lines)
+    }
+    
+    private mutating func parseLines(lines : [String.SubSequence]){
+        
         let trimCharSet = CharacterSet(charactersIn: "\"# ")
         
         let dateIndex : Int = 0
         let timeIndex : Int = 1
         let offsetIndex : Int = 2
         
+        // keep default format in list as if bad data need to try again the same
+        let extraDateFormats = [ "dd/MM/yyyy HH:mm:ss ZZ", "yyyy-MM-dd HH:mm:ss ZZ" ]
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy HH:mm:ss ZZ"
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
+        
+        var skipped : Int = 0
         
         for line in lines {
             let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
@@ -98,7 +110,32 @@ struct FlightData {
                 if let date = formatter.date(from: dateString) {
                     dates.append(date)
                 }else{
-                    Logger.app.error("Failed to parse date")
+                    if dateString.replacingOccurrences(of: " ", with: "").isEmpty {
+                        // skip empty strings
+                        continue
+                    }
+                    
+                    // if first one try few other format
+                    if dates.count == 0{
+                        for fmt in extraDateFormats {
+                            formatter.dateFormat = fmt
+                            if let date = formatter.date(from: dateString) {
+                                dates.append(date)
+                            }
+                        }
+                        if dates.count == 0 && skipped < 5 {
+                            Logger.app.error("Failed to identify date format '\(dateString)'")
+                            skipped += 1
+                            continue
+                        }
+                    }else{
+                        // we already have dates, so
+                        if skipped < 5 {
+                            Logger.app.error("Failed to parse date '\(dateString)' skipped=\(skipped)")
+                        }
+                        skipped += 1
+                        continue
+                    }
                 }
                 var doubleLine : [Double] = []
                 var stringLine : [String] = []

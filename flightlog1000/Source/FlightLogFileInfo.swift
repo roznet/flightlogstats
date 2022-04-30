@@ -8,8 +8,16 @@
 import UIKit
 import CoreData
 
+extension Notification.Name {
+    static let logFileInfoUpdated : Notification.Name = Notification.Name("Notification.Name.logFileInfoUpdated")
+}
+
 class FlightLogFileInfo: NSManagedObject {
     var flightLog : FlightLogFile? = nil
+    
+    static let currentVersion : Int32 = 1
+    
+    var isParsed : Bool { return self.version == Self.currentVersion }
     
     func populate(for url : URL){
         let dateFormatter = DateFormatter()
@@ -23,5 +31,16 @@ class FlightLogFileInfo: NSManagedObject {
            let endDate = attr[FileAttributeKey.modificationDate] as? Date {
             self.end_time = endDate
         }
+    }
+    
+    var totalFuelDescription : String {
+        guard self.isParsed else { return "??" }
+        
+        let end_fuel_r = self.end_fuel_quantity_right
+        let end_fuel_l = self.end_fuel_quantity_left
+        let start_fuel_r = self.start_fuel_quantity_right
+        let start_fuel_l = self.start_fuel_quantity_left
+        let total = (start_fuel_r+start_fuel_l) - (end_fuel_l+end_fuel_r) 
+        return String(format: "%.1f gal", total)
     }
 }

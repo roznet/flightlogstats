@@ -24,14 +24,19 @@ class FlightLogOrganizer {
     private(set) var managedFlightLogs : [String:FlightLogFileInfo] = [:]
     
     public static var shared = FlightLogOrganizer()
-    
     private let queue = OperationQueue()
     
+    enum UpdateState {
+        case ready
+        case updatingInfoFromData
+    }
+    private var currentState : UpdateState = .ready
+
     var flightLogFileList : FlightLogFileList {
-        
         let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog } )
         return list
     }
+    
     
     //MARK: - containers
     
@@ -75,12 +80,48 @@ class FlightLogOrganizer {
             }
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
             Logger.app.info("Loaded \(fetchedInfo.count) existing \(existing) added \(added) ")
-            
+            self.updateInfo(count: 1)
         }catch{
             Logger.app.error("Failed to query for files")
         }
     }
 
+    func updateInfo(count : Int = 1) {
+        guard currentState == .ready else { return }
+        currentState = .updatingInfoFromData
+        AppDelegate.worker.async {
+            var missing : [FlightLogFileInfo] = []
+            for (_,info) in self.managedFlightLogs {
+                if !info.isParsed {
+                    missing.append(info)
+                }
+            }
+            if !missing.isEmpty {
+                var done : Int = 0
+                for info in missing[..<min(count,missing.count)] {
+                    if let log_file_name = info.log_file_name, info.flightLog == nil {
+                        info.flightLog = self.flightLogFile(name: log_file_name)
+                    }
+                    
+                    if let flightLog = info.flightLog {
+                        let alreadyParsed = flightLog.isParsed
+                        flightLog.parse()
+                        flightLog.updateFlightLogFileInfo(info: info)
+                        if !alreadyParsed {
+                            flightLog.clear()
+                        }
+                        done += 1
+                    }
+                }
+                Logger.app.info("Updated \(done) info")
+                self.saveContext()
+                self.currentState = .ready
+                // if did something, schedule another batch
+                self.updateInfo(count: count)
+            }
+        }
+    }
+    
     func addMissingFromLocal(){
         Self.search(in: [localFolder]){
             result in
@@ -90,6 +131,7 @@ class FlightLogOrganizer {
             case .success(let urls):
                 let logs = FlightLogFileList(urls: urls)
                 self.add(flightLogFileList: logs)
+                self.updateInfo(count: 1)
             }
         }
     }
@@ -124,6 +166,10 @@ class FlightLogOrganizer {
     //MARK: - Log Files discovery
     var localFolder : URL = { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }()
     var cloudFolder : URL? = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
+    
+    func flightLogFile(name: String) -> FlightLogFile? {
+        return FlightLogFile(url: self.localFolder.appendingPathComponent(name))
+    }
     
     static public func search(in urls: [URL], completion: (Result<[URL],Error>) -> Void){
         for url in urls {
@@ -334,4 +380,16 @@ extension String {
 
 extension URL {
     var isLogFile : Bool { return self.lastPathComponent.isLogFile }
+}
+
+extension FlightLogOrganizer {
+    var count : Int { return managedFlightLogs.count }
+    
+    subscript(_ name : String) -> FlightLogFileInfo? {
+        return self.managedFlightLogs[name]
+    }
+    
+    subscript(log: FlightLogFile) -> FlightLogFileInfo? {
+        return self.managedFlightLogs[log.name]
+    }
 }

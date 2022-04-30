@@ -24,7 +24,8 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         self.navigationItem.leftBarButtonItem = addButton
         self.navigationItem.rightBarButtonItem = editButton
         
-
+        self.tableView.estimatedRowHeight = 100
+        self.tableView.rowHeight = UITableView.automaticDimension
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -56,8 +57,10 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
         if let cell = cell as? FlightLogTableViewCell,
             let list = self.logList,
-           let log = list.flightLogFiles[safe: indexPath.row] {
-            cell.name.text = log.name
+           let info = FlightLogOrganizer.shared[list.flightLogFiles[ indexPath.row].name] {
+            
+            cell.update(with: info)
+            
             /*
             if let cell = GCCellGrid(tableView) {
                 cell.setup(forRows: 1, andCols: 1)
@@ -66,6 +69,10 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
             }*/
         }
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100.0
     }
 
     //MARK: - build list functionality

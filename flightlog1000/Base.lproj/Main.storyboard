@@ -32,27 +32,45 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="flightlogcell" id="fOk-Uh-ECS" customClass="FlightLogTableViewCell" customModule="FlightLog1000" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="44.666666030883789" width="428" height="43.666667938232422"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="flightlogcell" rowHeight="99" id="fOk-Uh-ECS" customClass="FlightLogTableViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="44.666666030883789" width="428" height="99"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fOk-Uh-ECS" id="Fpc-Xo-3Um">
-                                    <rect key="frame" x="0.0" y="0.0" width="428" height="43.666667938232422"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="428" height="99"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eq4-SA-aTS">
-                                            <rect key="frame" x="5" y="5" width="42" height="21"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eq4-SA-aTS">
+                                            <rect key="frame" x="5" y="5" width="45" height="21"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y30-6u-gfG">
+                                            <rect key="frame" x="366" y="5" width="38" height="21"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Fuel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bU9-Ql-uYs">
+                                            <rect key="frame" x="376" y="34" width="32" height="21"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="bU9-Ql-uYs" secondAttribute="trailing" constant="20" symbolic="YES" id="APs-3g-0Hu"/>
                                         <constraint firstItem="eq4-SA-aTS" firstAttribute="leading" secondItem="Fpc-Xo-3Um" secondAttribute="leading" constant="5" id="AWB-Jn-WxO"/>
                                         <constraint firstItem="eq4-SA-aTS" firstAttribute="top" secondItem="Fpc-Xo-3Um" secondAttribute="top" constant="5" id="UL6-L9-YQG"/>
+                                        <constraint firstItem="bU9-Ql-uYs" firstAttribute="top" secondItem="y30-6u-gfG" secondAttribute="bottom" constant="8" symbolic="YES" id="l6h-hx-g9H"/>
+                                        <constraint firstItem="y30-6u-gfG" firstAttribute="firstBaseline" secondItem="eq4-SA-aTS" secondAttribute="firstBaseline" id="noR-Gu-zJZ"/>
+                                        <constraint firstAttribute="trailing" secondItem="y30-6u-gfG" secondAttribute="trailing" constant="24" id="p33-Ny-Net"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="fuel" destination="bU9-Ql-uYs" id="Uix-YJ-qx9"/>
                                     <outlet property="name" destination="eq4-SA-aTS" id="6sL-oi-MBv"/>
+                                    <outlet property="totalTime" destination="y30-6u-gfG" id="lE2-aO-C9q"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -65,7 +83,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NFi-sa-bXy" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="729" y="100"/>
+            <point key="canvasLocation" x="728.97196261682234" y="99.784017278617711"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="zvp-0y-6Hk">

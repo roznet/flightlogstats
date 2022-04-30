@@ -43,11 +43,12 @@ class FlightLogFile {
             guard let str = try? String(contentsOf: self.url, encoding: .utf8) else { return }
             let lines = str.split(whereSeparator: \.isNewline)
             
-            if self.data == nil {
-                self.data = FlightData()
-            }
-            self.data?.parseLines(lines: lines)
+            self.data = FlightData(lines: lines)
         }
+    }
+    
+    func clear() {
+        self.data = nil
     }
 }
 
@@ -81,23 +82,23 @@ extension FlightLogFile {
             if let moving_start = moving?.first(field: FlightLogFile.field(.GndSpd))?.date {
                 info.start_time_moving = moving_start
             }else{
-                info.start_time_moving = info.start_time
+                info.start_time_moving = nil
             }
             if let moving_end = moving?.last(field: FlightLogFile.field(.GndSpd))?.date {
                 info.end_time_moving = moving_end
             }else{
-                info.end_time_moving = info.end_time
+                info.end_time_moving = nil
             }
 
             if let flying_start = flying?.first(field: FlightLogFile.field(.GndSpd))?.date {
                 info.start_time_flying = flying_start
             }else{
-                info.start_time_flying = info.start_time
+                info.start_time_flying = nil
             }
             if let flying_end = flying?.last(field: FlightLogFile.field(.GndSpd))?.date {
                 info.end_time_flying = flying_end
             }else{
-                info.end_time_flying = info.end_time
+                info.end_time_flying = nil
             }
 
             if let fuel_start_l = values.first(field: FlightLogFile.field(.FQtyL))?.value {
@@ -112,6 +113,11 @@ extension FlightLogFile {
             }
             if let fuel_end_r = values.last(field: FlightLogFile.field(.FQtyR))?.value {
                 info.end_fuel_quantity_right = fuel_end_r
+            }
+            
+            info.version = FlightLogFileInfo.currentVersion
+            if info.hasChanges {
+                NotificationCenter.default.post(name: .logFileInfoUpdated, object: info)
             }
         }        
     }
