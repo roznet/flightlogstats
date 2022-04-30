@@ -272,7 +272,7 @@ class FlightLogOrganizer {
                     let lastComponent = cloudUrl.lastPathComponent
                     if lastComponent.isLogFile {
                         if !existingInLocal.contains(lastComponent) {
-                            Logger.app.info( "copy to local \(cloudUrl)")
+                            Logger.app.info( "copy to local \(cloudUrl.lastPathComponent)")
                             copyCloudToLocal.append(NSFileAccessIntent.readingIntent(with: cloudUrl))
                         }
                     }
@@ -287,7 +287,7 @@ class FlightLogOrganizer {
                             copyLocalToCloud.append(localUrl)
                             if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
                                 copiedToCloud += 1
-                                Logger.app.info( "copy to cloud \(localUrl)")
+                                Logger.app.info( "copy to cloud \(localUrl.lastPathComponent)")
                                 do {
                                     try FileManager.default.copyItem(at: localUrl, to: cloud)
                                 }catch{
