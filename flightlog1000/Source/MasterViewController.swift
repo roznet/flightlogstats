@@ -11,10 +11,16 @@ import RZUtilsSwift
 import RZUtilsTouch
 import UniformTypeIdentifiers
 
+protocol LogSelectionDelegate : AnyObject {
+    func logInfoSelected(_ info : FlightLogFileInfo)
+}
+
 class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
 
     var logList : FlightLogFileList? = nil
     var logFileOrganizer = FlightLogOrganizer.shared
+    
+    weak var delegate : LogSelectionDelegate? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,11 +59,15 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         }
     }
     
+    func flightInfo(at indexPath : IndexPath) -> FlightLogFileInfo? {
+        guard let list = self.logList else { return nil }
+        return FlightLogOrganizer.shared[list.flightLogFiles[ indexPath.row].name]
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
         if let cell = cell as? FlightLogTableViewCell,
-            let list = self.logList,
-           let info = FlightLogOrganizer.shared[list.flightLogFiles[ indexPath.row].name] {
+           let info = self.flightInfo(at: indexPath) {
             
             cell.update(with: info)
             
@@ -75,6 +85,14 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         return 100.0
     }
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let info = self.flightInfo(at: indexPath){
+            self.delegate?.logInfoSelected(info)
+            if let detailViewController = delegate as? LogDetailViewController {
+              splitViewController?.showDetailViewController(detailViewController, sender: nil)
+            }
+        }
+    }
     //MARK: - build list functionality
     
     func buildList() {

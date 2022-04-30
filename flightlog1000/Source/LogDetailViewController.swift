@@ -7,7 +7,15 @@
 
 import UIKit
 
-class LogDetailViewController: UIViewController {
+class LogDetailViewController: UIViewController,LogSelectionDelegate {
+    @IBOutlet weak var name: UILabel!
+    @IBOutlet weak var totalFuel: UILabel!
+    
+    var flightLogFileInfo : FlightLogFileInfo? = nil {
+        didSet {
+            updateUI()
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,4 +34,13 @@ class LogDetailViewController: UIViewController {
     }
     */
 
+    func updateUI(){
+        self.name.text = self.flightLogFileInfo?.log_file_name
+        self.totalFuel.text = self.flightLogFileInfo?.totalFuelDescription
+        self.view.setNeedsDisplay()
+    }
+    
+    func logInfoSelected(_ info: FlightLogFileInfo) {
+        self.flightLogFileInfo = info
+    }
 }

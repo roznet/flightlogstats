@@ -8,16 +8,40 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Log Detail View Controller-->
         <scene sceneID="aUE-ts-Q69">
             <objects>
-                <viewController id="jUv-0p-pFh" sceneMemberID="viewController">
+                <viewController id="jUv-0p-pFh" customClass="LogDetailViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="05n-vR-e7N">
                         <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
+                                <rect key="frame" x="20" y="106" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zeb-u1-shB">
+                                <rect key="frame" x="20" y="144" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="S3q-Cy-ALO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Zeb-u1-shB" firstAttribute="top" secondItem="h5i-bu-Kfn" secondAttribute="bottom" constant="17" id="2eJ-ej-wXO"/>
+                            <constraint firstItem="h5i-bu-Kfn" firstAttribute="top" secondItem="S3q-Cy-ALO" secondAttribute="top" constant="18" id="GUE-Gr-btL"/>
+                            <constraint firstItem="Zeb-u1-shB" firstAttribute="leading" secondItem="h5i-bu-Kfn" secondAttribute="leading" id="seH-4e-Fhb"/>
+                            <constraint firstItem="h5i-bu-Kfn" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="20" id="xI3-qo-aaL"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="name" destination="h5i-bu-Kfn" id="H0Q-jq-D8o"/>
+                        <outlet property="totalFuel" destination="Zeb-u1-shB" id="TPE-uF-9dV"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cr2-EI-nvD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
