@@ -53,15 +53,18 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let list = self.logList,
+        let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
+        if let cell = cell as? FlightLogTableViewCell,
+            let list = self.logList,
            let log = list.flightLogFiles[safe: indexPath.row] {
+            cell.name.text = log.name
+            /*
             if let cell = GCCellGrid(tableView) {
                 cell.setup(forRows: 1, andCols: 1)
                 cell.label(forRow: 0, andCol: 0).text = log.name
                 return cell
-            }
+            }*/
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         return cell
     }
 
