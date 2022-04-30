@@ -32,6 +32,9 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             self.buildList()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
         self.buildList()
     }
@@ -65,6 +68,7 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     //MARK: - build list functionality
     
     func buildList() {
+        self.logList = self.logFileOrganizer.flightLogFileList
     }
 
     //MARK: - add functionality

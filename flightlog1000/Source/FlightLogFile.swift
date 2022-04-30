@@ -21,8 +21,12 @@ class FlightLogFile {
     var isParsed : Bool { return data != nil }
     
     
-    init(url : URL) {
-        self.url = url
+    init?(url : URL) {
+        if url.lastPathComponent.isLogFile {
+            self.url = url
+        }else{
+            return nil
+        }
     }
     
     init(folder : URL, name : String) throws {

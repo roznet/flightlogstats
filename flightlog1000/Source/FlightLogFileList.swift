@@ -14,17 +14,22 @@ class FlightLogFileList {
     private(set) var flightLogFiles : [FlightLogFile]
     
     var description : String {
-        return "<FlightLogList:\(flightLogFiles.count)>"
+        return "<FlightLogFileList:\(flightLogFiles.count)>"
     }
     
     var urls : [URL] { return self.flightLogFiles.map { $0.url } }
         
+    
+    var count : Int { return urls.count }
+    
     init(logs : [FlightLogFile] ) {
         self.flightLogFiles = logs
+        self.flightLogFiles.sort { $0.name > $1.name }
     }
     
     init(urls : [URL] ){
-        self.flightLogFiles = urls.map { return FlightLogFile(url: $0)}
+        self.flightLogFiles = urls.compactMap { return FlightLogFile(url: $0) }
+        self.flightLogFiles.sort { $0.name > $1.name }
     }
     
     func missing(from : FlightLogFileList) -> FlightLogFileList {

@@ -50,7 +50,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NFi-sa-bXy" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="507" y="101"/>
+            <point key="canvasLocation" x="729" y="100"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="zvp-0y-6Hk">
@@ -66,22 +66,26 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="t6N-vQ-haW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-237" y="101"/>
+            <point key="canvasLocation" x="-91" y="100"/>
         </scene>
-        <!--Split View Controller-->
+        <!--Main Split View Controller-->
         <scene sceneID="11Z-c9-KGr">
             <objects>
-                <splitViewController allowDoubleColumnStyle="YES" id="UzS-5f-0Gy" sceneMemberID="viewController">
+                <splitViewController allowDoubleColumnStyle="YES" id="UzS-5f-0Gy" customClass="MainSplitViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <connections>
                         <segue destination="SpX-dd-qC9" kind="relationship" relationship="masterViewController" id="4XW-om-kZr"/>
                         <segue destination="jUv-0p-pFh" kind="relationship" relationship="detailViewController" id="egr-bJ-nog"/>
+                        <segue destination="SpX-dd-qC9" kind="relationship" relationship="compactViewController" id="4dG-fB-oSt"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QCp-oM-GSX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-997" y="701"/>
+            <point key="canvasLocation" x="-1633" y="801"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="4dG-fB-oSt"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

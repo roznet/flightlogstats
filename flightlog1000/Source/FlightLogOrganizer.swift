@@ -21,11 +21,17 @@ class FlightLogOrganizer {
     enum OrganizerError : Error {
         case failedToReadFolder
     }
-    private(set) var managedFlightLogList : [String:FlightLogFileInfo] = [:]
+    private(set) var managedFlightLogs : [String:FlightLogFileInfo] = [:]
     
     public static var shared = FlightLogOrganizer()
     
     private let queue = OperationQueue()
+    
+    var flightLogFileList : FlightLogFileList {
+        
+        let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog } )
+        return list
+    }
     
     //MARK: - containers
     
@@ -58,34 +64,60 @@ class FlightLogOrganizer {
         do {
             let fetchedInfo : [FlightLogFileInfo] = try self.persistentContainer.viewContext.fetch(fetchRequest)
             var added = 0
-            let existing = self.managedFlightLogList.count
+            let existing = self.managedFlightLogs.count
             for info in fetchedInfo {
                 if let filename = info.log_file_name {
-                    if self.managedFlightLogList[filename] == nil {
+                    if self.managedFlightLogs[filename] == nil {
                         added += 1
-                        self.managedFlightLogList[filename] = info
+                        self.managedFlightLogs[filename] = info
                     }
                 }
             }
+            NotificationCenter.default.post(name: .localFileListChanged, object: self)
             Logger.app.info("Loaded \(fetchedInfo.count) existing \(existing) added \(added) ")
+            
         }catch{
             Logger.app.error("Failed to query for files")
         }
     }
 
-    func add(flightLog : FlightLogFile){
-        let filename = flightLog.name
-        if filename.isLogFile {
-            if let existing = self.managedFlightLogList[filename] {
-                // replace if parsed or if flightlog not populated
-                if flightLog.isParsed || existing.flightLog == nil {
-                    existing.flightLog = flightLog
-                }
-            }else{
-                let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
-                flightLog.updateFlightLogFileInfo(info: fileInfo)
-                self.managedFlightLogList[ filename ] = fileInfo
+    func addMissingFromLocal(){
+        Self.search(in: [localFolder]){
+            result in
+            switch result {
+            case .failure(let error):
+                Logger.app.error("Failed to load local \(error.localizedDescription)")
+            case .success(let urls):
+                let logs = FlightLogFileList(urls: urls)
+                self.add(flightLogFileList: logs)
             }
+        }
+    }
+    
+    func add(flightLogFileList : FlightLogFileList){
+        var someNew : Int = 0
+        for flightLog in flightLogFileList.flightLogFiles {
+            let filename = flightLog.name
+            if filename.isLogFile {
+                if let existing = self.managedFlightLogs[filename] {
+                    // replace if parsed or if flightlog not populated
+                    if flightLog.isParsed || existing.flightLog == nil {
+                        existing.flightLog = flightLog
+                    }
+                }else{
+                    let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
+                    flightLog.updateFlightLogFileInfo(info: fileInfo)
+                    self.managedFlightLogs[ filename ] = fileInfo
+                    someNew += 1
+                }
+            }
+        }
+        if someNew > 0 {
+            Logger.app.info("Found \(someNew) local files to add")
+            self.saveContext()
+            NotificationCenter.default.post(name: .localFileListChanged, object: self)
+        }else{
+            Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
         }
     }
     
@@ -170,7 +202,24 @@ class FlightLogOrganizer {
     private var cachedQuery : NSMetadataQuery? = nil
     private var cachedLocalFlightLogList : FlightLogFileList? = nil
     
-    func syncCloud(with local : FlightLogFileList) {
+    func syncCloud() {
+        guard cloudFolder != nil else {
+            Logger.app.info("iCloud not setup, skipping sync")
+            return
+        }
+        
+        Self.search(in: [localFolder]){
+            result in
+            switch result {
+            case .failure(let error):
+                Logger.app.error("Failed to find files \(error.localizedDescription)")
+            case .success(let urls):
+                self.syncCloud(with: FlightLogFileList(urls: urls))
+            }
+        }
+    }
+    
+    private func syncCloud(with local : FlightLogFileList) {
         // look in cloud what we are missing locally
         if self.cachedQuery != nil {
             self.cachedQuery?.stop()
@@ -229,12 +278,15 @@ class FlightLogOrganizer {
                     }
                 }
                 
+                var copiedToCloud : Int = 0
+                
                 for localUrl in localUrls {
                     let lastComponent = localUrl.lastPathComponent
                     if lastComponent.isLogFile {
                         if !existingInCloud.contains(lastComponent) {
                             copyLocalToCloud.append(localUrl)
                             if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
+                                copiedToCloud += 1
                                 Logger.app.info( "copy to cloud \(localUrl)")
                                 do {
                                     try FileManager.default.copyItem(at: localUrl, to: cloud)
@@ -246,6 +298,9 @@ class FlightLogOrganizer {
                     }
                 }
                 
+                if copiedToCloud == 0 {
+                    Logger.app.info("Nothing new in local to copy to cloud")
+                }
                 if copyCloudToLocal.count > 0 {
                     let coordinator = NSFileCoordinator()
                     coordinator.coordinate(with: copyCloudToLocal, queue: self.queue){
@@ -255,7 +310,7 @@ class FlightLogOrganizer {
                                 for intent in copyCloudToLocal {
                                     try FileManager.default.copyItem(at: intent.url, to: self.localFolder.appendingPathComponent(intent.url.lastPathComponent))
                                 }
-                                NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+                                self.addMissingFromLocal()
                             }catch{
                                 Logger.app.error("Failed to copy from cloud \(error.localizedDescription)")
                             }
@@ -265,6 +320,8 @@ class FlightLogOrganizer {
                             }
                         }
                     }
+                }else{
+                    Logger.app.info("Nothing new in cloud to copy to local")
                 }
             }
         }

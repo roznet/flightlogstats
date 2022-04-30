@@ -31,7 +31,7 @@ class flightlog1000Tests: XCTestCase {
             return
         }
 
-        let log = FlightLogFile(url: url)
+        let log = FlightLogFile(url: url)!
         log.parse()
         if let data = log.data {
             let identifiers = data.datesStrings(for: ["AtvWpt"])
@@ -127,6 +127,7 @@ class flightlog1000Tests: XCTestCase {
         organizer.cloudFolder = bundleUrl
         
         //organizer.syncCloud(with: )
+        expectation.fulfill()
     }
     
     func testOrganizer() throws {
@@ -152,18 +153,18 @@ class flightlog1000Tests: XCTestCase {
             return
         }
 
-        let log = FlightLogFile(url: url)
+        let log = FlightLogFile(url: url)!
         log.parse()
-        organizer.add(flightLog: log)
+        organizer.add(flightLogFileList: FlightLogFileList(logs: [log]))
         organizer.saveContext()
-        XCTAssertEqual(organizer.managedFlightLogList.count,1)
+        XCTAssertEqual(organizer.managedFlightLogs.count,1)
         let reload = FlightLogOrganizer()
         reload.persistentContainer = container
-        XCTAssertEqual(reload.managedFlightLogList.count,0)
+        XCTAssertEqual(reload.managedFlightLogs.count,0)
         reload.loadFromContainer()
-        XCTAssertEqual(reload.managedFlightLogList.count,1)
+        XCTAssertEqual(reload.managedFlightLogs.count,1)
         organizer.loadFromContainer()
-        XCTAssertEqual(reload.managedFlightLogList.count,1)
+        XCTAssertEqual(reload.managedFlightLogs.count,1)
         expectation.fulfill()
     }
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		42478A5128153EF300212BF2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42478A5028153EF300212BF2 /* Log.swift */; };
+		4264C230281D830000F40436 /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C22F281D830000F40436 /* MainSplitViewController.swift */; };
 		4280C885280D43E400A0FB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C883280D43E400A0FB32 /* Main.storyboard */; };
 		4280C887280D43E500A0FB32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4280C886280D43E500A0FB32 /* Assets.xcassets */; };
 		4280C88A280D43E500A0FB32 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C888280D43E500A0FB32 /* LaunchScreen.storyboard */; };
@@ -57,6 +58,7 @@
 
 /* Begin PBXFileReference section */
 		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
+		4264C22F281D830000F40436 /* MainSplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainSplitViewController.swift; path = Source/MainSplitViewController.swift; sourceTree = "<group>"; };
 		4280C87A280D43E400A0FB32 /* FlightLog1000.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightLog1000.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4280C884280D43E400A0FB32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4280C886280D43E500A0FB32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 			children = (
 				4280C886280D43E500A0FB32 /* Assets.xcassets */,
 				4280C883280D43E400A0FB32 /* Main.storyboard */,
+				4264C22F281D830000F40436 /* MainSplitViewController.swift */,
 				4280C8B9280D460500A0FB32 /* MasterViewController.swift */,
 				4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */,
 			);
@@ -399,6 +402,7 @@
 				4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */,
 				42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */,
 				4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */,
+				4264C230281D830000F40436 /* MainSplitViewController.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,
 				4280C8C1280D467400A0FB32 /* FlightLogFile.swift in Sources */,
