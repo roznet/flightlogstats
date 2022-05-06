@@ -102,7 +102,16 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     //MARK: - add functionality
     
     @objc func addLog(button : UIBarButtonItem){
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder])
+        // mac should select files, ios just import folder
+#if targetEnvironment(macCatalyst)
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [
+            .commaSeparatedText
+        ])
+#else
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [
+            .folder
+        ])
+#endif
         documentPicker.delegate = self
         present(documentPicker, animated: true)
     }

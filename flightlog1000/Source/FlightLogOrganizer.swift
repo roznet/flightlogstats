@@ -173,34 +173,47 @@ class FlightLogOrganizer {
     
     static public func search(in urls: [URL], completion: (Result<[URL],Error>) -> Void){
         for url in urls {
-            guard url.startAccessingSecurityScopedResource() else {
-                return
+            let requireAccess = url.startAccessingSecurityScopedResource()
+            defer {
+                if requireAccess {
+                    url.stopAccessingSecurityScopedResource()
+                }
             }
-            defer { url.stopAccessingSecurityScopedResource() }
             
             var error :NSError? = nil
             NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &error){
                 (dirurl) in
-                let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
-                guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
-                    completion(Result.failure(OrganizerError.failedToReadFolder))
-                    return
-                }
                 var found : [URL] = []
                 
-                for case let file as URL in fileList {
-                    if file.isLogFile {
-                        found.append(file)
-                    }
-                    if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
-                        self.search(in: [file]) {
-                            result in
-                            switch result {
-                            case .success(let more):
-                                found.append(contentsOf: more)
-                            case .failure(let error):
-                                completion(.failure(error))
+                var isDirectory : ObjCBool = false
+                if FileManager.default.fileExists(atPath: dirurl.path, isDirectory: &isDirectory) {
+                    if isDirectory.boolValue {
+                        let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
+                        
+                        guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
+                            completion(Result.failure(OrganizerError.failedToReadFolder))
+                            return
+                        }
+                        
+                        for case let file as URL in fileList {
+                            if file.isLogFile {
+                                found.append(file)
                             }
+                            if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
+                                self.search(in: [file]) {
+                                    result in
+                                    switch result {
+                                    case .success(let more):
+                                        found.append(contentsOf: more)
+                                    case .failure(let error):
+                                        completion(.failure(error))
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        if dirurl.isLogFile {
+                            found.append(dirurl)
                         }
                     }
                 }
