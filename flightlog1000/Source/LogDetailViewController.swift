@@ -23,6 +23,18 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
         // Do any additional setup after loading the view.
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue:nil){
+            notification in
+            self.updateUI()
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+    }
 
     /*
     // MARK: - Navigation

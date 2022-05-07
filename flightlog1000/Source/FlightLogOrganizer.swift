@@ -14,6 +14,7 @@ import OSLog
 
 extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
+    static let flightLogInfoUpdated : Notification.Name = Notification.Name("Notification.Name.FlightLogInfoUpdated")
 }
 
 class FlightLogOrganizer {
@@ -107,6 +108,7 @@ class FlightLogOrganizer {
                         let alreadyParsed = flightLog.isParsed
                         flightLog.parse()
                         flightLog.updateFlightLogFileInfo(info: info)
+                        NotificationCenter.default.post(name: .logFileInfoUpdated, object: info)
                         if !alreadyParsed {
                             flightLog.clear()
                         }
@@ -161,6 +163,12 @@ class FlightLogOrganizer {
         }else{
             Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
         }
+    }
+    
+    func delete(info : FlightLogFileInfo){
+        info.delete()
+        self.persistentContainer.viewContext.delete(info)
+        self.saveContext()
     }
     
     //MARK: - Log Files discovery
@@ -249,6 +257,7 @@ class FlightLogOrganizer {
                     }
                 }
                 if someNew {
+                    Logger.app.info("Local File list has update")
                     NotificationCenter.default.post(name: .localFileListChanged, object: nil)
                 }
             case .failure(let error):

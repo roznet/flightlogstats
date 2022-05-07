@@ -10,6 +10,7 @@ import RZUtils
 import RZUtilsSwift
 import RZUtilsTouch
 import UniformTypeIdentifiers
+import OSLog
 
 protocol LogSelectionDelegate : AnyObject {
     func logInfoSelected(_ info : FlightLogFileInfo)
@@ -22,13 +23,25 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     
     weak var delegate : LogSelectionDelegate? = nil
     
+    func moreFunctionMenu() -> UIMenu {
+        let menuItems : [UIAction] = [
+            UIAction(title: "Delete", image: UIImage(systemName: "minus.circle")){
+                _ in
+                Logger.app.info("Delete")
+            }
+        ]
+        
+        return UIMenu( options: .displayInline, children: menuItems)
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         let addButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(addLog(button:)))
-        let editButton = UIBarButtonItem(image: UIImage(systemName: "pencil"), style: .plain, target: self, action: #selector(editLogList(button:)))
+        let moreFunctionButton = UIBarButtonItem(title: "More", image: UIImage(systemName: "ellipsis.circle"), menu: self.moreFunctionMenu())
         self.navigationItem.leftBarButtonItem = addButton
-        self.navigationItem.rightBarButtonItem = editButton
+        self.navigationItem.rightBarButtonItem = moreFunctionButton
         
         self.tableView.estimatedRowHeight = 100
         self.tableView.rowHeight = UITableView.automaticDimension
@@ -39,6 +52,12 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             self.buildList()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+        NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
+            _ in
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
@@ -129,7 +148,7 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     }
     
     //MARK: - Edit functionality
-    @objc func editLogList(button : UIBarButtonItem){
+    @objc func showMoreFunctions(button : UIBarButtonItem){
         
     }
     

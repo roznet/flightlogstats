@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import OSLog
 
 extension Notification.Name {
     static let logFileInfoUpdated : Notification.Name = Notification.Name("Notification.Name.logFileInfoUpdated")
@@ -18,6 +19,18 @@ class FlightLogFileInfo: NSManagedObject {
     static let currentVersion : Int32 = 1
     
     var isParsed : Bool { return self.version == Self.currentVersion }
+    
+    func delete() {
+        if let log = self.flightLog,
+           FileManager.default.fileExists(atPath: log.url.path){
+            do {
+                try FileManager.default.removeItem(at: log.url)
+                self.flightLog = nil
+            }catch{
+                Logger.app.error("Failed to delete \(log.url.path)")
+            }
+        }
+    }
     
     func populate(for url : URL){
         let dateFormatter = DateFormatter()
@@ -40,7 +53,7 @@ class FlightLogFileInfo: NSManagedObject {
         let end_fuel_l = self.end_fuel_quantity_left
         let start_fuel_r = self.start_fuel_quantity_right
         let start_fuel_l = self.start_fuel_quantity_left
-        let total = (start_fuel_r+start_fuel_l) - (end_fuel_l+end_fuel_r) 
+        let total = (start_fuel_r+start_fuel_l) - (end_fuel_l+end_fuel_r)
         return String(format: "%.1f gal", total)
     }
 }
