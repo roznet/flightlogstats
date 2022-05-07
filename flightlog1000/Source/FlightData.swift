@@ -190,9 +190,9 @@ struct FlightData {
         return rv
     }
     
-    func datesDoubles(for doubleFields : [String]) -> DatesValuesByField<Double> {
+    func datesDoubles(for doubleFields : [String]) -> DatesValuesByField<Double,String> {
         let fieldToIndex : [String:Int] = self.doubleFieldToIndex
-        var rv = DatesValuesByField<Double>(fields: doubleFields)
+        var rv = DatesValuesByField<Double,String>(fields: doubleFields)
         
         var lastDate : Date? = nil
         
@@ -232,9 +232,9 @@ struct FlightData {
     /***
         return each strings changes and corresponding date
      */
-    func datesStrings(for stringFields : [String]) -> DatesValuesByField<String> {
+    func datesStrings(for stringFields : [String]) -> DatesValuesByField<String,String> {
         let fieldToIndex : [String:Int] = self.stringFieldToIndex
-        var rv = DatesValuesByField<String>(fields: stringFields)
+        var rv = DatesValuesByField<String,String>(fields: stringFields)
         
         var first = true
         
@@ -282,8 +282,8 @@ struct FlightData {
     
     static let coordinateField = "coordinate"
     
-    func coordinates(latitudeField : String = "Latitude", longitudeField : String = "Longitude") -> DatesValuesByField<CLLocationCoordinate2D> {
-        var rv = DatesValuesByField<CLLocationCoordinate2D>(fields: [Self.coordinateField])
+    func coordinates(latitudeField : String = "Latitude", longitudeField : String = "Longitude") -> DatesValuesByField<CLLocationCoordinate2D,String> {
+        var rv = DatesValuesByField<CLLocationCoordinate2D,String>(fields: [Self.coordinateField])
         if let latitudeIndex = self.doubleFieldToIndex[latitudeField],
            let longitudeIndex = self.doubleFieldToIndex[longitudeField] {
             for (date,row) in zip(dates,values) {

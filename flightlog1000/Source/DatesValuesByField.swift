@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct DatesValuesByField<T> {
+public struct DatesValuesByField<T,F : Hashable> {
     public enum TimeDataByFieldError : Error {
         case inconsistentDateOrder
         case inconsistentDataSize
@@ -29,11 +29,11 @@ public struct DatesValuesByField<T> {
     }
     
     private var dates : [Date]
-    private var values : [String:[T]]
+    private var values : [F:[T]]
     
     var count : Int { return dates.count }
     
-    public init(fields : [String]){
+    public init(fields : [F]){
         dates = []
         values = [:]
         for field in fields {
@@ -43,7 +43,7 @@ public struct DatesValuesByField<T> {
     
     
     //MARK: - modify, append
-    public mutating func append(field : String, element : T, for date : Date) throws {
+    public mutating func append(field : F, element : T, for date : Date) throws {
         if let last = dates.last {
             if date > last {
                 dates.append(date)
@@ -61,14 +61,14 @@ public struct DatesValuesByField<T> {
         values[field]!.append(element)
     }
     
-    public func dropFirst(field : String, matching : ((T) -> Bool)) -> DatesValuesByField? {
+    public func dropFirst(field : F, matching : ((T) -> Bool)) -> DatesValuesByField? {
         
         guard let fieldValues = self.values[field]
         else {
             return nil
         }
         
-        var rv = DatesValuesByField(fields: [String](self.values.keys))
+        var rv = DatesValuesByField(fields: [F](self.values.keys))
 
         var found : Int = 0
         for (idx,value) in fieldValues.enumerated() {
@@ -85,14 +85,14 @@ public struct DatesValuesByField<T> {
         return rv
     }
     
-    public func dropLast(field : String, matching : ((T) -> Bool)) -> DatesValuesByField? {
+    public func dropLast(field : F, matching : ((T) -> Bool)) -> DatesValuesByField? {
         
         guard let fieldValues = self.values[field]
         else {
             return nil
         }
         
-        var rv = DatesValuesByField(fields: [String](self.values.keys))
+        var rv = DatesValuesByField(fields: Array(self.values.keys))
 
         var found : Int = 0
         for (idx,value) in fieldValues.reversed().enumerated() {
@@ -110,7 +110,7 @@ public struct DatesValuesByField<T> {
     }
     
     //MARK: - access
-    public func last(field : String, matching : ((T) -> Bool)? = nil) -> DateValue?{
+    public func last(field : F, matching : ((T) -> Bool)? = nil) -> DateValue?{
         guard let fieldValues = self.values[field],
               let lastDate = self.dates.last,
               let lastValue = fieldValues.last
@@ -130,7 +130,7 @@ public struct DatesValuesByField<T> {
         }
     }
 
-    public func first(field : String, matching : ((T) -> Bool)? = nil) -> DateValue?{
+    public func first(field : F, matching : ((T) -> Bool)? = nil) -> DateValue?{
         guard let fieldValues = self.values[field],
               let firstDate = self.dates.first,
               let firstValue = fieldValues.first
@@ -150,7 +150,8 @@ public struct DatesValuesByField<T> {
         }
     }
         
-    public subscript(field : String, index : Int) -> DateValue? {
+    
+    public subscript(field : F, index : Int) -> DateValue? {
         guard let fieldValues = self.values[field], index < self.dates.count
         else {
             return nil
@@ -160,9 +161,35 @@ public struct DatesValuesByField<T> {
         return DateValue(date: date, value: value)
     }
 
-    public subscript(_ field : String) -> DatesValues? {
+    public subscript(_ field : F) -> DatesValues? {
         guard let values = self.values[field] else { return nil }
         return DatesValues(dates: self.dates, values: values)
     }
     
+}
+
+extension DatesValuesByField  where T == Double {
+    public func valueStats(from : Date, to : Date) -> [F:ValueStats] {
+        var rv : [F:ValueStats] = [:]
+        var started : Bool = false
+        for (idx,runningdate) in self.dates.enumerated(){
+            if runningdate > to {
+                break
+            }
+            if runningdate >= from {
+                if started {
+                    for (field,values) in self.values {
+                        rv[field]?.update(with: values[idx])
+                    }
+                }else{
+                    for (field,values) in self.values {
+                        rv[field] = ValueStats(value: values[idx], weight: 1.0)
+                    }
+                    started = true
+                }
+            }
+        }
+        return rv
+    }
+
 }

@@ -18,7 +18,7 @@ struct TimeRange {
         return String(format: "%02.0f:%02.0f", hours,minutes )
     }
         
-    init?(valuesByField : DatesValuesByField<Double>?, field : FlightLogFile.Field) {
+    init?(valuesByField : DatesValuesByField<Double,String>?, field : FlightLogFile.Field) {
         guard let start = valuesByField?.first(field: FlightLogFile.field(field))?.date,
            let end = valuesByField?.last(field: FlightLogFile.field(field))?.date else {
             return nil
