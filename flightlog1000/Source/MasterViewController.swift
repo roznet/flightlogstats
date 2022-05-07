@@ -106,9 +106,16 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let info = self.flightInfo(at: indexPath){
-            self.delegate?.logInfoSelected(info)
-            if let detailViewController = delegate as? LogDetailViewController {
-              splitViewController?.showDetailViewController(detailViewController, sender: nil)
+            if self.delegate == nil,
+               let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailViewController") as? LogDetailViewController {
+                self.delegate = detailViewController
+                self.delegate?.logInfoSelected(info)
+                splitViewController?.showDetailViewController(detailViewController, sender: self)
+            }else{
+                self.delegate?.logInfoSelected(info)
+                if let detailViewController = delegate as? LogDetailViewController {
+                    splitViewController?.showDetailViewController(detailViewController, sender: nil)
+                }
             }
         }
     }

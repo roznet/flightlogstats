@@ -38,7 +38,6 @@ class FlightLogOrganizer {
         return list
     }
     
-    
     //MARK: - containers
     
     lazy var persistentContainer : NSPersistentContainer = {

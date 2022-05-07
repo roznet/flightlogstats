@@ -11,7 +11,7 @@
         <!--Log Detail View Controller-->
         <scene sceneID="aUE-ts-Q69">
             <objects>
-                <viewController id="jUv-0p-pFh" customClass="LogDetailViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LogDetailViewController" id="jUv-0p-pFh" customClass="LogDetailViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="05n-vR-e7N">
                         <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

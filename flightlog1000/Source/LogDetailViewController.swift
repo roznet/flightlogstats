@@ -47,9 +47,11 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     */
 
     func updateUI(){
-        self.name.text = self.flightLogFileInfo?.log_file_name
-        self.totalFuel.text = self.flightLogFileInfo?.totalFuelDescription
-        self.view.setNeedsDisplay()
+        if self.name != nil {
+            self.name.text = self.flightLogFileInfo?.log_file_name
+            self.totalFuel.text = self.flightLogFileInfo?.totalFuelDescription
+            self.view.setNeedsDisplay()
+        }
     }
     
     func logInfoSelected(_ info: FlightLogFileInfo) {
