@@ -121,6 +121,7 @@ struct FlightData {
                             formatter.dateFormat = fmt
                             if let date = formatter.date(from: dateString) {
                                 dates.append(date)
+                                break
                             }
                         }
                         if dates.count == 0 && skipped < 5 {

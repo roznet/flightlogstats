@@ -37,6 +37,8 @@ class flightlog1000Tests: XCTestCase {
             let identifiers = data.datesStrings(for: ["AtvWpt"])
             print( identifiers )
         
+            let summary = log.flightSummary
+            print( summary! )
             
             let speedPower = data.datesDoubles(for: FlightLogFile.fields([.GndSpd,.IAS,.E1_PctPwr,.AltMSL]))
 
@@ -47,7 +49,12 @@ class flightlog1000Tests: XCTestCase {
             }else{
                 XCTAssertTrue(false)
             }
+            
+            let route = log.route(fields: [.E1_PctPwr,.GndSpd,.FQtyL,.FQtyR])
+            print( route )
         }
+        
+        
         
         
     }

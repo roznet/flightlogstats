@@ -56,4 +56,5 @@ class FlightLogFileInfo: NSManagedObject {
         let total = (start_fuel_r+start_fuel_l) - (end_fuel_l+end_fuel_r)
         return String(format: "%.1f gal", total)
     }
+
 }

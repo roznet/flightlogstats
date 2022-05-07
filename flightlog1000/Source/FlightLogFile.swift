@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 class FlightLogFile {
     enum FlightLogFileError : Error {
@@ -20,6 +21,8 @@ class FlightLogFile {
     var data : FlightData? = nil
     var isParsed : Bool { return data != nil }
     
+    var flightSummary : FlightSummary? = nil
+    var legs : [ FlightLeg ] = []
     
     init?(url : URL) {
         if url.lastPathComponent.isLogFile {
@@ -44,6 +47,13 @@ class FlightLogFile {
             let lines = str.split(whereSeparator: \.isNewline)
             
             self.data = FlightData(lines: lines)
+            if let data = self.data {
+                do {
+                    self.flightSummary = try FlightSummary(data: data)
+                }catch{
+                    Logger.app.error("Failed to parse log file")
+                }
+            }
         }
     }
     
@@ -54,6 +64,7 @@ class FlightLogFile {
 
 //MARK: - interpretation
 extension FlightLogFile {
+    
     
     func updateFlightLogFileInfo(info : FlightLogFileInfo){
         info.flightLog = self
@@ -120,5 +131,22 @@ extension FlightLogFile {
                 NotificationCenter.default.post(name: .logFileInfoUpdated, object: info)
             }
         }        
+    }
+    
+    func route(fields : [ FlightLogFile.Field ]) -> [ FlightLeg ] {
+        var rv : [FlightLeg] = []
+        
+        // first identify list of way points
+        self.parse()
+        if let data = self.data {
+            let identifiers = data.datesStrings(for: ["AtvWpt"])
+            print(identifiers)
+            
+            
+            
+        }
+
+        
+        return rv
     }
 }
