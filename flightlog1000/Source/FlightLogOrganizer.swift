@@ -93,7 +93,7 @@ class FlightLogOrganizer {
         AppDelegate.worker.async {
             var missing : [FlightLogFileInfo] = []
             for (_,info) in self.managedFlightLogs {
-                if !info.isParsed {
+                if !info.hasUpdatedData {
                     missing.append(info)
                 }
             }

@@ -64,6 +64,14 @@ struct FlightData {
     
     private init() {}
     
+    init?(url: URL){
+        guard let str = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        let lines = str.split(whereSeparator: \.isNewline)
+        
+        self.init(lines: lines)
+    }
+
+    
     init(lines : [String.SubSequence]) {
         self.init()
         self.parseLines(lines: lines)

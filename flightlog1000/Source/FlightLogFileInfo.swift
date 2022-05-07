@@ -14,12 +14,25 @@ extension Notification.Name {
 }
 
 class FlightLogFileInfo: NSManagedObject {
-    var flightLog : FlightLogFile? = nil
+    enum FlightLogFileInfoError : Error {
+        case invalidFlightLog
+    }
+    
+    /*private*/ var flightLog : FlightLogFile? = nil
+    
+    var flightSummary : FlightSummary? {
+        if let fromLog = self.flightLog?.flightSummary {
+            return fromLog
+        }else{
+            return FlightSummary(info: self)
+        }
+    }
     
     static let currentVersion : Int32 = 1
     
-    var isParsed : Bool { return self.version == Self.currentVersion }
+    var hasUpdatedData : Bool { return self.version == Self.currentVersion }
     
+    //MARK: - database utilities
     func delete() {
         if let log = self.flightLog,
            FileManager.default.fileExists(atPath: log.url.path){
@@ -31,6 +44,50 @@ class FlightLogFileInfo: NSManagedObject {
             }
         }
     }
+    
+    //MARK: - get require data from files
+    func updateFromFlightLog(flightLog : FlightLogFile) throws {
+        self.flightLog = flightLog
+        guard let flightSummary = flightLog.flightSummary else {
+            throw FlightLogFileInfoError.invalidFlightLog
+        }
+
+        self.log_file_name = flightLog.name
+
+        if let system_id = flightLog.meta(key: .system_id) {
+            self.system_id = system_id
+        }
+            
+        if let airframe_name = flightLog.meta(key: .airframe_name) {
+            self.airframe_name = airframe_name
+        }
+
+        self.start_time = flightSummary.hobbs.start
+        self.end_time = flightSummary.hobbs.end
+
+        if let moving = flightSummary.moving {
+            self.start_time_moving = moving.start
+            self.end_time_moving = moving.end
+        
+        }
+        if let flying = flightSummary.flying {
+            self.start_time_flying = flying.start
+            self.end_time_flying = flying.end
+        }
+
+        self.start_fuel_quantity_left = flightSummary.fuelStart.left
+        self.start_fuel_quantity_right = flightSummary.fuelStart.right
+        self.end_fuel_quantity_left = flightSummary.fuelEnd.left
+        self.end_fuel_quantity_right = flightSummary.fuelEnd.right
+        
+        self.route = flightSummary.route.map { $0.name }.joined(separator: ",")
+        
+        self.version = FlightLogFileInfo.currentVersion
+        if self.hasChanges {
+            NotificationCenter.default.post(name: .logFileInfoUpdated, object: self)
+        }
+    }
+
     
     func populate(for url : URL){
         let dateFormatter = DateFormatter()
@@ -47,7 +104,7 @@ class FlightLogFileInfo: NSManagedObject {
     }
     
     var totalFuelDescription : String {
-        guard self.isParsed else { return "??" }
+        guard self.hasUpdatedData else { return "??" }
         
         let end_fuel_r = self.end_fuel_quantity_right
         let end_fuel_l = self.end_fuel_quantity_left

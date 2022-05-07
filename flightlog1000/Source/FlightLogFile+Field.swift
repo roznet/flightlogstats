@@ -95,4 +95,17 @@ extension FlightLogFile {
         case HPLfd = "HPLfd"
         case VPLwas = "VPLwas"
     }
+    
+    enum MetaKey : String {
+        case log_version = "log_version"
+        case log_content_version = "log_content_version"
+        case Product = "Product"
+        case airframe_name = "airframe_name"
+        case unit_software_part_number = "unit_software_part_number"
+        case unit_software_version = "unit_software_version"
+        case system_software_part_number = "system_software_part_number"
+        case system_id = "system_id"
+        case mode = "mode"
+        case flightstream_header = "flightstream_header"
+    }
 }

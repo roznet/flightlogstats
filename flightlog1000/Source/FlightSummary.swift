@@ -18,11 +18,38 @@ struct FlightSummary {
     let fuelEnd : FuelQuantity
     var fuelUsed : FuelQuantity { return self.fuelStart - self.fuelEnd }
     
-    let engineOn : TimeRange?
+    private let engineOn : TimeRange?
     let moving : TimeRange?
     let flying : TimeRange?
     let hobbs : TimeRange
     
+    let route : [Waypoint]
+    
+    init?( info : FlightLogFileInfo ) {
+        guard let start = info.start_time_moving, let end = info.end_time else { return nil }
+        self.hobbs = TimeRange(start: start, end: end)
+        if let start_moving = info.start_time_moving,
+           let end_moving = info.end_time_moving {
+            self.moving = TimeRange(start: start_moving, end: end_moving)
+        }else{
+            self.moving = nil
+        }
+        if let start_flying = info.start_time_flying,
+           let end_flying = info.end_time_flying {
+            self.flying = TimeRange(start: start_flying, end: end_flying)
+        }else{
+            self.flying = nil
+        }
+        if let route = info.route, route.count > 0 {
+            self.route = route.components(separatedBy: ",").map { Waypoint(name: $0) }
+        }else{
+            self.route = []
+        }
+        self.engineOn = nil
+        
+        self.fuelStart = FuelQuantity(left: info.start_fuel_quantity_left, right: info.start_fuel_quantity_right)
+        self.fuelEnd = FuelQuantity(left: info.end_fuel_quantity_left, right: info.end_fuel_quantity_right)
+    }
     
     init( data : FlightData) throws {
         let values = data.datesDoubles(for: FlightLogFile.fields([.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR]) )
@@ -53,6 +80,15 @@ struct FlightSummary {
         
         self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r)
         self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
+        
+        let identifiers = data.datesStrings(for: FlightLogFile.fields([.AtvWpt]))
+        if let names = identifiers[FlightLogFile.field(.AtvWpt)]?.values {
+            self.route = names.compactMap {
+                return Waypoint(name: $0)
+            }
+        }else{
+            self.route = []
+        }
     }
 }
 

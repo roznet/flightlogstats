@@ -8,6 +8,7 @@
         <attribute name="end_time_flying" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="end_time_moving" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
+        <attribute name="route" optional="YES" attributeType="String"/>
         <attribute name="start_fuel_quantity_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="start_fuel_quantity_right" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="start_time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -17,6 +18,6 @@
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <elements>
-        <element name="FlightLogFileInfo" positionX="-63" positionY="-18" width="128" height="239"/>
+        <element name="FlightLogFileInfo" positionX="-63" positionY="-18" width="128" height="254"/>
     </elements>
 </model>

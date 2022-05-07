@@ -10,6 +10,8 @@ import XCTest
 import CoreData
 import OSLog
 
+
+
 extension Logger {
     public static let test = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "test")
 }
@@ -24,6 +26,28 @@ class flightlog1000Tests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    func testFlightData() {
+        guard let url = Bundle(for: type(of: self)).url(forResource: "log_210623_141501_TEST1", withExtension: "csv"),
+              let data = FlightData(url: url)
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+
+        let identifiers = data.datesStrings(for: ["AtvWpt"])
+        print( identifiers )
+        let speedPower = data.datesDoubles(for: FlightLogFile.fields([.GndSpd,.IAS,.E1_PctPwr,.AltMSL]))
+
+        if let engineOn = speedPower.dropFirst(field: FlightLogFile.field(.E1_PctPwr), matching: { $0 > 0 }),
+           let moving = engineOn.dropFirst(field: FlightLogFile.field(.GndSpd),matching: { $0 > 0 }) {
+            XCTAssertLessThan(engineOn.count, data.count)
+            XCTAssertLessThan(moving.count, engineOn.count)
+        }else{
+            XCTAssertTrue(false)
+        }
+
+    }
+    
     func testLogInterpret() throws {
         guard let url = Bundle(for: type(of: self)).url(forResource: "log_210623_141501_TEST1", withExtension: "csv")
         else {
@@ -33,27 +57,11 @@ class flightlog1000Tests: XCTestCase {
 
         let log = FlightLogFile(url: url)!
         log.parse()
-        if let data = log.data {
-            let identifiers = data.datesStrings(for: ["AtvWpt"])
-            print( identifiers )
-        
-            let summary = log.flightSummary
-            print( summary! )
-            
-            let speedPower = data.datesDoubles(for: FlightLogFile.fields([.GndSpd,.IAS,.E1_PctPwr,.AltMSL]))
+        let summary = log.flightSummary
+        print( summary! )
 
-            if let engineOn = speedPower.dropFirst(field: FlightLogFile.field(.E1_PctPwr), matching: { $0 > 0 }),
-               let moving = engineOn.dropFirst(field: FlightLogFile.field(.GndSpd),matching: { $0 > 0 }) {
-                XCTAssertLessThan(engineOn.count, data.count)
-                XCTAssertLessThan(moving.count, engineOn.count)
-            }else{
-                XCTAssertTrue(false)
-            }
-            
-            let route = log.route(fields: [.E1_PctPwr,.GndSpd,.FQtyL,.FQtyR])
-            print( route )
-        }
-        
+        let route = log.route(fields: [.E1_PctPwr,.GndSpd,.FQtyL,.FQtyR])        
+        print( route )
         
         
         

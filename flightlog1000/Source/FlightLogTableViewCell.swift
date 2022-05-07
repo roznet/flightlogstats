@@ -18,8 +18,10 @@ class FlightLogTableViewCell: UITableViewCell {
     
     func update(with info: FlightLogFileInfo){
         self.flightLogFileInfo = info
-        self.name.text = info.flightLog?.name
-        self.fuel.text = info.totalFuelDescription
+        let flightSummary = info.flightSummary
+        self.name.text = info.log_file_name
+        self.totalTime.text = flightSummary?.hobbs.elapsedAsDecimalHours
+        self.fuel.text = flightSummary?.fuelUsed.totalAsGallon
         
     }
     
