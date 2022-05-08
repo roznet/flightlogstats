@@ -81,7 +81,12 @@ extension FlightLogFile {
         if let data = self.data {
             let identifiers = data.datesStrings(for: ["AtvWpt"])
             print(identifiers)
-            let datesDouble = data.datesDoubles(for: FlightLogFile.fields(fields))
+            do {
+                let stats = try data.extract(dates: identifiers.dates)
+                print( stats)
+            }catch{
+                Logger.app.error("Failed to extract route \(error.localizedDescription)")
+            }
             
             //let first = datesDouble.valueStats(from: identifiers.dates[0], to: identifiers.dates[1])
             //print( first )

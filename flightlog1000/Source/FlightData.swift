@@ -12,39 +12,19 @@ import RZUtilsSwift
 
 
 struct FlightData {
-    var meta : [String:String] = [:]
     private var units : [String] = []
-    private var fields : [String] = []
-    private var columnIsDouble : [Bool] = []
     /**
         * values columns are fields,
      */
     private var values : [[Double]] = []
     private var strings : [[String]] = []
 
+    private(set) var meta : [String:String] = [:]
     private(set) var dates : [Date] = []
-    
-    var count : Int { return dates.count }
-    
-    var doubleFields : [String] {
-        var rv : [String] = []
-        for (field,isDouble) in zip(fields, columnIsDouble) {
-            if isDouble {
-                rv.append(field)
-            }
-        }
-        return rv
-    }
+    private(set) var doubleFields : [String] = []
+    private(set) var stringFields : [String] = []
 
-    var stringFields : [String] {
-        var rv : [String] = []
-        for (field,isDouble) in zip(fields, columnIsDouble) {
-            if !isDouble {
-                rv.append(field)
-            }
-        }
-        return rv
-    }
+    var count : Int { return dates.count }
     
     private var doubleFieldToIndex : [String:Int] {
         var rv : [String:Int] = [:]
@@ -78,6 +58,8 @@ struct FlightData {
     }
     
     private mutating func parseLines(lines : [String.SubSequence]){
+        var fields : [String] = []
+        var columnIsDouble : [Bool] = []
         
         let trimCharSet = CharacterSet(charactersIn: "\"# ")
         
@@ -162,6 +144,20 @@ struct FlightData {
                 values.append(doubleLine)
                 strings.append(stringLine)
             }
+            self.doubleFields = []
+            for (field,isDouble) in zip(fields, columnIsDouble) {
+                if isDouble {
+                    self.doubleFields.append(field)
+                }
+            }
+            self.stringFields = []
+            for (field,isDouble) in zip(fields, columnIsDouble) {
+                if !isDouble {
+                    self.stringFields.append(field)
+                }
+            }
+
+            
         }
     }
 
@@ -277,6 +273,57 @@ struct FlightData {
                 }
             }
         }
+        return rv
+    }
+        
+    /// Will extract and compute parameters
+    /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the
+    /// first date in the input value, if the last date is before the end of the data, the end is skipped
+    /// if a start is provided the stats starts from the first available row of data
+    /// - Parameter dates: array of dates,
+    /// - Parameter start:first date to start statistics or nil
+    /// - Returns: statisitics computed between dates
+    func extract(dates : [Date], start : Date? = nil) throws -> DatesValuesByField<ValueStats,String> {
+        var rv = DatesValuesByField<ValueStats,String>(fields: self.doubleFields)
+        var nextExtractDate : Date? = dates.first
+        var remainingDates = dates.dropFirst()
+
+        if let firstDate = start ?? self.dates.first {
+            var current : [ValueStats] = []
+            
+            for (date,one) in zip(self.dates,self.values) {
+                if date < firstDate {
+                    continue
+                }
+                if let nextDate = nextExtractDate {
+                    if date > nextDate {
+                        do {
+                            try rv.append(fields: self.doubleFields, elements: current, for: nextDate)
+                        }catch{
+                            throw error
+                        }
+                        current = []
+                        nextExtractDate = remainingDates.first
+                        remainingDates = remainingDates.dropFirst()
+                        
+                        if nextExtractDate == nil {
+                            break
+                        }
+                    }
+                    if current.count == 0 {
+                        current = one.map { ValueStats(value: $0) }
+                    }else{
+                        for (idx,val) in one.enumerated() {
+                            current[idx].update(with: val)
+                        }
+                    }
+                }else{
+                    // no next date, stop
+                    break
+                }
+            }
+        }
+        
         return rv
     }
     

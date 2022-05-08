@@ -8,7 +8,7 @@
 import Foundation
 
 public struct ValueStats {
-    let start : Double
+    private(set) var start : Double
     private(set) var end   : Double
     
     private(set) var sum : Double
@@ -28,17 +28,31 @@ public struct ValueStats {
         self.sum = value
         self.max = value
         self.min = value
-        self.count = 1
+        self.count = value.isFinite ? 1 : 0
         self.weight = weight
         self.weightedSum = value * weight
     }
     
     mutating func update(with value : Double, weight : Double = 1) {
-        self.end = value
-        self.sum += value
-        self.max = Swift.max(self.max,value)
-        self.min = Swift.min(self.min,value)
-        self.count += 1
-        self.weight += weight
+        // if we got initial value correct
+        if self.start.isFinite {
+            if value.isFinite {
+                self.end = value
+                self.sum += value
+                self.max = Swift.max(self.max,value)
+                self.min = Swift.min(self.min,value)
+                self.count += 1
+                self.weight += weight
+            }
+        }else{
+            self.start = value
+            self.end = value
+            self.sum = value
+            self.max = value
+            self.min = value
+            self.count = value.isFinite ? 1 : 0
+            self.weight = weight
+            self.weightedSum = value * weight
+        }
     }
 }

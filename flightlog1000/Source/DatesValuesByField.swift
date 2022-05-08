@@ -28,7 +28,7 @@ public struct DatesValuesByField<T,F : Hashable> {
         }
     }
     
-    private var dates : [Date]
+    private(set) var dates : [Date]
     private var values : [F:[T]]
     
     var count : Int { return dates.count }
@@ -59,6 +59,26 @@ public struct DatesValuesByField<T,F : Hashable> {
             throw TimeDataByFieldError.inconsistentDataSize
         }
         values[field]!.append(element)
+    }
+    
+    public mutating func append(fields : [F], elements: [T], for date : Date) throws {
+        if let last = dates.last {
+            if date > last {
+                dates.append(date)
+            }else if date < last {
+                throw TimeDataByFieldError.inconsistentDateOrder
+            }
+        }else{
+            // nothing yet, insert date
+            dates.append(date)
+        }
+        for (field,element) in zip(fields,elements) {
+            guard let dataForField = values[field] else { throw TimeDataByFieldError.inconsistentDataSize }
+            if dataForField.count != (dates.count - 1) {
+                throw TimeDataByFieldError.inconsistentDataSize
+            }
+            values[field]!.append(element)
+        }
     }
     
     public func dropFirst(field : F, matching : ((T) -> Bool)) -> DatesValuesByField? {
