@@ -9,7 +9,7 @@ import Foundation
 import CoreLocation
 
 struct FlightLeg {
-    
+    typealias Field = FlightLogFile.Field
     
     let waypoint_to : Waypoint
     let waypoint_from : Waypoint?
@@ -17,6 +17,6 @@ struct FlightLeg {
     let start_time : Date
     let end_time : Date
     
-    var data : [FlightLogFile.Field:ValueStats]
+    var data : [Field:ValueStats]
     
 }

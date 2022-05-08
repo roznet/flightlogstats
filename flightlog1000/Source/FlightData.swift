@@ -12,6 +12,9 @@ import RZUtilsSwift
 
 
 struct FlightData {
+    typealias Field = FlightLogFile.Field
+    typealias MetaField = FlightLogFile.MetaField
+    
     private var units : [String] = []
     /**
         * values columns are fields,
@@ -19,23 +22,23 @@ struct FlightData {
     private var values : [[Double]] = []
     private var strings : [[String]] = []
 
-    private(set) var meta : [String:String] = [:]
+    private(set) var meta : [MetaField:String] = [:]
     private(set) var dates : [Date] = []
-    private(set) var doubleFields : [String] = []
-    private(set) var stringFields : [String] = []
+    private(set) var doubleFields : [Field] = []
+    private(set) var stringFields : [Field] = []
 
     var count : Int { return dates.count }
     
-    private var doubleFieldToIndex : [String:Int] {
-        var rv : [String:Int] = [:]
+    private var doubleFieldToIndex : [Field:Int] {
+        var rv : [Field:Int] = [:]
         for (idx,field) in doubleFields.enumerated() {
             rv[field] = idx
         }
         return rv
     }
 
-    private var stringFieldToIndex : [String:Int] {
-        var rv : [String:Int] = [:]
+    private var stringFieldToIndex : [Field:Int] {
+        var rv : [Field:Int] = [:]
         for (idx,field) in stringFields.enumerated() {
             rv[field] = idx
         }
@@ -58,7 +61,7 @@ struct FlightData {
     }
     
     private mutating func parseLines(lines : [String.SubSequence]){
-        var fields : [String] = []
+        var fields : [Field] = []
         var columnIsDouble : [Bool] = []
         
         let trimCharSet = CharacterSet(charactersIn: "\"# ")
@@ -81,7 +84,12 @@ struct FlightData {
                 for val in vals {
                     let keyval = val.split(separator: "=")
                     if keyval.count == 2 {
-                        meta[String(keyval[0])] = keyval[1].trimmingCharacters(in: trimCharSet)
+                        let metaFieldDescription = String(keyval[0])
+                        if let metaField = MetaField(rawValue: metaFieldDescription) {
+                            meta[metaField] = keyval[1].trimmingCharacters(in: trimCharSet)
+                        }else{
+                            Logger.app.warning("Unknown meta field \(metaFieldDescription)")
+                        }
                     }
                 }
             }else if line.hasPrefix("#"){
@@ -94,7 +102,17 @@ struct FlightData {
                     }
                 }
             }else if fields.count == 0 {
-                fields = vals
+                fields = []
+                for fieldDescription in vals {
+                    if let field = Field(rawValue: fieldDescription) {
+                        fields.append(field)
+                    }else{
+                        fields.append(.Unknown)
+                        Logger.app.warning("Unknown field \(fieldDescription)")
+                    }
+                    
+                }
+                fields = vals.map { Field(rawValue: $0) ?? .Unknown }
             }else if vals.count == columnIsDouble.count {
                 let dateString = String(format: "%@ %@ %@", vals[dateIndex], vals[timeIndex], vals[offsetIndex])
                 if let date = formatter.date(from: dateString) {
@@ -166,13 +184,13 @@ struct FlightData {
     /**
      * return array of values which are dict of field -> value
      */
-    func values(for doubleFields : [String]) -> [ [String:Double] ] {
-        let fieldToIndex : [String:Int] = self.doubleFieldToIndex
+    func values(for doubleFields : [Field]) -> [ [Field:Double] ] {
+        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
         
-        var rv : [[String:Double]] = []
+        var rv : [[Field:Double]] = []
         
         for row in values {
-            var newRow : [String:Double] = [:]
+            var newRow : [Field:Double] = [:]
             for field in doubleFields {
                 if let idx = fieldToIndex[field] {
                     let val = row[idx]
@@ -186,9 +204,9 @@ struct FlightData {
         return rv
     }
     
-    func datesDoubles(for doubleFields : [String]) -> DatesValuesByField<Double,String> {
-        let fieldToIndex : [String:Int] = self.doubleFieldToIndex
-        var rv = DatesValuesByField<Double,String>(fields: doubleFields)
+    func datesDoubles(for doubleFields : [Field]) -> DatesValuesByField<Double,Field> {
+        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
+        var rv = DatesValuesByField<Double,Field>(fields: doubleFields)
         
         var lastDate : Date? = nil
         
@@ -228,9 +246,9 @@ struct FlightData {
     /***
         return each strings changes and corresponding date
      */
-    func datesStrings(for stringFields : [String]) -> DatesValuesByField<String,String> {
-        let fieldToIndex : [String:Int] = self.stringFieldToIndex
-        var rv = DatesValuesByField<String,String>(fields: stringFields)
+    func datesStrings(for stringFields : [Field]) -> DatesValuesByField<String,Field> {
+        let fieldToIndex : [Field:Int] = self.stringFieldToIndex
+        var rv = DatesValuesByField<String,Field>(fields: stringFields)
         
         var first = true
         
@@ -283,8 +301,8 @@ struct FlightData {
     /// - Parameter dates: array of dates,
     /// - Parameter start:first date to start statistics or nil
     /// - Returns: statisitics computed between dates
-    func extract(dates : [Date], start : Date? = nil) throws -> DatesValuesByField<ValueStats,String> {
-        var rv = DatesValuesByField<ValueStats,String>(fields: self.doubleFields)
+    func extract(dates : [Date], start : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
+        var rv = DatesValuesByField<ValueStats,Field>(fields: self.doubleFields)
         var nextExtractDate : Date? = dates.first
         var remainingDates = dates.dropFirst()
 
@@ -329,7 +347,7 @@ struct FlightData {
     
     static let coordinateField = "coordinate"
     
-    func coordinates(latitudeField : String = "Latitude", longitudeField : String = "Longitude") -> DatesValuesByField<CLLocationCoordinate2D,String> {
+    func coordinates(latitudeField : Field = .Latitude, longitudeField : Field = .Longitude) -> DatesValuesByField<CLLocationCoordinate2D,String> {
         var rv = DatesValuesByField<CLLocationCoordinate2D,String>(fields: [Self.coordinateField])
         if let latitudeIndex = self.doubleFieldToIndex[latitudeField],
            let longitudeIndex = self.doubleFieldToIndex[longitudeField] {

@@ -10,8 +10,12 @@ import Foundation
 struct Waypoint {
     let name : String
     
-    init(name : String) {
-        self.name = name
+    init?(name : String?) {
+        if let name = name {
+            self.name = name
+        }else{
+            return nil
+        }
     }
     
 }

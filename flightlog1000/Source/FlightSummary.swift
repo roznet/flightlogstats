@@ -41,7 +41,7 @@ struct FlightSummary {
             self.flying = nil
         }
         if let route = info.route, route.count > 0 {
-            self.route = route.components(separatedBy: ",").map { Waypoint(name: $0) }
+            self.route = route.components(separatedBy: ",").compactMap { Waypoint(name: $0) }
         }else{
             self.route = []
         }
@@ -52,12 +52,12 @@ struct FlightSummary {
     }
     
     init( data : FlightData) throws {
-        let values = data.datesDoubles(for: FlightLogFile.fields([.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR]) )
+        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR] )
 
-        let engineOnValues = values.dropFirst(field: FlightLogFile.field(.E1_PctPwr)) { $0 > 0.0 }?.dropLast(field: FlightLogFile.field(.E1_PctPwr)) { $0 > 0.0 }
+        let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         
-        let movingValues = engineOnValues?.dropFirst(field: FlightLogFile.field(.GndSpd)) { $0 > 0.0 }?.dropLast(field: FlightLogFile.field(.GndSpd)) { $0 > 0.0 }
-        let flyingValues = engineOnValues?.dropFirst(field: FlightLogFile.field(.IAS)) { $0 > 35.0 }?.dropLast(field: FlightLogFile.field(.IAS)) { $0 > 35.0 }
+        let movingValues = engineOnValues?.dropFirst(field: .GndSpd) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
+        let flyingValues = engineOnValues?.dropFirst(field: .IAS) { $0 > 35.0 }?.dropLast(field: .IAS) { $0 > 35.0 }
         
         
         guard let start = data.dates.first, let end = data.dates.last else {
@@ -70,10 +70,10 @@ struct FlightSummary {
         self.moving = TimeRange(valuesByField: movingValues, field: .GndSpd)
         self.flying = TimeRange(valuesByField: flyingValues, field: .IAS)
 
-        guard  let fuel_start_l = values.first(field: FlightLogFile.field(.FQtyL))?.value,
-               let fuel_start_r = values.first(field: FlightLogFile.field(.FQtyR))?.value,
-               let fuel_end_l = values.last(field: FlightLogFile.field(.FQtyL))?.value,
-               let fuel_end_r = values.last(field: FlightLogFile.field(.FQtyR))?.value
+        guard  let fuel_start_l = values.first(field: .FQtyL)?.value,
+               let fuel_start_r = values.first(field: .FQtyR)?.value,
+               let fuel_end_l = values.last(field: .FQtyL)?.value,
+               let fuel_end_r = values.last(field: .FQtyR)?.value
         else  {
             throw FlightSummaryError.missingFuel
         }
@@ -81,8 +81,8 @@ struct FlightSummary {
         self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r)
         self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
         
-        let identifiers = data.datesStrings(for: FlightLogFile.fields([.AtvWpt]))
-        if let names = identifiers[FlightLogFile.field(.AtvWpt)]?.values {
+        let identifiers = data.datesStrings(for: [.AtvWpt])
+        if let names = identifiers[.AtvWpt]?.values {
             self.route = names.compactMap {
                 return Waypoint(name: $0)
             }

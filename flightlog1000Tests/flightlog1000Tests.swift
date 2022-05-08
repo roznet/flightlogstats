@@ -34,12 +34,12 @@ class flightlog1000Tests: XCTestCase {
             return
         }
 
-        let identifiers = data.datesStrings(for: ["AtvWpt"])
+        let identifiers = data.datesStrings(for: [.AtvWpt])
         print( identifiers )
-        let speedPower = data.datesDoubles(for: FlightLogFile.fields([.GndSpd,.IAS,.E1_PctPwr,.AltMSL]))
+        let speedPower = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.AltMSL])
 
-        if let engineOn = speedPower.dropFirst(field: FlightLogFile.field(.E1_PctPwr), matching: { $0 > 0 }),
-           let moving = engineOn.dropFirst(field: FlightLogFile.field(.GndSpd),matching: { $0 > 0 }) {
+        if let engineOn = speedPower.dropFirst(field: .E1_PctPwr, matching: { $0 > 0 }),
+           let moving = engineOn.dropFirst(field: .GndSpd,matching: { $0 > 0 }) {
             XCTAssertLessThan(engineOn.count, data.count)
             XCTAssertLessThan(moving.count, engineOn.count)
         }else{

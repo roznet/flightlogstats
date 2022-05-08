@@ -17,6 +17,7 @@ extension FlightLogFile {
     }
     
     enum Field : String {
+        case Unknown = "Unknown"
         case AtvWpt = "AtvWpt"
         case Latitude = "Latitude"
         case Longitude = "Longitude"
@@ -96,7 +97,7 @@ extension FlightLogFile {
         case VPLwas = "VPLwas"
     }
     
-    enum MetaKey : String {
+    enum MetaField : String {
         case log_version = "log_version"
         case log_content_version = "log_content_version"
         case Product = "Product"
@@ -108,4 +109,12 @@ extension FlightLogFile {
         case mode = "mode"
         case flightstream_header = "flightstream_header"
     }
+}
+
+extension FlightLogFile.Field : CustomStringConvertible {
+    var description: String { return self.rawValue }
+}
+
+extension FlightLogFile.MetaField : CustomStringConvertible {
+    var description: String { return self.rawValue }
 }

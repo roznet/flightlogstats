@@ -14,6 +14,8 @@ public struct DatesValuesByField<T,F : Hashable> {
         case unknownField
     }
     
+    public typealias FieldsValues = [F:T]
+    
     public struct DateValue {
         public let date : Date
         public let value : T
@@ -169,18 +171,30 @@ public struct DatesValuesByField<T,F : Hashable> {
             return DateValue(date: firstDate, value: firstValue)
         }
     }
-        
     
-    public subscript(field : F, index : Int) -> DateValue? {
-        guard let fieldValues = self.values[field], index < self.dates.count
-        else {
-            return nil
-        }
+    public func dateValue(for field : F, at index : Int) -> DateValue? {
+        guard let fieldValues = self.values[field], index < self.dates.count else { return nil }
         let value = fieldValues[index]
         let date = self.dates[index]
         return DateValue(date: date, value: value)
     }
 
+    public func value(for field : F, at index : Int) -> T? {
+        guard let fieldValues = self.values[field], index < self.dates.count else { return nil }
+        let value = fieldValues[index]
+        return value
+    }
+
+    public func fieldValue(at index : Int) -> FieldsValues {
+        var rv : FieldsValues = [:]
+        for (field,values) in self.values {
+            if let value = values[safe: index] {
+                rv[field] = value
+            }
+        }
+        return rv
+    }
+    
     public subscript(_ field : F) -> DatesValues? {
         guard let values = self.values[field] else { return nil }
         return DatesValues(dates: self.dates, values: values)

@@ -64,9 +64,9 @@ class FlightLogFile {
 //MARK: - interpretation
 extension FlightLogFile {
     
-    func meta(key : MetaKey) -> String? {
+    func meta(key : MetaField) -> String? {
         self.parse()
-        return self.data?.meta[key.rawValue]
+        return self.data?.meta[key]
     }
     
     func updateFlightLogFileInfo(info : FlightLogFileInfo){
@@ -79,11 +79,28 @@ extension FlightLogFile {
         // first identify list of way points
         self.parse()
         if let data = self.data {
-            let identifiers = data.datesStrings(for: ["AtvWpt"])
-            print(identifiers)
+            let identifiers : DatesValuesByField<String,Field> = data.datesStrings(for: [.AtvWpt])
+
             do {
-                let stats = try data.extract(dates: identifiers.dates)
-                print( stats)
+                let stats : DatesValuesByField<ValueStats,Field> = try data.extract(dates: identifiers.dates)
+                
+                var previousIdentifier : String? = nil
+                var previousDate : Date? = self.data?.dates.first
+                
+                for (idx,date) in identifiers.dates.enumerated() {
+                    if let identifier = identifiers.value(for: .AtvWpt, at: idx),
+                       let waypoint = Waypoint(name: identifier),
+                       let startTime = previousDate {
+                        
+                        
+                        let leg = FlightLeg(waypoint_to: waypoint, waypoint_from: Waypoint(name: previousIdentifier),
+                                            start_time: startTime, end_time: date,
+                                            data: stats.fieldValue(at: idx))
+                        rv.append(leg)
+                        previousIdentifier = identifier
+                        previousDate = date
+                    }
+                }
             }catch{
                 Logger.app.error("Failed to extract route \(error.localizedDescription)")
             }
