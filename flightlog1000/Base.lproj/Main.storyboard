@@ -29,18 +29,24 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" ambiguous="YES" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="wkc-d6-MzS">
+                                <rect key="frame" x="20" y="202" width="150" height="4"/>
+                            </progressView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="S3q-Cy-ALO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Zeb-u1-shB" firstAttribute="top" secondItem="h5i-bu-Kfn" secondAttribute="bottom" constant="17" id="2eJ-ej-wXO"/>
+                            <constraint firstItem="wkc-d6-MzS" firstAttribute="top" secondItem="Zeb-u1-shB" secondAttribute="bottom" constant="37" id="5VM-gB-CVA"/>
                             <constraint firstItem="h5i-bu-Kfn" firstAttribute="top" secondItem="S3q-Cy-ALO" secondAttribute="top" constant="18" id="GUE-Gr-btL"/>
+                            <constraint firstItem="wkc-d6-MzS" firstAttribute="leading" secondItem="h5i-bu-Kfn" secondAttribute="leading" id="rVb-2o-RhP"/>
                             <constraint firstItem="Zeb-u1-shB" firstAttribute="leading" secondItem="h5i-bu-Kfn" secondAttribute="leading" id="seH-4e-Fhb"/>
                             <constraint firstItem="h5i-bu-Kfn" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="20" id="xI3-qo-aaL"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="name" destination="h5i-bu-Kfn" id="H0Q-jq-D8o"/>
+                        <outlet property="progressView" destination="wkc-d6-MzS" id="mzV-jg-duT"/>
                         <outlet property="totalFuel" destination="Zeb-u1-shB" id="TPE-uF-9dV"/>
                     </connections>
                 </viewController>

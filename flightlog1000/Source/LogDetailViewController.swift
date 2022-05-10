@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import OSLog
 
 class LogDetailViewController: UIViewController,LogSelectionDelegate {
     var logFileOrganizer = FlightLogOrganizer.shared
     
+    @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var totalFuel: UILabel!
     
@@ -25,7 +27,9 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
         super.viewWillAppear(animated)
         NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue:nil){
             notification in
-            self.updateUI()
+            DispatchQueue.main.async{
+                self.updateUI()
+            }
         }
         
     }
@@ -56,7 +60,13 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     func logInfoSelected(_ info: FlightLogFileInfo) {
         self.flightLogFileInfo = info
         AppDelegate.worker.async {
-            self.flightLogFileInfo?.parseAndUpdate()
+            self.flightLogFileInfo?.parseAndUpdate() {
+                val in
+                DispatchQueue.main.async {
+                    Logger.app.info( "progress \(val)")
+                    self.progressView.progress = Float(val)
+                }
+            }
             DispatchQueue.main.async {
                 self.updateUI()
             }

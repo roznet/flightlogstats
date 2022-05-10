@@ -10,8 +10,13 @@ import OSLog
 import RZUtils
 import RZUtilsSwift
 
+typealias ProcessingProgressReport = (_ : Double) -> Void
 
 struct FlightData {
+    // how often to report progress
+    private static let progressReportStep = 5
+    
+    
     typealias Field = FlightLogFile.Field
     typealias MetaField = FlightLogFile.MetaField
     
@@ -50,20 +55,20 @@ struct FlightData {
     
     private init() {}
     
-    init?(url: URL){
+    init?(url: URL, progress : ProcessingProgressReport? = nil){
         guard let str = try? String(contentsOf: url, encoding: .utf8) else { return nil }
         let lines = str.split(whereSeparator: \.isNewline)
         
-        self.init(lines: lines)
+        self.init(lines: lines, progress: progress)
     }
 
     
-    init(lines : [String.SubSequence]) {
+    init(lines : [String.SubSequence], progress : ProcessingProgressReport? = nil) {
         self.init()
-        self.parseLines(lines: lines)
+        self.parseLines(lines: lines, progress: progress)
     }
     
-    private mutating func parseLines(lines : [String.SubSequence]){
+    private mutating func parseLines(lines : [String.SubSequence], progress : ProcessingProgressReport? = nil){
         var fields : [Field] = []
         var columnIsDouble : [Bool] = []
         
@@ -85,7 +90,14 @@ struct FlightData {
         var lastLocation : CLLocation? = nil
         var runningDistance : CLLocationDistance = 0.0
         
+        var done_sofar = 0
+        let done_step = lines.count / 10
+        
         for line in lines {
+            if done_sofar % done_step == 0, let progress = progress {
+                progress(Double(done_sofar)/Double(lines.count))
+            }
+            done_sofar += 1
             let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
             
             if line.hasPrefix("#airframe") {

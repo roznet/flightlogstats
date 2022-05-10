@@ -43,9 +43,9 @@ class FlightLogFile {
     }
     
     
-    func parse() {
+    func parse(progress : ProcessingProgressReport? = nil) {
         if data == nil {
-            self.data = FlightData(url: self.url)
+            self.data = FlightData(url: self.url, progress: progress)
             if let data = self.data {
                 do {
                     self.flightSummary = try FlightSummary(data: data)

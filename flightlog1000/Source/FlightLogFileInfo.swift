@@ -47,7 +47,7 @@ class FlightLogFileInfo: NSManagedObject {
         }
     }
     
-    func parseAndUpdate() {
+    func parseAndUpdate(progress : ProcessingProgressReport? = nil) {
         if flightLog == nil {
             guard let container = self.container,
                   let log_file_name = self.log_file_name
@@ -56,7 +56,7 @@ class FlightLogFileInfo: NSManagedObject {
         }
         
         if let flightLog = flightLog {
-            flightLog.parse()
+            flightLog.parse(progress:progress)
             do {
                 try self.updateFromFlightLog(flightLog: flightLog)
                 container?.saveContext()
