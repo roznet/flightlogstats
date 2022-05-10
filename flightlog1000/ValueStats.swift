@@ -22,6 +22,10 @@ public struct ValueStats {
     var average : Double { return self.sum / Double(self.count) }
     var weightedAverage : Double { return self.weightedSum / self.weight }
 
+    var isValid : Bool { return self.count != 0 }
+    
+    static let invalid = ValueStats(value: .nan)
+    
     init(value : Double, weight : Double = 1.0) {
         self.start = value
         self.end = value

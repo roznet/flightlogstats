@@ -18,6 +18,8 @@ class FlightLogFileInfo: NSManagedObject {
         case invalidFlightLog
     }
     
+    weak var container : FlightLogOrganizer? = nil
+    
     /*private*/ var flightLog : FlightLogFile? = nil
     
     var flightSummary : FlightSummary? {
@@ -41,6 +43,25 @@ class FlightLogFileInfo: NSManagedObject {
                 self.flightLog = nil
             }catch{
                 Logger.app.error("Failed to delete \(log.url.path)")
+            }
+        }
+    }
+    
+    func parseAndUpdate() {
+        if flightLog == nil {
+            guard let container = self.container,
+                  let log_file_name = self.log_file_name
+            else { return }
+            self.flightLog = container.flightLogFile(name: log_file_name)
+        }
+        
+        if let flightLog = flightLog {
+            flightLog.parse()
+            do {
+                try self.updateFromFlightLog(flightLog: flightLog)
+                container?.saveContext()
+            }catch{
+                Logger.app.error("Failed to update \(error.localizedDescription)")
             }
         }
     }
@@ -81,6 +102,8 @@ class FlightLogFileInfo: NSManagedObject {
         self.end_fuel_quantity_right = flightSummary.fuelEnd.right
         
         self.route = flightSummary.route.map { $0.name }.joined(separator: ",")
+        
+        self.total_distance = flightSummary.distance
         
         self.version = FlightLogFileInfo.currentVersion
         if self.hasChanges {

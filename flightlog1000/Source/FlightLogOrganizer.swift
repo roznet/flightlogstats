@@ -74,6 +74,7 @@ class FlightLogOrganizer {
                 if let filename = info.log_file_name {
                     if self.managedFlightLogs[filename] == nil {
                         added += 1
+                        info.container = self
                         self.managedFlightLogs[filename] = info
                     }
                 }
@@ -149,6 +150,7 @@ class FlightLogOrganizer {
                     }
                 }else{
                     let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
+                    fileInfo.container = self
                     flightLog.updateFlightLogFileInfo(info: fileInfo)
                     self.managedFlightLogs[ filename ] = fileInfo
                     someNew += 1

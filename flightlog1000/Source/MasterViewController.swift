@@ -108,12 +108,14 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         if let info = self.flightInfo(at: indexPath){
             if self.delegate == nil,
                let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailViewController") as? LogDetailViewController {
+                detailViewController.logFileOrganizer = self.logFileOrganizer
                 self.delegate = detailViewController
                 self.delegate?.logInfoSelected(info)
                 splitViewController?.showDetailViewController(detailViewController, sender: self)
             }else{
                 self.delegate?.logInfoSelected(info)
                 if let detailViewController = delegate as? LogDetailViewController {
+                    detailViewController.logFileOrganizer = self.logFileOrganizer
                     splitViewController?.showDetailViewController(detailViewController, sender: nil)
                 }
             }

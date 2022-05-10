@@ -26,6 +26,9 @@ struct FlightData {
     private(set) var dates : [Date] = []
     private(set) var doubleFields : [Field] = []
     private(set) var stringFields : [Field] = []
+    
+    private(set) var coordinates : [CLLocationCoordinate2D] = []
+    private(set) var distances : [CLLocationDistance] = []
 
     var count : Int { return dates.count }
     
@@ -70,12 +73,17 @@ struct FlightData {
         let timeIndex : Int = 1
         let offsetIndex : Int = 2
         
+        var latitudeIndex : Int? = nil
+        var longitudeIndex : Int? = nil
+
         // keep default format in list as if bad data need to try again the same
         let extraDateFormats = [ "dd/MM/yyyy HH:mm:ss ZZ", "yyyy-MM-dd HH:mm:ss ZZ" ]
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
         
         var skipped : Int = 0
+        var lastLocation : CLLocation? = nil
+        var runningDistance : CLLocationDistance = 0.0
         
         for line in lines {
             let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
@@ -103,8 +111,14 @@ struct FlightData {
                 }
             }else if fields.count == 0 {
                 fields = []
-                for fieldDescription in vals {
+                for (idx,fieldDescription) in vals.enumerated() {
                     if let field = Field(rawValue: fieldDescription) {
+                        if field == .Latitude {
+                            latitudeIndex = idx
+                        }
+                        if field == .Longitude {
+                            longitudeIndex = idx
+                        }
                         fields.append(field)
                     }else{
                         fields.append(.Unknown)
@@ -148,9 +162,17 @@ struct FlightData {
                 }
                 var doubleLine : [Double] = []
                 var stringLine : [String] = []
-                for (val, isDouble) in zip(vals,columnIsDouble) {
+                var coord = CLLocationCoordinate2D(latitude: .nan, longitude: .nan)
+                
+                for (idx,(val, isDouble)) in zip(vals,columnIsDouble).enumerated() {
                     if isDouble {
                         if let dbl = Double(val) {
+                            if idx == longitudeIndex {
+                                coord.longitude = dbl
+                            }
+                            if idx == latitudeIndex {
+                                coord.latitude = dbl
+                            }
                             doubleLine.append(dbl)
                         }else{
                             doubleLine.append(.nan)
@@ -159,8 +181,17 @@ struct FlightData {
                         stringLine.append(val)
                     }
                 }
+                coordinates.append(coord)
                 values.append(doubleLine)
                 strings.append(stringLine)
+                if coord.latitude.isFinite && coord.longitude.isFinite {
+                    let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
+                    if let last = lastLocation {
+                        runningDistance += location.distance(from: last)
+                    }
+                    lastLocation = location
+                }
+                distances.append(runningDistance)
             }
             self.doubleFields = []
             for (field,isDouble) in zip(fields, columnIsDouble) {
@@ -308,7 +339,6 @@ struct FlightData {
 
         if let firstDate = start ?? self.dates.first {
             var current : [ValueStats] = []
-            
             for (date,one) in zip(self.dates,self.values) {
                 if date < firstDate {
                     continue

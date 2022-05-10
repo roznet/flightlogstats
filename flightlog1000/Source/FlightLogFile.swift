@@ -91,11 +91,18 @@ extension FlightLogFile {
                     if let identifier = identifiers.value(for: .AtvWpt, at: idx),
                        let waypoint = Waypoint(name: identifier),
                        let startTime = previousDate {
+                    
+                        var validData : [Field:ValueStats] = [:]
+                        for (field,val) in stats.fieldValue(at: idx) {
+                            if val.isValid {
+                                validData[field] = val
+                            }
+                        }
                         
                         
                         let leg = FlightLeg(waypoint_to: waypoint, waypoint_from: Waypoint(name: previousIdentifier),
-                                            start_time: startTime, end_time: date,
-                                            data: stats.fieldValue(at: idx))
+                                            timeRange: TimeRange(start: startTime, end: date),
+                                            data: validData)
                         rv.append(leg)
                         previousIdentifier = identifier
                         previousDate = date

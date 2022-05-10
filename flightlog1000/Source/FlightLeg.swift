@@ -14,9 +14,16 @@ struct FlightLeg {
     let waypoint_to : Waypoint
     let waypoint_from : Waypoint?
     
-    let start_time : Date
-    let end_time : Date
+    let timeRange : TimeRange
     
     var data : [Field:ValueStats]
     
+}
+
+extension FlightLeg : CustomStringConvertible {
+    var description: String {
+        let displayContext = DisplayContext()
+        let time = displayContext.formatHHMM(timeRange: self.timeRange)
+        return String(format: "<FlightLeg %@-%@ %@>", waypoint_from?.name ?? "", waypoint_to.name, time )        
+    }
 }

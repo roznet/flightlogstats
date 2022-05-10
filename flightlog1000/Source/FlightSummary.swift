@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 
 struct FlightSummary {
@@ -24,6 +25,10 @@ struct FlightSummary {
     let hobbs : TimeRange
     
     let route : [Waypoint]
+    
+    
+    let distance : CLLocationDistance
+    
     
     init?( info : FlightLogFileInfo ) {
         guard let start = info.start_time_moving, let end = info.end_time else { return nil }
@@ -49,11 +54,14 @@ struct FlightSummary {
         
         self.fuelStart = FuelQuantity(left: info.start_fuel_quantity_left, right: info.start_fuel_quantity_right)
         self.fuelEnd = FuelQuantity(left: info.end_fuel_quantity_left, right: info.end_fuel_quantity_right)
+        self.distance = info.total_distance
     }
     
     init( data : FlightData) throws {
         let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR] )
 
+        
+        
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
@@ -81,6 +89,8 @@ struct FlightSummary {
         self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r)
         self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
         
+        self.distance = data.distances.last ?? 0.0
+
         let identifiers = data.datesStrings(for: [.AtvWpt])
         if let names = identifiers[.AtvWpt]?.values {
             self.route = names.compactMap {
@@ -94,10 +104,14 @@ struct FlightSummary {
 
 extension FlightSummary : CustomStringConvertible {
     var description: String {
+        let displayContext = DisplayContext()
+        let elapsedAsDecimalHours = displayContext.formatDecimal(timeRange: self.hobbs)
+        let fuel = displayContext.formatValue(gallon: self.fuelUsed.total)
         if let flying = self.flying {
-            return "<FlightSummary: hobbs:\(self.hobbs.elapsedAsDecimalHours) flying:\(flying.elapsedAsDecimalHours) fuel:\(self.fuelUsed.totalAsGallon)>"
+            let flyingElapsedAsDecimalHours = displayContext.formatDecimal(timeRange: flying)
+            return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) flying:\(flyingElapsedAsDecimalHours) fuel:\(fuel)>"
         }else{
-            return "<FlightSummary: hobbs:\(self.hobbs.elapsedAsDecimalHours) fuel:\(self.fuelUsed.totalAsGallon)>"
+            return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) fuel:\(fuel)>"
         }
     }
 }

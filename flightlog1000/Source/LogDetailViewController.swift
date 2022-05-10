@@ -8,15 +8,13 @@
 import UIKit
 
 class LogDetailViewController: UIViewController,LogSelectionDelegate {
+    var logFileOrganizer = FlightLogOrganizer.shared
+    
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var totalFuel: UILabel!
     
-    var flightLogFileInfo : FlightLogFileInfo? = nil {
-        didSet {
-            updateUI()
-        }
-    }
-
+    var flightLogFileInfo : FlightLogFileInfo? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -29,6 +27,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
             notification in
             self.updateUI()
         }
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,5 +55,11 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     
     func logInfoSelected(_ info: FlightLogFileInfo) {
         self.flightLogFileInfo = info
+        AppDelegate.worker.async {
+            self.flightLogFileInfo?.parseAndUpdate()
+            DispatchQueue.main.async {
+                self.updateUI()
+            }
+        }
     }
 }

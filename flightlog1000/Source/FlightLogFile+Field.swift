@@ -18,6 +18,8 @@ extension FlightLogFile {
     
     enum Field : String {
         case Unknown = "Unknown"
+        
+        // From Garmin
         case AtvWpt = "AtvWpt"
         case Latitude = "Latitude"
         case Longitude = "Longitude"
@@ -108,6 +110,169 @@ extension FlightLogFile {
         case system_id = "system_id"
         case mode = "mode"
         case flightstream_header = "flightstream_header"
+    }
+}
+
+extension FlightLogFile.Field {
+    func format(valueStats : ValueStats, context : DisplayContext = DisplayContext() ) -> String {
+        switch self {
+        case .AltInd:
+            return context.formatStats(altitude: valueStats)
+        case .BaroA:
+            return context.formatStats(baro: valueStats)
+        case .AltMSL:
+            return context.formatStats(altitude: valueStats)
+        case .OAT:
+            return context.formatStats(valueStats)
+        case .IAS:
+            return context.formatStats(speed: valueStats)
+        case .GndSpd:
+            return context.formatStats(speed: valueStats)
+        case .VSpd:
+            return context.formatStats(fpm: valueStats)
+        case .Pitch:
+            return context.formatStats(valueStats)
+        case .Roll:
+            return context.formatStats(valueStats)
+        case .LatAc:
+            return context.formatStats(valueStats)
+        case .NormAc:
+            return context.formatStats(valueStats)
+        case .HDG:
+            return context.formatStats(degree: valueStats)
+        case .TRK:
+            return context.formatStats(degree: valueStats)
+        case .volt1:
+            return context.formatStats(valueStats)
+        case .volt2:
+            return context.formatStats(valueStats)
+        case .amp1:
+            return context.formatStats(valueStats)
+        case .FQtyL:
+            return context.formatStats(gallon: valueStats)
+        case .FQtyR:
+            return context.formatStats(gallon: valueStats)
+        case .E1_FFlow:
+            return context.formatStats(gph: valueStats)
+        case .E1_OilT:
+            return context.formatStats(valueStats)
+        case .E1_OilP:
+            return context.formatStats(valueStats)
+        case .E1_MAP:
+            return context.formatStats(map: valueStats)
+        case .E1_RPM:
+            return context.formatStats(valueStats)
+        case .E1_PctPwr:
+            return context.formatStats(percent: valueStats)
+        case .E1_CHT1:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_CHT2:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_CHT3:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_CHT4:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_CHT5:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_CHT6:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_EGT1:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_EGT2:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_EGT3:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_EGT4:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_EGT5:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_EGT6:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_TIT1:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_TIT2:
+            return context.formatStats(engineTemp: valueStats)
+        case .E1_Torq:
+            return context.formatStats(valueStats)
+        case .E1_NG:
+            return context.formatStats(valueStats)
+        case .E1_ITT:
+            return context.formatStats(valueStats)
+        case .E2_FFlow:
+            return context.formatStats(gph: valueStats)
+        case .E2_MAP:
+            return context.formatStats(map: valueStats)
+        case .E2_RPM:
+            return context.formatStats(valueStats)
+        case .E2_Torq:
+            return context.formatStats(valueStats)
+        case .E2_NG:
+            return context.formatStats(valueStats)
+        case .E2_ITT:
+            return context.formatStats(valueStats)
+        case .AltGPS:
+            return context.formatStats(altitude: valueStats)
+        case .TAS:
+            return context.formatStats(speed: valueStats)
+        case .HSIS:
+            return context.formatStats(valueStats)
+        case .CRS:
+            return context.formatStats(degree: valueStats)
+        case .NAV1:
+            return context.formatStats(frequency: valueStats)
+        case .NAV2:
+            return context.formatStats(frequency: valueStats)
+        case .COM1:
+            return context.formatStats(frequency: valueStats)
+        case .COM2:
+            return context.formatStats(frequency: valueStats)
+        case .HCDI:
+            return context.formatStats(valueStats)
+        case .VCDI:
+            return context.formatStats(valueStats)
+        case .WndSpd:
+            return context.formatStats(speed: valueStats)
+        case .WndDr:
+            return context.formatStats(degree: valueStats)
+        case .WptDst:
+            return context.formatStats(distance: valueStats)
+        case .WptBrg:
+            return context.formatStats(degree: valueStats)
+        case .MagVar:
+            return context.formatStats(degree: valueStats)
+        case .AfcsOn:
+            return context.formatStats(valueStats)
+        case .RollM:
+            return context.formatStats(valueStats)
+        case .PitchM:
+            return context.formatStats(valueStats)
+        case .RollC:
+            return context.formatStats(degree: valueStats)
+        case .PichC:
+            return context.formatStats(degree: valueStats)
+        case .VSpdG:
+            return context.formatStats(fpm: valueStats)
+        case .GPSfix:
+            return context.formatStats(valueStats)
+        case .HAL:
+            return context.formatStats(valueStats)
+        case .VAL:
+            return context.formatStats(valueStats)
+        case .HPLwas:
+            return context.formatStats(valueStats)
+        case .HPLfd:
+            return context.formatStats(valueStats)
+        case .VPLwas:
+            return context.formatStats(valueStats)
+        case .Unknown:
+            return context.formatStats(valueStats)
+        case .AtvWpt:
+            return context.formatStats(valueStats)
+        case .Latitude:
+            return context.formatStats(valueStats)
+        case .Longitude:
+            return context.formatStats(valueStats)
+        }
     }
 }
 
