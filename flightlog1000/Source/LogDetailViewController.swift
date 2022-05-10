@@ -59,15 +59,21 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     
     func logInfoSelected(_ info: FlightLogFileInfo) {
         self.flightLogFileInfo = info
+        
+        DispatchQueue.main.async {
+            self.progressView.setProgress(0.0, animated: false)
+            self.progressView.isHidden = false
+        }
         AppDelegate.worker.async {
             self.flightLogFileInfo?.parseAndUpdate() {
                 val in
                 DispatchQueue.main.async {
                     Logger.app.info( "progress \(val)")
-                    self.progressView.progress = Float(val)
+                    self.progressView.setProgress( Float(val), animated: true )
                 }
             }
             DispatchQueue.main.async {
+                self.progressView.isHidden = true
                 self.updateUI()
             }
         }
