@@ -60,11 +60,18 @@ class flightlog1000Tests: XCTestCase {
         let summary = log.flightSummary
         print( summary! )
 
-        let route = log.route(fields: [.E1_PctPwr,.GndSpd,.FQtyL,.FQtyR])        
+        let route = log.legs
         print( route )
         
+        print( FlightLogFile.Field.AfcsOn.localizedDescription )
         
-        
+        let dataSource = FlightLegsDataSource(legs: route)
+        print( dataSource.fields.map { $0.order } )
+        //for table each column should have same number of row
+        dataSource.computeGeometry()
+        print( dataSource.totalSize)
+        XCTAssertEqual(dataSource.rowsHeight.count * dataSource.columnsWidth.count, dataSource.cellSizes.count)
+        XCTAssertEqual(dataSource.rowsHeight.count * dataSource.columnsWidth.count, dataSource.attributedCells.count)
     }
     
     func testLogFileDiscovery() throws {

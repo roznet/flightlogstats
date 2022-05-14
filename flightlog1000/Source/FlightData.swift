@@ -20,7 +20,7 @@ struct FlightData {
     typealias Field = FlightLogFile.Field
     typealias MetaField = FlightLogFile.MetaField
     
-    private var units : [String] = []
+    private var fieldsUnits : [Field:GCUnit] = [:]
     /**
         * values columns are fields,
      */
@@ -92,7 +92,7 @@ struct FlightData {
         
         var done_sofar = 0
         let done_step = lines.count / 10
-        
+        var units : [String] = []
         for line in lines {
             if done_sofar % done_step == 0, let progress = progress {
                 progress(Double(done_sofar)/Double(lines.count))
@@ -139,6 +139,13 @@ struct FlightData {
                     
                 }
                 fields = vals.map { Field(rawValue: $0) ?? .Unknown }
+                for (idx,(isDouble,unit)) in zip(columnIsDouble,units).enumerated() {
+                    if isDouble {
+                        let field = fields[idx]
+                        let gcunit = GCUnit.from(logFileUnit: unit)
+                        fieldsUnits[field] = gcunit
+                    }
+                }
             }else if vals.count == columnIsDouble.count {
                 let dateString = String(format: "%@ %@ %@", vals[dateIndex], vals[timeIndex], vals[offsetIndex])
                 if let date = formatter.date(from: dateString) {

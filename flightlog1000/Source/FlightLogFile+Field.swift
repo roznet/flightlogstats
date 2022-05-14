@@ -6,17 +6,11 @@
 //
 
 import Foundation
+import OSLog
 
 extension FlightLogFile {
-    static func fields(_ fs : [Field]) -> [String] {
-        return fs.map { $0.rawValue }
-    }
-    
-    static func field(_ f : Field) -> String {
-        return f.rawValue
-    }
-    
     enum Field : String {
+        // the rawValue needs to be the same as in the original csv log file
         case Unknown = "Unknown"
         
         // From Garmin
@@ -97,6 +91,9 @@ extension FlightLogFile {
         case HPLwas = "HPLwas"
         case HPLfd = "HPLfd"
         case VPLwas = "VPLwas"
+        
+        var displayName : String { return self.rawValue }
+        
     }
     
     enum MetaField : String {
@@ -114,6 +111,48 @@ extension FlightLogFile {
 }
 
 extension FlightLogFile.Field {
+    struct FieldDef : Codable {
+        let field : String
+        let order : Int
+        let unit : String
+        let description : String
+        let unit_description : String
+        
+    }
+    static var fieldDefinitions : [FlightLogFile.Field:FieldDef] {
+        var rv : [FlightLogFile.Field:FieldDef] = [:]
+        do {
+            if let bundlePath = Bundle.main.path(forResource: "logFileFields", ofType: "json"),
+               let jsonData = try String(contentsOfFile: bundlePath).data(using: .utf8) {
+                let defs = try JSONDecoder().decode([FieldDef].self, from: jsonData)
+                for def in defs {
+                    if let field = FlightLogFile.Field(rawValue: def.field) {
+                        rv[field] = def
+                    }else{
+                        Logger.app.error("Incompatible field \(def.field)")
+                    }
+                }
+            }
+        } catch {
+            Logger.app.error( "failed to decode field json \(error.localizedDescription)" )
+        }
+        return rv
+    }
+    
+    var localizedDescription : String {
+        if let def = Self.fieldDefinitions[self] {
+            return def.description
+        }
+        return self.rawValue
+    }
+    
+    var order : Int {
+        if let def = Self.fieldDefinitions[self] {
+            return def.order
+        }
+        return 9999
+    }
+    
     func format(valueStats : ValueStats, context : DisplayContext = DisplayContext() ) -> String {
         switch self {
         case .AltInd:

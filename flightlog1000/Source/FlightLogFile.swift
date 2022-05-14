@@ -49,6 +49,8 @@ class FlightLogFile {
             if let data = self.data {
                 do {
                     self.flightSummary = try FlightSummary(data: data)
+                    self.legs = self.route()
+                    
                 }catch{
                     Logger.app.error("Failed to parse log file")
                 }
@@ -73,11 +75,10 @@ extension FlightLogFile {
         try? info.updateFromFlightLog(flightLog: self)
     }
     
-    func route(fields : [ FlightLogFile.Field ]) -> [ FlightLeg ] {
+    private func route() -> [ FlightLeg ] {
         var rv : [FlightLeg] = []
         
         // first identify list of way points
-        self.parse()
         if let data = self.data {
             let identifiers : DatesValuesByField<String,Field> = data.datesStrings(for: [.AtvWpt])
 

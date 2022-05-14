@@ -11,6 +11,14 @@ import CoreLocation
 struct FlightLeg {
     typealias Field = FlightLogFile.Field
     
+    enum LegInfo : String {
+        case start_time = "Start"
+        case end_time = "End"
+        case waypoint_from = "From"
+        case waypoint_to = "To"
+        case route = "Route"
+    }
+    
     let waypoint_to : Waypoint
     let waypoint_from : Waypoint?
     
@@ -18,6 +26,26 @@ struct FlightLeg {
     
     var data : [Field:ValueStats]
     
+    var fields : [Field] { return Array(data.keys).sorted { $0.order < $1.order } }
+    
+    func format(which : LegInfo, displayContext :DisplayContext = DisplayContext(), reference : Date? = nil) -> String {
+        switch which {
+        case .start_time:
+            return displayContext.format(date: self.timeRange.start, since: self.timeRange.start, reference: reference)
+        case .end_time:
+            return displayContext.format(date: self.timeRange.start, since: self.timeRange.start, reference: reference)
+        case .route:
+            return displayContext.format(waypoint: self.waypoint_to, from: waypoint_from)
+        case .waypoint_from:
+            if let waypoint_from = waypoint_from {
+                return displayContext.format(waypoint: waypoint_from)
+            }else{
+                return ""
+            }
+        case .waypoint_to:
+            return displayContext.format(waypoint: self.waypoint_to)
+        }
+    }
 }
 
 extension FlightLeg : CustomStringConvertible {
@@ -26,4 +54,34 @@ extension FlightLeg : CustomStringConvertible {
         let time = displayContext.formatHHMM(timeRange: self.timeRange)
         return String(format: "<FlightLeg %@-%@ %@>", waypoint_from?.name ?? "", waypoint_to.name, time )        
     }
+}
+
+extension Array where Element == FlightLeg {
+    typealias Field = FlightLogFile.Field
+
+    var valueStatsByField : [Field:[ValueStats]] {
+        var rv : [Field:[ValueStats]] = [:]
+        
+        // first collect and initialize superset of fields
+        for element in self {
+            for (f,_) in element.data {
+                rv[f] = []
+            }
+        }
+        for element in self {
+            for f in rv.keys {
+                if let v = element.data[f] {
+                    rv[f]?.append(v)
+                }else{
+                    rv[f]?.append(ValueStats.invalid)
+                }
+            }
+        }
+        
+        return rv
+    }
+}
+
+extension FlightLeg.LegInfo : CustomStringConvertible {
+    var description : String { return self.rawValue }
 }

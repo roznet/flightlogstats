@@ -14,6 +14,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var totalFuel: UILabel!
+    @IBOutlet weak var fuelCollectionView: UICollectionView!
     
     var flightLogFileInfo : FlightLogFileInfo? = nil
     

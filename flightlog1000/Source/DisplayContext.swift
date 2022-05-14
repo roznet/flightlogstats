@@ -7,22 +7,31 @@
 
 import Foundation
 import CoreLocation
+import RZUtils
 
-struct DisplayContext {
-    enum UnitSystem {
-        case metric
-        case imperial
-    }
-    
+class DisplayContext {
+    typealias Field = FlightLogFile.Field
     enum Style {
         case value
         case range
     }
     
-    var unitSystem : UnitSystem = .metric
+    enum DateStyle {
+        case absolute
+        case elapsed
+        case reference
+    }
+    
     var style : Style = .value
-        
+    var dateStyle : DateStyle = .elapsed
+    var timeFormatter : DateFormatter
 
+    init() {
+        self.timeFormatter = DateFormatter()
+        self.timeFormatter.dateStyle = .none
+        self.timeFormatter.timeStyle = .short
+    }
+    
     //MARK: - format model objets
     func formatDecimal(timeRange : TimeRange) -> String {
         return String(format: "%.1f", timeRange.elapsed / 3600.0 )
@@ -38,23 +47,59 @@ struct DisplayContext {
         return route.map { $0.name }.joined(separator: ",")
     }
     
+    func format(waypoint : Waypoint, from : Waypoint? = nil) -> String {
+        if let from = from {
+            return "\(from.name)-\(waypoint.name)"
+        }else{
+            return "\(waypoint.name)"
+        }
+    }
+    
+    /// Format date according to current convention: absolute, elapsed since beg of entity (ex; leg) or elapsed since reference date
+    /// - Parameters:
+    ///   - date: the date to format
+    ///   - since: the beginning of the period that date is relevant, for example in a leg that would be the start the leg
+    ///   - reference: This is the reference date of which to compute general elapsed, typically the first date of the log
+    /// - Returns: formatted date according to the convention
+    func format(date : Date, since : Date? = nil, reference : Date? = nil) -> String {
+        switch self.dateStyle {
+        case .elapsed:
+            if let since = since {
+                return self.formatHHMM(timeRange: TimeRange(start: since, end: date))
+            }else{
+                return self.timeFormatter.string(from: date)
+            }
+        case .reference:
+            if let reference = reference {
+                return self.formatHHMM(timeRange: TimeRange(start: reference, end: date))
+            }else{
+                return self.timeFormatter.string(from: date)
+            }
+        case .absolute:
+            return self.timeFormatter.string(from: date)
+        }
+    }
+    
+
+    //MARK: - format Fields
+    func formatStats(field : Field, valueStats : ValueStats) -> String {
+        return field.format(valueStats: valueStats, context: self)
+    }
+    
     //MARK: - format values
     func formatValue(distanceMeter : CLLocationDistance) -> String {
         return String(format: "%.1f nm", distanceMeter / 1852.0)
     }
 
     func formatValue(gallon : Double) -> String {
-        return String(format: "%.1f gal", gallon)
+        let val = GCNumberWithUnit(GCUnit.from(logFileUnit: "gal"), andValue: gallon)
+        return val.description
     }
     
     //MARK: - format stats
     func formatStats(baro inch : ValueStats) -> String {
-        switch unitSystem {
-        case .metric:
-            return String(format: "%.0f", inch.average)
-        case .imperial:
-            return String(format: "%.0f", inch.average)
-        }
+        let val = GCNumberWithUnit(GCUnit.from(logFileUnit: "inch"), andValue: inch.average)
+        return val.description
     }
 
     func formatStats(fpm : ValueStats) -> String {

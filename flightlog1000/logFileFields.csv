@@ -1,0 +1,78 @@
+﻿field,order,unit,description,unit_description
+AtvWpt,1,ident,Active Waypoint Identifier,
+AltInd,4,ft,Baro-Corrected altitude ,feet
+BaroA,5,inch,Baro Correction ,in/Hg
+AltMSL,6,ft msl,GPS altitude ,MSL
+OAT,7,deg C,OAT ,degrees C
+IAS,8,kt,Indicated airspeed ,kts
+GndSpd,9,kt,Ground Speed ,kts
+VSpd,10,fpm,Vertical speed ,fpm
+Pitch,11,deg,Pitch Attitude Angle ,degrees
+Roll,12,deg,Roll Attitude Angle ,degrees
+LatAc,13,G,Lateral G Force ,g
+NormAc,14,G,Vertical G Force ,g
+HDG,15,deg,Magnetic Heading ,degrees
+TRK,16,deg,Ground Track ,degrees magnetic
+volt1,17,volts,volt1,
+volt2,18,volts,volt2,
+amp1,19,amps,amp1,
+FQtyL,20,gals,Fuel Qty Left ,gals
+FQtyR,21,gals,Fuel Qty Right ,gals
+AltGPS,51,ft wgs,GPS altitude ,WGS84 datum
+TAS,52,kt,True airspeed ,knots
+HSIS,53,enum,HSI source,
+CRS,54,deg,Selected course,
+NAV1,55,MHz,Nav1 frequency,
+NAV2,56,MHz,Nav2 frequency,
+COM1,57,MHz,Com1 frequency,
+COM2,58,MHz,Com2 frequency,
+HCDI,59,fsd,CDI deflection,
+VCDI,60,fsd,VDI/GP/GS deflection,
+WndSpd,61,kt,Wind Speed ,knots
+WndDr,62,deg,Wind Direction ,degrees
+WptDst,63,nm,Distance to next waypoint ,nm
+WptBrg,64,deg,Bearing to next waypoint ,degrees
+MagVar,65,deg,Magnetic variation ,degrees
+AfcsOn,66,bool,Autopilot On/Off,
+VSpdG,71,fpm,GPS vertical speed ,fpm
+GPSfix,72,enum,GPSfix,
+E1 FFlow,100,gph,Fuel Flow ,gph
+E1 OilT,101,deg F,Oil Temperature ,deg. F
+E1 OilP,102,psi,Oil Pressure ,psi
+E1 MAP,103,Hg,E1 MAP,
+E1 RPM,104,rpm,E1 RPM,
+E1 %Pwr,105,%,E1 PctPwr,
+E1 CHT1,106,deg F,E1 CHT1,
+E1 CHT2,107,deg F,E1 CHT2,
+E1 CHT3,108,deg F,E1 CHT3,
+E1 CHT4,109,deg F,E1 CHT4,
+E1 CHT5,110,deg F,E1 CHT5,
+E1 CHT6,111,deg F,E1 CHT6,
+E1 EGT1,112,deg F,E1 EGT1,
+E1 EGT2,113,deg F,E1 EGT2,
+E1 EGT3,114,deg F,E1 EGT3,
+E1 EGT4,115,deg F,E1 EGT4,
+E1 EGT5,116,deg F,E1 EGT5,
+E1 EGT6,117,deg F,E1 EGT6,
+E1 TIT1,118,deg F,E1 TIT1,
+E1 TIT2,119,deg F,E1 TIT2,
+E1 Torq,120,ft lbs,E1 Torq,
+E1 NG,121,%,E1 NG,
+E1 ITT,122,deg C,E1 ITT,
+E2 FFlow,200,gph,E2 FFlow,
+E2 MAP,201,Hg,E2 MAP,
+E2 RPM,202,rpm,E2 RPM,
+E2 Torq,203,ft lbs,E2 Torq,
+E2 NG,204,%,E2 NG,
+E2 ITT,205,deg C,E2 ITT,
+RollM,800,enum,RollM,
+PitchM,801,enum,PitchM,
+RollC,802,deg,RollC,
+PichC,803,deg,PichC,
+HAL,804,mt,GPS horizontal alert limit,
+VAL,805,mt,GPS vertical alert limit,
+HPLwas,806,mt,WAAS GPS horizontal protection level,
+HPLfd,807,mt,HPLfd,
+VPLwas,808,mt,WAAS GPS vertical protection level,
+Latitude,900,degrees,Latitude ,degrees geodetic +North
+Longitude,901,degrees,Longitude ,degrees geodetic +East

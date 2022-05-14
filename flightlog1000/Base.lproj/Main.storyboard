@@ -6,6 +6,7 @@
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -35,19 +36,61 @@
                                     <constraint firstAttribute="width" constant="150" id="FCx-80-klz"/>
                                 </constraints>
                             </progressView>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mee-fG-3c6">
+                                <rect key="frame" x="-5" y="225" width="428" height="214"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="mee-fG-3c6" secondAttribute="height" multiplier="4:2" id="mgM-cY-dbD"/>
+                                </constraints>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="g7n-Kr-V0W">
+                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="fuelInfoCell" id="J22-fR-Qj1" customClass="FuelInfoCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="FDz-jQ-IZ8">
+                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Qs-3h-518">
+                                                    <rect key="frame" x="43" y="53.666666666666657" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="8Qs-3h-518" firstAttribute="centerX" secondItem="FDz-jQ-IZ8" secondAttribute="centerX" id="SCb-Fb-Chi"/>
+                                                <constraint firstItem="8Qs-3h-518" firstAttribute="centerY" secondItem="FDz-jQ-IZ8" secondAttribute="centerY" id="ds8-DA-EoH"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="label" destination="8Qs-3h-518" id="qho-DW-lLc"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="S3q-Cy-ALO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Zeb-u1-shB" firstAttribute="top" secondItem="h5i-bu-Kfn" secondAttribute="bottom" constant="17" id="2eJ-ej-wXO"/>
                             <constraint firstItem="wkc-d6-MzS" firstAttribute="top" secondItem="Zeb-u1-shB" secondAttribute="bottom" constant="37" id="5VM-gB-CVA"/>
+                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="mee-fG-3c6" secondAttribute="trailing" constant="5" id="7LI-kd-Xre"/>
+                            <constraint firstItem="mee-fG-3c6" firstAttribute="top" secondItem="wkc-d6-MzS" secondAttribute="bottom" constant="19" id="EeT-rk-bvx"/>
                             <constraint firstItem="h5i-bu-Kfn" firstAttribute="top" secondItem="S3q-Cy-ALO" secondAttribute="top" constant="18" id="GUE-Gr-btL"/>
+                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="leading" secondItem="mee-fG-3c6" secondAttribute="leading" constant="5" id="O9u-Mv-Zgc"/>
                             <constraint firstItem="wkc-d6-MzS" firstAttribute="leading" secondItem="h5i-bu-Kfn" secondAttribute="leading" id="rVb-2o-RhP"/>
                             <constraint firstItem="Zeb-u1-shB" firstAttribute="leading" secondItem="h5i-bu-Kfn" secondAttribute="leading" id="seH-4e-Fhb"/>
                             <constraint firstItem="h5i-bu-Kfn" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="20" id="xI3-qo-aaL"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="fuelCollectionView" destination="mee-fG-3c6" id="ASf-Nf-8NE"/>
                         <outlet property="name" destination="h5i-bu-Kfn" id="H0Q-jq-D8o"/>
                         <outlet property="progressView" destination="wkc-d6-MzS" id="mzV-jg-duT"/>
                         <outlet property="totalFuel" destination="Zeb-u1-shB" id="TPE-uF-9dV"/>
@@ -55,7 +98,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cr2-EI-nvD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-221" y="868"/>
+            <point key="canvasLocation" x="-221.49532710280371" y="867.60259179265665"/>
         </scene>
         <!--Flight Logs-->
         <scene sceneID="ifI-4a-r8r">
