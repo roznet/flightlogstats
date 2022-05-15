@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import OSLog
 
 class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionSizeDelegate {
     typealias Field = FlightLogFile.Field
@@ -21,8 +22,11 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     var cellSizes : [CGSize] = []
     var columnsWidth : [CGFloat] = []
     var rowsHeight : [CGFloat] = []
-    var totalSize : CGSize = CGSize.zero
     
+    var contentSize : CGSize = CGSize.zero
+    
+    var frozenColumns : Int { return self.fixedColumnsInfo.count }
+    var frozenRows : Int = 1
     
     init(legs : [FlightLeg], displayContext : DisplayContext = DisplayContext()){
         self.legs = legs
@@ -38,13 +42,13 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
 
         // should be sorted
         self.displayContext = displayContext
-        self.fixedColumnsInfo = [.end_time,.route]
+        self.fixedColumnsInfo = [.end_time,.waypoint_from,.waypoint_to]
         
     }
     
     //MARK: - delegate
     func size(at: IndexPath) -> CGSize {
-        return CGSize.zero
+        return CGSize(width: self.columnsWidth[at.item], height: self.rowsHeight[at.section])
     }
     
     func prepare() {
@@ -53,8 +57,6 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     
     var titleAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.boldSystemFont(ofSize: 14.0)]
     var cellAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.systemFont(ofSize: 14.0)]
-    
-    
     
     func formattedValueFor(field : Field, row : Int) -> String {
         guard let leg = self.legs[safe: row],
@@ -69,7 +71,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     
     func computeGeometry() {
         
-        self.totalSize = CGSize.zero
+        self.contentSize = CGSize.zero
         self.attributedCells  = []
         self.cellSizes  = []
         self.columnsWidth  = []
@@ -101,7 +103,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
                 rowHeight = max(rowHeight, fieldSize.height)
             }
             self.rowsHeight.append(rowHeight)
-            self.totalSize.height += rowHeight
+            self.contentSize.height += rowHeight
             
             var row = 0
             for leg in legs {
@@ -126,11 +128,11 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
                     idx += 1
                 }
                 self.rowsHeight.append(rowHeight)
-                self.totalSize.height += rowHeight
+                self.contentSize.height += rowHeight
                 row += 1
             }
             
-            self.totalSize.width = self.columnsWidth.reduce(0.0, +)
+            self.contentSize.width = self.columnsWidth.reduce(0.0, +)
         }
     }
     
@@ -144,7 +146,25 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TableCollectionViewCell", for: indexPath)
+        if let tableCell = cell as? TableCollectionViewCell {
+            let index = indexPath.section * self.columnsWidth.count + indexPath.item
+            tableCell.label.attributedText = self.attributedCells[index]
+            
+            if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
+                tableCell.backgroundColor = UIColor.systemCyan
+            }else{
+                if indexPath.section % 2 == 0{
+                    tableCell.backgroundColor = UIColor.systemBackground
+                }else{
+                    tableCell.backgroundColor = UIColor.systemGroupedBackground
+                }
+            }
+        }
+        
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        Logger.app.info("Selected \(indexPath)")
+    }
 }

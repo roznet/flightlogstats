@@ -69,7 +69,7 @@ class flightlog1000Tests: XCTestCase {
         print( dataSource.fields.map { $0.order } )
         //for table each column should have same number of row
         dataSource.computeGeometry()
-        print( dataSource.totalSize)
+        print( dataSource.contentSize)
         XCTAssertEqual(dataSource.rowsHeight.count * dataSource.columnsWidth.count, dataSource.cellSizes.count)
         XCTAssertEqual(dataSource.rowsHeight.count * dataSource.columnsWidth.count, dataSource.attributedCells.count)
     }

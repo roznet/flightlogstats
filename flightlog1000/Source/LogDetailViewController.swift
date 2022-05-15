@@ -16,7 +16,10 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     @IBOutlet weak var totalFuel: UILabel!
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     
+    @IBOutlet weak var legsCollectionView: UICollectionView!
+    
     var flightLogFileInfo : FlightLogFileInfo? = nil
+    var legsDataSource : FlightLegsDataSource? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +58,24 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
             self.name.text = self.flightLogFileInfo?.log_file_name
             self.totalFuel.text = self.flightLogFileInfo?.totalFuelDescription
             self.view.setNeedsDisplay()
+        
+            if let legs = self.flightLogFileInfo?.flightLog?.legs {
+                let legsDataSource = FlightLegsDataSource(legs: legs)
+                legsDataSource.prepare()
+                self.legsDataSource = legsDataSource
+                self.legsCollectionView.dataSource = self.legsDataSource
+                self.legsCollectionView.delegate = self.legsDataSource
+                if let tableCollectionLayout = self.legsCollectionView.collectionViewLayout as? TableCollectionViewLayout {
+                    tableCollectionLayout.sizeDelegate = self.legsDataSource
+                }else{
+                    Logger.app.error("Internal error: Inconsistent layout ")
+                }
+                //self.fuelCollectionView.collectionViewLayout
+            }else{
+                self.legsDataSource = nil
+                
+            }
+                
         }
     }
     

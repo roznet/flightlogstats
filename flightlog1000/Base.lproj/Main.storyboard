@@ -42,42 +42,32 @@
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="mee-fG-3c6" secondAttribute="height" multiplier="4:2" id="mgM-cY-dbD"/>
                                 </constraints>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="g7n-Kr-V0W">
-                                    <size key="itemSize" width="128" height="128"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
+                                <collectionViewLayout key="collectionViewLayout" id="rhw-Mu-gap" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="fuelInfoCell" id="J22-fR-Qj1" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="FDz-jQ-IZ8">
-                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </collectionViewCellContentView>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="aKL-fC-i7y" userLabel="Legs Collection View">
-                                <rect key="frame" x="0.0" y="559" width="428" height="272"/>
+                                <rect key="frame" x="0.0" y="439" width="428" height="453"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="t9s-lq-tIU">
-                                    <size key="itemSize" width="128" height="128"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
+                                <collectionViewLayout key="collectionViewLayout" id="oSQ-lx-eW3" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="Ybg-6H-Krt" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="wEg-kd-TkA">
-                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="poO-1U-1lH" userLabel="label">
-                                                    <rect key="frame" x="43" y="53.666666666666657" width="42" height="21"/>
+                                                    <rect key="frame" x="4" y="14.666666666666664" width="42" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -99,7 +89,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Zeb-u1-shB" firstAttribute="top" secondItem="h5i-bu-Kfn" secondAttribute="bottom" constant="17" id="2eJ-ej-wXO"/>
-                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="bottom" secondItem="aKL-fC-i7y" secondAttribute="bottom" constant="61" id="4bY-16-cFc"/>
+                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="bottom" secondItem="aKL-fC-i7y" secondAttribute="bottom" id="4bY-16-cFc"/>
                             <constraint firstItem="wkc-d6-MzS" firstAttribute="top" secondItem="Zeb-u1-shB" secondAttribute="bottom" constant="37" id="5VM-gB-CVA"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="mee-fG-3c6" secondAttribute="trailing" constant="5" id="7LI-kd-Xre"/>
                             <constraint firstItem="mee-fG-3c6" firstAttribute="top" secondItem="wkc-d6-MzS" secondAttribute="bottom" constant="19" id="EeT-rk-bvx"/>
@@ -110,11 +100,12 @@
                             <constraint firstItem="Zeb-u1-shB" firstAttribute="leading" secondItem="h5i-bu-Kfn" secondAttribute="leading" id="seH-4e-Fhb"/>
                             <constraint firstItem="h5i-bu-Kfn" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="20" id="xI3-qo-aaL"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="aKL-fC-i7y" secondAttribute="trailing" id="y4Z-zG-2za"/>
-                            <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="mee-fG-3c6" secondAttribute="bottom" constant="120" id="y5c-0i-9X6"/>
+                            <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="mee-fG-3c6" secondAttribute="bottom" id="y5c-0i-9X6"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="fuelCollectionView" destination="mee-fG-3c6" id="ASf-Nf-8NE"/>
+                        <outlet property="legsCollectionView" destination="aKL-fC-i7y" id="B4G-8r-hwp"/>
                         <outlet property="name" destination="h5i-bu-Kfn" id="H0Q-jq-D8o"/>
                         <outlet property="progressView" destination="wkc-d6-MzS" id="mzV-jg-duT"/>
                         <outlet property="totalFuel" destination="Zeb-u1-shB" id="TPE-uF-9dV"/>
