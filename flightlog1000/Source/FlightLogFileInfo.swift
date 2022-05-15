@@ -69,11 +69,12 @@ class FlightLogFileInfo: NSManagedObject {
     //MARK: - get require data from files
     func updateFromFlightLog(flightLog : FlightLogFile) throws {
         self.flightLog = flightLog
+
+        self.log_file_name = flightLog.name
+
         guard let flightSummary = flightLog.flightSummary else {
             throw FlightLogFileInfoError.invalidFlightLog
         }
-
-        self.log_file_name = flightLog.name
 
         if let system_id = flightLog.meta(key: .system_id) {
             self.system_id = system_id
@@ -106,9 +107,6 @@ class FlightLogFileInfo: NSManagedObject {
         self.total_distance = flightSummary.distance
         
         self.version = FlightLogFileInfo.currentVersion
-        if self.hasChanges {
-            NotificationCenter.default.post(name: .logFileInfoUpdated, object: self)
-        }
     }
 
     

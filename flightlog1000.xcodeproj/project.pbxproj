@@ -37,7 +37,7 @@
 		4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
 		429949D7282816A100CA1B89 /* DisplayContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D6282816A100CA1B89 /* DisplayContext.swift */; };
-		429949D9282A9F7C00CA1B89 /* FuelInfoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D8282A9F7C00CA1B89 /* FuelInfoCollectionViewCell.swift */; };
+		429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */; };
 		429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */; };
 		429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */; };
 		429949E2282C6E3E00CA1B89 /* FlightLegsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949E1282C6E3E00CA1B89 /* FlightLegsDataSource.swift */; };
@@ -103,7 +103,7 @@
 		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		429949D6282816A100CA1B89 /* DisplayContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisplayContext.swift; path = Source/DisplayContext.swift; sourceTree = "<group>"; };
-		429949D8282A9F7C00CA1B89 /* FuelInfoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelInfoCollectionViewCell.swift; path = Source/FuelInfoCollectionViewCell.swift; sourceTree = "<group>"; };
+		429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewCell.swift; path = Source/TableCollectionViewCell.swift; sourceTree = "<group>"; };
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
 		429949DC282B427D00CA1B89 /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewLayout.swift; path = Source/TableCollectionViewLayout.swift; sourceTree = "<group>"; };
@@ -227,7 +227,7 @@
 				4280C8B9280D460500A0FB32 /* MasterViewController.swift */,
 				4264C231281D9A0700F40436 /* FlightLogTableViewCell.swift */,
 				4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */,
-				429949D8282A9F7C00CA1B89 /* FuelInfoCollectionViewCell.swift */,
+				429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */,
 				429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */,
 				429949E1282C6E3E00CA1B89 /* FlightLegsDataSource.swift */,
 			);
@@ -460,7 +460,7 @@
 				4280C8C1280D467400A0FB32 /* FlightLogFile.swift in Sources */,
 				429949D7282816A100CA1B89 /* DisplayContext.swift in Sources */,
 				4264C23828267F6600F40436 /* Waypoint.swift in Sources */,
-				429949D9282A9F7C00CA1B89 /* FuelInfoCollectionViewCell.swift in Sources */,
+				429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */,
 				429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */,
 				4280C8BD280D460600A0FB32 /* SceneDelegate.swift in Sources */,
 				429949E2282C6E3E00CA1B89 /* FlightLegsDataSource.swift in Sources */,

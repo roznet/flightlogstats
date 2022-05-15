@@ -34,7 +34,7 @@ class FlightLogOrganizer {
     private var currentState : UpdateState = .ready
 
     var flightLogFileList : FlightLogFileList {
-        let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog } )
+        let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
         return list
     }
     
@@ -170,6 +170,21 @@ class FlightLogOrganizer {
         info.delete()
         self.persistentContainer.viewContext.delete(info)
         self.saveContext()
+    }
+    
+    func deleteAndResetAll() {
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "FlightLogFileInfo")
+        do {
+
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+
+            try self.persistentContainer.viewContext.execute(deleteRequest)
+        } catch let error {
+            Logger.app.error("Failed to reset \(error.localizedDescription)")
+        }
+
+        self.managedFlightLogs = [:]
+        
     }
     
     //MARK: - Log Files discovery

@@ -28,6 +28,11 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
             UIAction(title: "Delete", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Delete")
+            },
+            UIAction(title: "Reset All", image: UIImage(systemName: "minus.circle")){
+                _ in
+                Logger.app.info("Reset All")
+                self.logFileOrganizer.deleteAndResetAll()
             }
         ]
         

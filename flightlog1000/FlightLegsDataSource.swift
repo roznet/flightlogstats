@@ -42,12 +42,19 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
         
     }
     
+    //MARK: - delegate
     func size(at: IndexPath) -> CGSize {
         return CGSize.zero
     }
     
+    func prepare() {
+        self.computeGeometry()
+    }
+    
     var titleAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.boldSystemFont(ofSize: 14.0)]
     var cellAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.systemFont(ofSize: 14.0)]
+    
+    
     
     func formattedValueFor(field : Field, row : Int) -> String {
         guard let leg = self.legs[safe: row],
@@ -72,7 +79,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
             // col 0 = time since start
             // col 1 = leg waypoints
 
-            let since = first.timeRange.start
+            let reference = first.timeRange.start
             
             // first headers
             var rowHeight : CGFloat = 0.0
@@ -101,7 +108,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
                 var idx = 0
                 rowHeight = 0.0
                 for info in self.fixedColumnsInfo {
-                    let fixedAttributed = NSAttributedString(string: leg.format(which: info, displayContext: self.displayContext), attributes: self.titleAttributes)
+                    let fixedAttributed = NSAttributedString(string: leg.format(which: info, displayContext: self.displayContext, reference: reference), attributes: self.titleAttributes)
                     let fixedSize = fixedAttributed.size()
                     self.attributedCells.append(fixedAttributed)
                     self.cellSizes.append(fixedSize)
@@ -128,15 +135,16 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return legs.count
+        return legs.count + 1 /* for header */
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2 /*time+waypoint*/
+        return self.fixedColumnsInfo.count + self.fields.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return UICollectionViewCell()
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TableCollectionViewCell", for: indexPath)
+        return cell
     }
     
 }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class FuelInfoCollectionViewCell: UICollectionViewCell {
+class TableCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var label: UILabel!
     
 }
