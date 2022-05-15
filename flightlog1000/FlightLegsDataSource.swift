@@ -76,6 +76,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
         self.cellSizes  = []
         self.columnsWidth  = []
         self.rowsHeight = []
+        let marginMultiplier = CGSize(width: 1.2, height: 1.2)
         
         if let first = legs.first {
             // col 0 = time since start
@@ -90,8 +91,8 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
                 let titleSize = titleAttributed.size()
                 self.attributedCells.append(titleAttributed)
                 self.cellSizes.append(titleSize)
-                self.columnsWidth.append(titleSize.width)
-                rowHeight  = max(rowHeight, titleSize.height)
+                self.columnsWidth.append(titleSize.width * marginMultiplier.width)
+                rowHeight  = max(rowHeight, titleSize.height * marginMultiplier.height)
             }
 
             for field in fields {
@@ -99,8 +100,8 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
                 let fieldSize = fieldAttributed.size()
                 self.attributedCells.append(fieldAttributed)
                 self.cellSizes.append(fieldSize)
-                self.columnsWidth.append(fieldSize.width)
-                rowHeight = max(rowHeight, fieldSize.height)
+                self.columnsWidth.append(fieldSize.width * marginMultiplier.width)
+                rowHeight = max(rowHeight, fieldSize.height * marginMultiplier.height)
             }
             self.rowsHeight.append(rowHeight)
             self.contentSize.height += rowHeight
@@ -114,8 +115,8 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
                     let fixedSize = fixedAttributed.size()
                     self.attributedCells.append(fixedAttributed)
                     self.cellSizes.append(fixedSize)
-                    self.columnsWidth[idx] = max(fixedSize.width, self.columnsWidth[idx])
-                    rowHeight = max(rowHeight, fixedSize.height)
+                    self.columnsWidth[idx] = max(fixedSize.width*marginMultiplier.width, self.columnsWidth[idx])
+                    rowHeight = max(rowHeight, fixedSize.height*marginMultiplier.height)
                     idx += 1
                 }
                 for field in fields {
@@ -123,8 +124,8 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
                     let fieldSize = fieldAttributed.size()
                     self.attributedCells.append(fieldAttributed)
                     self.cellSizes.append(fieldSize)
-                    self.columnsWidth[idx] = max(self.columnsWidth[idx], fieldSize.width)
-                    rowHeight = max(rowHeight, fieldSize.height)
+                    self.columnsWidth[idx] = max(self.columnsWidth[idx], fieldSize.width*marginMultiplier.width)
+                    rowHeight = max(rowHeight, fieldSize.height*marginMultiplier.height)
                     idx += 1
                 }
                 self.rowsHeight.append(rowHeight)
