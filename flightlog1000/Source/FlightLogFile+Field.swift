@@ -13,6 +13,10 @@ extension FlightLogFile {
         // the rawValue needs to be the same as in the original csv log file
         case Unknown = "Unknown"
         
+        case Lcl_Date = "Lcl Date"
+        case Lcl_Time = "Lcl Time"
+        case UTCOfst = "UTCOfst"
+        
         // From Garmin
         case AtvWpt = "AtvWpt"
         case Latitude = "Latitude"
@@ -311,6 +315,14 @@ extension FlightLogFile.Field {
             return context.formatStats(valueStats)
         case .Longitude:
             return context.formatStats(valueStats)
+        case .Lcl_Date:
+            return ""
+        case .Lcl_Time:
+            return ""
+
+        case .UTCOfst:
+            return ""
+
         }
     }
 }
