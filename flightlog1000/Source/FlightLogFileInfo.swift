@@ -104,6 +104,9 @@ class FlightLogFileInfo: NSManagedObject {
         
         self.route = flightSummary.route.map { $0.name }.joined(separator: ",")
         
+        self.start_airport_icao = flightSummary.startAirport?.icao
+        self.end_airport_icao = flightSummary.endAirport?.icao
+        
         self.total_distance = flightSummary.distance
         
         self.version = FlightLogFileInfo.currentVersion

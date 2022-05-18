@@ -7,15 +7,24 @@
 
 import UIKit
 import RZFlight
+import FMDB
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     public static let worker = DispatchQueue(label: "net.ro-z.flightlog1000.worker")
     private let keepOrganizer = FlightLogOrganizer.shared
+    public static var db : FMDatabase = FMDatabase()
+    public static var knownAirports : KnownAirports? = nil
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         Secrets.shared = Secrets(url: Bundle.main.url(forResource: "secrets", withExtension: "json") )
+        AppDelegate.db =  FMDatabase(url: Bundle.main.url(forResource: "airports", withExtension: "db"))
+        AppDelegate.db.open()
+        
+        AppDelegate.worker.async {
+            AppDelegate.knownAirports = KnownAirports(db: AppDelegate.db)
+        }
         
         Settings.registerDefaults()
 

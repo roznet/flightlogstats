@@ -9,6 +9,7 @@ import Foundation
 import FMDB
 import KDTree
 import CoreLocation
+import RZFlight
 
 class KnownAirports {
     
@@ -58,8 +59,14 @@ class KnownAirports {
         tree = KDTree<AirportCoord>(values: points)
     }
  
-    func nearest(coord : CLLocationCoordinate2D) -> String? {
+    func nearestIdent(coord : CLLocationCoordinate2D) -> String? {
         let found = tree.nearest(to: AirportCoord(coord: coord))
         return found?.ident
+    }
+    func nearest(coord : CLLocationCoordinate2D, db : FMDatabase) -> Airport? {
+        if let found = self.nearestIdent(coord: coord){
+            return try? Airport(db: db, ident: found)
+        }
+        return nil
     }
 }

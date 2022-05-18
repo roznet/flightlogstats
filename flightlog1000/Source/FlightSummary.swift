@@ -57,6 +57,13 @@ class FlightSummary {
         self.fuelStart = FuelQuantity(left: info.start_fuel_quantity_left, right: info.start_fuel_quantity_right)
         self.fuelEnd = FuelQuantity(left: info.end_fuel_quantity_left, right: info.end_fuel_quantity_right)
         self.distance = info.total_distance
+        
+        if let start_airport_icao = info.start_airport_icao {
+            self.startAirport = try? Airport(db: AppDelegate.db, ident: start_airport_icao)
+        }
+        if let end_airport_icao = info.end_airport_icao {
+            self.endAirport = try? Airport(db: AppDelegate.db, ident: end_airport_icao)
+        }
     }
     
     init( data : FlightData) throws {
@@ -98,6 +105,9 @@ class FlightSummary {
         }else{
             self.route = []
         }
+        
+        self.startAirport = AppDelegate.knownAirports?.nearest(coord: data.firstCoordinate, db: AppDelegate.db)
+        self.endAirport = AppDelegate.knownAirports?.nearest(coord: data.lastCoordinate, db: AppDelegate.db)
     }
     
 }
