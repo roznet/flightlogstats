@@ -9,8 +9,9 @@ import XCTest
 @testable import FlightLog1000
 import CoreData
 import OSLog
-
-
+import RZFlight
+import FMDB
+import CoreLocation
 
 extension Logger {
     public static let test = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "test")
@@ -188,6 +189,37 @@ class flightlog1000Tests: XCTestCase {
         organizer.loadFromContainer()
         XCTAssertEqual(reload.managedFlightLogs.count,1)
         expectation.fulfill()
+    }
+    
+    func testKnownAirports(){
+        let url = Bundle.main.url(forResource: "airports", withExtension: "db")
+
+        XCTAssertNotNil(url)
+        if let url = url {
+            let db = FMDatabase(url: url)
+            db.open()
+            
+            let known = KnownAirports(db:db)
+            let cases = [ ("EGTF", 51.3504028, -0.5617803),
+                          ("EGPN", 56.4537125,    -3.0180488) ]
+            for test in cases {
+                let coord = CLLocationCoordinate2D(latitude: test.1, longitude: test.2)
+                let nearest = known.nearest(coord: coord)
+                XCTAssertNotNil(nearest)
+                guard let nearest = nearest else { continue }
+                XCTAssertEqual(nearest, test.0 )
+                //
+                do {
+                    let airport = try Airport(db: db, ident: nearest)
+                    print( airport.name )
+                    print( airport.runways )
+                }catch{
+                    print(error)
+                }
+            }
+            db.close()
+        }
+        
     }
 }
 
