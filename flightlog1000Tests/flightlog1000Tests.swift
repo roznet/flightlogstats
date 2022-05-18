@@ -200,8 +200,9 @@ class flightlog1000Tests: XCTestCase {
             db.open()
             
             let known = KnownAirports(db:db)
-            let cases = [ ("EGTF", 51.3504028, -0.5617803),
-                          ("EGPN", 56.4537125,    -3.0180488) ]
+            let cases = [ ("EGTF", 51.3504028, -0.5617803, "Woking", 1),
+                          ("EGPN", 56.4537125,    -3.0180488, "Dundee", 1),
+                          ("KSAF", 35.617, -106.089, "Santa Fe", 3),]
             for test in cases {
                 let coord = CLLocationCoordinate2D(latitude: test.1, longitude: test.2)
                 let nearest = known.nearest(coord: coord)
@@ -211,8 +212,9 @@ class flightlog1000Tests: XCTestCase {
                 //
                 do {
                     let airport = try Airport(db: db, ident: nearest)
-                    print( airport.name )
-                    print( airport.runways )
+                    XCTAssertEqual(airport.icao, test.0)
+                    XCTAssertEqual(airport.city, test.3)
+                    XCTAssertEqual(airport.runways.count, test.4)
                 }catch{
                     print(error)
                 }
