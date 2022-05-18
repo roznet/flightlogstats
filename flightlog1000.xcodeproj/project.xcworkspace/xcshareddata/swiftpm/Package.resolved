@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "Geomagnetism",
+        "repositoryURL": "https://github.com/roznet/Geomagnetism",
+        "state": {
+          "branch": null,
+          "revision": "74049c87ab58b6e004342a64de2884c60b0c4734",
+          "version": "1.0.0"
+        }
+      },
+      {
         "package": "RZUtilsTouch",
         "repositoryURL": "https://github.com/roznet/rzutils-touch",
         "state": {

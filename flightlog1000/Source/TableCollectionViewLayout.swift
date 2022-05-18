@@ -111,9 +111,11 @@ class TableCollectionViewLayout: UICollectionViewLayout {
         let frozenColumns = sizeDelegate.frozenColumns
         let frozenRows = sizeDelegate.frozenRows
         
+        // var because should update when more than 1 row
         var y = collectionView.contentOffset.y
         for section in 0..<collectionView.numberOfSections {
             var x = collectionView.contentOffset.x
+            var maxHeight : CGFloat = 0.0
             for item in 0..<collectionView.numberOfItems(inSection: section) {
                 if section >= frozenRows && item >= frozenColumns {
                     continue
@@ -124,6 +126,7 @@ class TableCollectionViewLayout: UICollectionViewLayout {
                         var frame = attributes.frame
                         frame.origin.y = y
                         attributes.frame = frame
+                        maxHeight = max(maxHeight, frame.size.height)
                         
                     }
                     if item < frozenColumns {
@@ -136,6 +139,7 @@ class TableCollectionViewLayout: UICollectionViewLayout {
                     }
                 }
             }
+            y += maxHeight
         }
     }
 }

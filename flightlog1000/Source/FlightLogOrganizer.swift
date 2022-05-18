@@ -117,10 +117,15 @@ class FlightLogOrganizer {
                 }
                 Logger.app.info("Updated \(done) info")
                 self.saveContext()
+                // need to switch state before starting next
                 self.currentState = .ready
                 // if did something, schedule another batch
                 self.updateInfo(count: count)
+            }else{
+                // nothing done, ready for more
+                self.currentState = .ready
             }
+            
         }
     }
     
@@ -172,7 +177,7 @@ class FlightLogOrganizer {
         self.saveContext()
     }
     
-    func deleteAndResetAll() {
+    func deleteAndResetDatabase() {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "FlightLogFileInfo")
         do {
 
@@ -184,6 +189,24 @@ class FlightLogOrganizer {
         }
 
         self.managedFlightLogs = [:]
+        
+    }
+    
+    func deleteLocalFilesAndDatabase() {
+        self.deleteAndResetDatabase()
+        do {
+            var count = 0
+            let files = try FileManager.default.contentsOfDirectory(atPath: self.localFolder.path)
+            for file in files{
+                if file.isLogFile {
+                    count += 1
+                    try FileManager.default.removeItem(at: self.localFolder.appendingPathComponent(file))
+                }
+            }
+            Logger.app.info("Deleted \(count) out of \(files.count) files")
+        }catch{
+            Logger.app.error("Failed to look at content for delete")
+        }
         
     }
     

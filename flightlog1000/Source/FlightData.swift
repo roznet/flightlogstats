@@ -9,6 +9,7 @@ import Foundation
 import OSLog
 import RZUtils
 import RZUtilsSwift
+import RZFlight
 
 typealias ProcessingProgressReport = (_ : Double) -> Void
 
@@ -36,7 +37,13 @@ struct FlightData {
     private(set) var distances : [CLLocationDistance] = []
 
     var count : Int { return dates.count }
-    
+    var firstCoordinate : CLLocationCoordinate2D {
+        return self.coordinates.first { CLLocationCoordinate2DIsValid($0) } ?? kCLLocationCoordinate2DInvalid
+    }
+    var lastCoordinate : CLLocationCoordinate2D {
+        return self.coordinates.last { CLLocationCoordinate2DIsValid($0) } ?? kCLLocationCoordinate2DInvalid
+    }
+
     private var doubleFieldToIndex : [Field:Int] {
         var rv : [Field:Int] = [:]
         for (idx,field) in doubleFields.enumerated() {
@@ -200,7 +207,11 @@ struct FlightData {
                         stringLine.append(val)
                     }
                 }
-                coordinates.append(coord)
+                if coord.latitude.isFinite && coord.longitude.isFinite {
+                    coordinates.append(coord)
+                }else{
+                    coordinates.append(kCLLocationCoordinate2DInvalid)
+                }
                 values.append(doubleLine)
                 strings.append(stringLine)
                 if coord.latitude.isFinite && coord.longitude.isFinite {
@@ -229,6 +240,31 @@ struct FlightData {
         }
     }
 
+        //MARK: - external and derived info
+    func fetchAirports(completion : @escaping ([Airport]) -> Void){
+        guard CLLocationCoordinate2DIsValid(self.firstCoordinate) && CLLocationCoordinate2DIsValid(self.lastCoordinate)
+        else {
+            completion([])
+            return
+        }
+            
+        Airport.near(coord: self.firstCoordinate, count: 1, reporting: false){
+            startAirports in
+            Airport.near(coord: self.lastCoordinate, count: 1, reporting: false){
+                endAirports in
+                var rv : [Airport] = []
+                if let start = startAirports.first {
+                    rv.append(start)
+                }
+                if let end = endAirports.first {
+                    rv.append(end)
+                }
+                completion(rv)
+            }
+        }
+    }
+
+    
     //MARK: - raw extracts
     
     /**
@@ -391,27 +427,6 @@ struct FlightData {
             }
         }
         
-        return rv
-    }
-    
-    static let coordinateField = "coordinate"
-    
-    func coordinates(latitudeField : Field = .Latitude, longitudeField : Field = .Longitude) -> DatesValuesByField<CLLocationCoordinate2D,String> {
-        var rv = DatesValuesByField<CLLocationCoordinate2D,String>(fields: [Self.coordinateField])
-        if let latitudeIndex = self.doubleFieldToIndex[latitudeField],
-           let longitudeIndex = self.doubleFieldToIndex[longitudeField] {
-            for (date,row) in zip(dates,values) {
-                let latitude = row[latitudeIndex]
-                let longitude = row[longitudeIndex]
-                if latitude.isFinite && longitude.isFinite {
-                    do {
-                        try rv.append(field: Self.coordinateField, element: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), for: date)
-                    }catch{
-                        Logger.app.error("Failed to create coordinate for \(date)")
-                    }
-                }
-            }
-        }
         return rv
     }
 }

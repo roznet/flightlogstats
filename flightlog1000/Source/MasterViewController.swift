@@ -29,11 +29,17 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
                 _ in
                 Logger.app.info("Delete")
             },
-            UIAction(title: "Reset All", image: UIImage(systemName: "minus.circle")){
+            UIAction(title: "Reset Database", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Reset All")
-                self.logFileOrganizer.deleteAndResetAll()
+                self.logFileOrganizer.deleteAndResetDatabase()
+            },
+            UIAction(title: "Reset Files and Database", image: UIImage(systemName: "minus.circle")){
+                _ in
+                Logger.app.info("Reset All")
+                self.logFileOrganizer.deleteLocalFilesAndDatabase()
             }
+
         ]
         
         return UIMenu( options: .displayInline, children: menuItems)

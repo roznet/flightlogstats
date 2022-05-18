@@ -135,24 +135,32 @@
                                             <rect key="frame" x="5" y="5" width="101.66666666666667" height="89"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="22 Apr 22 10:10" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fnr-Qm-BJe" userLabel="date">
-                                                    <rect key="frame" x="0.0" y="0.0" width="101.66666666666667" height="21.666666666666668"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="101.66666666666667" height="18"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="EGTF,OCK," textAlignment="natural" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BsR-3f-wqd" userLabel="route">
-                                                    <rect key="frame" x="0.0" y="39.666666666666664" width="101.66666666666667" height="17"/>
+                                                    <rect key="frame" x="0.0" y="36" width="101.66666666666667" height="17"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="knq-lT-6lR">
-                                                    <rect key="frame" x="0.0" y="74.666666666666671" width="101.66666666666667" height="14.333333333333329"/>
+                                                    <rect key="frame" x="0.0" y="71" width="101.66666666666667" height="18"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstItem="knq-lT-6lR" firstAttribute="centerY" secondItem="eHV-1q-1DG" secondAttribute="centerY" id="2oX-f1-1xL"/>
+                                                <constraint firstItem="BsR-3f-wqd" firstAttribute="centerY" secondItem="eHV-1q-1DG" secondAttribute="centerY" id="I37-Io-dmt"/>
+                                                <constraint firstItem="fnr-Qm-BJe" firstAttribute="centerY" secondItem="eHV-1q-1DG" secondAttribute="centerY" id="YnF-WF-9As"/>
+                                                <constraint firstItem="knq-lT-6lR" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="dpo-0a-pVr"/>
+                                                <constraint firstItem="BsR-3f-wqd" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="ho5-f9-UUP"/>
+                                                <constraint firstItem="fnr-Qm-BJe" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="lq3-XF-g3P"/>
+                                            </constraints>
                                         </stackView>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="f5y-BP-W6W">
                                             <rect key="frame" x="111.66666666666666" y="5" width="311.33333333333337" height="89"/>

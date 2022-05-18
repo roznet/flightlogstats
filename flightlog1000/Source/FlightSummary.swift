@@ -7,9 +7,10 @@
 
 import Foundation
 import CoreLocation
+import RZFlight
 
 
-struct FlightSummary {
+class FlightSummary {
     enum FlightSummaryError : Error {
         case noData
         case missingFuel
@@ -26,9 +27,10 @@ struct FlightSummary {
     
     let route : [Waypoint]
     
+    var startAirport : Airport? = nil
+    var endAirport : Airport? = nil
     
     let distance : CLLocationDistance
-    
     
     init?( info : FlightLogFileInfo ) {
         guard let start = info.start_time_moving, let end = info.end_time else { return nil }
@@ -59,14 +61,11 @@ struct FlightSummary {
     
     init( data : FlightData) throws {
         let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR] )
-
-        
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
         let flyingValues = engineOnValues?.dropFirst(field: .IAS) { $0 > 35.0 }?.dropLast(field: .IAS) { $0 > 35.0 }
-        
         
         guard let start = data.dates.first, let end = data.dates.last else {
             throw FlightSummaryError.noData
@@ -100,6 +99,7 @@ struct FlightSummary {
             self.route = []
         }
     }
+    
 }
 
 extension FlightSummary : CustomStringConvertible {

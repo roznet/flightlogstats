@@ -50,7 +50,6 @@ class FlightLogFile {
                 do {
                     self.flightSummary = try FlightSummary(data: data)
                     self.legs = self.route()
-                    
                 }catch{
                     Logger.app.error("Failed to parse log file")
                 }

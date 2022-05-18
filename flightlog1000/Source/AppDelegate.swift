@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RZFlight
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,6 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        Secrets.shared = Secrets(url: Bundle.main.url(forResource: "secrets", withExtension: "json") )
+        
         Settings.registerDefaults()
 
         FlightLogOrganizer.shared.loadFromContainer()
