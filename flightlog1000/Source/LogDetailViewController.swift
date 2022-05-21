@@ -13,9 +13,15 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var name: UILabel!
-    @IBOutlet weak var totalFuel: UILabel!
-    @IBOutlet weak var fuelCollectionView: UICollectionView!
+    @IBOutlet weak var airports: UILabel!
+    @IBOutlet weak var route: UILabel!
     
+    @IBOutlet weak var totalFuel: UILabel!
+    @IBOutlet weak var totalRemainingFuel: UILabel!
+    @IBOutlet weak var leftRemainingFuel: UILabel!
+    @IBOutlet weak var rightRemainingFuel: UILabel!
+    
+    @IBOutlet weak var fuelCollectionView: UICollectionView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
     
     var flightLogFileInfo : FlightLogFileInfo? = nil
@@ -54,9 +60,33 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     */
 
     func updateUI(){
+        let displayContext = DisplayContext()
+        
         if self.name != nil {
             self.name.text = self.flightLogFileInfo?.log_file_name
             self.totalFuel.text = self.flightLogFileInfo?.totalFuelDescription
+            
+            if let summary = self.flightLogFileInfo?.flightSummary {
+                var airports : [String] = []
+                if let from = summary.startAirport {
+                    airports.append("\(from.name) (\(from.icao))")
+                }
+                if let to = summary.endAirport {
+                    airports.append("\(to.name) (\(to.icao))")
+                }
+                self.airports.text = airports.joined(separator: "  -  ")
+                self.route.text = displayContext.format(route: summary.route)
+                self.totalRemainingFuel.text =  displayContext.formatValue(gallon: summary.fuelEnd.total)
+                self.leftRemainingFuel.text =  displayContext.formatValue(gallon: summary.fuelEnd.left)
+                self.rightRemainingFuel.text =  displayContext.formatValue(gallon: summary.fuelEnd.right)
+            }else{
+                self.airports.text = nil
+                self.totalRemainingFuel.text = nil
+                self.leftRemainingFuel.text =  nil
+                self.rightRemainingFuel.text =  nil
+                self.route.text = nil
+            }
+            
             self.view.setNeedsDisplay()
         
             if let legs = self.flightLogFileInfo?.flightLog?.legs {
@@ -83,6 +113,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
         self.flightLogFileInfo = info
         
         DispatchQueue.main.async {
+            self.updateUI()
             self.progressView.setProgress(0.0, animated: false)
             self.progressView.isHidden = false
         }

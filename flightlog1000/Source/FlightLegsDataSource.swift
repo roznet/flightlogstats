@@ -48,6 +48,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     
     //MARK: - delegate
     func size(at: IndexPath) -> CGSize {
+        guard legs.count > 0 else { return CGSize.zero }
         return CGSize(width: self.columnsWidth[at.item], height: self.rowsHeight[at.section])
     }
     
@@ -138,10 +139,12 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
+        guard legs.count > 0 else { return 0 }
         return legs.count + 1 /* for header */
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard legs.count > 0 else { return 0 }
         return self.fixedColumnsInfo.count + self.fields.count
     }
     
