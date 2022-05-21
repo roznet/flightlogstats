@@ -14,6 +14,7 @@ class FlightLogTableViewCell: UITableViewCell {
     @IBOutlet weak var flightTime: UILabel!
     @IBOutlet weak var totalTime: UILabel!
     @IBOutlet weak var route: UILabel!
+    @IBOutlet weak var airports: UILabel!
     @IBOutlet weak var fuel: UILabel!
     
     @IBOutlet weak var distance: UILabel!
@@ -33,12 +34,21 @@ class FlightLogTableViewCell: UITableViewCell {
             self.fuel.text = self.displayContext.formatValue(gallon: flightSummary.fuelUsed.total)
             self.route.text = self.displayContext.format(route: flightSummary.route)
             self.distance.text = self.displayContext.formatValue(distanceMeter: flightSummary.distance)
+            var airports : [String] = []
+            if let from = flightSummary.startAirport {
+                airports.append(from.icao)
+            }
+            if let to = flightSummary.endAirport {
+                airports.append(to.icao)
+            }
+            self.airports.text = airports.joined(separator: "-")
         }else{
             self.totalTime.text = "??"
             self.flightTime.text = nil
             self.fuel.text = nil
             self.route.text = nil
             self.distance.text = nil
+            self.airports.text = nil
 
         }
     }

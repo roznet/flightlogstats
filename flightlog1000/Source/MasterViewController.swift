@@ -99,7 +99,12 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
         if let cell = cell as? FlightLogTableViewCell,
            let info = self.flightInfo(at: indexPath) {
             
-            cell.update(with: info)
+            AppDelegate.worker.async {
+                let _ = info.flightSummary
+                DispatchQueue.main.async {
+                    cell.update(with: info)
+                }
+            }
             
             /*
             if let cell = GCCellGrid(tableView) {

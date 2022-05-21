@@ -20,15 +20,15 @@ class FlightLogFileInfo: NSManagedObject {
     
     weak var container : FlightLogOrganizer? = nil
     
-    /*private*/ var flightLog : FlightLogFile? = nil
-    
-    var flightSummary : FlightSummary? {
-        if let fromLog = self.flightLog?.flightSummary {
-            return fromLog
-        }else{
-            return FlightSummary(info: self)
+    /*private*/ var flightLog : FlightLogFile? = nil {
+        didSet {
+            if let fromLog = self.flightLog?.flightSummary {
+                self.flightSummary = fromLog
+            }
         }
     }
+    
+    lazy var flightSummary : FlightSummary? = FlightSummary(info: self)
     
     static let currentVersion : Int32 = 1
     
