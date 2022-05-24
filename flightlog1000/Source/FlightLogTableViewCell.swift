@@ -25,6 +25,14 @@ class FlightLogTableViewCell: UITableViewCell {
         self.fileName.text = info.log_file_name
         self.flightLogFileInfo = info
         if let flightSummary = info.flightSummary {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            formatter.timeStyle = .short
+            if let start_time = info.start_time {
+                self.date.text = formatter.string(from: start_time)
+            }else{
+                self.date.text = "Missing"
+            }
             self.totalTime.text = self.displayContext.formatDecimal(timeRange: flightSummary.hobbs)
             if let flying = flightSummary.flying {
                 self.flightTime.text = self.displayContext.formatDecimal(timeRange: flying)
@@ -43,6 +51,7 @@ class FlightLogTableViewCell: UITableViewCell {
             }
             self.airports.text = airports.joined(separator: "-")
         }else{
+            self.date.text = "Empty"
             self.totalTime.text = "??"
             self.flightTime.text = nil
             self.fuel.text = nil

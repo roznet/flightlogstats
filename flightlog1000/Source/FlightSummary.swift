@@ -8,7 +8,8 @@
 import Foundation
 import CoreLocation
 import RZFlight
-
+import RZUtils
+import OSLog
 
 class FlightSummary {
     enum FlightSummaryError : Error {
@@ -70,10 +71,9 @@ class FlightSummary {
         let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR] )
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
-        
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
         let flyingValues = engineOnValues?.dropFirst(field: .IAS) { $0 > 35.0 }?.dropLast(field: .IAS) { $0 > 35.0 }
-        
+
         guard let start = data.dates.first, let end = data.dates.last else {
             throw FlightSummaryError.noData
         }
@@ -84,13 +84,10 @@ class FlightSummary {
         self.moving = TimeRange(valuesByField: movingValues, field: .GndSpd)
         self.flying = TimeRange(valuesByField: flyingValues, field: .IAS)
 
-        guard  let fuel_start_l = values.first(field: .FQtyL)?.value,
-               let fuel_start_r = values.first(field: .FQtyR)?.value,
-               let fuel_end_l = values.last(field: .FQtyL)?.value,
-               let fuel_end_r = values.last(field: .FQtyR)?.value
-        else  {
-            throw FlightSummaryError.missingFuel
-        }
+        let fuel_start_l = values.first(field: .FQtyL)?.value ?? 0.0
+        let fuel_start_r = values.first(field: .FQtyR)?.value ?? 0.0
+        let fuel_end_l = values.last(field: .FQtyL)?.value ?? 0.0
+        let fuel_end_r = values.last(field: .FQtyR)?.value ?? 0.0
         
         self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r)
         self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
@@ -98,6 +95,7 @@ class FlightSummary {
         self.distance = data.distances.last ?? 0.0
 
         let identifiers = data.datesStrings(for: [.AtvWpt])
+
         if let names = identifiers[.AtvWpt]?.values {
             self.route = names.compactMap {
                 return Waypoint(name: $0)
@@ -108,6 +106,7 @@ class FlightSummary {
         
         self.startAirport = AppDelegate.knownAirports?.nearest(coord: data.firstCoordinate, db: AppDelegate.db)
         self.endAirport = AppDelegate.knownAirports?.nearest(coord: data.lastCoordinate, db: AppDelegate.db)
+
     }
     
 }

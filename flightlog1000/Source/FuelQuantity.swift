@@ -9,6 +9,7 @@ import Foundation
 
 struct FuelQuantity {
     static let gallon : Double = 3.785411784
+    static let zero = FuelQuantity(left: 0.0, right: 0.0)
     
     let left : Double
     let right : Double

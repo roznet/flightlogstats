@@ -56,6 +56,8 @@
 		42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */; };
 		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
+		42E83FEB283CB58E00869598 /* TestG1000LogFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEA283CB58E00869598 /* TestG1000LogFiles.swift */; };
+		42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,7 +79,6 @@
 
 /* Begin PBXFileReference section */
 		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
-		425D04F82832F7360028FD67 /* rzflight */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzflight; path = ../rzflight; sourceTree = "<group>"; };
 		425D04F92832FCFE0028FD67 /* secrets.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = secrets.json; sourceTree = "<group>"; };
 		425D04FB283451F30028FD67 /* airports.db */ = {isa = PBXFileReference; lastKnownFileType = file; name = airports.db; path = python/airports.db; sourceTree = SOURCE_ROOT; };
 		425D04FC283451F30028FD67 /* logFileFields.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = logFileFields.json; path = python/logFileFields.json; sourceTree = SOURCE_ROOT; };
@@ -116,7 +117,6 @@
 		429949D6282816A100CA1B89 /* DisplayContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisplayContext.swift; path = Source/DisplayContext.swift; sourceTree = "<group>"; };
 		429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewCell.swift; path = Source/TableCollectionViewCell.swift; sourceTree = "<group>"; };
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
-		429949DC282B427D00CA1B89 /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewLayout.swift; path = Source/TableCollectionViewLayout.swift; sourceTree = "<group>"; };
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
 		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
@@ -127,6 +127,8 @@
 		42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_211204_102045_EGLL.csv; sourceTree = "<group>"; };
 		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
+		42E83FEA283CB58E00869598 /* TestG1000LogFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestG1000LogFiles.swift; sourceTree = "<group>"; };
+		42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BufferedStreamReader.swift; path = Source/BufferedStreamReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +166,7 @@
 		42478A4F28153EBE00212BF2 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */,
 				425D0501283452320028FD67 /* ValueStats.swift */,
 				42478A5028153EF300212BF2 /* Log.swift */,
 				4264C2332825B58F00F40436 /* Settings.swift */,
@@ -178,8 +181,6 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
-				425D04F82832F7360028FD67 /* rzflight */,
-				429949DC282B427D00CA1B89 /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLog1000.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlog1000 */,
 				4280C893280D43E500A0FB32 /* flightlog1000Tests */,
@@ -216,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				4280C8C6280D48E700A0FB32 /* TestAssets */,
+				42E83FEA283CB58E00869598 /* TestG1000LogFiles.swift */,
 				4280C894280D43E500A0FB32 /* flightlog1000Tests.swift */,
 			);
 			path = flightlog1000Tests;
@@ -474,6 +476,7 @@
 				4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
 				4264C2342825B58F00F40436 /* Settings.swift in Sources */,
+				42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */,
 				4264C23C282691EF00F40436 /* FuelQuantity.swift in Sources */,
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
@@ -496,6 +499,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4280C895280D43E500A0FB32 /* flightlog1000Tests.swift in Sources */,
+				42E83FEB283CB58E00869598 /* TestG1000LogFiles.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

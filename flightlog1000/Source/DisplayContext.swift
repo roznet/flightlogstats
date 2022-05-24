@@ -23,7 +23,7 @@ class DisplayContext {
     }
     
     var style : Style = .value
-    var dateStyle : DateStyle = .elapsed
+    var dateStyle : DateStyle = .reference
     var timeFormatter : DateFormatter
 
     init() {
@@ -38,8 +38,8 @@ class DisplayContext {
     }
     
     func formatHHMM(timeRange : TimeRange) -> String {
-        let hours = round(timeRange.elapsed / 3600.0)
-        let minutes = round((timeRange.elapsed - (hours * 3600.0))/60.0)
+        let hours = floor(timeRange.elapsed / 3600.0)
+        let minutes = floor((timeRange.elapsed - (hours * 3600.0))/60.0)
         return String(format: "%02.0f:%02.0f", hours,minutes )
     }
     
@@ -139,7 +139,7 @@ class DisplayContext {
     }
 
     func formatStats(frequency : ValueStats) -> String {
-        return String(format: "%@", frequency.end)
+        return String(format: "%.3f", frequency.end)
     }
     // default
     func formatStats(_ stat : ValueStats) -> String {

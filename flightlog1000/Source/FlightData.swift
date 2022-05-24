@@ -13,7 +13,7 @@ import RZFlight
 
 typealias ProcessingProgressReport = (_ : Double) -> Void
 
-struct FlightData {
+class FlightData {
     // how often to report progress
     private static let progressReportStep = 5
     
@@ -62,24 +62,54 @@ struct FlightData {
     
     private init() {}
     
-    init?(url: URL, progress : ProcessingProgressReport? = nil){
-        guard let str = try? String(contentsOf: url, encoding: .utf8) else { return nil }
-        let lines = str.split(whereSeparator: \.isNewline)
-        
-        self.init(lines: lines, progress: progress)
-    }
-
+    static var methodBuffered = false
     
-    init(lines : [String.SubSequence], progress : ProcessingProgressReport? = nil) {
+    convenience init?(url: URL, progress : ProcessingProgressReport? = nil){
         self.init()
-        self.parseLines(lines: lines, progress: progress)
+        
+        if Self.methodBuffered {
+            var inputSize = 0
+            do {
+                let resources = try url.resourceValues(forKeys: [.fileSizeKey] )
+                if let fileSize = resources.fileSize {
+                    inputSize = fileSize
+                }
+            }catch{
+                inputSize = 0
+            }
+            
+            guard let inputStream = InputStream(url: url) else { return nil }
+            do {
+                try self.parse(inputStream: inputStream, totalSize: inputSize, progress: nil)
+            }catch{
+                return nil
+            }
+        }else{
+            guard let str = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+            let lines = str.split(whereSeparator: \.isNewline)
+            
+            self.init(lines: lines, progress: progress)
+        }
     }
     
-    private mutating func parseLines(lines : [String.SubSequence], progress : ProcessingProgressReport? = nil){
+    convenience init(lines : [String.SubSequence], progress : ProcessingProgressReport? = nil) {
+        self.init()
+        self.parse(array: lines, progress: progress)
+    }
+    
+    convenience init(inputStream : InputStream,progress : ProcessingProgressReport? = nil) throws {
+        self.init()
+        try self.parse(inputStream: inputStream)
+    }
+    
+    //MARK: - Parsing State
+    
+    private struct ParsingState {
+        var lastReportTime = Date()
+        var totalSize = 0
+        
         var fields : [Field] = []
         var columnIsDouble : [Bool] = []
-        
-        let trimCharSet = CharacterSet(charactersIn: "\"# ")
         
         let dateIndex : Int = 0
         let timeIndex : Int = 1
@@ -91,36 +121,40 @@ struct FlightData {
         // keep default format in list as if bad data need to try again the same
         let extraDateFormats = [ "dd/MM/yyyy HH:mm:ss ZZ", "yyyy-MM-dd HH:mm:ss ZZ" ]
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
         
         var skipped : Int = 0
         var lastLocation : CLLocation? = nil
         var runningDistance : CLLocationDistance = 0.0
         
-        var done_sofar = 0
-        let done_step = lines.count / 10
         var units : [String] = []
-        for line in lines {
-            if done_sofar % done_step == 0, let progress = progress {
-                progress(Double(done_sofar)/Double(lines.count))
-            }
-            done_sofar += 1
-            let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
+
+        var data : FlightData
+        
+        var doubleLine : [Double] = []
+        var stringLine : [String] = []
+        
+        init(data : FlightData){
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
+            self.data = data
+        }
+        
+        mutating func process(line : [String]){
+            guard let first = line.first else { return }
             
-            if line.hasPrefix("#airframe") {
-                for val in vals {
+            if first.hasPrefix("#airframe") {
+                for val in line {
                     let keyval = val.split(separator: "=")
                     if keyval.count == 2 {
                         let metaFieldDescription = String(keyval[0])
                         if let metaField = MetaField(rawValue: metaFieldDescription) {
-                            meta[metaField] = keyval[1].trimmingCharacters(in: trimCharSet)
+                            data.meta[metaField] = String(keyval[1])
                         }else{
                             Logger.app.warning("Unknown meta field \(metaFieldDescription)")
                         }
                     }
                 }
-            }else if line.hasPrefix("#"){
-                units = vals
+            }else if first.hasPrefix("#"){
+                units = line
                 for unit in units {
                     if unit.hasPrefix("yyy-") || unit.hasPrefix("hh:") || unit == "ident" || unit == "enum" {
                         columnIsDouble.append(false)
@@ -130,7 +164,7 @@ struct FlightData {
                 }
             }else if fields.count == 0 {
                 fields = []
-                for (idx,fieldDescription) in vals.enumerated() {
+                for (idx,fieldDescription) in line.enumerated() {
                     if let field = Field(rawValue: fieldDescription) {
                         if field == .Latitude {
                             latitudeIndex = idx
@@ -145,52 +179,63 @@ struct FlightData {
                     }
                     
                 }
-                fields = vals.map { Field(rawValue: $0) ?? .Unknown }
+                fields = line.map { Field(rawValue: $0) ?? .Unknown }
                 for (idx,(isDouble,unit)) in zip(columnIsDouble,units).enumerated() {
                     if isDouble {
                         let field = fields[idx]
                         let gcunit = GCUnit.from(logFileUnit: unit)
-                        fieldsUnits[field] = gcunit
+                        data.fieldsUnits[field] = gcunit
                     }
                 }
-            }else if vals.count == columnIsDouble.count {
-                let dateString = String(format: "%@ %@ %@", vals[dateIndex], vals[timeIndex], vals[offsetIndex])
+                data.doubleFields = []
+                data.stringFields = []
+                for (field,isDouble) in zip(fields, columnIsDouble) {
+                    if isDouble {
+                        data.doubleFields.append(field)
+                    }else{
+                        data.stringFields.append(field)
+                    }
+                }
+            }else if line.count == columnIsDouble.count {
+                let dateString = String(format: "%@ %@ %@", line[dateIndex], line[timeIndex], line[offsetIndex])
                 if let date = formatter.date(from: dateString) {
-                    dates.append(date)
+                    data.dates.append(date)
                 }else{
                     if dateString.replacingOccurrences(of: " ", with: "").isEmpty {
                         // skip empty strings
-                        continue
+                        return
                     }
                     
                     // if first one try few other format
-                    if dates.count == 0{
+                    if data.dates.count == 0{
                         for fmt in extraDateFormats {
                             formatter.dateFormat = fmt
                             if let date = formatter.date(from: dateString) {
-                                dates.append(date)
+                                data.dates.append(date)
                                 break
                             }
                         }
-                        if dates.count == 0 && skipped < 5 {
+                        if data.dates.count == 0 && skipped < 5 {
                             Logger.app.error("Failed to identify date format '\(dateString)'")
                             skipped += 1
-                            continue
+                            return
                         }
                     }else{
                         // we already have dates, so
                         if skipped < 5 {
+                            let skipped = skipped
                             Logger.app.error("Failed to parse date '\(dateString)' skipped=\(skipped)")
                         }
                         skipped += 1
-                        continue
+                        return
                     }
                 }
-                var doubleLine : [Double] = []
-                var stringLine : [String] = []
+                self.doubleLine.removeAll()
+                self.stringLine.removeAll()
+                
                 var coord = CLLocationCoordinate2D(latitude: .nan, longitude: .nan)
                 
-                for (idx,(val, isDouble)) in zip(vals,columnIsDouble).enumerated() {
+                for (idx,(val, isDouble)) in zip(line,columnIsDouble).enumerated() {
                     if isDouble {
                         if let dbl = Double(val) {
                             if idx == longitudeIndex {
@@ -208,12 +253,12 @@ struct FlightData {
                     }
                 }
                 if coord.latitude.isFinite && coord.longitude.isFinite {
-                    coordinates.append(coord)
+                    data.coordinates.append(coord)
                 }else{
-                    coordinates.append(kCLLocationCoordinate2DInvalid)
+                    data.coordinates.append(kCLLocationCoordinate2DInvalid)
                 }
-                values.append(doubleLine)
-                strings.append(stringLine)
+                data.values.append(doubleLine)
+                data.strings.append(stringLine)
                 if coord.latitude.isFinite && coord.longitude.isFinite {
                     let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
                     if let last = lastLocation {
@@ -221,27 +266,211 @@ struct FlightData {
                     }
                     lastLocation = location
                 }
-                distances.append(runningDistance)
+                data.distances.append(runningDistance)
             }
-            self.doubleFields = []
-            for (field,isDouble) in zip(fields, columnIsDouble) {
-                if isDouble {
-                    self.doubleFields.append(field)
-                }
-            }
-            self.stringFields = []
-            for (field,isDouble) in zip(fields, columnIsDouble) {
-                if !isDouble {
-                    self.stringFields.append(field)
-                }
-            }
-
-            
         }
     }
+    
+    //MARK: - parse stream
+    
+    private enum State {
+        case beginningOfDocument
+        case endOfDocument
+        
+        
+        case beginningOfLine
+        case maybeEndOfLine
+        case endOfLine
+        
+        case maybeInField
+        case inField
+        case endOfField
 
-        //MARK: - external and derived info
+        case inQuotedField
+        case maybeEndOfQuotedField
+    }
+    
+    private struct CSVScalar  {
+        static let CarriageReturn : UnicodeScalar = "\r"
+        static let LineFeed : UnicodeScalar = "\n"
+        static let DoubleQuote : UnicodeScalar = "\""
+        static let Comma : UnicodeScalar = ","
+        static let Space : UnicodeScalar = " "
+    }
+    
+    enum ParseError : Error {
+        case invalidStateForComma
+        case invalidStateForNewLine
+        case invalidStateForQuote
+        case invalidStateForOtherChar
+    }
+    
+    func parse(inputStream : InputStream, totalSize : Int = 0, progress : ProcessingProgressReport? = nil) throws {
+        var lastReportTime = Date()
+        let start = lastReportTime
+        if let progress = progress {
+            progress(0.0)
+        }
+
+        var parsingState = ParsingState(data: self)
+        //var done_sofar = 0
+        
+        let bufferedStreamReader = BufferedStreamReader(inputStream: inputStream)
+        var state : State = .beginningOfDocument
+        
+        var fieldBuffer : [UInt8] = []
+        
+        var line : [String] = []
+        
+        while state != .endOfDocument {
+            let byte = bufferedStreamReader.pop()
+            switch byte {
+            case .error(let error):
+                Logger.app.error("Failed to read stream \(error.localizedDescription)")
+                state = .endOfDocument
+            case .endOfFile:
+                state = .endOfDocument
+            case .char(let char):
+                
+                let scalar = UnicodeScalar(char)
+                if state == .beginningOfDocument {
+                    state = .beginningOfLine
+                }
+                
+                if state == .endOfLine {
+                    state = .beginningOfLine
+                }
+                
+                switch scalar {
+                case CSVScalar.Comma:
+                    switch state {
+                    case .beginningOfLine:
+                        state = .endOfField
+                    case .inField, .maybeInField:
+                        state = .endOfField
+                    case .inQuotedField:
+                        fieldBuffer.append(char)
+                    case .maybeEndOfQuotedField,.endOfField:
+                        state = .endOfField
+                    default:
+                        throw ParseError.invalidStateForComma
+                    }
+                case CSVScalar.CarriageReturn:
+                    switch state {
+                    case .endOfField, .beginningOfLine, .inField, .maybeInField, .maybeEndOfQuotedField:
+                        state = .maybeEndOfLine
+                    case .inQuotedField:
+                        fieldBuffer.append(char)
+                    default:
+                        throw ParseError.invalidStateForNewLine
+                    }
+                case CSVScalar.LineFeed:
+                    switch state {
+                    case .endOfField, .beginningOfLine, .inField, .maybeInField, .maybeEndOfQuotedField:
+                        state = .endOfLine
+                    case .inQuotedField:
+                        fieldBuffer.append(char)
+                    case .maybeEndOfLine:
+                        state = .beginningOfLine
+                    default:
+                        throw ParseError.invalidStateForNewLine
+                    }
+                case CSVScalar.Space:
+                    switch state {
+                    case .inField:
+                        fieldBuffer.append(char)
+                    default:
+                        state = .maybeInField
+                    }
+                case CSVScalar.DoubleQuote:
+                    switch state {
+                    case .beginningOfLine, .endOfField:
+                        state = .inQuotedField
+                    case .maybeEndOfQuotedField:
+                        // double double quote, to escape double quote
+                        fieldBuffer.append(char)
+                        state = .inQuotedField
+                    case .inField:
+                        fieldBuffer.append(char)
+                    case .inQuotedField:
+                        // first one
+                        state = .maybeEndOfQuotedField
+                    default:
+                        throw ParseError.invalidStateForQuote
+                    }
+                default:
+                    switch state {
+                    case .beginningOfLine, .endOfField:
+                        fieldBuffer.append(char)
+                        state = .inField
+                    case .maybeEndOfQuotedField:
+                        state = .maybeEndOfQuotedField
+                    case .maybeInField:
+                        fieldBuffer.append(char)
+                        state = .inField
+                    case .inField, .inQuotedField:
+                        fieldBuffer.append(char)
+                    default:
+                        throw ParseError.invalidStateForOtherChar
+                    }
+                }
+            }
+            if state == .endOfField || state == .endOfLine || state == .maybeEndOfLine || state == .endOfDocument {
+                if let value = String(data: Data(fieldBuffer), encoding: .utf8) {
+                    line.append(value)
+                }else{
+                    line.append("") // empty
+                }
+                fieldBuffer.removeAll()
+                if state != .endOfField {
+                    parsingState.process(line: line)
+                    line.removeAll()
+                    if totalSize > 0, let progress = progress {
+                        let current = Date()
+                        if current.timeIntervalSince(lastReportTime) > 0.1 {
+                            progress(min(1.0,Double(bufferedStreamReader.readCount)/Double(totalSize)))
+                            lastReportTime = current
+                        }
+                    }
+                }
+            }
+        }
+        if let progress = progress {
+            progress(1.0)
+        }
+        if totalSize > 0 {
+            Logger.app.info("parsed \(totalSize) bytes in \(Date().timeIntervalSince(start)) secs")
+        }
+    }
+    
+    //MARK: - parse Memory
+    
+    private func parse(array : [String.SubSequence], progress : ProcessingProgressReport? = nil){
+        let start = Date()
+        var state = ParsingState(data: self)
+        var done_sofar = 0
+        let done_step = array.count / 10
+        
+        self.values.reserveCapacity(array.count)
+        self.strings.reserveCapacity(array.count)
+        
+        let trimCharSet = CharacterSet(charactersIn: "\" ")
+
+        for line in array {
+            if done_sofar % done_step == 0, let progress = progress {
+                progress(Double(done_sofar)/Double(array.count))
+            }
+            done_sofar += 1
+            let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
+            state.process(line: vals)
+        }
+        Logger.app.info("parsed \(array.count) lines in \(Date().timeIntervalSince(start)) secs")
+    }
+
+
+    //MARK: - external and derived info
     func fetchAirports(completion : @escaping ([Airport]) -> Void){
+        
         guard CLLocationCoordinate2DIsValid(self.firstCoordinate) && CLLocationCoordinate2DIsValid(self.lastCoordinate)
         else {
             completion([])

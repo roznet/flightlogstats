@@ -121,7 +121,6 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
             self.flightLogFileInfo?.parseAndUpdate() {
                 val in
                 DispatchQueue.main.async {
-                    Logger.app.info( "progress \(val)")
                     self.progressView.setProgress( Float(val), animated: true )
                 }
             }

@@ -33,7 +33,7 @@ struct FlightLeg {
         case .start_time:
             return displayContext.format(date: self.timeRange.start, since: self.timeRange.start, reference: reference)
         case .end_time:
-            return displayContext.format(date: self.timeRange.start, since: self.timeRange.start, reference: reference)
+            return displayContext.format(date: self.timeRange.end, since: self.timeRange.start, reference: reference)
         case .route:
             return displayContext.format(waypoint: self.waypoint_to, from: waypoint_from)
         case .waypoint_from:
