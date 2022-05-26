@@ -13,10 +13,6 @@ import RZFlight
 import FMDB
 import CoreLocation
 
-extension Logger {
-    public static let test = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "test")
-}
-
 class TestG1000LogFiles: XCTestCase {
 
     override func setUpWithError() throws {

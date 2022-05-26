@@ -12,6 +12,8 @@ import OSLog
 import RZFlight
 import FMDB
 import CoreLocation
+import TabularData
+import RZUtils
 
 extension Logger {
     public static let test = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "test")
@@ -35,6 +37,25 @@ class flightlog1000Tests: XCTestCase {
             return
         }
 
+        let m = RZPerformance.start()
+        do {
+            var csvtypes : [String:CSVType] = [:]
+            for field in data.doubleFields {
+                csvtypes[field.rawValue] = .double
+            }
+            for field in data.stringFields {
+                csvtypes[field.rawValue] = .string
+            }
+            var csvoption = CSVReadingOptions()
+            if( false ){
+                let tab = try DataFrame(contentsOfCSVFile: url, columns: nil, types: csvtypes, options: csvoption)
+                print(tab)
+                Logger.test.info("Tabular \(m!.description)")
+            }
+        }catch{
+            Logger.test.info("Tabular error \(error.localizedDescription)")
+        }
+        
         let identifiers = data.datesStrings(for: [.AtvWpt])
         print( identifiers )
         let speedPower = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.AltMSL])
@@ -205,19 +226,13 @@ class flightlog1000Tests: XCTestCase {
                           ("KSAF", 35.617, -106.089, "Santa Fe", 3),]
             for test in cases {
                 let coord = CLLocationCoordinate2D(latitude: test.1, longitude: test.2)
-                let nearest = known.nearest(coord: coord)
+                let nearest = known.nearest(coord: coord, db: db)
                 XCTAssertNotNil(nearest)
                 guard let nearest = nearest else { continue }
-                XCTAssertEqual(nearest, test.0 )
                 //
-                do {
-                    let airport = try Airport(db: db, ident: nearest)
-                    XCTAssertEqual(airport.icao, test.0)
-                    XCTAssertEqual(airport.city, test.3)
-                    XCTAssertEqual(airport.runways.count, test.4)
-                }catch{
-                    print(error)
-                }
+                XCTAssertEqual(nearest.icao, test.0)
+                XCTAssertEqual(nearest.city, test.3)
+                XCTAssertEqual(nearest.runways.count, test.4)
             }
             db.close()
         }

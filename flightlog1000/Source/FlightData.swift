@@ -10,6 +10,7 @@ import OSLog
 import RZUtils
 import RZUtilsSwift
 import RZFlight
+import TabularData
 
 typealias ProcessingProgressReport = (_ : Double) -> Void
 
@@ -87,7 +88,7 @@ class FlightData {
         }else{
             guard let str = try? String(contentsOf: url, encoding: .utf8) else { return nil }
             let lines = str.split(whereSeparator: \.isNewline)
-            
+                        
             self.init(lines: lines, progress: progress)
         }
     }
