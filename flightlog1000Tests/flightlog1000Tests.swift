@@ -29,8 +29,9 @@ class flightlog1000Tests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testFlightData() {
-        guard let url = Bundle(for: type(of: self)).url(forResource: "log_210623_141501_TEST1", withExtension: "csv"),
+    func testDataFrame() {
+        guard let url = Bundle(for: type(of: self)).url(forResource: "log_small_sample", withExtension: "csv"),
+              let urlfixed = Bundle(for: type(of: self)).url(forResource: "log_small_sample_fixed", withExtension: "csv"),
               let data = FlightData(url: url)
         else {
             XCTAssertTrue(false)
@@ -47,14 +48,25 @@ class flightlog1000Tests: XCTestCase {
                 csvtypes[field.rawValue] = .string
             }
             var csvoption = CSVReadingOptions()
-            if( false ){
-                let tab = try DataFrame(contentsOfCSVFile: url, columns: nil, types: csvtypes, options: csvoption)
+            if( true ){
+                let tab = try DataFrame(contentsOfCSVFile: urlfixed, columns: nil, types: csvtypes, options: csvoption)
                 print(tab)
                 Logger.test.info("Tabular \(m!.description)")
             }
         }catch{
             Logger.test.info("Tabular error \(error.localizedDescription)")
         }
+
+    }
+    
+    func testFlightData() {
+        guard let url = Bundle(for: type(of: self)).url(forResource: "log_210623_141501_TEST1", withExtension: "csv"),
+              let data = FlightData(url: url)
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+
         
         let identifiers = data.datesStrings(for: [.AtvWpt])
         print( identifiers )
