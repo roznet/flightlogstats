@@ -7,7 +7,7 @@
 
 import UIKit
 
-class FlightLogTableViewCell: UITableViewCell {
+class LogListTableViewCell: UITableViewCell {
     var flightLogFileInfo : FlightLogFileInfo? = nil
     var displayContext : DisplayContext = DisplayContext()
     

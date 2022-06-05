@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
           let leftNavController = splitViewController.viewControllers.first
             as? UINavigationController,
           let masterViewController = leftNavController.viewControllers.first
-            as? MasterViewController,
+            as? LogListTableViewController,
           let rightNavController = splitViewController.viewControllers.last as? UINavigationController,
           let detailViewController = rightNavController.viewControllers.first
             as? LogDetailViewController

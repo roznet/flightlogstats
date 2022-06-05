@@ -16,10 +16,12 @@ protocol LogSelectionDelegate : AnyObject {
     func logInfoSelected(_ info : FlightLogFileInfo)
 }
 
-class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
+class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate {
 
     var logList : FlightLogFileList? = nil
     var logFileOrganizer = FlightLogOrganizer.shared
+    
+    var progressReportViewController : ProgressReportViewController? = nil
     
     weak var delegate : LogSelectionDelegate? = nil
     
@@ -38,11 +40,48 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
                 _ in
                 Logger.app.info("Reset All")
                 self.logFileOrganizer.deleteLocalFilesAndDatabase()
+            },
+            UIAction(title: "Try Overlay", image: UIImage(systemName: "minus.circle")){
+                _ in
+                Logger.app.info("Reset All")
+                self.displayOverlay()
             }
 
         ]
         
         return UIMenu( options: .displayInline, children: menuItems)
+        
+    }
+    
+    func displayOverlay() {
+        if self.progressReportViewController == nil {
+            let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+            if let progressReport = storyBoard.instantiateViewController(withIdentifier: "ProgressReport") as? ProgressReportViewController {
+                self.progressReportViewController = progressReport
+            }
+        }
+        
+        if let progressReport = self.progressReportViewController,
+           let navigationController = self.navigationController{
+            
+            navigationController.view.addSubview(progressReport.view)
+            navigationController.view.bringSubviewToFront(progressReport.view)
+            progressReport.view.isHidden = false
+            var frame = navigationController.view.frame
+            frame.origin.x = 0
+            frame.origin.y = frame.size.height - 60.0
+            frame.size.height = 60.0
+            progressReport.view.frame = frame
+            progressReport.statusLabel.text = "Hello"
+            progressReport.progressBar.progress = 0.5
+            DispatchQueue.main.asyncAfter(deadline: .now()+10.0) {
+                if let progressReportViewController = self.progressReportViewController {
+                    progressReportViewController.view.removeFromSuperview()
+                }
+            }
+        }
+        
+        
         
     }
     
@@ -96,7 +135,7 @@ class MasterViewController: UITableViewController, UIDocumentPickerDelegate {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
-        if let cell = cell as? FlightLogTableViewCell,
+        if let cell = cell as? LogListTableViewCell,
            let info = self.flightInfo(at: indexPath) {
             
             AppDelegate.worker.async {
