@@ -33,7 +33,11 @@ class FlightLogTableViewCell: UITableViewCell {
             }else{
                 self.date.text = "Missing"
             }
-            self.totalTime.text = self.displayContext.formatDecimal(timeRange: flightSummary.hobbs)
+            if let hobbs = flightSummary.hobbs {
+                self.totalTime.text = self.displayContext.formatDecimal(timeRange: hobbs)
+            }else{
+                self.totalTime.text = nil
+            }
             if let flying = flightSummary.flying {
                 self.flightTime.text = self.displayContext.formatDecimal(timeRange: flying)
             }else{

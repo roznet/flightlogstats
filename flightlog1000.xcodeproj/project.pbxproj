@@ -26,10 +26,10 @@
 		4264C23E2826922C00F40436 /* TimeRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23D2826922C00F40436 /* TimeRange.swift */; };
 		4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4268A0C328357E2600A3CB05 /* KnownAirports.swift */; };
 		4268A0C728357E6300A3CB05 /* KDTree in Frameworks */ = {isa = PBXBuildFile; productRef = 4268A0C628357E6300A3CB05 /* KDTree */; };
+		4268A0C92842851900A3CB05 /* ProgressReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4268A0C82842851900A3CB05 /* ProgressReport.swift */; };
 		4280C885280D43E400A0FB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C883280D43E400A0FB32 /* Main.storyboard */; };
 		4280C887280D43E500A0FB32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4280C886280D43E500A0FB32 /* Assets.xcassets */; };
 		4280C88A280D43E500A0FB32 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C888280D43E500A0FB32 /* LaunchScreen.storyboard */; };
-		4280C895280D43E500A0FB32 /* flightlog1000Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C894280D43E500A0FB32 /* flightlog1000Tests.swift */; };
 		4280C89F280D43E500A0FB32 /* flightlog1000UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C89E280D43E500A0FB32 /* flightlog1000UITests.swift */; };
 		4280C8A1280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8A0280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift */; };
 		4280C8BB280D460600A0FB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8B8280D460500A0FB32 /* AppDelegate.swift */; };
@@ -58,8 +58,13 @@
 		42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */; };
 		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
-		42E83FEB283CB58E00869598 /* TestG1000LogFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEA283CB58E00869598 /* TestG1000LogFiles.swift */; };
+		42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */; };
 		42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */; };
+		42F1E848284A3C2E00DB732A /* TestParsingCsv.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */; };
+		42F1E84C284A491600DB732A /* log_220502_095923______.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F1E849284A491600DB732A /* log_220502_095923______.csv */; };
+		42F1E84D284A491600DB732A /* log_220414_065328______.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F1E84A284A491600DB732A /* log_220414_065328______.csv */; };
+		42F1E84E284A491700DB732A /* log_220502_135932_EGPN.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F1E84B284A491600DB732A /* log_220502_135932_EGPN.csv */; };
+		42F1E850284A4D2800DB732A /* TestOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F1E84F284A4D2800DB732A /* TestOrganizer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,13 +102,13 @@
 		4264C23B282691EF00F40436 /* FuelQuantity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelQuantity.swift; path = Source/FuelQuantity.swift; sourceTree = "<group>"; };
 		4264C23D2826922C00F40436 /* TimeRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimeRange.swift; path = Source/TimeRange.swift; sourceTree = "<group>"; };
 		4268A0C328357E2600A3CB05 /* KnownAirports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KnownAirports.swift; path = Source/KnownAirports.swift; sourceTree = "<group>"; };
+		4268A0C82842851900A3CB05 /* ProgressReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReport.swift; path = Source/ProgressReport.swift; sourceTree = "<group>"; };
 		4280C87A280D43E400A0FB32 /* FlightLog1000.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightLog1000.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4280C884280D43E400A0FB32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4280C886280D43E500A0FB32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4280C889280D43E500A0FB32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4280C88B280D43E500A0FB32 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4280C890280D43E500A0FB32 /* flightlog1000Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = flightlog1000Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4280C894280D43E500A0FB32 /* flightlog1000Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = flightlog1000Tests.swift; sourceTree = "<group>"; };
 		4280C89A280D43E500A0FB32 /* flightlog1000UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = flightlog1000UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4280C89E280D43E500A0FB32 /* flightlog1000UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = flightlog1000UITests.swift; sourceTree = "<group>"; };
 		4280C8A0280D43E500A0FB32 /* flightlog1000UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = flightlog1000UITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -131,8 +136,13 @@
 		42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_211204_102045_EGLL.csv; sourceTree = "<group>"; };
 		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
-		42E83FEA283CB58E00869598 /* TestG1000LogFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestG1000LogFiles.swift; sourceTree = "<group>"; };
+		42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestParsingLogFiles.swift; sourceTree = "<group>"; };
 		42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BufferedStreamReader.swift; path = Source/BufferedStreamReader.swift; sourceTree = "<group>"; };
+		42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestParsingCsv.swift; sourceTree = "<group>"; };
+		42F1E849284A491600DB732A /* log_220502_095923______.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "log_220502_095923______.csv"; sourceTree = "<group>"; };
+		42F1E84A284A491600DB732A /* log_220414_065328______.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "log_220414_065328______.csv"; sourceTree = "<group>"; };
+		42F1E84B284A491600DB732A /* log_220502_135932_EGPN.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220502_135932_EGPN.csv; sourceTree = "<group>"; };
+		42F1E84F284A4D2800DB732A /* TestOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestOrganizer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +188,7 @@
 				4264C23D2826922C00F40436 /* TimeRange.swift */,
 				429949D6282816A100CA1B89 /* DisplayContext.swift */,
 				429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */,
+				4268A0C82842851900A3CB05 /* ProgressReport.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -221,8 +232,9 @@
 			isa = PBXGroup;
 			children = (
 				4280C8C6280D48E700A0FB32 /* TestAssets */,
-				42E83FEA283CB58E00869598 /* TestG1000LogFiles.swift */,
-				4280C894280D43E500A0FB32 /* flightlog1000Tests.swift */,
+				42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */,
+				42F1E84F284A4D2800DB732A /* TestOrganizer.swift */,
+				42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */,
 			);
 			path = flightlog1000Tests;
 			sourceTree = "<group>";
@@ -285,6 +297,9 @@
 		4280C8C6280D48E700A0FB32 /* TestAssets */ = {
 			isa = PBXGroup;
 			children = (
+				42F1E84A284A491600DB732A /* log_220414_065328______.csv */,
+				42F1E849284A491600DB732A /* log_220502_095923______.csv */,
+				42F1E84B284A491600DB732A /* log_220502_135932_EGPN.csv */,
 				420247AE2840011300B7E52C /* log_small_sample_fixed.csv */,
 				420247AD2840011300B7E52C /* log_small_sample.csv */,
 				42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */,
@@ -449,9 +464,12 @@
 				42CEA371281C2F7400AB7B5F /* log_220417_125002_LFQA.csv in Resources */,
 				420247B02840011300B7E52C /* log_small_sample_fixed.csv in Resources */,
 				42CEA372281C2F7400AB7B5F /* log_220416_161856_LFQA.csv in Resources */,
+				42F1E84E284A491700DB732A /* log_220502_135932_EGPN.csv in Resources */,
 				42CEA370281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv in Resources */,
 				4280C8C8280D48E700A0FB32 /* log_210623_141501_TEST1.csv in Resources */,
+				42F1E84D284A491600DB732A /* log_220414_065328______.csv in Resources */,
 				42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */,
+				42F1E84C284A491600DB732A /* log_220502_095923______.csv in Resources */,
 				420247AF2840011300B7E52C /* log_small_sample.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -474,6 +492,7 @@
 				42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */,
 				42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */,
 				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
+				4268A0C92842851900A3CB05 /* ProgressReport.swift in Sources */,
 				42478A5128153EF300212BF2 /* Log.swift in Sources */,
 				4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */,
 				42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */,
@@ -506,8 +525,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4280C895280D43E500A0FB32 /* flightlog1000Tests.swift in Sources */,
-				42E83FEB283CB58E00869598 /* TestG1000LogFiles.swift in Sources */,
+				42F1E850284A4D2800DB732A /* TestOrganizer.swift in Sources */,
+				42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */,
+				42F1E848284A3C2E00DB732A /* TestParsingCsv.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

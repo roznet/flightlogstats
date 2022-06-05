@@ -17,6 +17,16 @@ class FlightSummary {
         case missingFuel
     }
     
+    
+    enum SummaryType : String {
+        case empty
+        case preflight
+        case ground
+        case flight
+    }
+    
+    let summaryType : SummaryType
+    
     let fuelStart : FuelQuantity
     let fuelEnd : FuelQuantity
     var fuelUsed : FuelQuantity { return self.fuelStart - self.fuelEnd }
@@ -24,7 +34,7 @@ class FlightSummary {
     private let engineOn : TimeRange?
     let moving : TimeRange?
     let flying : TimeRange?
-    let hobbs : TimeRange
+    let hobbs : TimeRange?
     
     let route : [Waypoint]
     
@@ -34,18 +44,28 @@ class FlightSummary {
     let distance : CLLocationDistance
     
     init?( info : FlightLogFileInfo ) {
-        guard let start = info.start_time_moving, let end = info.end_time else { return nil }
+        guard let start = info.start_time_moving, let end = info.end_time else {
+            return nil
+        }
+        
         self.hobbs = TimeRange(start: start, end: end)
         if let start_moving = info.start_time_moving,
            let end_moving = info.end_time_moving {
             self.moving = TimeRange(start: start_moving, end: end_moving)
+            
         }else{
             self.moving = nil
         }
         if let start_flying = info.start_time_flying,
            let end_flying = info.end_time_flying {
             self.flying = TimeRange(start: start_flying, end: end_flying)
+            self.summaryType = .flight
         }else{
+            if self.moving != nil {
+                self.summaryType = .ground
+            }else{
+                self.summaryType = .preflight
+            }
             self.flying = nil
         }
         if let route = info.route, route.count > 0 {
@@ -75,7 +95,17 @@ class FlightSummary {
         let flyingValues = engineOnValues?.dropFirst(field: .IAS) { $0 > 35.0 }?.dropLast(field: .IAS) { $0 > 35.0 }
 
         guard let start = data.dates.first, let end = data.dates.last else {
-            throw FlightSummaryError.noData
+            self.summaryType = .empty
+            self.engineOn = nil
+            self.moving = nil
+            self.flying = nil
+            self.hobbs = nil
+            
+            self.fuelEnd = FuelQuantity.zero
+            self.fuelStart = FuelQuantity.zero
+            self.distance = 0.0
+            self.route = []
+            return
         }
         
         self.hobbs = TimeRange(start: start, end: end)
@@ -84,6 +114,19 @@ class FlightSummary {
         self.moving = TimeRange(valuesByField: movingValues, field: .GndSpd)
         self.flying = TimeRange(valuesByField: flyingValues, field: .IAS)
 
+        if engineOn == nil {
+            self.summaryType = .preflight
+        }else{
+            if moving == nil {
+                self.summaryType = .preflight
+            }else{
+                if flying == nil {
+                    self.summaryType = .ground
+                }else{
+                    self.summaryType = .flight
+                }
+            }
+        }
         let fuel_start_l = values.first(field: .FQtyL)?.value ?? 0.0
         let fuel_start_r = values.first(field: .FQtyR)?.value ?? 0.0
         let fuel_end_l = values.last(field: .FQtyL)?.value ?? 0.0
@@ -114,13 +157,17 @@ class FlightSummary {
 extension FlightSummary : CustomStringConvertible {
     var description: String {
         let displayContext = DisplayContext()
-        let elapsedAsDecimalHours = displayContext.formatDecimal(timeRange: self.hobbs)
-        let fuel = displayContext.formatValue(gallon: self.fuelUsed.total)
-        if let flying = self.flying {
-            let flyingElapsedAsDecimalHours = displayContext.formatDecimal(timeRange: flying)
-            return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) flying:\(flyingElapsedAsDecimalHours) fuel:\(fuel)>"
+        if let hobbs = self.hobbs {
+            let elapsedAsDecimalHours = displayContext.formatDecimal(timeRange: hobbs)
+            let fuel = displayContext.formatValue(gallon: self.fuelUsed.total)
+            if let flying = self.flying {
+                let flyingElapsedAsDecimalHours = displayContext.formatDecimal(timeRange: flying)
+                return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) flying:\(flyingElapsedAsDecimalHours) fuel:\(fuel)>"
+            }else{
+                return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) fuel:\(fuel)>"
+            }
         }else{
-            return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) fuel:\(fuel)>"
+            return "<FlightSummary: empty>"
         }
     }
 }

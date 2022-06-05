@@ -7,6 +7,9 @@
 
 import XCTest
 @testable import FlightLog1000
+import RZUtils
+import TabularData
+import OSLog
 
 class TestParsingCsv: XCTestCase {
 
@@ -34,10 +37,32 @@ class TestParsingCsv: XCTestCase {
         print( data )
     }
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func disableTestDataFrame() {
+        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.smallLog.rawValue, withExtension: "csv"),
+              let urlfixed = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.smallLog.rawValue, withExtension: "csv"),
+              let data = FlightData(url: url)
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+        
+        let m = RZPerformance.start()
+        do {
+            var csvtypes : [String:CSVType] = [:]
+            for field in data.doubleFields {
+                csvtypes[field.rawValue] = .double
+            }
+            for field in data.stringFields {
+                csvtypes[field.rawValue] = .string
+            }
+            let csvoption = CSVReadingOptions()
+            if( true ){
+                let tab = try DataFrame(contentsOfCSVFile: urlfixed, columns: nil, types: csvtypes, options: csvoption)
+                print(tab)
+                Logger.test.info("Tabular \(m!.description)")
+            }
+        }catch{
+            Logger.test.info("Tabular error \(error.localizedDescription)")
         }
     }
 

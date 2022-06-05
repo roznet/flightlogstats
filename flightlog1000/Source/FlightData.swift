@@ -86,9 +86,15 @@ class FlightData {
                 return nil
             }
         }else{
-            guard let str = try? String(contentsOf: url, encoding: .utf8) else { return nil }
-            let lines = str.split(whereSeparator: \.isNewline)
-                        
+            var lines : [String.SubSequence] = []
+            do {
+                let str = try String(contentsOf: url, encoding: .macOSRoman)
+                lines = str.split(whereSeparator: \.isNewline)
+            }catch {
+                Logger.app.error("Failed to read \(url.lastPathComponent) \(error.localizedDescription)")
+                return nil
+            }
+                                    
             self.init(lines: lines, progress: progress)
         }
     }

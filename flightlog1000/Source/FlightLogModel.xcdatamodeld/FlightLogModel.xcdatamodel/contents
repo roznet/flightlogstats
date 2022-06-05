@@ -8,6 +8,7 @@
         <attribute name="end_time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="end_time_flying" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="end_time_moving" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="info_status" optional="YES" attributeType="String"/>
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
         <attribute name="route" optional="YES" attributeType="String"/>
         <attribute name="start_airport_icao" optional="YES" attributeType="String"/>
@@ -21,6 +22,6 @@
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <elements>
-        <element name="FlightLogFileInfo" positionX="-63" positionY="-18" width="128" height="299"/>
+        <element name="FlightLogFileInfo" positionX="-63" positionY="-18" width="128" height="314"/>
     </elements>
 </model>

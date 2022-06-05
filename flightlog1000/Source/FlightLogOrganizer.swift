@@ -87,13 +87,13 @@ class FlightLogOrganizer {
         }
     }
 
-    func updateInfo(count : Int = 1) {
+    func updateInfo(count : Int = 1, force : Bool = false,  progress : @escaping ProgressReport.Callback = { _ in} ) {
         guard currentState == .ready else { return }
         currentState = .updatingInfoFromData
         AppDelegate.worker.async {
             var missing : [FlightLogFileInfo] = []
             for (_,info) in self.managedFlightLogs {
-                if !info.hasUpdatedData {
+                if !info.requiresParsing{
                     missing.append(info)
                 }
             }
@@ -105,7 +105,7 @@ class FlightLogOrganizer {
                     }
                     
                     if let flightLog = info.flightLog {
-                        let alreadyParsed = flightLog.isParsed
+                        let alreadyParsed = flightLog.requiresParsing
                         flightLog.parse()
                         flightLog.updateFlightLogFileInfo(info: info)
                         NotificationCenter.default.post(name: .logFileInfoUpdated, object: info)
@@ -118,14 +118,16 @@ class FlightLogOrganizer {
                 Logger.app.info("Updated \(done) info")
                 self.saveContext()
                 // need to switch state before starting next
+                let percent = 1.0 - (Double(missing.count)/Double(self.managedFlightLogs.count))
+                progress(.progressing(percent))
                 self.currentState = .ready
                 // if did something, schedule another batch
-                self.updateInfo(count: count)
+                self.updateInfo(count: count, force: force)
             }else{
+                progress(.complete)
                 // nothing done, ready for more
                 self.currentState = .ready
             }
-            
         }
     }
     

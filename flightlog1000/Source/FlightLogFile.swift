@@ -9,16 +9,28 @@ import Foundation
 import OSLog
 
 class FlightLogFile {
-    enum FlightLogFileError : Error {
+    enum FlightLogFileError : Error, Comparable {
         case fileDoesNotExist
+        case fileIsNotALogFile
+        case parsingError
     }
+    
+    enum LogType : Comparable {
+        case notParsed
+        case parsed
+        case empty
+        case error(FlightLogFileError)
+    }
+    
+    var logType : LogType
     
     let url : URL 
     var name : String { return url.lastPathComponent }
     
     var description : String { return "<FlightLog:\(name)>" }
     
-    var isParsed : Bool { return data != nil }
+    var requiresParsing : Bool { return self.logType == .notParsed }
+    var isParsed : Bool { return self.logType != .notParsed }
     
     var flightSummary : FlightSummary? = nil
     var legs : [ FlightLeg ] = []
@@ -27,6 +39,7 @@ class FlightLogFile {
 
     init?(url : URL) {
         if url.lastPathComponent.isLogFile {
+            self.logType = .notParsed
             self.url = url
         }else{
             return nil
@@ -36,23 +49,27 @@ class FlightLogFile {
     init(folder : URL, name : String) throws {
         let url = folder.appendingPathComponent(name)
         if FileManager.default.fileExists(atPath: url.path) {
+            self.logType = .notParsed
             self.url = url
         }else{
             throw FlightLogFileError.fileDoesNotExist
         }
     }
     
-    
     func parse(progress : ProcessingProgressReport? = nil) {
-        if data == nil {
+        if self.logType == .notParsed {
             self.data = FlightData(url: self.url, progress: progress)
             if let data = self.data {
                 do {
                     self.flightSummary = try FlightSummary(data: data)
                     self.legs = self.route()
+                    self.logType = .parsed
                 }catch{
+                    self.logType = .error(.parsingError)
                     Logger.app.error("Failed to parse log file \(self.url.lastPathComponent)")
                 }
+            }else{
+                self.logType = .empty
             }
         }
     }

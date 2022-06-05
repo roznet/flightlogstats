@@ -18,21 +18,34 @@ class FlightLogFileInfo: NSManagedObject {
         case invalidFlightLog
     }
     
+    enum InfoStatus : String {
+        case notParsed
+        case parsed
+        case empty
+        case error
+    }
+    
     weak var container : FlightLogOrganizer? = nil
     
     /*private*/ var flightLog : FlightLogFile? = nil {
         didSet {
             if let fromLog = self.flightLog?.flightSummary {
                 self.flightSummary = fromLog
+                self.infoStatus = .parsed
             }
         }
+    }
+    var infoStatus : InfoStatus {
+        get { if let status = self.info_status { return InfoStatus(rawValue: status ) ?? .notParsed } else { return .notParsed } }
+        set { self.info_status = newValue.rawValue }
     }
     
     lazy var flightSummary : FlightSummary? = FlightSummary(info: self)
     
     static let currentVersion : Int32 = 1
     
-    var hasUpdatedData : Bool { return self.version == Self.currentVersion }
+    var requiresVersionUpdate : Bool { return self.version < Self.currentVersion }
+    var requiresParsing : Bool { return self.requiresVersionUpdate || self.infoStatus == .notParsed }
     
     //MARK: - database utilities
     func delete() {
@@ -71,11 +84,14 @@ class FlightLogFileInfo: NSManagedObject {
         self.flightLog = flightLog
 
         self.log_file_name = flightLog.name
-
+        
         guard let flightSummary = flightLog.flightSummary else {
+            self.infoStatus = .error
             throw FlightLogFileInfoError.invalidFlightLog
         }
-
+        // start empty
+        self.infoStatus = .empty
+        
         if let system_id = flightLog.meta(key: .system_id) {
             self.system_id = system_id
         }
@@ -84,14 +100,18 @@ class FlightLogFileInfo: NSManagedObject {
             self.airframe_name = airframe_name
         }
 
-        self.start_time = flightSummary.hobbs.start
-        self.end_time = flightSummary.hobbs.end
-
+        if let hobbs = flightSummary.hobbs {
+            self.start_time = hobbs.start
+            self.end_time = hobbs.end
+            // if we have some times, then consider it parsed
+            self.infoStatus = .parsed
+        }
+        
         if let moving = flightSummary.moving {
             self.start_time_moving = moving.start
             self.end_time_moving = moving.end
-        
         }
+        
         if let flying = flightSummary.flying {
             self.start_time_flying = flying.start
             self.end_time_flying = flying.end
@@ -110,6 +130,7 @@ class FlightLogFileInfo: NSManagedObject {
         self.total_distance = flightSummary.distance
         
         self.version = FlightLogFileInfo.currentVersion
+        
     }
 
     
@@ -128,7 +149,7 @@ class FlightLogFileInfo: NSManagedObject {
     }
     
     var totalFuelDescription : String {
-        guard self.hasUpdatedData else { return "??" }
+        guard self.requiresVersionUpdate else { return "??" }
         
         let end_fuel_r = self.end_fuel_quantity_right
         let end_fuel_l = self.end_fuel_quantity_left
