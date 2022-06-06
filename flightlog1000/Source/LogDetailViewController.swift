@@ -91,12 +91,11 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
         
             if let legs = self.flightLogFileInfo?.flightLog?.legs {
                 let legsDataSource = FlightLegsDataSource(legs: legs)
-                legsDataSource.prepare()
                 self.legsDataSource = legsDataSource
                 self.legsCollectionView.dataSource = self.legsDataSource
                 self.legsCollectionView.delegate = self.legsDataSource
                 if let tableCollectionLayout = self.legsCollectionView.collectionViewLayout as? TableCollectionViewLayout {
-                    tableCollectionLayout.sizeDelegate = self.legsDataSource
+                    tableCollectionLayout.tableCollectionDelegate = self.legsDataSource
                 }else{
                     Logger.app.error("Internal error: Inconsistent layout ")
                 }

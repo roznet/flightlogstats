@@ -36,7 +36,17 @@ class FlightLogFileInfo: NSManagedObject {
         }
     }
     var infoStatus : InfoStatus {
-        get { if let status = self.info_status { return InfoStatus(rawValue: status ) ?? .notParsed } else { return .notParsed } }
+        get {
+            if let status = self.info_status {
+                if let rv = InfoStatus(rawValue: status ) {
+                    return rv
+                }else{
+                    return .notParsed
+                }
+            } else {
+                return .notParsed
+            }
+        }
         set { self.info_status = newValue.rawValue }
     }
     

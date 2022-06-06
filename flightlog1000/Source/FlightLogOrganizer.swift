@@ -29,9 +29,11 @@ class FlightLogOrganizer {
     
     enum UpdateState {
         case ready
+        case complete
         case updatingInfoFromData
     }
-    private var currentState : UpdateState = .ready
+    private var currentState : UpdateState = .complete
+    private var missingCount : Int = 0
 
     var flightLogFileList : FlightLogFileList {
         let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
@@ -88,42 +90,69 @@ class FlightLogOrganizer {
     }
 
     func updateInfo(count : Int = 1, force : Bool = false,  progress : @escaping ProgressReport.Callback = { _ in} ) {
-        guard currentState == .ready else { return }
+        guard currentState != .updatingInfoFromData else { return }
+        let firstMissingCheck : Bool = (currentState == .complete)
         currentState = .updatingInfoFromData
         AppDelegate.worker.async {
             var missing : [FlightLogFileInfo] = []
             for (_,info) in self.managedFlightLogs {
-                if !info.requiresParsing{
+                if info.requiresParsing{
+                    if firstMissingCheck, let log_file_name = info.log_file_name {
+                        Logger.app.info("Missing info for \(log_file_name)")
+                    }
                     missing.append(info)
                 }
             }
             if !missing.isEmpty {
-                var done : Int = 0
+                if firstMissingCheck {
+                    self.missingCount = missing.count
+                }
+                var done : [String] = []
                 for info in missing[..<min(count,missing.count)] {
-                    if let log_file_name = info.log_file_name, info.flightLog == nil {
+                    guard let log_file_name = info.log_file_name
+                    else {
+                        info.infoStatus = .error
+                        continue
+                    }
+                    
+                    if info.flightLog == nil {
                         info.flightLog = self.flightLogFile(name: log_file_name)
                     }
                     
                     if let flightLog = info.flightLog {
                         let alreadyParsed = flightLog.requiresParsing
                         flightLog.parse()
-                        flightLog.updateFlightLogFileInfo(info: info)
+                        do {
+                            try info.updateFromFlightLog(flightLog: flightLog)
+                        }catch{
+                            info.infoStatus = .error
+                            Logger.app.error("Failed to update log \(error.localizedDescription)")
+                        }
+                        
                         NotificationCenter.default.post(name: .logFileInfoUpdated, object: info)
                         if !alreadyParsed {
                             flightLog.clear()
                         }
-                        done += 1
+                        done.append(log_file_name)
+                    }else{
+                        info.infoStatus = .error
                     }
+                    Logger.app.info("after update \(log_file_name) \(info.infoStatus.rawValue) \(self.managedFlightLogs[log_file_name]!.infoStatus.rawValue)")
                 }
-                Logger.app.info("Updated \(done) info")
+                let firstName = done.last ?? ""
+                Logger.app.info("Updated \(self.missingCount-missing.count)/\(self.missingCount) info last=\(firstName)")
                 self.saveContext()
                 // need to switch state before starting next
-                let percent = 1.0 - (Double(missing.count)/Double(self.managedFlightLogs.count))
+    
+                let percent = 1.0 - (Double(missing.count)/Double(self.missingCount))
                 progress(.progressing(percent))
                 self.currentState = .ready
                 // if did something, schedule another batch
                 self.updateInfo(count: count, force: force)
             }else{
+                if firstMissingCheck {
+                    Logger.app.info("No logFile requires updating")
+                }
                 progress(.complete)
                 // nothing done, ready for more
                 self.currentState = .ready

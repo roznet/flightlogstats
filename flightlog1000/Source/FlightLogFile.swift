@@ -22,7 +22,7 @@ class FlightLogFile {
         case error(FlightLogFileError)
     }
     
-    var logType : LogType
+    private(set) var logType : LogType
     
     let url : URL 
     var name : String { return url.lastPathComponent }
@@ -75,6 +75,7 @@ class FlightLogFile {
     }
     
     func clear() {
+        self.logType = .notParsed
         self.data = nil
     }
 }
