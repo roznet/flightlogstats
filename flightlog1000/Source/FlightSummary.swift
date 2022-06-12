@@ -91,7 +91,7 @@ class FlightSummary {
         let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR] )
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
-        let movingValues = engineOnValues?.dropFirst(field: .GndSpd) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
+        let movingValues = engineOnValues?.dropFirst(field: .GndSpd, minimumMatchCount: 5) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
         let flyingValues = engineOnValues?.dropFirst(field: .IAS) { $0 > 35.0 }?.dropLast(field: .IAS) { $0 > 35.0 }
 
         guard let start = data.dates.first, let end = data.dates.last else {

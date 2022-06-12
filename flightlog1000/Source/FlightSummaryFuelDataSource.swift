@@ -38,7 +38,7 @@ class FlightSummaryFuelDataSource: NSObject, UICollectionViewDataSource, UIColle
         
         self.attributedCells  = []
         
-        for title in [ "Stage", "Total", "Left", "Right" ] {
+        for title in [ "Fuel", "Total", "Left", "Right" ] {
             self.attributedCells.append(NSAttributedString(string: title, attributes: self.titleAttributes))
         }
         for (name,fuel) in [("Start", self.flightSummary.fuelStart),

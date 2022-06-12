@@ -83,7 +83,7 @@ public struct DatesValuesByField<T,F : Hashable> {
         }
     }
     
-    public func dropFirst(field : F, matching : ((T) -> Bool)) -> DatesValuesByField? {
+    public func dropFirst(field : F, minimumMatchCount : Int = 1, matching : ((T) -> Bool)) -> DatesValuesByField? {
         
         guard let fieldValues = self.values[field]
         else {
@@ -93,11 +93,19 @@ public struct DatesValuesByField<T,F : Hashable> {
         var rv = DatesValuesByField(fields: [F](self.values.keys))
 
         var found : Int = 0
+        var matchCount : Int = 0
         for (idx,value) in fieldValues.enumerated() {
             if matching(value) {
+                matchCount += 1
+            }else{
+                matchCount = 0
+            }
+
+            if matchCount >= minimumMatchCount {
                 found = idx
                 break
             }
+
         }
 
         rv.dates = [Date](self.dates.dropFirst(found))

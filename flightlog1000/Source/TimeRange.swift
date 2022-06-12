@@ -28,6 +28,19 @@ struct TimeRange {
         self.end = end
     }
     
+    func startTo(start other : TimeRange) -> TimeRange {
+        return TimeRange(start: self.start, end: other.start)
+    }
     
+    func startTo(end other : TimeRange) -> TimeRange {
+        return TimeRange(start: self.start, end: other.end)
+    }
+
     
+    /// Return new range that start from current end ot the end of other
+    /// - Parameter other: other range ot pick end from
+    /// - Returns: new range
+    func endTo(end other : TimeRange) -> TimeRange {
+        return TimeRange(start: self.end, end: other.end)
+    }
 }

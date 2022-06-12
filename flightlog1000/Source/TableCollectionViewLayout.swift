@@ -18,7 +18,9 @@ protocol TableCollectionDelegate : AnyObject {
 
 class TableCollectionViewLayout: UICollectionViewLayout {
 
-    weak var tableCollectionDelegate : TableCollectionDelegate? = nil
+    weak var tableCollectionDelegate : TableCollectionDelegate? = nil {
+        didSet { self.itemAttributes.removeAll() }
+    }
     
     var itemAttributes = [[UICollectionViewLayoutAttributes]]()
     

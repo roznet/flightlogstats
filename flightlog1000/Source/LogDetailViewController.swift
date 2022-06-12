@@ -13,20 +13,15 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var name: UILabel!
-    @IBOutlet weak var airports: UILabel!
-    @IBOutlet weak var route: UILabel!
-    
-    @IBOutlet weak var totalFuel: UILabel!
-    @IBOutlet weak var totalRemainingFuel: UILabel!
-    @IBOutlet weak var leftRemainingFuel: UILabel!
-    @IBOutlet weak var rightRemainingFuel: UILabel!
-    
+        
+    @IBOutlet weak var timeCollectionView: UICollectionView!
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
     
     var flightLogFileInfo : FlightLogFileInfo? = nil
     var legsDataSource : FlightLegsDataSource? = nil
     var fuelDataSource : FlightSummaryFuelDataSource? = nil
+    var timeDataSource : FlightSummaryTimeDataSource? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,7 +60,6 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
         
         if self.name != nil {
             self.name.text = self.flightLogFileInfo?.log_file_name
-            self.totalFuel.text = self.flightLogFileInfo?.totalFuelDescription
             
             if let summary = self.flightLogFileInfo?.flightSummary {
                 var airports : [String] = []
@@ -75,9 +69,9 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                 if let to = summary.endAirport {
                     airports.append("\(to.name) (\(to.icao))")
                 }
-                self.airports.text = airports.joined(separator: "  -  ")
-                self.route.text = displayContext.format(route: summary.route)
-                self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary)
+
+                self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary, displayContext: displayContext)
+                self.fuelDataSource?.prepare()
                 self.fuelCollectionView.dataSource = self.fuelDataSource
                 self.fuelCollectionView.delegate = self.fuelDataSource
                 if let tableCollectionLayout = self.fuelCollectionView.collectionViewLayout as? TableCollectionViewLayout {
@@ -85,21 +79,22 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                 }else{
                     Logger.app.error("Internal error: Inconsistent layout ")
                 }
-                self.totalRemainingFuel.text = nil
-                self.leftRemainingFuel.text =  nil
-                self.rightRemainingFuel.text =  nil
-            }else{
-                self.airports.text = nil
-                self.route.text = nil
-                self.totalRemainingFuel.text = nil
-                self.leftRemainingFuel.text =  nil
-                self.rightRemainingFuel.text =  nil
+                
+                self.timeDataSource = FlightSummaryTimeDataSource(flightSummary: summary, displayContext: displayContext)
+                self.timeDataSource?.prepare()
+                self.timeCollectionView.dataSource = self.timeDataSource
+                self.timeCollectionView.delegate = self.timeDataSource
+                if let tableCollectionLayout = self.timeCollectionView.collectionViewLayout as? TableCollectionViewLayout {
+                    tableCollectionLayout.tableCollectionDelegate = self.timeDataSource
+                }else{
+                    Logger.app.error("Internal error: Inconsistent layout ")
+                }
             }
             
             self.view.setNeedsDisplay()
         
             if let legs = self.flightLogFileInfo?.flightLog?.legs {
-                let legsDataSource = FlightLegsDataSource(legs: legs)
+                let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: displayContext)
                 self.legsDataSource = legsDataSource
                 self.legsCollectionView.dataSource = self.legsDataSource
                 self.legsCollectionView.delegate = self.legsDataSource

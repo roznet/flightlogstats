@@ -10,6 +10,7 @@
 		420247AF2840011300B7E52C /* log_small_sample.csv in Resources */ = {isa = PBXBuildFile; fileRef = 420247AD2840011300B7E52C /* log_small_sample.csv */; };
 		420247B02840011300B7E52C /* log_small_sample_fixed.csv in Resources */ = {isa = PBXBuildFile; fileRef = 420247AE2840011300B7E52C /* log_small_sample_fixed.csv */; };
 		4204FCAA2855F6BF006D753F /* FlightSummaryFuelDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4204FCA92855F6BF006D753F /* FlightSummaryFuelDataSource.swift */; };
+		4204FCAC2855FF6C006D753F /* FlightSummaryTimeDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4204FCAB2855FF6C006D753F /* FlightSummaryTimeDataSource.swift */; };
 		42478A5128153EF300212BF2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42478A5028153EF300212BF2 /* Log.swift */; };
 		425D04F72832F47B0028FD67 /* RZFlight in Frameworks */ = {isa = PBXBuildFile; productRef = 425D04F62832F47B0028FD67 /* RZFlight */; };
 		425D04FA2832FCFE0028FD67 /* secrets.json in Resources */ = {isa = PBXBuildFile; fileRef = 425D04F92832FCFE0028FD67 /* secrets.json */; };
@@ -90,6 +91,7 @@
 		420247AD2840011300B7E52C /* log_small_sample.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_small_sample.csv; sourceTree = "<group>"; };
 		420247AE2840011300B7E52C /* log_small_sample_fixed.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_small_sample_fixed.csv; sourceTree = "<group>"; };
 		4204FCA92855F6BF006D753F /* FlightSummaryFuelDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightSummaryFuelDataSource.swift; path = Source/FlightSummaryFuelDataSource.swift; sourceTree = "<group>"; };
+		4204FCAB2855FF6C006D753F /* FlightSummaryTimeDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightSummaryTimeDataSource.swift; path = Source/FlightSummaryTimeDataSource.swift; sourceTree = "<group>"; };
 		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
 		425D04F92832FCFE0028FD67 /* secrets.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = secrets.json; sourceTree = "<group>"; };
 		425D04FB283451F30028FD67 /* airports.db */ = {isa = PBXFileReference; lastKnownFileType = file; name = airports.db; path = python/airports.db; sourceTree = SOURCE_ROOT; };
@@ -258,6 +260,7 @@
 			children = (
 				425D04FF2834521C0028FD67 /* FlightLegsDataSource.swift */,
 				4204FCA92855F6BF006D753F /* FlightSummaryFuelDataSource.swift */,
+				4204FCAB2855FF6C006D753F /* FlightSummaryTimeDataSource.swift */,
 				4280C886280D43E500A0FB32 /* Assets.xcassets */,
 				4280C883280D43E400A0FB32 /* Main.storyboard */,
 				4264C22F281D830000F40436 /* MainSplitViewController.swift */,
@@ -526,6 +529,7 @@
 				4204FCAA2855F6BF006D753F /* FlightSummaryFuelDataSource.swift in Sources */,
 				4280C8C2280D467400A0FB32 /* FlightLogFileList.swift in Sources */,
 				4264C232281D9A0700F40436 /* LogListTableViewCell.swift in Sources */,
+				4204FCAC2855FF6C006D753F /* FlightSummaryTimeDataSource.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

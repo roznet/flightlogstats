@@ -8,6 +8,7 @@
 import Foundation
 import CoreLocation
 import RZUtils
+import RZFlight
 
 class DisplayContext {
     typealias Field = FlightLogFile.Field
@@ -45,6 +46,10 @@ class DisplayContext {
     
     func format(route : [Waypoint] ) -> String {
         return route.map { $0.name }.joined(separator: ",")
+    }
+    
+    func format(airport : Airport) -> String {
+        return "\(airport.icao) \(airport.name)"
     }
     
     func format(waypoint : Waypoint, from : Waypoint? = nil) -> String {
