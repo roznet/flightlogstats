@@ -42,6 +42,12 @@ class FlightLogOrganizer {
         return list
     }
     
+    func ensureProgressReport() {
+        if self.progress == nil {
+            self.progress = ProgressReport(message: "Organizer")
+        }
+    }
+    
     //MARK: - containers
     
     lazy var persistentContainer : NSPersistentContainer = {
@@ -108,8 +114,11 @@ class FlightLogOrganizer {
             if !missing.isEmpty {
                 if firstMissingCheck {
                     self.missingCount = missing.count
+                    self.progress?.update(state: .progressing(0.0), message: "Updating Info")
                 }
                 var done : [String] = []
+                // do more recent first
+                missing.sort() { $1.log_file_name! < $0.log_file_name! }
                 for info in missing[..<min(count,missing.count)] {
                     guard let log_file_name = info.log_file_name
                     else {
@@ -123,7 +132,7 @@ class FlightLogOrganizer {
                     
                     if let flightLog = info.flightLog {
                         let alreadyParsed = flightLog.requiresParsing
-                        flightLog.parse()
+                        flightLog.parse(progress: self.progress)
                         do {
                             try info.updateFromFlightLog(flightLog: flightLog)
                         }catch{
@@ -145,9 +154,9 @@ class FlightLogOrganizer {
                 Logger.app.info("Updated \(self.missingCount-missing.count)/\(self.missingCount) info last=\(firstName)")
                 self.saveContext()
                 // need to switch state before starting next
-    
+                NotificationCenter.default.post(name: .flightLogInfoUpdated, object: nil)
                 let percent = 1.0 - (Double(missing.count)/Double(self.missingCount))
-                self.progress?.update(state: .progressing(percent))
+                self.progress?.update(state: .progressing(percent), message: "Updating Info")
                 self.currentState = .ready
                 // if did something, schedule another batch
                 self.updateInfo(count: count, force: force)
@@ -347,7 +356,7 @@ class FlightLogOrganizer {
             Logger.app.info("iCloud not setup, skipping sync")
             return
         }
-        
+        self.progress?.update(state: .progressing(0.0), message: "Sync iCloud")
         Self.search(in: [localFolder]){
             result in
             switch result {
@@ -459,7 +468,7 @@ class FlightLogOrganizer {
                 if error == nil {
                     do {
                         for intent in copyCloudToLocal {
-                            self.progress?.update(state: .progressing(done/totalCount))
+                            self.progress?.update(state: .progressing(done/totalCount), message: "Sync iCloud")
                             done += 1.0
                             try FileManager.default.copyItem(at: intent.url, to: self.localFolder.appendingPathComponent(intent.url.lastPathComponent))
                         }
@@ -476,6 +485,7 @@ class FlightLogOrganizer {
         }else{
             Logger.app.info("Nothing new in cloud to copy to local")
         }
+        self.progress?.update(state: .complete, message: "Sync iCloud")
     }
 }
 

@@ -450,13 +450,14 @@ class FlightData {
         self.strings.reserveCapacity(array.count)
         
         let trimCharSet = CharacterSet(charactersIn: "\" ")
-
+        progress?.update(state: .progressing(0.0), message: "Parsing Log")
         for line in array {
             progress?.update(state: .progressing(Double(done_sofar)/Double(array.count)))
             done_sofar += 1
             let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
             state.process(line: vals)
         }
+        progress?.update(state: .complete)
         Logger.app.info("parsed \(array.count) lines in \(Date().timeIntervalSince(start)) secs")
     }
 

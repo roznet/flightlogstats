@@ -24,20 +24,21 @@ extension Notification.Name {
     typealias Callback = (_ : State, _ : String) -> Void
     
     private(set) var message : String
+    private(set) var state : State
+    
     private var lastDate : Date
-    private var lastState : State
     private let callback : Callback
     
     init(message : String, callback : @escaping Callback = { _,_ in }){
         self.message = message
         self.lastDate = Date()
         self.callback = callback
-        self.lastState = .complete
+        self.state = .complete
     }
     
     func update(state : State, message : String? = nil) {
         // if already reported, return
-        guard state != self.lastState else { return }
+        guard state != self.state else { return }
         
         // if progressing only update after 0.1seconds
         let now = Date()
@@ -51,9 +52,9 @@ extension Notification.Name {
             if let message = message {
                 self.message = message
             }
-            self.lastState = state
+            self.state = state
             self.lastDate = now
-            self.callback(self.lastState, self.message)
+            self.callback(self.state, self.message)
             NotificationCenter.default.post(name: .kProgressUpdate, object: self)
         }
     }

@@ -90,26 +90,19 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
         self.progressReportViewController?.statusLabel.text = message
         self.progressReportViewController?.progressBar.setProgress(0, animated: false)
-        self.logFileOrganizer.progress = ProgressReport(message: "Organizer") { state,_ in self.update(for: state) }
+        
     }
     
-    func update(for state : ProgressReport.State ){
+    func update(for report : ProgressReport ){
         DispatchQueue.main.async {
-            if state != .complete && self.progressReportViewController == nil {
+            if report.state != .complete && self.progressReportViewController == nil {
                 self.displayOverlay()
             }
-            
-            switch state {
-            case .progressing(let pct):
-                self.progressReportViewController?.progressBar.setProgress(Float(pct), animated: true)
-            case .complete:
-                self.progressReportViewController?.progressBar.setProgress(1.0, animated: true)
-                self.removeOverlay()
-            case .error(let error):
-                self.progressReportViewController?.statusLabel.text = error
-                self.removeOverlay(delay: 5.0)
+            if let controller = self.progressReportViewController {
+                if controller.update(for: report) {
+                    self.removeOverlay()
+                }
             }
-
         }
     }
     
@@ -128,6 +121,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        self.logFileOrganizer.ensureProgressReport()
+        
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             self.buildList()
@@ -137,8 +132,17 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
         NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
             _ in
+            self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
+            }
+        }
+        NotificationCenter.default.addObserver(forName: .kProgressUpdate, object: nil, queue: nil){
+            notification in
+            if let progress = notification.object as? ProgressReport {
+                self.update(for: progress)
+            }else{
+                Logger.app.error("invalid notification \(notification)")
             }
         }
         self.buildList()

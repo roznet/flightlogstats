@@ -19,8 +19,21 @@ class ProgressReportViewController: UIViewController {
     }
     
 
-    func update(for : ProgressReport){
-        
+    func update(for report: ProgressReport) -> Bool {
+        var rv = false
+        let animate = self.statusLabel.text == report.message
+        self.statusLabel.text = report.message
+        switch report.state {
+        case .progressing(let pct):
+            self.progressBar.setProgress(Float(pct), animated: (animate && pct != 0.0))
+        case .complete:
+            self.progressBar.setProgress(1.0, animated: true)
+            rv = true
+        case .error(let error):
+            self.statusLabel.text = error
+            rv = true
+        }
+        return rv
     }
     /*
     // MARK: - Navigation
@@ -32,4 +45,5 @@ class ProgressReportViewController: UIViewController {
     }
     */
 
+    
 }
