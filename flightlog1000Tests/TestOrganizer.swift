@@ -94,7 +94,7 @@ class TestOrganizer: XCTestCase {
         self.wait(for: [expectation], timeout: TimeInterval(10.0))
     }
     
-    func testOrganizerSyncCloud() throws {
+    func DISABLEtestOrganizerSyncCloud() throws {
         // This will test that
         //   1. logic of copying missing from from cloud works: cloud proxied by bundle path, and local by a testLocal folder initially empty
         //   2. after copying form cloud (bundle path) the coredata container updated
@@ -156,7 +156,6 @@ class TestOrganizer: XCTestCase {
         }else{
             XCTAssertTrue(false)
         }
-
     }
     
     func testOrganizer() throws {
