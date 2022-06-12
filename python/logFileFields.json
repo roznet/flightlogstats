@@ -8,38 +8,52 @@
   },
   {
     "field": "AltInd",
-    "order": 4,
+    "order": 2,
     "unit": "ft",
     "description": "Baro-Corrected altitude ",
     "unit_description": "feet"
   },
   {
     "field": "BaroA",
-    "order": 5,
+    "order": 3,
     "unit": "inch",
     "description": "Baro Correction ",
     "unit_description": "in/Hg"
   },
   {
     "field": "AltMSL",
-    "order": 6,
+    "order": 4,
     "unit": "ft msl",
     "description": "GPS altitude ",
     "unit_description": "MSL"
   },
   {
+    "field": "AltGPS",
+    "order": 5,
+    "unit": "ft wgs",
+    "description": "GPS altitude ",
+    "unit_description": "WGS84 datum"
+  },
+  {
     "field": "OAT",
-    "order": 7,
+    "order": 6,
     "unit": "deg C",
     "description": "OAT ",
     "unit_description": "degrees C"
   },
   {
     "field": "IAS",
-    "order": 8,
+    "order": 7,
     "unit": "kt",
     "description": "Indicated airspeed ",
     "unit_description": "kts"
+  },
+  {
+    "field": "TAS",
+    "order": 8,
+    "unit": "kt",
+    "description": "True airspeed ",
+    "unit_description": "knots"
   },
   {
     "field": "GndSpd",
@@ -56,204 +70,120 @@
     "unit_description": "fpm"
   },
   {
-    "field": "Pitch",
+    "field": "VSpdG",
     "order": 11,
-    "unit": "deg",
-    "description": "Pitch Attitude Angle ",
-    "unit_description": "degrees"
-  },
-  {
-    "field": "Roll",
-    "order": 12,
-    "unit": "deg",
-    "description": "Roll Attitude Angle ",
-    "unit_description": "degrees"
-  },
-  {
-    "field": "LatAc",
-    "order": 13,
-    "unit": "G",
-    "description": "Lateral G Force ",
-    "unit_description": "g"
-  },
-  {
-    "field": "NormAc",
-    "order": 14,
-    "unit": "G",
-    "description": "Vertical G Force ",
-    "unit_description": "g"
+    "unit": "fpm",
+    "description": "GPS vertical speed ",
+    "unit_description": "fpm"
   },
   {
     "field": "HDG",
-    "order": 15,
+    "order": 12,
     "unit": "deg",
     "description": "Magnetic Heading ",
     "unit_description": "degrees"
   },
   {
     "field": "TRK",
-    "order": 16,
+    "order": 13,
     "unit": "deg",
     "description": "Ground Track ",
     "unit_description": "degrees magnetic"
   },
   {
-    "field": "volt1",
-    "order": 17,
-    "unit": "volts",
-    "description": "volt1",
-    "unit_description": ""
-  },
-  {
-    "field": "volt2",
-    "order": 18,
-    "unit": "volts",
-    "description": "volt2",
-    "unit_description": ""
-  },
-  {
-    "field": "amp1",
-    "order": 19,
-    "unit": "amps",
-    "description": "amp1",
-    "unit_description": ""
-  },
-  {
-    "field": "FQtyL",
-    "order": 20,
-    "unit": "gals",
-    "description": "Fuel Qty Left ",
-    "unit_description": "gals"
-  },
-  {
-    "field": "FQtyR",
-    "order": 21,
-    "unit": "gals",
-    "description": "Fuel Qty Right ",
-    "unit_description": "gals"
-  },
-  {
-    "field": "AltGPS",
-    "order": 51,
-    "unit": "ft wgs",
-    "description": "GPS altitude ",
-    "unit_description": "WGS84 datum"
-  },
-  {
-    "field": "TAS",
-    "order": 52,
-    "unit": "kt",
-    "description": "True airspeed ",
-    "unit_description": "knots"
-  },
-  {
-    "field": "HSIS",
-    "order": 53,
-    "unit": "enum",
-    "description": "HSI source",
-    "unit_description": ""
-  },
-  {
     "field": "CRS",
-    "order": 54,
+    "order": 14,
     "unit": "deg",
     "description": "Selected course",
     "unit_description": ""
   },
   {
-    "field": "NAV1",
-    "order": 55,
-    "unit": "MHz",
-    "description": "Nav1 frequency",
-    "unit_description": ""
-  },
-  {
-    "field": "NAV2",
-    "order": 56,
-    "unit": "MHz",
-    "description": "Nav2 frequency",
-    "unit_description": ""
-  },
-  {
-    "field": "COM1",
-    "order": 57,
-    "unit": "MHz",
-    "description": "Com1 frequency",
-    "unit_description": ""
-  },
-  {
-    "field": "COM2",
-    "order": 58,
-    "unit": "MHz",
-    "description": "Com2 frequency",
-    "unit_description": ""
-  },
-  {
-    "field": "HCDI",
-    "order": 59,
-    "unit": "fsd",
-    "description": "CDI deflection",
-    "unit_description": ""
-  },
-  {
-    "field": "VCDI",
-    "order": 60,
-    "unit": "fsd",
-    "description": "VDI/GP/GS deflection",
-    "unit_description": ""
-  },
-  {
     "field": "WndSpd",
-    "order": 61,
+    "order": 15,
     "unit": "kt",
     "description": "Wind Speed ",
     "unit_description": "knots"
   },
   {
     "field": "WndDr",
-    "order": 62,
+    "order": 16,
     "unit": "deg",
     "description": "Wind Direction ",
     "unit_description": "degrees"
   },
   {
     "field": "WptDst",
-    "order": 63,
+    "order": 17,
     "unit": "nm",
     "description": "Distance to next waypoint ",
     "unit_description": "nm"
   },
   {
     "field": "WptBrg",
-    "order": 64,
+    "order": 18,
     "unit": "deg",
     "description": "Bearing to next waypoint ",
     "unit_description": "degrees"
   },
   {
-    "field": "MagVar",
-    "order": 65,
-    "unit": "deg",
-    "description": "Magnetic variation ",
-    "unit_description": "degrees"
+    "field": "FQtyL",
+    "order": 19,
+    "unit": "gals",
+    "description": "Fuel Qty Left ",
+    "unit_description": "gals"
+  },
+  {
+    "field": "FQtyR",
+    "order": 20,
+    "unit": "gals",
+    "description": "Fuel Qty Right ",
+    "unit_description": "gals"
+  },
+  {
+    "field": "HSIS",
+    "order": 21,
+    "unit": "enum",
+    "description": "HSI source",
+    "unit_description": ""
+  },
+  {
+    "field": "NAV1",
+    "order": 22,
+    "unit": "MHz",
+    "description": "Nav1 frequency",
+    "unit_description": ""
+  },
+  {
+    "field": "NAV2",
+    "order": 23,
+    "unit": "MHz",
+    "description": "Nav2 frequency",
+    "unit_description": ""
+  },
+  {
+    "field": "COM1",
+    "order": 24,
+    "unit": "MHz",
+    "description": "Com1 frequency",
+    "unit_description": ""
+  },
+  {
+    "field": "COM2",
+    "order": 25,
+    "unit": "MHz",
+    "description": "Com2 frequency",
+    "unit_description": ""
   },
   {
     "field": "AfcsOn",
-    "order": 66,
+    "order": 26,
     "unit": "bool",
     "description": "Autopilot On/Off",
     "unit_description": ""
   },
   {
-    "field": "VSpdG",
-    "order": 71,
-    "unit": "fpm",
-    "description": "GPS vertical speed ",
-    "unit_description": "fpm"
-  },
-  {
     "field": "GPSfix",
-    "order": 72,
+    "order": 27,
     "unit": "enum",
     "description": "GPSfix",
     "unit_description": ""
@@ -266,136 +196,136 @@
     "unit_description": "gph"
   },
   {
-    "field": "E1 OilT",
-    "order": 101,
-    "unit": "deg F",
-    "description": "Oil Temperature ",
-    "unit_description": "deg. F"
-  },
-  {
-    "field": "E1 OilP",
-    "order": 102,
-    "unit": "psi",
-    "description": "Oil Pressure ",
-    "unit_description": "psi"
-  },
-  {
     "field": "E1 MAP",
-    "order": 103,
+    "order": 101,
     "unit": "Hg",
     "description": "E1 MAP",
     "unit_description": ""
   },
   {
     "field": "E1 RPM",
-    "order": 104,
+    "order": 102,
     "unit": "rpm",
     "description": "E1 RPM",
     "unit_description": ""
   },
   {
     "field": "E1 %Pwr",
-    "order": 105,
+    "order": 103,
     "unit": "%",
     "description": "E1 PctPwr",
     "unit_description": ""
   },
   {
-    "field": "E1 CHT1",
-    "order": 106,
+    "field": "E1 OilT",
+    "order": 104,
     "unit": "deg F",
-    "description": "E1 CHT1",
-    "unit_description": ""
+    "description": "Oil Temperature ",
+    "unit_description": "deg. F"
   },
   {
-    "field": "E1 CHT2",
-    "order": 107,
-    "unit": "deg F",
-    "description": "E1 CHT2",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 CHT3",
-    "order": 108,
-    "unit": "deg F",
-    "description": "E1 CHT3",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 CHT4",
-    "order": 109,
-    "unit": "deg F",
-    "description": "E1 CHT4",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 CHT5",
-    "order": 110,
-    "unit": "deg F",
-    "description": "E1 CHT5",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 CHT6",
-    "order": 111,
-    "unit": "deg F",
-    "description": "E1 CHT6",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 EGT1",
-    "order": 112,
-    "unit": "deg F",
-    "description": "E1 EGT1",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 EGT2",
-    "order": 113,
-    "unit": "deg F",
-    "description": "E1 EGT2",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 EGT3",
-    "order": 114,
-    "unit": "deg F",
-    "description": "E1 EGT3",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 EGT4",
-    "order": 115,
-    "unit": "deg F",
-    "description": "E1 EGT4",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 EGT5",
-    "order": 116,
-    "unit": "deg F",
-    "description": "E1 EGT5",
-    "unit_description": ""
-  },
-  {
-    "field": "E1 EGT6",
-    "order": 117,
-    "unit": "deg F",
-    "description": "E1 EGT6",
-    "unit_description": ""
+    "field": "E1 OilP",
+    "order": 105,
+    "unit": "psi",
+    "description": "Oil Pressure ",
+    "unit_description": "psi"
   },
   {
     "field": "E1 TIT1",
-    "order": 118,
+    "order": 106,
     "unit": "deg F",
     "description": "E1 TIT1",
     "unit_description": ""
   },
   {
     "field": "E1 TIT2",
-    "order": 119,
+    "order": 107,
     "unit": "deg F",
     "description": "E1 TIT2",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 CHT1",
+    "order": 108,
+    "unit": "deg F",
+    "description": "E1 CHT1",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 CHT2",
+    "order": 109,
+    "unit": "deg F",
+    "description": "E1 CHT2",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 CHT3",
+    "order": 110,
+    "unit": "deg F",
+    "description": "E1 CHT3",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 CHT4",
+    "order": 111,
+    "unit": "deg F",
+    "description": "E1 CHT4",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 CHT5",
+    "order": 112,
+    "unit": "deg F",
+    "description": "E1 CHT5",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 CHT6",
+    "order": 113,
+    "unit": "deg F",
+    "description": "E1 CHT6",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGT1",
+    "order": 114,
+    "unit": "deg F",
+    "description": "E1 EGT1",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGT2",
+    "order": 115,
+    "unit": "deg F",
+    "description": "E1 EGT2",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGT3",
+    "order": 116,
+    "unit": "deg F",
+    "description": "E1 EGT3",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGT4",
+    "order": 117,
+    "unit": "deg F",
+    "description": "E1 EGT4",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGT5",
+    "order": 118,
+    "unit": "deg F",
+    "description": "E1 EGT5",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGT6",
+    "order": 119,
+    "unit": "deg F",
+    "description": "E1 EGT6",
     "unit_description": ""
   },
   {
@@ -460,6 +390,76 @@
     "unit": "deg C",
     "description": "E2 ITT",
     "unit_description": ""
+  },
+  {
+    "field": "HCDI",
+    "order": 150,
+    "unit": "fsd",
+    "description": "CDI deflection",
+    "unit_description": ""
+  },
+  {
+    "field": "VCDI",
+    "order": 151,
+    "unit": "fsd",
+    "description": "VDI/GP/GS deflection",
+    "unit_description": ""
+  },
+  {
+    "field": "MagVar",
+    "order": 152,
+    "unit": "deg",
+    "description": "Magnetic variation ",
+    "unit_description": "degrees"
+  },
+  {
+    "field": "volt1",
+    "order": 153,
+    "unit": "volts",
+    "description": "volt1",
+    "unit_description": ""
+  },
+  {
+    "field": "volt2",
+    "order": 154,
+    "unit": "volts",
+    "description": "volt2",
+    "unit_description": ""
+  },
+  {
+    "field": "amp1",
+    "order": 155,
+    "unit": "amps",
+    "description": "amp1",
+    "unit_description": ""
+  },
+  {
+    "field": "Pitch",
+    "order": 156,
+    "unit": "deg",
+    "description": "Pitch Attitude Angle ",
+    "unit_description": "degrees"
+  },
+  {
+    "field": "Roll",
+    "order": 157,
+    "unit": "deg",
+    "description": "Roll Attitude Angle ",
+    "unit_description": "degrees"
+  },
+  {
+    "field": "LatAc",
+    "order": 158,
+    "unit": "G",
+    "description": "Lateral G Force ",
+    "unit_description": "g"
+  },
+  {
+    "field": "NormAc",
+    "order": 159,
+    "unit": "G",
+    "description": "Vertical G Force ",
+    "unit_description": "g"
   },
   {
     "field": "RollM",
