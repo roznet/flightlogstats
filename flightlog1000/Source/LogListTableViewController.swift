@@ -244,6 +244,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             }
         }else{
             self.logList = self.logFileOrganizer.flightLogFileList
+            self.tableView.reloadData()
         }
     }
 
