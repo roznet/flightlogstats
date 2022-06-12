@@ -26,6 +26,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     
     var flightLogFileInfo : FlightLogFileInfo? = nil
     var legsDataSource : FlightLegsDataSource? = nil
+    var fuelDataSource : FlightSummaryFuelDataSource? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,15 +77,23 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                 }
                 self.airports.text = airports.joined(separator: "  -  ")
                 self.route.text = displayContext.format(route: summary.route)
-                self.totalRemainingFuel.text =  displayContext.formatValue(gallon: summary.fuelEnd.total)
-                self.leftRemainingFuel.text =  displayContext.formatValue(gallon: summary.fuelEnd.left)
-                self.rightRemainingFuel.text =  displayContext.formatValue(gallon: summary.fuelEnd.right)
-            }else{
-                self.airports.text = nil
+                self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary)
+                self.fuelCollectionView.dataSource = self.fuelDataSource
+                self.fuelCollectionView.delegate = self.fuelDataSource
+                if let tableCollectionLayout = self.fuelCollectionView.collectionViewLayout as? TableCollectionViewLayout {
+                    tableCollectionLayout.tableCollectionDelegate = self.fuelDataSource
+                }else{
+                    Logger.app.error("Internal error: Inconsistent layout ")
+                }
                 self.totalRemainingFuel.text = nil
                 self.leftRemainingFuel.text =  nil
                 self.rightRemainingFuel.text =  nil
+            }else{
+                self.airports.text = nil
                 self.route.text = nil
+                self.totalRemainingFuel.text = nil
+                self.leftRemainingFuel.text =  nil
+                self.rightRemainingFuel.text =  nil
             }
             
             self.view.setNeedsDisplay()
