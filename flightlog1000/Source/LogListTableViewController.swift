@@ -24,9 +24,17 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     var progressReportViewController : ProgressReportViewController? = nil
     
     weak var delegate : LogSelectionDelegate? = nil
+    var filterEmpty = true
     
     func moreFunctionMenu() -> UIMenu {
         let menuItems : [UIAction] = [
+            UIAction(title: "Toggle Filter", image: UIImage(systemName: "minus.circle")){
+                _ in
+                self.filterEmpty = !self.filterEmpty
+                self.buildList()
+                self.tableView.reloadData()
+            },
+
             UIAction(title: "Delete", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Delete")
@@ -212,7 +220,24 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     //MARK: - build list functionality
     
     func buildList() {
-        self.logList = self.logFileOrganizer.flightLogFileList
+        
+        if self.filterEmpty {
+            AppDelegate.worker.async {
+                self.logList = self.logFileOrganizer.filter(flightLogFileList: self.logFileOrganizer.flightLogFileList){
+                    info in
+                    if let elapsed = info.flightSummary?.moving?.elapsed,
+                       let distance = info.flightSummary?.distance {
+                        return elapsed > 0.0 && distance > 500
+                    }
+                    return false
+                }
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
+        }else{
+            self.logList = self.logFileOrganizer.flightLogFileList
+        }
     }
 
     //MARK: - add functionality

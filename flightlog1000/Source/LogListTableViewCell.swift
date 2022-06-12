@@ -21,7 +21,6 @@ class LogListTableViewCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var fileName: UILabel!
     
-    
     func update(with info: FlightLogFileInfo){
         self.fileName.text = info.log_file_name
         self.flightLogFileInfo = info

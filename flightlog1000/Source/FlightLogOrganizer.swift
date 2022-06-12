@@ -213,6 +213,18 @@ class FlightLogOrganizer {
         }
     }
     
+    func filter(flightLogFileList : FlightLogFileList, filter : (FlightLogFileInfo) -> Bool) -> FlightLogFileList {
+        var logs : [FlightLogFile] = []
+        for one in flightLogFileList.flightLogFiles {
+            if let info = self.managedFlightLogs[one.name] {
+                if filter(info) {
+                    logs.append(one)
+                }
+            }
+        }
+        return FlightLogFileList(logs: logs)
+    }
+    
     func delete(info : FlightLogFileInfo){
         info.delete()
         self.persistentContainer.viewContext.delete(info)
