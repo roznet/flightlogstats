@@ -14,7 +14,8 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var name: UILabel!
-        
+    @IBOutlet weak var date: UILabel!
+    
     @IBOutlet weak var timeCollectionView: UICollectionView!
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
@@ -63,7 +64,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                     
                     if self.name != nil {
                         self.name.text = self.flightLogFileInfo?.log_file_name
-                        
+                        self.date.text = self.flightLogFileInfo?.start_time?.formatted()
                         var airports : [String] = []
                         if let from = summary.startAirport {
                             airports.append("\(from.name) (\(from.icao))")

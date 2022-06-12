@@ -19,20 +19,37 @@
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="i78-1P-54X">
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="i78-1P-54X">
                                 <rect key="frame" x="0.0" y="74" width="834" height="60"/>
                                 <subviews>
-                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
-                                        <rect key="frame" x="0.0" y="0.0" width="834" height="60"/>
+                                    <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" ambiguous="YES" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
+                                        <rect key="frame" x="0.0" y="0.0" width="834" height="34.5"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Filename" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dA2-7N-Rah">
-                                                <rect key="frame" x="0.0" y="0.0" width="417" height="60"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Filename" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dA2-7N-Rah">
+                                                <rect key="frame" x="0.0" y="0.0" width="68.5" height="34.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
-                                                <rect key="frame" x="417" y="0.0" width="417" height="60"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
+                                                <rect key="frame" x="73.5" y="0.0" width="760.5" height="34.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" ambiguous="YES" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="kQT-db-JLR">
+                                        <rect key="frame" x="0.0" y="39.5" width="834" height="20.5"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q5D-D3-fdA" userLabel="Date">
+                                                <rect key="frame" x="0.0" y="0.0" width="36" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
+                                                <rect key="frame" x="41" y="0.0" width="793" height="20.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -44,11 +61,44 @@
                                     <constraint firstAttribute="height" constant="60" id="l6B-PR-Qee"/>
                                 </constraints>
                             </stackView>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mee-fG-3c6" userLabel="Fuel Collection View">
-                                <rect key="frame" x="-5" y="404" width="834" height="150"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="s50-2U-Cvg" userLabel="TimeSummary Collection View">
+                                <rect key="frame" x="5" y="139" width="834" height="150"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="150" id="Ocf-zi-YCp"/>
+                                    <constraint firstAttribute="height" constant="150" id="KDg-SL-kLK"/>
+                                </constraints>
+                                <collectionViewLayout key="collectionViewLayout" id="IIK-bc-UxE" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="gwc-Wk-8DA" userLabel="TimeSummaryCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="UzP-6M-UFt">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pFh-zQ-2rw">
+                                                    <rect key="frame" x="7" y="15" width="36" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="pFh-zQ-2rw" firstAttribute="centerX" secondItem="UzP-6M-UFt" secondAttribute="centerX" id="QQc-rI-IQX"/>
+                                                <constraint firstItem="pFh-zQ-2rw" firstAttribute="centerY" secondItem="UzP-6M-UFt" secondAttribute="centerY" id="RDc-ZA-Och"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="label" destination="pFh-zQ-2rw" id="JWB-ce-2Cn"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mee-fG-3c6" userLabel="Fuel Collection View">
+                                <rect key="frame" x="-5" y="294" width="834" height="100"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="100" id="uJR-ao-is8"/>
                                 </constraints>
                                 <collectionViewLayout key="collectionViewLayout" id="rhw-Mu-gap" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
@@ -78,7 +128,7 @@
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="aKL-fC-i7y" userLabel="Legs Collection View">
-                                <rect key="frame" x="5" y="554" width="824" height="620"/>
+                                <rect key="frame" x="5" y="399" width="824" height="766"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="oSQ-lx-eW3" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
@@ -107,71 +157,40 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" id="wkc-d6-MzS">
-                                <rect key="frame" x="0.0" y="595" width="834" height="4"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="cyP-Hg-ndb">
+                                <rect key="frame" x="342" y="1165" width="150" height="4"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="150" id="FCx-80-klz"/>
+                                    <constraint firstAttribute="width" constant="150" id="Qva-TF-6jV"/>
+                                    <constraint firstAttribute="height" constant="4" id="y7G-P6-0Pl"/>
                                 </constraints>
                             </progressView>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="s50-2U-Cvg" userLabel="TimeSummary Collection View">
-                                <rect key="frame" x="5" y="144" width="834" height="250"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="250" id="5jO-NM-qe8"/>
-                                </constraints>
-                                <collectionViewLayout key="collectionViewLayout" id="IIK-bc-UxE" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="gwc-Wk-8DA" userLabel="TimeSummaryCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="UzP-6M-UFt">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pFh-zQ-2rw">
-                                                    <rect key="frame" x="4.5" y="15" width="41.5" height="20.5"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="pFh-zQ-2rw" firstAttribute="centerX" secondItem="UzP-6M-UFt" secondAttribute="centerX" id="QQc-rI-IQX"/>
-                                                <constraint firstItem="pFh-zQ-2rw" firstAttribute="centerY" secondItem="UzP-6M-UFt" secondAttribute="centerY" id="RDc-ZA-Och"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="label" destination="pFh-zQ-2rw" id="JWB-ce-2Cn"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="S3q-Cy-ALO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="mee-fG-3c6" secondAttribute="trailing" constant="5" id="7LI-kd-Xre"/>
                             <constraint firstItem="i78-1P-54X" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" id="Ei4-Mk-Ken"/>
-                            <constraint firstItem="s50-2U-Cvg" firstAttribute="top" secondItem="i78-1P-54X" secondAttribute="bottom" constant="10" id="Jhn-5U-SuE"/>
-                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="bottom" secondItem="aKL-fC-i7y" secondAttribute="bottom" id="LGr-hm-wEB"/>
+                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="bottom" secondItem="cyP-Hg-ndb" secondAttribute="bottom" constant="5" id="FzA-Yu-gIn"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="leading" secondItem="mee-fG-3c6" secondAttribute="leading" constant="5" id="O9u-Mv-Zgc"/>
-                            <constraint firstItem="s50-2U-Cvg" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="P9t-SA-UCT"/>
+                            <constraint firstItem="s50-2U-Cvg" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="PlE-ff-Pmr"/>
+                            <constraint firstItem="cyP-Hg-ndb" firstAttribute="top" secondItem="aKL-fC-i7y" secondAttribute="bottom" id="RXi-sH-vsO"/>
                             <constraint firstItem="i78-1P-54X" firstAttribute="top" secondItem="S3q-Cy-ALO" secondAttribute="top" id="TJC-33-FyI"/>
                             <constraint firstItem="aKL-fC-i7y" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="Y1g-wh-syl"/>
                             <constraint firstItem="i78-1P-54X" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" id="YWb-a3-edh"/>
-                            <constraint firstItem="mee-fG-3c6" firstAttribute="top" secondItem="s50-2U-Cvg" secondAttribute="bottom" constant="10" id="gp6-Fp-vS1"/>
-                            <constraint firstItem="s50-2U-Cvg" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" constant="5" id="qsc-7W-1C7"/>
-                            <constraint firstItem="wkc-d6-MzS" firstAttribute="centerX" secondItem="aKL-fC-i7y" secondAttribute="centerX" id="xNf-Ld-juS"/>
+                            <constraint firstItem="s50-2U-Cvg" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" constant="5" id="fwH-MJ-3C7"/>
+                            <constraint firstItem="s50-2U-Cvg" firstAttribute="top" secondItem="i78-1P-54X" secondAttribute="bottom" constant="5" id="iUh-rj-mTh"/>
+                            <constraint firstItem="cyP-Hg-ndb" firstAttribute="centerX" secondItem="S3q-Cy-ALO" secondAttribute="centerX" id="uCO-dL-3lO"/>
+                            <constraint firstItem="mee-fG-3c6" firstAttribute="top" secondItem="s50-2U-Cvg" secondAttribute="bottom" constant="5" id="xC1-Os-cMZ"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="aKL-fC-i7y" secondAttribute="trailing" constant="5" id="y4Z-zG-2za"/>
-                            <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="mee-fG-3c6" secondAttribute="bottom" id="y5c-0i-9X6"/>
+                            <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="mee-fG-3c6" secondAttribute="bottom" constant="5" id="y5c-0i-9X6"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="date" destination="6bN-rh-gIs" id="sL8-AX-MI1"/>
                         <outlet property="fuelCollectionView" destination="mee-fG-3c6" id="ASf-Nf-8NE"/>
                         <outlet property="legsCollectionView" destination="aKL-fC-i7y" id="B4G-8r-hwp"/>
                         <outlet property="name" destination="h5i-bu-Kfn" id="H0Q-jq-D8o"/>
-                        <outlet property="progressView" destination="wkc-d6-MzS" id="mzV-jg-duT"/>
+                        <outlet property="progressView" destination="cyP-Hg-ndb" id="10g-C4-FYE"/>
                         <outlet property="timeCollectionView" destination="s50-2U-Cvg" id="gS0-hA-xIg"/>
                     </connections>
                 </viewController>
