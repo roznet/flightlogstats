@@ -19,7 +19,7 @@ class BufferedStreamReader {
     var isAtEnd : Bool
     var readCount : Int
     
-    init(inputStream : InputStream, capacity : Int = 1024 * 16 ){
+    init(inputStream : InputStream, capacity : Int = 1024 * 1024 ){
         self.inputStream = inputStream
         self.buffer = [UInt8](repeating: 0, count: capacity)
         

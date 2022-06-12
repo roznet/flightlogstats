@@ -61,7 +61,7 @@ class FlightData {
     
     private init() {}
     
-    static var methodBuffered = false
+    static var methodBuffered = true
     
     convenience init?(url: URL, progress : ProgressReport? = nil){
         self.init()
@@ -202,37 +202,55 @@ class FlightData {
                     }
                 }
             }else if line.count == columnIsDouble.count {
-                let dateString = String(format: "%@ %@ %@", line[dateIndex], line[timeIndex], line[offsetIndex])
-                if let date = formatter.date(from: dateString) {
-                    data.dates.append(date)
-                }else{
-                    if dateString.replacingOccurrences(of: " ", with: "").isEmpty {
-                        // skip empty strings
-                        return
+                // Usually date are +1, +2 or same, saves a lot of time vs date parsing to try to guess...
+                var dateProxied = false
+                if let lastDate = data.dates.last {
+                    let lastDigit = Int(lastDate.timeIntervalSinceReferenceDate)
+                    let suffix = line[timeIndex].suffix(1)
+                    if suffix == "\( (lastDigit + 1) % 10)" {
+                        data.dates.append(lastDate.addingTimeInterval(1.0) )
+                        dateProxied = true
+                    }else if suffix == "\( (lastDigit + 2) % 10)" {
+                        data.dates.append(lastDate.addingTimeInterval(2.0) )
+                        dateProxied = true
+                    }else if suffix == "\( lastDigit % 10)" {
+                        data.dates.append(lastDate )
+                        dateProxied = true
                     }
-                    
-                    // if first one try few other format
-                    if data.dates.count == 0{
-                        for fmt in extraDateFormats {
-                            formatter.dateFormat = fmt
-                            if let date = formatter.date(from: dateString) {
-                                data.dates.append(date)
-                                break
-                            }
+                }
+                if !dateProxied {
+                    let dateString = String(format: "%@ %@ %@", line[dateIndex], line[timeIndex], line[offsetIndex])
+                    if let date = formatter.date(from: dateString) {
+                        data.dates.append(date)
+                    }else{
+                        if dateString.replacingOccurrences(of: " ", with: "").isEmpty {
+                            // skip empty strings
+                            return
                         }
-                        if data.dates.count == 0 && skipped < 5 {
-                            Logger.app.error("Failed to identify date format '\(dateString)'")
+                        
+                        // if first one try few other format
+                        if data.dates.count == 0{
+                            for fmt in extraDateFormats {
+                                formatter.dateFormat = fmt
+                                if let date = formatter.date(from: dateString) {
+                                    data.dates.append(date)
+                                    break
+                                }
+                            }
+                            if data.dates.count == 0 && skipped < 5 {
+                                Logger.app.error("Failed to identify date format '\(dateString)'")
+                                skipped += 1
+                                return
+                            }
+                        }else{
+                            // we already have dates, so
+                            if skipped < 5 {
+                                let skipped = skipped
+                                Logger.app.error("Failed to parse date '\(dateString)' skipped=\(skipped)")
+                            }
                             skipped += 1
                             return
                         }
-                    }else{
-                        // we already have dates, so
-                        if skipped < 5 {
-                            let skipped = skipped
-                            Logger.app.error("Failed to parse date '\(dateString)' skipped=\(skipped)")
-                        }
-                        skipped += 1
-                        return
                     }
                 }
                 self.doubleLine.removeAll()
