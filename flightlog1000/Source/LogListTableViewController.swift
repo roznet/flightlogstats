@@ -240,11 +240,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 }
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
+                    self.delegate?.selectOneIfEmpty()
                 }
             }
         }else{
             self.logList = self.logFileOrganizer.flightLogFileList
             self.tableView.reloadData()
+            self.delegate?.selectOneIfEmpty()
         }
     }
 

@@ -17,7 +17,6 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        FlightLogOrganizer.shared.syncCloud()
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             FlightLogOrganizer.shared.syncCloud()

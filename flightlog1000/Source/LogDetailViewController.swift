@@ -38,7 +38,6 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                 self.updateUI()
             }
         }
-        self.selectOneIfEmpty()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
