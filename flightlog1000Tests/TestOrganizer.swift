@@ -15,7 +15,37 @@ import CoreLocation
 import RZUtils
 
 class TestOrganizer: XCTestCase {
-
+    
+    /// quick helper to find log file
+    /// - Parameter dirurl: url to search
+    /// - Returns: list of found files
+    func findLocalLogFiles(dirurl : URL) -> [URL] {
+        var found : [URL] = []
+        
+        var isDirectory : ObjCBool = false
+        if FileManager.default.fileExists(atPath: dirurl.path, isDirectory: &isDirectory) {
+            if isDirectory.boolValue {
+                let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
+                
+                guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
+                    return []
+                }
+                
+                for case let file as URL in fileList {
+                    if file.isLogFile {
+                        found.append(file)
+                    }
+                }
+            }else{
+                if dirurl.isLogFile {
+                    found.append(dirurl)
+                }
+            }
+        }
+        return found
+    }
+    
+    
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -23,9 +53,13 @@ class TestOrganizer: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    
     func testLogFileDiscovery() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        // This will test that:
+        //   1. we find list of files in local directory
+        //   2. logic if we remove one file from known ones that it identifies missing one
+        
         guard let url = Bundle(for: type(of: self)).resourceURL
         else {
             XCTAssertTrue(false)
@@ -54,12 +88,17 @@ class TestOrganizer: XCTestCase {
                         XCTAssertEqual(last.lastPathComponent, missingLog.name)
                     }
                 }
-                expectation.fulfill()
             }
+            expectation.fulfill()
         }
+        self.wait(for: [expectation], timeout: TimeInterval(10.0))
     }
     
     func testOrganizerSyncCloud() throws {
+        // This will test that
+        //   1. logic of copying missing from from cloud works: cloud proxied by bundle path, and local by a testLocal folder initially empty
+        //   2. after copying form cloud (bundle path) the coredata container updated
+        
         guard let bundleUrl = Bundle(for: type(of: self)).resourceURL
         else {
             XCTAssertTrue(false)
@@ -90,14 +129,34 @@ class TestOrganizer: XCTestCase {
         }
         organizer.persistentContainer = container
         
-        let expectation = XCTestExpectation(description: "container cloud loaded")
-        
         // set up cloud folder to be bundle, should copy eveyrthing locally
         organizer.localFolder = writeableUrl
         organizer.cloudFolder = bundleUrl
         
-        //organizer.syncCloud(with: )
-        expectation.fulfill()
+        let cloudUrls = self.findLocalLogFiles(dirurl: bundleUrl)
+        var localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
+        
+        organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
+        localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
+        // check we copied all
+        XCTAssertEqual(localUrls.count, cloudUrls.count)
+        
+        // now remove one from localUrls, and assuming local is cloud, make sure syncCloud will copy missing over
+        if let last = localUrls.last {
+            do {
+                try FileManager.default.removeItem(at: last)
+                localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
+                XCTAssertEqual(localUrls.count, cloudUrls.count - 1)
+                organizer.syncCloudLogic(localUrls: cloudUrls, cloudUrls: localUrls)
+                localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
+                XCTAssertEqual(localUrls.count, cloudUrls.count)
+            }catch{
+                XCTAssertTrue(false)
+            }
+        }else{
+            XCTAssertTrue(false)
+        }
+
     }
     
     func testOrganizer() throws {

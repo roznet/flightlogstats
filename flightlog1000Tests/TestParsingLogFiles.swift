@@ -80,17 +80,30 @@ class TestParsingLogFiles: XCTestCase {
         print( summary! )
         
         let route = log.legs
-        print( route )
-        
-        print( FlightLogFile.Field.AfcsOn.localizedDescription )
         
         let dataSource = FlightLegsDataSource(legs: route)
-        print( dataSource.fields.map { $0.order } )
-        //for table each column should have same number of row
-        dataSource.computeGeometry()
-        print( dataSource.contentSize)
-        XCTAssertEqual(dataSource.rowsHeight.count * dataSource.columnsWidth.count, dataSource.cellSizes.count)
-        XCTAssertEqual(dataSource.rowsHeight.count * dataSource.columnsWidth.count, dataSource.attributedCells.count)
+        let layout = TableCollectionViewLayout()
+        layout.tableCollectionDelegate = dataSource
+        
+        let dummy = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        dummy.dataSource = dataSource
+        layout.tableCollectionDelegate = dataSource
+        layout.prepare()
+        
+        XCTAssertTrue(layout.contentSize != CGSize.zero)
+        
+        // check all cells fits in their row and columns
+        let sections = dataSource.numberOfSections(in: dummy)
+        for section in 0..<sections {
+            for item in 0..<dataSource.collectionView(dummy, numberOfItemsInSection: section) {
+                let indexPath = IndexPath(item: item, section: section)
+                let tableSize = layout.size(at: indexPath)
+                let cellText = dataSource.attributedString(at: indexPath)
+                let cellSize = cellText.size()
+                XCTAssertLessThanOrEqual(cellSize.width, tableSize.width)
+                XCTAssertLessThanOrEqual(cellSize.height, tableSize.height)
+            }
+        }
     }
     
     

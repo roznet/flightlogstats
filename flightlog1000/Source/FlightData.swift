@@ -12,8 +12,6 @@ import RZUtilsSwift
 import RZFlight
 import TabularData
 
-typealias ProcessingProgressReport = (_ : Double) -> Void
-
 class FlightData {
     // how often to report progress
     private static let progressReportStep = 5
@@ -65,7 +63,7 @@ class FlightData {
     
     static var methodBuffered = false
     
-    convenience init?(url: URL, progress : ProcessingProgressReport? = nil){
+    convenience init?(url: URL, progress : ProgressReport? = nil){
         self.init()
         
         if Self.methodBuffered {
@@ -99,12 +97,12 @@ class FlightData {
         }
     }
     
-    convenience init(lines : [String.SubSequence], progress : ProcessingProgressReport? = nil) {
+    convenience init(lines : [String.SubSequence], progress : ProgressReport? = nil) {
         self.init()
         self.parse(array: lines, progress: progress)
     }
     
-    convenience init(inputStream : InputStream,progress : ProcessingProgressReport? = nil) throws {
+    convenience init(inputStream : InputStream,progress : ProgressReport? = nil) throws {
         self.init()
         try self.parse(inputStream: inputStream)
     }
@@ -312,12 +310,9 @@ class FlightData {
         case invalidStateForOtherChar
     }
     
-    func parse(inputStream : InputStream, totalSize : Int = 0, progress : ProcessingProgressReport? = nil) throws {
-        var lastReportTime = Date()
-        let start = lastReportTime
-        if let progress = progress {
-            progress(0.0)
-        }
+    func parse(inputStream : InputStream, totalSize : Int = 0, progress : ProgressReport? = nil) throws {
+        let start = Date()
+        progress?.update(state: .progressing(0.0))
 
         var parsingState = ParsingState(data: self)
         //var done_sofar = 0
@@ -432,19 +427,13 @@ class FlightData {
                 if state != .endOfField {
                     parsingState.process(line: line)
                     line.removeAll()
-                    if totalSize > 0, let progress = progress {
-                        let current = Date()
-                        if current.timeIntervalSince(lastReportTime) > 0.1 {
-                            progress(min(1.0,Double(bufferedStreamReader.readCount)/Double(totalSize)))
-                            lastReportTime = current
-                        }
+                    if totalSize > 0 {
+                        progress?.update(state: .progressing(min(1.0,Double(bufferedStreamReader.readCount)/Double(totalSize))))
                     }
                 }
             }
         }
-        if let progress = progress {
-            progress(1.0)
-        }
+        progress?.update(state: .complete)
         if totalSize > 0 {
             Logger.app.info("parsed \(totalSize) bytes in \(Date().timeIntervalSince(start)) secs")
         }
@@ -452,11 +441,10 @@ class FlightData {
     
     //MARK: - parse Memory
     
-    private func parse(array : [String.SubSequence], progress : ProcessingProgressReport? = nil){
+    private func parse(array : [String.SubSequence], progress : ProgressReport? = nil){
         let start = Date()
         var state = ParsingState(data: self)
         var done_sofar = 0
-        let done_step = array.count / 10
         
         self.values.reserveCapacity(array.count)
         self.strings.reserveCapacity(array.count)
@@ -464,9 +452,7 @@ class FlightData {
         let trimCharSet = CharacterSet(charactersIn: "\" ")
 
         for line in array {
-            if done_sofar % done_step == 0, let progress = progress {
-                progress(Double(done_sofar)/Double(array.count))
-            }
+            progress?.update(state: .progressing(Double(done_sofar)/Double(array.count)))
             done_sofar += 1
             let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
             state.process(line: vals)

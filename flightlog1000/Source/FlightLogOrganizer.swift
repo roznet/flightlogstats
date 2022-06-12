@@ -27,6 +27,8 @@ class FlightLogOrganizer {
     public static var shared = FlightLogOrganizer()
     private let queue = OperationQueue()
     
+    var progress : ProgressReport? = nil
+    
     enum UpdateState {
         case ready
         case complete
@@ -89,7 +91,7 @@ class FlightLogOrganizer {
         }
     }
 
-    func updateInfo(count : Int = 1, force : Bool = false,  progress : @escaping ProgressReport.Callback = { _ in} ) {
+    func updateInfo(count : Int = 1, force : Bool = false) {
         guard currentState != .updatingInfoFromData else { return }
         let firstMissingCheck : Bool = (currentState == .complete)
         currentState = .updatingInfoFromData
@@ -145,7 +147,7 @@ class FlightLogOrganizer {
                 // need to switch state before starting next
     
                 let percent = 1.0 - (Double(missing.count)/Double(self.missingCount))
-                progress(.progressing(percent))
+                self.progress?.update(state: .progressing(percent))
                 self.currentState = .ready
                 // if did something, schedule another batch
                 self.updateInfo(count: count, force: force)
@@ -153,7 +155,7 @@ class FlightLogOrganizer {
                 if firstMissingCheck {
                     Logger.app.info("No logFile requires updating")
                 }
-                progress(.complete)
+                self.progress?.update(state: .complete)
                 // nothing done, ready for more
                 self.currentState = .ready
             }
@@ -340,7 +342,7 @@ class FlightLogOrganizer {
     private var cachedQuery : NSMetadataQuery? = nil
     private var cachedLocalFlightLogList : FlightLogFileList? = nil
     
-    func syncCloud() {
+    func syncCloud(progress : @escaping ProgressReport.Callback = { _, _ in} ) {
         guard cloudFolder != nil else {
             Logger.app.info("iCloud not setup, skipping sync")
             return
@@ -357,7 +359,7 @@ class FlightLogOrganizer {
         }
     }
     
-    private func syncCloud(with local : FlightLogFileList) {
+    private func syncCloud(with local : FlightLogFileList ) {
         // look in cloud what we are missing locally
         if self.cachedQuery != nil {
             self.cachedQuery?.stop()
@@ -385,83 +387,94 @@ class FlightLogOrganizer {
                         cloudUrls.append(url)
                     }
                 }
-                var existingInLocal : Set<String> = []
-                var existingInCloud : Set<String> = []
-
-                // Gather what is in what to check what is missing
-                for cloudUrl in cloudUrls {
-                    let lastComponent = cloudUrl.lastPathComponent
-                    if lastComponent.isLogFile {
-                        existingInCloud.insert(lastComponent)
-                    }
-                }
-                
-                for localUrl in localUrls {
-                    let lastComponent = localUrl.lastPathComponent
-                    if lastComponent.isLogFile {
-                        existingInLocal.insert(lastComponent)
-                    }
-                }
-                // copy local to cloud
-                var copyLocalToCloud : [URL] = []
-                var copyCloudToLocal : [NSFileAccessIntent] = []
-
-                for cloudUrl in cloudUrls {
-                    let lastComponent = cloudUrl.lastPathComponent
-                    if lastComponent.isLogFile {
-                        if !existingInLocal.contains(lastComponent) {
-                            Logger.app.info( "copy to local \(cloudUrl.lastPathComponent)")
-                            copyCloudToLocal.append(NSFileAccessIntent.readingIntent(with: cloudUrl))
-                        }
-                    }
-                }
-                
-                var copiedToCloud : Int = 0
-                
-                for localUrl in localUrls {
-                    let lastComponent = localUrl.lastPathComponent
-                    if lastComponent.isLogFile {
-                        if !existingInCloud.contains(lastComponent) {
-                            copyLocalToCloud.append(localUrl)
-                            if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
-                                copiedToCloud += 1
-                                Logger.app.info( "copy to cloud \(localUrl.lastPathComponent)")
-                                do {
-                                    try FileManager.default.copyItem(at: localUrl, to: cloud)
-                                }catch{
-                                    Logger.app.error("Failed to copy to cloud \(error.localizedDescription)")
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                if copiedToCloud == 0 {
-                    Logger.app.info("Nothing new in local to copy to cloud")
-                }
-                if copyCloudToLocal.count > 0 {
-                    let coordinator = NSFileCoordinator()
-                    coordinator.coordinate(with: copyCloudToLocal, queue: self.queue){
-                        error in
-                        if error == nil {
-                            do {
-                                for intent in copyCloudToLocal {
-                                    try FileManager.default.copyItem(at: intent.url, to: self.localFolder.appendingPathComponent(intent.url.lastPathComponent))
-                                }
-                                self.addMissingFromLocal()
-                            }catch{
-                                Logger.app.error("Failed to copy from cloud \(error.localizedDescription)")
-                            }
-                        }else{
-                            if let error = error {
-                                Logger.app.error("Failed to coordinate \(error.localizedDescription)")
-                            }
-                        }
-                    }
-                }else{
-                    Logger.app.info("Nothing new in cloud to copy to local")
+                self.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
+            }
+        }
+    }
+    
+    func syncCloudLogic(localUrls : [URL], cloudUrls : [URL]){
+        var existingInLocal : Set<String> = []
+        var existingInCloud : Set<String> = []
+        
+        // Gather what is in what to check what is missing
+        for cloudUrl in cloudUrls {
+            let lastComponent = cloudUrl.lastPathComponent
+            if lastComponent.isLogFile {
+                existingInCloud.insert(lastComponent)
+            }
+        }
+        
+        for localUrl in localUrls {
+            let lastComponent = localUrl.lastPathComponent
+            if lastComponent.isLogFile {
+                existingInLocal.insert(lastComponent)
+            }
+        }
+        // copy local to cloud
+        var copyLocalToCloud : [URL] = []
+        var copyCloudToLocal : [NSFileAccessIntent] = []
+        
+        for cloudUrl in cloudUrls {
+            let lastComponent = cloudUrl.lastPathComponent
+            if lastComponent.isLogFile {
+                if !existingInLocal.contains(lastComponent) {
+                    Logger.app.info( "copy to local \(cloudUrl.lastPathComponent)")
+                    copyCloudToLocal.append(NSFileAccessIntent.readingIntent(with: cloudUrl))
                 }
             }
+        }
+        
+        var copiedToCloud : Int = 0
+        
+        let totalCount = Double(localUrls.count + cloudUrls.count)
+        var done : Double = 0
+        
+        for localUrl in localUrls {
+            let lastComponent = localUrl.lastPathComponent
+            self.progress?.update(state: .progressing(done/totalCount))
+            done += 1.0
+            if lastComponent.isLogFile {
+                if !existingInCloud.contains(lastComponent) {
+                    copyLocalToCloud.append(localUrl)
+                    if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
+                        copiedToCloud += 1
+                        Logger.app.info( "copy to cloud \(localUrl.lastPathComponent)")
+                        do {
+                            try FileManager.default.copyItem(at: localUrl, to: cloud)
+                        }catch{
+                            Logger.app.error("Failed to copy to cloud \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+        
+        if copiedToCloud == 0 {
+            Logger.app.info("Nothing new in local to copy to cloud")
+        }
+        if copyCloudToLocal.count > 0 {
+            let coordinator = NSFileCoordinator()
+            coordinator.coordinate(with: copyCloudToLocal, queue: self.queue){
+                error in
+                if error == nil {
+                    do {
+                        for intent in copyCloudToLocal {
+                            self.progress?.update(state: .progressing(done/totalCount))
+                            done += 1.0
+                            try FileManager.default.copyItem(at: intent.url, to: self.localFolder.appendingPathComponent(intent.url.lastPathComponent))
+                        }
+                        self.addMissingFromLocal()
+                    }catch{
+                        Logger.app.error("Failed to copy from cloud \(error.localizedDescription)")
+                    }
+                }else{
+                    if let error = error {
+                        Logger.app.error("Failed to coordinate \(error.localizedDescription)")
+                    }
+                }
+            }
+        }else{
+            Logger.app.info("Nothing new in cloud to copy to local")
         }
     }
 }

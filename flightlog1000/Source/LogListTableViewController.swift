@@ -62,7 +62,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
         
         if let progressReport = self.progressReportViewController,
-           let navigationController = self.navigationController{
+           let navigationController = self.navigationController {
             
             navigationController.view.addSubview(progressReport.view)
             navigationController.view.bringSubviewToFront(progressReport.view)
@@ -72,17 +72,45 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             frame.origin.y = frame.size.height - 60.0
             frame.size.height = 60.0
             progressReport.view.frame = frame
-            progressReport.statusLabel.text = "Hello"
-            progressReport.progressBar.progress = 0.5
-            DispatchQueue.main.asyncAfter(deadline: .now()+10.0) {
-                if let progressReportViewController = self.progressReportViewController {
-                    progressReportViewController.view.removeFromSuperview()
-                }
+        }
+    }
+    
+    func removeOverlay(delay : Double = 2.0){
+        DispatchQueue.main.asyncAfter(deadline: .now()+delay) {
+            if let progressReportViewController = self.progressReportViewController {
+                progressReportViewController.view.removeFromSuperview()
+                self.progressReportViewController = nil
             }
         }
-        
-        
-        
+    }
+    
+    func prepareOverlay(message : String){
+        if self.progressReportViewController == nil {
+            self.displayOverlay()
+        }
+        self.progressReportViewController?.statusLabel.text = message
+        self.progressReportViewController?.progressBar.setProgress(0, animated: false)
+        self.logFileOrganizer.progress = ProgressReport(message: "Organizer") { state,_ in self.update(for: state) }
+    }
+    
+    func update(for state : ProgressReport.State ){
+        DispatchQueue.main.async {
+            if state != .complete && self.progressReportViewController == nil {
+                self.displayOverlay()
+            }
+            
+            switch state {
+            case .progressing(let pct):
+                self.progressReportViewController?.progressBar.setProgress(Float(pct), animated: true)
+            case .complete:
+                self.progressReportViewController?.progressBar.setProgress(1.0, animated: true)
+                self.removeOverlay()
+            case .error(let error):
+                self.progressReportViewController?.statusLabel.text = error
+                self.removeOverlay(delay: 5.0)
+            }
+
+        }
     }
     
     override func viewDidLoad() {
@@ -99,6 +127,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             self.buildList()
@@ -201,6 +230,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
 
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        self.prepareOverlay(message: "Adding Files")
         self.logFileOrganizer.copyMissingToLocal(urls: urls)
         
         controller.dismiss(animated: true)

@@ -19,6 +19,9 @@ class ProgressReportViewController: UIViewController {
     }
     
 
+    func update(for : ProgressReport){
+        
+    }
     /*
     // MARK: - Navigation
 

@@ -56,7 +56,7 @@ class FlightLogFile {
         }
     }
     
-    func parse(progress : ProcessingProgressReport? = nil) {
+    func parse(progress : ProgressReport? = nil) {
         if self.logType == .notParsed {
             self.data = FlightData(url: self.url, progress: progress)
             if let data = self.data {

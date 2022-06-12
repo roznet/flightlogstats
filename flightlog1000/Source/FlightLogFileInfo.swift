@@ -70,7 +70,7 @@ class FlightLogFileInfo: NSManagedObject {
         }
     }
     
-    func parseAndUpdate(progress : ProcessingProgressReport? = nil) {
+    func parseAndUpdate(progress : ProgressReport? = nil) {
         if flightLog == nil {
             guard let container = self.container,
                   let log_file_name = self.log_file_name

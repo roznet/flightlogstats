@@ -23,10 +23,10 @@ class TableCollectionViewLayout: UICollectionViewLayout {
     var itemAttributes = [[UICollectionViewLayoutAttributes]]()
     
     private var cellSizes : [CGSize] = []
-    private var columnsWidth : [CGFloat] = []
-    private var rowsHeight : [CGFloat] = []
+    private(set) var columnsWidth : [CGFloat] = []
+    private(set) var rowsHeight : [CGFloat] = []
     
-    private var contentSize : CGSize = CGSize.zero
+    private(set) var contentSize : CGSize = CGSize.zero
 
     override func prepare() {
         guard let collectionView = collectionView,
@@ -154,7 +154,7 @@ class TableCollectionViewLayout: UICollectionViewLayout {
     }
     
     
-    private func size(at: IndexPath) -> CGSize {
+    func size(at: IndexPath) -> CGSize {
         guard self.columnsWidth.count > 0 else { return CGSize.zero }
         return CGSize(width: self.columnsWidth[at.item], height: self.rowsHeight[at.section])
     }
