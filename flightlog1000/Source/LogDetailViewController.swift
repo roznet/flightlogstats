@@ -7,6 +7,7 @@
 
 import UIKit
 import OSLog
+import RZUtils
 
 class LogDetailViewController: UIViewController,LogSelectionDelegate {
     var logFileOrganizer = FlightLogOrganizer.shared
@@ -37,7 +38,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                 self.updateUI()
             }
         }
-        
+        self.selectOneIfEmpty()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,70 +57,78 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     */
 
     func updateUI(){
-        let displayContext = DisplayContext()
-        
-        if self.name != nil {
-            self.name.text = self.flightLogFileInfo?.log_file_name
-            
+        AppDelegate.worker.async {
             if let summary = self.flightLogFileInfo?.flightSummary {
-                var airports : [String] = []
-                if let from = summary.startAirport {
-                    airports.append("\(from.name) (\(from.icao))")
-                }
-                if let to = summary.endAirport {
-                    airports.append("\(to.name) (\(to.icao))")
-                }
-
-                self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary, displayContext: displayContext)
-                self.fuelDataSource?.prepare()
-                self.fuelCollectionView.dataSource = self.fuelDataSource
-                self.fuelCollectionView.delegate = self.fuelDataSource
-                if let tableCollectionLayout = self.fuelCollectionView.collectionViewLayout as? TableCollectionViewLayout {
-                    tableCollectionLayout.tableCollectionDelegate = self.fuelDataSource
-                }else{
-                    Logger.app.error("Internal error: Inconsistent layout ")
-                }
-                
-                self.timeDataSource = FlightSummaryTimeDataSource(flightSummary: summary, displayContext: displayContext)
-                self.timeDataSource?.prepare()
-                self.timeCollectionView.dataSource = self.timeDataSource
-                self.timeCollectionView.delegate = self.timeDataSource
-                if let tableCollectionLayout = self.timeCollectionView.collectionViewLayout as? TableCollectionViewLayout {
-                    tableCollectionLayout.tableCollectionDelegate = self.timeDataSource
-                }else{
-                    Logger.app.error("Internal error: Inconsistent layout ")
+                DispatchQueue.main.async {
+                    let displayContext = DisplayContext()
+                    
+                    if self.name != nil {
+                        self.name.text = self.flightLogFileInfo?.log_file_name
+                        
+                        var airports : [String] = []
+                        if let from = summary.startAirport {
+                            airports.append("\(from.name) (\(from.icao))")
+                        }
+                        if let to = summary.endAirport {
+                            airports.append("\(to.name) (\(to.icao))")
+                        }
+                        
+                        self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary, displayContext: displayContext)
+                        self.fuelDataSource?.prepare()
+                        self.fuelCollectionView.dataSource = self.fuelDataSource
+                        self.fuelCollectionView.delegate = self.fuelDataSource
+                        if let tableCollectionLayout = self.fuelCollectionView.collectionViewLayout as? TableCollectionViewLayout {
+                            tableCollectionLayout.tableCollectionDelegate = self.fuelDataSource
+                        }else{
+                            Logger.app.error("Internal error: Inconsistent layout ")
+                        }
+                        self.timeDataSource = FlightSummaryTimeDataSource(flightSummary: summary, displayContext: displayContext)
+                        self.timeDataSource?.prepare()
+                        self.timeCollectionView.dataSource = self.timeDataSource
+                        self.timeCollectionView.delegate = self.timeDataSource
+                        if let tableCollectionLayout = self.timeCollectionView.collectionViewLayout as? TableCollectionViewLayout {
+                            tableCollectionLayout.tableCollectionDelegate = self.timeDataSource
+                        }else{
+                            Logger.app.error("Internal error: Inconsistent layout ")
+                        }
+                    }
+                    
+                    self.view.setNeedsDisplay()
+                    
+                    if let legs = self.flightLogFileInfo?.flightLog?.legs {
+                        let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: displayContext)
+                        self.legsDataSource = legsDataSource
+                        self.legsCollectionView.dataSource = self.legsDataSource
+                        self.legsCollectionView.delegate = self.legsDataSource
+                        if let tableCollectionLayout = self.legsCollectionView.collectionViewLayout as? TableCollectionViewLayout {
+                            tableCollectionLayout.tableCollectionDelegate = self.legsDataSource
+                        }else{
+                            Logger.app.error("Internal error: Inconsistent layout ")
+                        }
+                    }else{
+                        self.legsDataSource = nil
+                    }
                 }
             }
-            
-            self.view.setNeedsDisplay()
-        
-            if let legs = self.flightLogFileInfo?.flightLog?.legs {
-                let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: displayContext)
-                self.legsDataSource = legsDataSource
-                self.legsCollectionView.dataSource = self.legsDataSource
-                self.legsCollectionView.delegate = self.legsDataSource
-                if let tableCollectionLayout = self.legsCollectionView.collectionViewLayout as? TableCollectionViewLayout {
-                    tableCollectionLayout.tableCollectionDelegate = self.legsDataSource
-                }else{
-                    Logger.app.error("Internal error: Inconsistent layout ")
-                }
-                //self.fuelCollectionView.collectionViewLayout
-            }else{
-                self.legsDataSource = nil
-                
-            }
-                
         }
     }
+
     private var progress : ProgressReport? = nil
+    
+    
+    func selectOneIfEmpty() {
+        if self.flightLogFileInfo == nil, let first = self.logFileOrganizer.first {
+            self.logInfoSelected(first)
+        }
+    }
     
     func logInfoSelected(_ info: FlightLogFileInfo) {
         self.flightLogFileInfo = info
         if self.progress == nil {
             self.progress = ProgressReport(message: "LogDetail"){
-                state,_ in
+                report in
                 DispatchQueue.main.async {
-                    if case .progressing(let val) = state {
+                    if case .progressing(let val) = report.state {
                         self.progressView.setProgress( Float(val), animated: true )
                     }
                 }

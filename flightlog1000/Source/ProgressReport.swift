@@ -21,7 +21,7 @@ extension Notification.Name {
     /**
      * state and message
      */
-    typealias Callback = (_ : State, _ : String) -> Void
+    typealias Callback = (_ : ProgressReport) -> Void
     
     private(set) var message : String
     private(set) var state : State
@@ -29,7 +29,7 @@ extension Notification.Name {
     private var lastDate : Date
     private let callback : Callback
     
-    init(message : String, callback : @escaping Callback = { _,_ in }){
+    init(message : String, callback : @escaping Callback = { _ in }){
         self.message = message
         self.lastDate = Date()
         self.callback = callback
@@ -44,7 +44,8 @@ extension Notification.Name {
         let now = Date()
         switch state {
         case .progressing(let pct):
-            if pct > 0.0 && pct < 1.0 && now.timeIntervalSince(self.lastDate) < 0.1 {
+            // if not at 0 (start) or end (1.0) only report once every few 100ms
+            if pct > 0.0 && pct < 1.0 && now.timeIntervalSince(self.lastDate) < 0.2 {
                 return
             }
             fallthrough
@@ -54,7 +55,7 @@ extension Notification.Name {
             }
             self.state = state
             self.lastDate = now
-            self.callback(self.state, self.message)
+            self.callback(self)
             NotificationCenter.default.post(name: .kProgressUpdate, object: self)
         }
     }

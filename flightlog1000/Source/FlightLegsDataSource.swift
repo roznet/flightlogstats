@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import OSLog
+import RZUtils
 
 class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionDelegate {
         
@@ -59,7 +60,6 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     
     
     func prepare() {
-        
         self.attributedCells  = []
         
         if let first = legs.first {
@@ -114,7 +114,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
             tableCell.label.attributedText = self.attributedString(at: indexPath)
             
             if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
-                tableCell.backgroundColor = UIColor.systemCyan
+                tableCell.backgroundColor = UIColor.systemBrown
             }else{
                 if indexPath.section % 2 == 0{
                     tableCell.backgroundColor = UIColor.systemBackground

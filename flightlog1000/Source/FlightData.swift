@@ -79,7 +79,7 @@ class FlightData {
             
             guard let inputStream = InputStream(url: url) else { return nil }
             do {
-                try self.parse(inputStream: inputStream, totalSize: inputSize, progress: nil)
+                try self.parse(inputStream: inputStream, totalSize: inputSize, progress: progress)
             }catch{
                 return nil
             }

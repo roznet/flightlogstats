@@ -42,9 +42,19 @@ class FlightLogOrganizer {
         return list
     }
     
-    func ensureProgressReport() {
+    var flightLogFileInfos : [FlightLogFileInfo] {
+        let list = Array(self.managedFlightLogs.values)
+                                     
+        return list.sorted { $0.log_file_name! > $1.log_file_name! }
+    }
+    
+    var first : FlightLogFileInfo? {
+        self.flightLogFileInfos.first
+    }
+    
+    func ensureProgressReport(callback : @escaping ProgressReport.Callback = { _ in }) {
         if self.progress == nil {
-            self.progress = ProgressReport(message: "Organizer")
+            self.progress = ProgressReport(message: "Organizer", callback: callback)
         }
     }
     
@@ -363,7 +373,7 @@ class FlightLogOrganizer {
     private var cachedQuery : NSMetadataQuery? = nil
     private var cachedLocalFlightLogList : FlightLogFileList? = nil
     
-    func syncCloud(progress : @escaping ProgressReport.Callback = { _, _ in} ) {
+    func syncCloud() {
         guard cloudFolder != nil else {
             Logger.app.info("iCloud not setup, skipping sync")
             return
@@ -408,7 +418,9 @@ class FlightLogOrganizer {
                         cloudUrls.append(url)
                     }
                 }
-                self.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
+                AppDelegate.worker.async {
+                    self.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
+                }
             }
         }
     }

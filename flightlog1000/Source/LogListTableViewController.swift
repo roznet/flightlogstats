@@ -14,6 +14,7 @@ import OSLog
 
 protocol LogSelectionDelegate : AnyObject {
     func logInfoSelected(_ info : FlightLogFileInfo)
+    func selectOneIfEmpty()
 }
 
 class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate {
@@ -129,13 +130,16 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.logFileOrganizer.ensureProgressReport()
-        
+        self.logFileOrganizer.ensureProgressReport() {
+            progress in
+            self.update(for: progress)
+        }
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
+                self.delegate?.selectOneIfEmpty()
             }
         }
         NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
@@ -143,8 +147,10 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
+                self.delegate?.selectOneIfEmpty()
             }
         }
+        /*
         NotificationCenter.default.addObserver(forName: .kProgressUpdate, object: nil, queue: nil){
             notification in
             if let progress = notification.object as? ProgressReport {
@@ -153,6 +159,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 Logger.app.error("invalid notification \(notification)")
             }
         }
+         */
         self.buildList()
     }
     

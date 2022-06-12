@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RZUtils
+import OSLog
 
 protocol TableCollectionDelegate : AnyObject {
     var frozenColumns : Int { get }
@@ -37,7 +39,6 @@ class TableCollectionViewLayout: UICollectionViewLayout {
         else {
             return
         }
-        
         
         if itemAttributes.count != collectionView.numberOfSections {
             tableCollectionDelegate.prepare()

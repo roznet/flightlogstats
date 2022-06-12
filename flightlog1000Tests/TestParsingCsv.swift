@@ -46,7 +46,6 @@ class TestParsingCsv: XCTestCase {
             return
         }
         
-        let m = RZPerformance.start()
         do {
             var csvtypes : [String:CSVType] = [:]
             for field in data.doubleFields {
@@ -59,7 +58,6 @@ class TestParsingCsv: XCTestCase {
             if( true ){
                 let tab = try DataFrame(contentsOfCSVFile: urlfixed, columns: nil, types: csvtypes, options: csvoption)
                 print(tab)
-                Logger.test.info("Tabular \(m!.description)")
             }
         }catch{
             Logger.test.info("Tabular error \(error.localizedDescription)")

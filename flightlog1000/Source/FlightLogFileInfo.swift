@@ -8,6 +8,7 @@
 import UIKit
 import CoreData
 import OSLog
+import RZUtils
 
 extension Notification.Name {
     static let logFileInfoUpdated : Notification.Name = Notification.Name("Notification.Name.logFileInfoUpdated")
