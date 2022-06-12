@@ -240,6 +240,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 }
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now()+0.5){
                     self.delegate?.selectOneIfEmpty()
                 }
             }
