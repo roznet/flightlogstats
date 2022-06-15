@@ -112,7 +112,11 @@ class DisplayContext {
     }
 
     func formatStats(degree : ValueStats) -> String {
-        return String(format: "%.0f deg", degree.average)
+        if degree.average > 0 {
+            return String(format: "%.0f deg", degree.average)
+        }else{
+            return String(format: "%.0f deg", 360.0 + degree.average)
+        }
     }
     
     func formatStats(gallon : ValueStats, used : Bool = true) -> String {

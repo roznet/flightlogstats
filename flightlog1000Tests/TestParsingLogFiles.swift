@@ -13,6 +13,7 @@ import RZFlight
 import FMDB
 import CoreLocation
 import RZUtils
+import RZFlight
 
 extension Logger {
     public static let test = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "test")
@@ -62,6 +63,23 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertLessThan(moving.count, engineOn.count)
         }else{
             XCTAssertTrue(false)
+        }
+        
+        let wind = data.datesDoubles(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
+        for idx in 0..<wind.count {
+            let x = wind.fieldValue(at: idx)
+            if let wndspddirect = x[.WndDirect], let wndspdcross = x[.WndCross], let wndspd = x[.WndSpd], let wnddr = x[.WndDr], let crs = x[.CRS] {
+                let heading = Heading(heading: crs)
+                let windDir = Heading(heading: wnddr > 0 ? wnddr : 360+wnddr)
+                let runway = RunwayWindModel(runway: heading, wind: windDir, speed: Speed(speed: wndspd))
+                let windCross = runway.crossWindSpeed.speed
+                let windDirect = runway.headWindSpeed.speed
+                
+                XCTAssertEqual(windCross, wndspdcross, accuracy: 1.0)
+                XCTAssertEqual(windDirect, wndspddirect, accuracy: 1.0)
+            }else{
+                XCTAssertTrue(false)
+            }
         }
         
     }

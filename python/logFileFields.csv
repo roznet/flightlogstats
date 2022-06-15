@@ -14,20 +14,22 @@ VSpdG,12,fpm,GPS vertical speed ,fpm
 HDG,13,deg,Magnetic Heading ,degrees
 TRK,14,deg,Ground Track ,degrees magnetic
 CRS,15,deg,Selected course,
-WndSpd,16,kt,Wind Speed ,knots
-WndDr,17,deg,Wind Direction ,degrees
-WptDst,18,nm,Distance to next waypoint ,nm
-WptBrg,19,deg,Bearing to next waypoint ,degrees
-FQtyT,20,gals,Fuel Qty Total,gals
-FQtyL,21,gals,Fuel Qty Left ,gals
-FQtyR,22,gals,Fuel Qty Right ,gals
-HSIS,23,enum,HSI source,
-NAV1,24,MHz,Nav1 frequency,
-NAV2,25,MHz,Nav2 frequency,
-COM1,26,MHz,Com1 frequency,
-COM2,27,MHz,Com2 frequency,
-AfcsOn,28,bool,Autopilot On/Off,
-GPSfix,29,enum,GPSfix,
+WndDirect,16,kt,Wind Speed ,knots
+WndCross,17,kt,Wind Speed ,knots
+WndSpd,18,kt,Wind Speed ,knots
+WndDr,19,deg,Wind Direction ,degrees
+WptDst,20,nm,Distance to next waypoint ,nm
+WptBrg,21,deg,Bearing to next waypoint ,degrees
+FQtyT,22,gals,Fuel Qty Total,gals
+FQtyL,23,gals,Fuel Qty Left ,gals
+FQtyR,24,gals,Fuel Qty Right ,gals
+HSIS,25,enum,HSI source,
+NAV1,26,MHz,Nav1 frequency,
+NAV2,27,MHz,Nav2 frequency,
+COM1,28,MHz,Com1 frequency,
+COM2,29,MHz,Com2 frequency,
+AfcsOn,30,bool,Autopilot On/Off,
+GPSfix,31,enum,GPSfix,
 E1 FFlow,100,gph,Fuel Flow ,gph
 E1 MAP,101,Hg,E1 MAP,
 E1 RPM,102,rpm,E1 RPM,

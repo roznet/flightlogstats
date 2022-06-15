@@ -99,6 +99,8 @@ extension FlightLogFile {
         // Calculated
         case FQtyT = "FQtyT"
         case Distance = "Distance"
+        case WndDirect = "WndDirect"
+        case WndCross  = "WndCross"
         
         var displayName : String { return self.rawValue }
         
@@ -335,7 +337,10 @@ extension FlightLogFile.Field {
             return context.formatStats(gallon: valueStats, used: false)
         case .Distance:
             return context.formatStats(distance: valueStats, total: true)
-
+        case .WndCross:
+            return context.formatStats(speed: valueStats)
+        case .WndDirect:
+            return context.formatStats(speed: valueStats)
         case .UTCOfst:
             return ""
         }
@@ -379,6 +384,26 @@ struct FieldCalculation {
         FieldCalculation(output: .FQtyT, inputs: [.FQtyL,.FQtyR]) {
             x in
             return x.reduce(0, +)
+        },
+        FieldCalculation(output: .WndCross, inputs: [.WndDr,.WndSpd,.CRS]){
+            x in
+            let dir = x[0] < 0 ? 360.0 + x[0] : x[0]
+            var diff = abs(dir - x[2])
+            if diff > 180 {
+                diff = 360-diff
+            }
+            let component = __sinpi(diff/180.0)
+            return x[1] * component
+        },
+        FieldCalculation(output: .WndDirect, inputs: [.WndDr,.WndSpd,.CRS]){
+            x in
+            let dir = x[0] < 0 ? 360.0 + x[0] : x[0]
+            var diff = abs(dir - x[2])
+            if diff > 180 {
+                diff = 360-diff
+            }
+            let component = __cospi(diff/180.0) * -1.0
+            return x[1] * component
         }
     ]
 }
