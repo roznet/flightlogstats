@@ -98,6 +98,12 @@ extension FlightLogFile {
         
         var displayName : String { return self.rawValue }
         
+        //calc
+        //distance
+        //crosswind, headwind
+        //E1CHTMax
+        //E1TITMax
+        //FQtyT
     }
     
     enum MetaField : String {
@@ -123,7 +129,7 @@ extension FlightLogFile.Field {
         let unit_description : String
         
     }
-    static var fieldDefinitions : [FlightLogFile.Field:FieldDef] {
+    static var fieldDefinitions : [FlightLogFile.Field:FieldDef] = {
         var rv : [FlightLogFile.Field:FieldDef] = [:]
         do {
             if let bundlePath = Bundle.main.path(forResource: "logFileFields", ofType: "json"),
@@ -141,7 +147,7 @@ extension FlightLogFile.Field {
             Logger.app.error( "failed to decode field json \(error.localizedDescription)" )
         }
         return rv
-    }
+    }()
     
     var localizedDescription : String {
         if let def = Self.fieldDefinitions[self] {
@@ -333,4 +339,32 @@ extension FlightLogFile.Field : CustomStringConvertible {
 
 extension FlightLogFile.MetaField : CustomStringConvertible {
     var description: String { return self.rawValue }
+}
+
+struct FieldCalculation {
+    typealias Field = FlightLogFile.Field
+    let output : Field
+    let inputs : [Field]
+    let calcFunc : ([Double]) -> Double
+    
+    init(output : Field, inputs: [Field], calcFunc : @escaping ([Double])->Double){
+        self.output = output
+        self.inputs = inputs
+        self.calcFunc = calcFunc
+    }
+    
+    func evaluate(line : [Double], fieldsMap : [Field:Int]) -> Double{
+        var doubles : [Double] = []
+        for field in self.inputs {
+            if let idx = fieldsMap[field],
+               let val = line[safe: idx],
+               val.isFinite {
+                doubles.append(val)
+            }else{
+                return .nan
+            }
+        }
+        return self.calcFunc(doubles)
+    }
+    
 }
