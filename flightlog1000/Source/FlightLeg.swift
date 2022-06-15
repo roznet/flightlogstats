@@ -24,9 +24,20 @@ struct FlightLeg {
     
     let timeRange : TimeRange
     
-    var data : [Field:ValueStats]
+    private var data : [Field:ValueStats]
     
     var fields : [Field] { return Array(data.keys).sorted { $0.order < $1.order } }
+    
+    init(waypoint_to: Waypoint, waypoint_from: Waypoint?, timeRange: TimeRange, data: [Field : ValueStats]) {
+        self.waypoint_to = waypoint_to
+        self.waypoint_from = waypoint_from
+        self.timeRange = timeRange
+        self.data = data
+    }
+    
+    func valueStats(field : Field) -> ValueStats? {
+        return self.data[field]
+    }
     
     func format(which : LegInfo, displayContext :DisplayContext = DisplayContext(), reference : Date? = nil) -> String {
         switch which {
@@ -64,13 +75,13 @@ extension Array where Element == FlightLeg {
         
         // first collect and initialize superset of fields
         for element in self {
-            for (f,_) in element.data {
+            for f in element.fields {
                 rv[f] = []
             }
         }
         for element in self {
             for f in rv.keys {
-                if let v = element.data[f] {
+                if let v = element.valueStats(field: f) {
                     rv[f]?.append(v)
                 }else{
                     rv[f]?.append(ValueStats.invalid)

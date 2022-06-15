@@ -30,7 +30,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
         
         var fields : Set<Field> = []
         for leg in legs {
-            fields.formUnion(leg.data.keys)
+            fields.formUnion(leg.fields)
         }
         self.fields = Array(fields).sorted {
             $0.order < $1.order
@@ -38,7 +38,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
 
         // should be sorted
         self.displayContext = displayContext
-        self.fixedColumnsInfo = [.end_time,.waypoint_from,.waypoint_to]
+        self.fixedColumnsInfo = [.end_time,.waypoint_to]
         
     }
     
@@ -49,7 +49,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     
     func formattedValueFor(field : Field, row : Int) -> String {
         guard let leg = self.legs[safe: row],
-              let value = leg.data[field]
+              let value = leg.valueStats(field: field)
         else {
             // empty string if missing for a blank in the table
             return ""

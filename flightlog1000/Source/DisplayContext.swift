@@ -119,13 +119,13 @@ class DisplayContext {
         if used {
             return String(format: "%.1f gal", gallon.max-gallon.min)
         }else{
-            return String(format: "%.1f gal", gallon.min)
+            return String(format: "%.1f gal", gallon.end)
         }
     }
     
     func formatStats(distance: ValueStats, total : Bool = false) -> String {
         if total {
-            return String(format: "%.1f", distance.max)
+            return String(format: "%.1f", distance.end)
         }else{
             return String(format: "%.1f - %.1f", distance.min,distance.max)
         }

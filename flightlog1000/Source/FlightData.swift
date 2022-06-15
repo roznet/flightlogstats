@@ -597,43 +597,33 @@ class FlightData {
         var first = true
         
         for (date,row) in zip(dates,strings) {
-            var valid : Bool = true
-            for field in stringFields {
-                if let idx = fieldToIndex[field] {
-                    if row[idx].isEmpty {
-                        valid = false
-                        break
-                    }
-                }
-            }
-            if valid {
-                var changed = first
-                if !first {
-                    for field in stringFields {
-                        if let idx = fieldToIndex[field] {
-                            let val = row[idx]
-                            if rv.last(field: field)?.value != val {
-                                changed = true
-                            }
+            var changed = first
+            if !first {
+                for field in stringFields {
+                    if let idx = fieldToIndex[field] {
+                        let val = row[idx]
+                        if rv.last(field: field)?.value != val {
+                            changed = true
                         }
                     }
                 }
-                
-                if changed {
-                    for field in stringFields {
-                        if let idx = fieldToIndex[field] {
-                            let val = row[idx]
-                            do {
-                                try rv.append(field: field, element: val, for: date)
-                            }catch{
-                                Logger.app.error("Failed to create serie for \(field) at \(date)")
-                                continue
-                            }
+            }
+            
+            if changed {
+                for field in stringFields {
+                    if let idx = fieldToIndex[field] {
+                        let val = row[idx]
+                        do {
+                            try rv.append(field: field, element: val, for: date)
+                        }catch{
+                            Logger.app.error("Failed to create serie for \(field) at \(date)")
+                            continue
                         }
                     }
-                    first = false
                 }
+                first = false
             }
+            
         }
         return rv
     }
@@ -645,46 +635,62 @@ class FlightData {
     /// - Parameter dates: array of dates,
     /// - Parameter start:first date to start statistics or nil
     /// - Returns: statisitics computed between dates
-    func extract(dates : [Date], start : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
+    func extract(dates extractDates : [Date], start : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
         var rv = DatesValuesByField<ValueStats,Field>(fields: self.doubleFields)
-        var nextExtractDate : Date? = dates.first
-        var remainingDates = dates.dropFirst()
-
-        if let firstDate = start ?? self.dates.first {
+        
+        // we need at least one date to extract and one date of data, else we'll return empty
+        // last date should be past the last date (+10 seconds) so it's included
+        if let firstExtractDate = extractDates.first,
+           let lastDate = self.dates.last?.addingTimeInterval(10.0) {
+            // remote firstExtractDate
+            var remainingDates = extractDates.dropFirst()
+            
+            var nextExtractDate : Date = remainingDates.first ?? lastDate
+            if remainingDates.count > 0 {
+                remainingDates.removeFirst()
+            }
+            
+            let startDate = start ?? firstExtractDate
+            let firstDate = max(startDate,firstExtractDate)
+            
             var current : [ValueStats] = []
+            var currentDate = startDate
+            
             for (date,one) in zip(self.dates,self.values) {
                 if date < firstDate {
                     continue
                 }
-                if let nextDate = nextExtractDate {
-                    if date > nextDate {
-                        do {
-                            try rv.append(fields: self.doubleFields, elements: current, for: nextDate)
-                        }catch{
-                            throw error
-                        }
-                        current = []
-                        nextExtractDate = remainingDates.first
-                        remainingDates = remainingDates.dropFirst()
-                        
-                        if nextExtractDate == nil {
-                            break
-                        }
+                if date >= nextExtractDate {
+                    do {
+                        try rv.append(fields: self.doubleFields, elements: current, for: currentDate)
+                    }catch{
+                        throw error
                     }
-                    if current.count == 0 {
-                        current = one.map { ValueStats(value: $0) }
-                    }else{
-                        for (idx,val) in one.enumerated() {
-                            current[idx].update(with: val)
-                        }
+                    current = []
+                    nextExtractDate = remainingDates.first ?? lastDate
+                    if remainingDates.count > 0 {
+                        remainingDates.removeFirst()
                     }
-                }else{
-                    // no next date, stop
-                    break
                 }
+                if current.count == 0 {
+                    current = one.map { ValueStats(value: $0) }
+                }else{
+                    for (idx,val) in one.enumerated() {
+                        current[idx].update(with: val)
+                    }
+                }
+                currentDate = date
+            }
+            // add last one if still there
+            if current.count > 0 {
+                do {
+                    try rv.append(fields: self.doubleFields, elements: current, for: currentDate)
+                }catch{
+                    throw error
+                }
+
             }
         }
-        
         return rv
     }
 }
