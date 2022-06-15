@@ -1,31 +1,33 @@
 ﻿field,order,unit,description,unit_description
 AtvWpt,1,ident,Active Waypoint Identifier,
-AltInd,2,ft,Baro-Corrected altitude ,feet
-BaroA,3,inch,Baro Correction ,in/Hg
+Distance,2,nm,Distance from start,
+AltInd,3,ft,Baro-Corrected altitude ,feet
 AltMSL,4,ft msl,GPS altitude ,MSL
 AltGPS,5,ft wgs,GPS altitude ,WGS84 datum
-OAT,6,deg C,OAT ,degrees C
-IAS,7,kt,Indicated airspeed ,kts
-TAS,8,kt,True airspeed ,knots
-GndSpd,9,kt,Ground Speed ,kts
-VSpd,10,fpm,Vertical speed ,fpm
-VSpdG,11,fpm,GPS vertical speed ,fpm
-HDG,12,deg,Magnetic Heading ,degrees
-TRK,13,deg,Ground Track ,degrees magnetic
-CRS,14,deg,Selected course,
-WndSpd,15,kt,Wind Speed ,knots
-WndDr,16,deg,Wind Direction ,degrees
-WptDst,17,nm,Distance to next waypoint ,nm
-WptBrg,18,deg,Bearing to next waypoint ,degrees
-FQtyL,19,gals,Fuel Qty Left ,gals
-FQtyR,20,gals,Fuel Qty Right ,gals
-HSIS,21,enum,HSI source,
-NAV1,22,MHz,Nav1 frequency,
-NAV2,23,MHz,Nav2 frequency,
-COM1,24,MHz,Com1 frequency,
-COM2,25,MHz,Com2 frequency,
-AfcsOn,26,bool,Autopilot On/Off,
-GPSfix,27,enum,GPSfix,
+BaroA,6,inch,Baro Correction ,in/Hg
+OAT,7,deg C,OAT ,degrees C
+IAS,8,kt,Indicated airspeed ,kts
+TAS,9,kt,True airspeed ,knots
+GndSpd,10,kt,Ground Speed ,kts
+VSpd,11,fpm,Vertical speed ,fpm
+VSpdG,12,fpm,GPS vertical speed ,fpm
+HDG,13,deg,Magnetic Heading ,degrees
+TRK,14,deg,Ground Track ,degrees magnetic
+CRS,15,deg,Selected course,
+WndSpd,16,kt,Wind Speed ,knots
+WndDr,17,deg,Wind Direction ,degrees
+WptDst,18,nm,Distance to next waypoint ,nm
+WptBrg,19,deg,Bearing to next waypoint ,degrees
+FQtyT,20,gals,Fuel Qty Total,gals
+FQtyL,21,gals,Fuel Qty Left ,gals
+FQtyR,22,gals,Fuel Qty Right ,gals
+HSIS,23,enum,HSI source,
+NAV1,24,MHz,Nav1 frequency,
+NAV2,25,MHz,Nav2 frequency,
+COM1,26,MHz,Com1 frequency,
+COM2,27,MHz,Com2 frequency,
+AfcsOn,28,bool,Autopilot On/Off,
+GPSfix,29,enum,GPSfix,
 E1 FFlow,100,gph,Fuel Flow ,gph
 E1 MAP,101,Hg,E1 MAP,
 E1 RPM,102,rpm,E1 RPM,

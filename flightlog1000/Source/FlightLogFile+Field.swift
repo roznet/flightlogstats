@@ -96,6 +96,10 @@ extension FlightLogFile {
         case HPLfd = "HPLfd"
         case VPLwas = "VPLwas"
         
+        // Calculated
+        case FQtyT = "FQtyT"
+        case Distance = "Distance"
+        
         var displayName : String { return self.rawValue }
         
         //calc
@@ -325,10 +329,15 @@ extension FlightLogFile.Field {
             return ""
         case .Lcl_Time:
             return ""
+        
+        // Calculated
+        case .FQtyT:
+            return context.formatStats(gallon: valueStats, used: false)
+        case .Distance:
+            return context.formatStats(distance: valueStats, total: true)
 
         case .UTCOfst:
             return ""
-
         }
     }
 }
@@ -366,5 +375,10 @@ struct FieldCalculation {
         }
         return self.calcFunc(doubles)
     }
-    
+    static var calculatedFields : [FieldCalculation] = [
+        FieldCalculation(output: .FQtyT, inputs: [.FQtyL,.FQtyR]) {
+            x in
+            return x.reduce(0, +)
+        }
+    ]
 }

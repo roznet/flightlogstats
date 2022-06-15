@@ -115,12 +115,20 @@ class DisplayContext {
         return String(format: "%.0f deg", degree.average)
     }
     
-    func formatStats(gallon : ValueStats) -> String {
-        return String(format: "%.1f gal", gallon.max-gallon.min)
+    func formatStats(gallon : ValueStats, used : Bool = true) -> String {
+        if used {
+            return String(format: "%.1f gal", gallon.max-gallon.min)
+        }else{
+            return String(format: "%.1f gal", gallon.min)
+        }
     }
     
-    func formatStats(distance: ValueStats) -> String {
-        return String(format: "%.1f - %.1f", distance.min,distance.max)
+    func formatStats(distance: ValueStats, total : Bool = false) -> String {
+        if total {
+            return String(format: "%.1f", distance.max)
+        }else{
+            return String(format: "%.1f - %.1f", distance.min,distance.max)
+        }
     }
     
     

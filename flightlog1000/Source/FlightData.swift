@@ -115,6 +115,7 @@ class FlightData {
         
         var fields : [Field] = []
         var columnIsDouble : [Bool] = []
+        var fieldsMap : [Field:Int] = [:]
         
         let dateIndex : Int = 0
         let timeIndex : Int = 1
@@ -141,6 +142,7 @@ class FlightData {
         init(data : FlightData){
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
             self.data = data
+            
         }
         
         mutating func process(line : [String]){
@@ -194,12 +196,22 @@ class FlightData {
                 }
                 data.doubleFields = []
                 data.stringFields = []
+                fieldsMap = [:]
+                var idx = 0
                 for (field,isDouble) in zip(fields, columnIsDouble) {
                     if isDouble {
                         data.doubleFields.append(field)
+                        fieldsMap[field] = idx
+                        idx += 1
                     }else{
                         data.stringFields.append(field)
                     }
+                }
+                
+                // add calculated fields
+                data.doubleFields.append(.Distance)
+                for field in FieldCalculation.calculatedFields {
+                    data.doubleFields.append(field.output)
                 }
             }else if line.count == columnIsDouble.count {
                 // Usually date are +1, +2 or same, saves a lot of time vs date parsing to try to guess...
@@ -280,8 +292,6 @@ class FlightData {
                 }else{
                     data.coordinates.append(kCLLocationCoordinate2DInvalid)
                 }
-                data.values.append(doubleLine)
-                data.strings.append(stringLine)
                 if coord.latitude.isFinite && coord.longitude.isFinite {
                     let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
                     if let last = lastLocation {
@@ -289,7 +299,14 @@ class FlightData {
                     }
                     lastLocation = location
                 }
-                data.distances.append(runningDistance)
+                // match order with what was added for fields
+                doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
+                for calcField in FieldCalculation.calculatedFields {
+                    doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap))
+                }
+                
+                data.values.append(doubleLine)
+                data.strings.append(stringLine)
             }
         }
     }
