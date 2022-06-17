@@ -92,8 +92,8 @@ class DisplayContext {
     }
     
     //MARK: - format values
-    func formatValue(distanceMeter : CLLocationDistance) -> String {
-        return String(format: "%.1f nm", distanceMeter / 1852.0)
+    func formatValue(distance : Double) -> String {
+        return String(format: "%.1f nm", distance )
     }
 
     func formatValue(gallon : Double) -> String {
@@ -129,13 +129,19 @@ class DisplayContext {
     
     func formatStats(distance: ValueStats, total : Bool = false) -> String {
         if total {
-            return String(format: "%.1f", distance.end)
+            return String(format: "%.1f nm", distance.end)
         }else{
-            return String(format: "%.1f - %.1f", distance.min,distance.max)
+            return String(format: "%.1f - %.1f nm", distance.min,distance.max)
         }
     }
     
-    
+    func formatStats(autopilot : ValueStats) -> String {
+        if autopilot.end == 0 {
+            return "Off"
+        }else{
+            return "On"
+        }
+    }
     func formatStats(engineTemp : ValueStats) -> String {
         return String(format: "%.0f - %.0f", engineTemp.min,engineTemp.max)
     }

@@ -41,7 +41,7 @@ class FlightSummary {
     var startAirport : Airport? = nil
     var endAirport : Airport? = nil
     
-    let distance : CLLocationDistance
+    let distance : Double
     
     init?( info : FlightLogFileInfo ) {
         guard let start = info.start_time_moving, let end = info.end_time else {
@@ -88,7 +88,7 @@ class FlightSummary {
     }
     
     init( data : FlightData) throws {
-        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR] )
+        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance] )
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd, minimumMatchCount: 5) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
@@ -135,7 +135,7 @@ class FlightSummary {
         self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r)
         self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
         
-        self.distance = data.distances.last ?? 0.0
+        self.distance = values.last(field: .Distance)?.value ?? 0.0
 
         let identifiers = data.datesStrings(for: [.AtvWpt])
 

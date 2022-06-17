@@ -33,7 +33,6 @@ class FlightData {
     private(set) var stringFields : [Field] = []
     
     private(set) var coordinates : [CLLocationCoordinate2D] = []
-    private(set) var distances : [CLLocationDistance] = []
 
     var count : Int { return dates.count }
     var firstCoordinate : CLLocationCoordinate2D {
@@ -108,7 +107,8 @@ class FlightData {
     }
     
     //MARK: - Parsing State
-    
+
+    //
     private struct ParsingState {
         var lastReportTime = Date()
         var totalSize = 0

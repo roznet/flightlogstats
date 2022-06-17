@@ -290,13 +290,13 @@ extension FlightLogFile.Field {
         case .WndDr:
             return context.formatStats(degree: valueStats)
         case .WptDst:
-            return context.formatStats(distance: valueStats)
+            return context.formatStats(distance: valueStats, total: true)
         case .WptBrg:
             return context.formatStats(degree: valueStats)
         case .MagVar:
             return context.formatStats(degree: valueStats)
         case .AfcsOn:
-            return context.formatStats(valueStats)
+            return context.formatStats(autopilot: valueStats)
         case .RollM:
             return context.formatStats(valueStats)
         case .PitchM:

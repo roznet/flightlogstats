@@ -1,35 +1,36 @@
 ﻿field,order,unit,description,unit_description
 AtvWpt,1,ident,Active Waypoint Identifier,
 Distance,2,nm,Distance from start,
-AltInd,3,ft,Baro-Corrected altitude ,feet
-AltMSL,4,ft msl,GPS altitude ,MSL
-AltGPS,5,ft wgs,GPS altitude ,WGS84 datum
-BaroA,6,inch,Baro Correction ,in/Hg
-OAT,7,deg C,OAT ,degrees C
-IAS,8,kt,Indicated airspeed ,kts
-TAS,9,kt,True airspeed ,knots
-GndSpd,10,kt,Ground Speed ,kts
-VSpd,11,fpm,Vertical speed ,fpm
-VSpdG,12,fpm,GPS vertical speed ,fpm
-HDG,13,deg,Magnetic Heading ,degrees
-TRK,14,deg,Ground Track ,degrees magnetic
-CRS,15,deg,Selected course,
-WndDirect,16,kt,Wind Speed ,knots
-WndCross,17,kt,Wind Speed ,knots
-WndSpd,18,kt,Wind Speed ,knots
-WndDr,19,deg,Wind Direction ,degrees
-WptDst,20,nm,Distance to next waypoint ,nm
-WptBrg,21,deg,Bearing to next waypoint ,degrees
-FQtyT,22,gals,Fuel Qty Total,gals
-FQtyL,23,gals,Fuel Qty Left ,gals
-FQtyR,24,gals,Fuel Qty Right ,gals
-HSIS,25,enum,HSI source,
-NAV1,26,MHz,Nav1 frequency,
-NAV2,27,MHz,Nav2 frequency,
-COM1,28,MHz,Com1 frequency,
-COM2,29,MHz,Com2 frequency,
-AfcsOn,30,bool,Autopilot On/Off,
-GPSfix,31,enum,GPSfix,
+WptDst,3,nm,Distance to next waypoint ,nm
+AltInd,4,ft,Baro-Corrected altitude ,feet
+AltMSL,5,ft msl,GPS altitude ,MSL
+AltGPS,6,ft wgs,GPS altitude ,WGS84 datum
+BaroA,7,inch,Baro Correction ,in/Hg
+OAT,8,deg C,OAT ,degrees C
+IAS,9,kt,Indicated airspeed ,kts
+TAS,10,kt,True airspeed ,knots
+GndSpd,11,kt,Ground Speed ,kts
+VSpd,12,fpm,Vertical speed ,fpm
+VSpdG,13,fpm,GPS vertical speed ,fpm
+HDG,14,deg,Magnetic Heading ,degrees
+TRK,15,deg,Ground Track ,degrees magnetic
+CRS,16,deg,Selected course,
+WptBrg,17,deg,Bearing to next waypoint ,degrees
+WndDr,18,deg,Wind Direction ,degrees
+WndSpd,19,kt,Wind Speed ,knots
+WndDirect,20,kt,Wind Speed ,knots
+WndCross,21,kt,Wind Speed ,knots
+WptDst,22,nm,Distance to next waypoint ,nm
+FQtyT,23,gals,Fuel Qty Total,gals
+FQtyL,24,gals,Fuel Qty Left ,gals
+FQtyR,25,gals,Fuel Qty Right ,gals
+HSIS,26,enum,HSI source,
+NAV1,27,MHz,Nav1 frequency,
+NAV2,28,MHz,Nav2 frequency,
+COM1,29,MHz,Com1 frequency,
+COM2,30,MHz,Com2 frequency,
+AfcsOn,31,bool,Autopilot On/Off,
+GPSfix,32,enum,GPSfix,
 E1 FFlow,100,gph,Fuel Flow ,gph
 E1 MAP,101,Hg,E1 MAP,
 E1 RPM,102,rpm,E1 RPM,
@@ -53,12 +54,6 @@ E1 EGT6,119,deg F,E1 EGT6,
 E1 Torq,120,ft lbs,E1 Torq,
 E1 NG,121,%,E1 NG,
 E1 ITT,122,deg C,E1 ITT,
-E2 FFlow,200,gph,E2 FFlow,
-E2 MAP,201,Hg,E2 MAP,
-E2 RPM,202,rpm,E2 RPM,
-E2 Torq,203,ft lbs,E2 Torq,
-E2 NG,204,%,E2 NG,
-E2 ITT,205,deg C,E2 ITT,
 HCDI,150,fsd,CDI deflection,
 VCDI,151,fsd,VDI/GP/GS deflection,
 MagVar,152,deg,Magnetic variation ,degrees
@@ -69,6 +64,12 @@ Pitch,156,deg,Pitch Attitude Angle ,degrees
 Roll,157,deg,Roll Attitude Angle ,degrees
 LatAc,158,G,Lateral G Force ,g
 NormAc,159,G,Vertical G Force ,g
+E2 FFlow,200,gph,E2 FFlow,
+E2 MAP,201,Hg,E2 MAP,
+E2 RPM,202,rpm,E2 RPM,
+E2 Torq,203,ft lbs,E2 Torq,
+E2 NG,204,%,E2 NG,
+E2 ITT,205,deg C,E2 ITT,
 RollM,800,enum,RollM,
 PitchM,801,enum,PitchM,
 RollC,802,deg,RollC,

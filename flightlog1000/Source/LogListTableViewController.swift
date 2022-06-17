@@ -234,7 +234,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                     info in
                     if let elapsed = info.flightSummary?.moving?.elapsed,
                        let distance = info.flightSummary?.distance {
-                        return elapsed > 0.0 && distance > 500
+                        return elapsed > 0.0 && distance > 0.2
                     }
                     return false
                 }

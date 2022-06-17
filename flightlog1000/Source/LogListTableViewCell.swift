@@ -45,7 +45,7 @@ class LogListTableViewCell: UITableViewCell {
             }
             self.fuel.text = self.displayContext.formatValue(gallon: flightSummary.fuelUsed.total)
             self.route.text = self.displayContext.format(route: flightSummary.route)
-            self.distance.text = self.displayContext.formatValue(distanceMeter: flightSummary.distance)
+            self.distance.text = self.displayContext.formatValue(distance: flightSummary.distance)
             var airports : [String] = []
             if let from = flightSummary.startAirport {
                 airports.append(from.icao)

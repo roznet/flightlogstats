@@ -63,7 +63,12 @@ class FlightLogFile {
             if let data = self.data {
                 do {
                     self.flightSummary = try FlightSummary(data: data)
-                    self.legs = self.route()
+                    var start : Date? = nil
+                    if let flyingStart = self.flightSummary?.flying?.start {
+                        start = flyingStart
+                    }
+                    start = nil
+                    self.legs = self.route(start: start)
                     self.logType = .parsed
                 }catch{
                     self.logType = .error(.parsingError)
@@ -93,7 +98,7 @@ extension FlightLogFile {
         try? info.updateFromFlightLog(flightLog: self)
     }
     
-    private func route() -> [ FlightLeg ] {
+    private func route(start : Date? = nil) -> [ FlightLeg ] {
         var rv : [FlightLeg] = []
         
         // first identify list of way points
@@ -101,7 +106,7 @@ extension FlightLogFile {
             let identifiers : DatesValuesByField<String,Field> = data.datesStrings(for: [.AtvWpt])
 
             do {
-                let stats : DatesValuesByField<ValueStats,Field> = try data.extract(dates: identifiers.dates)
+                let stats : DatesValuesByField<ValueStats,Field> = try data.extract(dates: identifiers.dates, start: start)
                 
                 var previousIdentifier : String? = nil
                 var previousDate : Date? = self.data?.dates.first
