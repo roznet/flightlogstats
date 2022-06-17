@@ -20,15 +20,15 @@ extension Logger {
 }
 
 enum TestLogFileSamples : String, CaseIterable {
-    case empty = "log_220414_065328______.csv"
-    case turnOnOnly = "log_220502_095923______.csv"
-    case taxiOnly = "log_220502_135932_EGPN.csv"
+    case empty = "log_220414_065328______"
+    case turnOnOnly = "log_220502_095923______"
     
-    case smallLog = "log_small_sample.csv"
-    case smallLogFixed = "log_small_sample_fixed.csv"
-    case largeLog = "log_211204_102045_EGLL.csv" // 5.2Mb
+    case taxiOnly = "log_220502_135932_EGPN"
+    case taxiOnly2 = "log_220416_161856_LFQA"
     
-    case preflight1 = "log_220416_161856_LFQA.csv"
+    case smallLog = "log_small_sample"
+    case smallLogFixed = "log_small_sample_fixed"
+    case largeLog = "log_211204_102045_EGLL" // 5.2Mb
     
     case flight1 = "log_210623_141501_TEST1" // 2.4Mb  date with slash
     case flight2 = "log_220417_125002_LFQA" // 1.4Mb
@@ -82,6 +82,29 @@ class TestParsingLogFiles: XCTestCase {
             }
         }
         
+    }
+    
+    func testTaxiOnly() {
+        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.taxiOnly2.rawValue, withExtension: "csv"),
+              let logfile = FlightLogFile(url: url)
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+        logfile.parse()
+        
+        let legs = logfile.legs
+        let summary = logfile.flightSummary
+        
+        XCTAssertNotNil(summary)
+        XCTAssertNotNil(legs.last)
+        XCTAssertNil(summary?.flying)
+        XCTAssertNotNil(summary?.moving)
+        if let fuelEndR = summary?.fuelEnd.right,
+           let lastFuelR = legs.last?.valueStats(field: .FQtyR) {
+            XCTAssertEqual( lastFuelR.end, fuelEndR, accuracy: 1.0e-7)
+        }
+
     }
     
     func testFlightLogFile() {

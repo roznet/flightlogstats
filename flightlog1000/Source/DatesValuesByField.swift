@@ -92,7 +92,7 @@ public struct DatesValuesByField<T,F : Hashable> {
         
         var rv = DatesValuesByField(fields: [F](self.values.keys))
 
-        var found : Int = 0
+        var found : Int = -1
         var matchCount : Int = 0
         for (idx,value) in fieldValues.enumerated() {
             if matching(value) {
@@ -108,9 +108,11 @@ public struct DatesValuesByField<T,F : Hashable> {
 
         }
 
-        rv.dates = [Date](self.dates.dropFirst(found))
-        for (oneField,oneFieldValues) in self.values {
-            rv.values[oneField] = [T](oneFieldValues.dropFirst(found))
+        if found != -1 {
+            rv.dates = [Date](self.dates.dropFirst(found))
+            for (oneField,oneFieldValues) in self.values {
+                rv.values[oneField] = [T](oneFieldValues.dropFirst(found))
+            }
         }
         return rv
     }
