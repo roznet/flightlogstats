@@ -46,9 +46,9 @@ class FlightSummaryFuelDataSource: NSObject, UICollectionViewDataSource, UIColle
                           ("Used", self.flightSummary.fuelUsed)
         ] {
             self.attributedCells.append(NSAttributedString(string: name, attributes: self.titleAttributes))
-            self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.total)))
-            self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.left)))
-            self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.right)))
+            self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.total), attributes: self.cellAttributes))
+            self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.left), attributes: self.cellAttributes))
+            self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.right), attributes: self.cellAttributes))
         }
     }
     

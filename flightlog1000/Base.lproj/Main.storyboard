@@ -226,20 +226,20 @@
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dGn-BM-a9i" userLabel="Airports">
                                                     <rect key="frame" x="0.0" y="24.5" width="95.5" height="16"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="EGTF,OCK," textAlignment="natural" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BsR-3f-wqd" userLabel="route">
                                                     <rect key="frame" x="0.0" y="48.5" width="95.5" height="16.5"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="knq-lT-6lR">
                                                     <rect key="frame" x="0.0" y="73" width="95.5" height="16"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
-                                                    <nil key="textColor"/>
+                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -247,22 +247,23 @@
                                                 <constraint firstItem="knq-lT-6lR" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="dpo-0a-pVr"/>
                                                 <constraint firstItem="BsR-3f-wqd" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="ho5-f9-UUP"/>
                                                 <constraint firstItem="fnr-Qm-BJe" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="lq3-XF-g3P"/>
+                                                <constraint firstItem="dGn-BM-a9i" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="x7x-1k-1mV"/>
                                             </constraints>
                                         </stackView>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="f5y-BP-W6W">
                                             <rect key="frame" x="105.5" y="5" width="723.5" height="89"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Xjg-gc-MoM">
-                                                    <rect key="frame" x="661.5" y="0.0" width="62" height="22.5"/>
+                                                    <rect key="frame" x="641.5" y="0.0" width="82" height="22.5"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4PB-Ye-NdT">
-                                                            <rect key="frame" x="0.0" y="5" width="31" height="12"/>
+                                                            <rect key="frame" x="0.0" y="5" width="41" height="12"/>
                                                             <color key="tintColor" systemColor="labelColor"/>
                                                             <imageReference key="image" image="timer" catalog="system" symbolScale="small"/>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y30-6u-gfG" userLabel="totaltime">
-                                                            <rect key="frame" x="31" y="1.5" width="31" height="19.5"/>
-                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                                            <rect key="frame" x="41" y="1.5" width="41" height="19.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
@@ -272,16 +273,16 @@
                                                     </constraints>
                                                 </stackView>
                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="bSU-XE-FhV">
-                                                    <rect key="frame" x="661.5" y="22.5" width="62" height="22"/>
+                                                    <rect key="frame" x="641.5" y="22.5" width="82" height="22"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kWF-h7-DKy">
-                                                            <rect key="frame" x="0.0" y="3" width="31" height="16"/>
+                                                            <rect key="frame" x="0.0" y="3" width="41" height="16"/>
                                                             <color key="tintColor" systemColor="labelColor"/>
                                                             <imageReference key="image" image="airplane.departure" catalog="system" symbolScale="small"/>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TJ6-sh-rHB" userLabel="flighttime">
-                                                            <rect key="frame" x="31" y="1.5" width="31" height="18.5"/>
-                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                                            <rect key="frame" x="41" y="1.5" width="41" height="18.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
@@ -324,6 +325,7 @@
                                     <outlet property="date" destination="fnr-Qm-BJe" id="OM9-ei-RH7"/>
                                     <outlet property="distance" destination="QPY-lw-LJx" id="6wh-n0-74F"/>
                                     <outlet property="fileName" destination="knq-lT-6lR" id="ODB-XS-yvY"/>
+                                    <outlet property="flightIcon" destination="kWF-h7-DKy" id="zbq-Dr-Xmc"/>
                                     <outlet property="flightTime" destination="TJ6-sh-rHB" id="iJf-Ua-ldq"/>
                                     <outlet property="fuel" destination="bU9-Ql-uYs" id="Uix-YJ-qx9"/>
                                     <outlet property="route" destination="BsR-3f-wqd" id="5ny-QM-Ak7"/>
@@ -425,6 +427,9 @@
         <image name="timer" catalog="system" width="128" height="123"/>
         <systemColor name="labelColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

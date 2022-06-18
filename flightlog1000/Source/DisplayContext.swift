@@ -48,8 +48,12 @@ class DisplayContext {
         return route.map { $0.name }.joined(separator: ",")
     }
     
-    func format(airport : Airport) -> String {
-        return "\(airport.icao) \(airport.name)"
+    func format(airport : Airport, icao : Bool = true) -> String {
+        if icao {
+            return "\(airport.icao) \(airport.name)"
+        }else{
+            return airport.name
+        }
     }
     
     func format(waypoint : Waypoint, from : Waypoint? = nil) -> String {
@@ -97,7 +101,7 @@ class DisplayContext {
     }
 
     func formatValue(gallon : Double) -> String {
-        let val = GCNumberWithUnit(GCUnit.from(logFileUnit: "gal"), andValue: gallon)
+        let val = GCNumberWithUnit(GCUnit.from(logFileUnit: "gals"), andValue: gallon)
         return val.description
     }
     

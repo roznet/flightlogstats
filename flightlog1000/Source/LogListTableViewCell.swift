@@ -11,6 +11,7 @@ class LogListTableViewCell: UITableViewCell {
     var flightLogFileInfo : FlightLogFileInfo? = nil
     var displayContext : DisplayContext = DisplayContext()
     
+    @IBOutlet weak var flightIcon: UIImageView!
     @IBOutlet weak var flightTime: UILabel!
     @IBOutlet weak var totalTime: UILabel!
     @IBOutlet weak var route: UILabel!
@@ -39,12 +40,22 @@ class LogListTableViewCell: UITableViewCell {
                 self.totalTime.text = nil
             }
             if let flying = flightSummary.flying {
+                self.flightTime.isHidden = false
+                self.flightIcon.isHidden = false
                 self.flightTime.text = self.displayContext.formatDecimal(timeRange: flying)
             }else{
+                self.flightIcon.isHidden = true
+                self.flightTime.isHidden = true
+                
                 self.flightTime.text = "0.0"
             }
             self.fuel.text = self.displayContext.formatValue(gallon: flightSummary.fuelUsed.total)
-            self.route.text = self.displayContext.format(route: flightSummary.route)
+            if let endAirport = flightSummary.endAirport {
+                self.route.isHidden = false
+                self.route.text = self.displayContext.format(airport: endAirport, icao: false)
+            }else{
+                self.route.isHidden = true
+            }
             self.distance.text = self.displayContext.formatValue(distance: flightSummary.distance)
             var airports : [String] = []
             if let from = flightSummary.startAirport {

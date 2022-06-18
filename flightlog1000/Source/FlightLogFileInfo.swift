@@ -121,11 +121,18 @@ class FlightLogFileInfo: NSManagedObject {
         if let moving = flightSummary.moving {
             self.start_time_moving = moving.start
             self.end_time_moving = moving.end
+        }else{
+            self.start_time_moving = nil
+            self.end_time_moving = nil
+
         }
         
         if let flying = flightSummary.flying {
             self.start_time_flying = flying.start
             self.end_time_flying = flying.end
+        }else{
+            self.start_time_flying = nil
+            self.end_time_flying = nil
         }
 
         self.start_fuel_quantity_left = flightSummary.fuelStart.left
