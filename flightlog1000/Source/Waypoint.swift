@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Waypoint {
+struct Waypoint : Equatable {
     let name : String
     
     init?(name : String?) {
@@ -19,3 +19,5 @@ struct Waypoint {
     }
     
 }
+
+

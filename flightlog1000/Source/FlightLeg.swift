@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreLocation
+import OSLog
 
 struct FlightLeg {
     typealias Field = FlightLogFile.Field
@@ -14,13 +15,11 @@ struct FlightLeg {
     enum LegInfo : String {
         case start_time = "Start"
         case end_time = "End"
-        case waypoint_from = "From"
-        case waypoint_to = "To"
+        case waypoint = "Waypoint"
         case route = "Route"
     }
     
-    let waypoint_to : Waypoint
-    let waypoint_from : Waypoint?
+    let waypoint : Waypoint
     
     let timeRange : TimeRange
     
@@ -28,9 +27,8 @@ struct FlightLeg {
     
     var fields : [Field] { return Array(data.keys).sorted { $0.order < $1.order } }
     
-    init(waypoint_to: Waypoint, waypoint_from: Waypoint?, timeRange: TimeRange, data: [Field : ValueStats]) {
-        self.waypoint_to = waypoint_to
-        self.waypoint_from = waypoint_from
+    init(waypoint: Waypoint, timeRange: TimeRange, data: [Field : ValueStats]) {
+        self.waypoint = waypoint
         self.timeRange = timeRange
         self.data = data
     }
@@ -39,31 +37,61 @@ struct FlightLeg {
         return self.data[field]
     }
     
-    func format(which : LegInfo, displayContext :DisplayContext = DisplayContext(), reference : Date? = nil) -> String {
+    func format(which : LegInfo, displayContext : DisplayContext = DisplayContext(), reference : Date? = nil) -> String {
         switch which {
         case .start_time:
             return displayContext.format(date: self.timeRange.start, since: self.timeRange.start, reference: reference)
         case .end_time:
             return displayContext.format(date: self.timeRange.end, since: self.timeRange.start, reference: reference)
         case .route:
-            return displayContext.format(waypoint: self.waypoint_to, from: waypoint_from)
-        case .waypoint_from:
-            if let waypoint_from = waypoint_from {
-                return displayContext.format(waypoint: waypoint_from)
-            }else{
-                return ""
-            }
-        case .waypoint_to:
-            return displayContext.format(waypoint: self.waypoint_to)
+            return displayContext.format(waypoint: self.waypoint)
+        case .waypoint:
+            return displayContext.format(waypoint: waypoint)
         }
     }
+    
+    static func legs(from data : FlightData, start : Date? = nil, end : Date? = nil) -> [FlightLeg] {
+        var rv : [FlightLeg] = []
+        let identifiers : DatesValuesByField<String,Field> = data.datesStrings(for: [.AtvWpt], start: start)
+        
+        do {
+            let stats : DatesValuesByField<ValueStats,Field> = try data.extract(dates: identifiers.dates, start: start, end : end)
+            
+            for idx in 0..<identifiers.count {
+                if let identifier = identifiers.value(for: .AtvWpt, at: idx),
+                   let waypoint = Waypoint(name: identifier),
+                   var endTime = end ?? identifiers.dates.last {
+                   let startTime = identifiers.dates[idx]
+                    
+                    if idx + 1 < identifiers.count {
+                        endTime = identifiers.dates[idx+1]
+                    }
+                    var validData : [Field:ValueStats] = [:]
+                    for (field,val) in stats.fieldValue(at: idx) {
+                        if val.isValid {
+                            validData[field] = val
+                        }
+                    }
+                    let leg = FlightLeg(waypoint: waypoint,
+                                        timeRange: TimeRange(start: startTime, end: endTime),
+                                        data: validData)
+                    rv.append(leg)
+                }
+
+            }
+        }catch{
+            Logger.app.error("Failed to extract route \(error.localizedDescription)")
+        }
+        return rv
+    }
+
 }
 
 extension FlightLeg : CustomStringConvertible {
     var description: String {
         let displayContext = DisplayContext()
         let time = displayContext.formatHHMM(timeRange: self.timeRange)
-        return String(format: "<FlightLeg %@-%@ %@>", waypoint_from?.name ?? "", waypoint_to.name, time )        
+        return String(format: "<FlightLeg %@ %@>", waypoint.name, time )
     }
 }
 
@@ -91,6 +119,7 @@ extension Array where Element == FlightLeg {
         
         return rv
     }
+    
 }
 
 extension FlightLeg.LegInfo : CustomStringConvertible {

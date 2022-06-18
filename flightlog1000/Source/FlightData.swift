@@ -587,16 +587,25 @@ class FlightData {
         return rv
     }
 
-    /***
-        return each strings changes and corresponding date
+    /**
+     *
+     return each strings changes and assigned to the first date when the string appeared
+     
+     - Parameters:
+     - stringFields: the field to collect the values for
+     - start: nil or the date when the collection should start
+     - Returns: DatesValuesByField where date is the first appearance of the string
      */
-    func datesStrings(for stringFields : [Field]) -> DatesValuesByField<String,Field> {
+    func datesStrings(for stringFields : [Field], start : Date? = nil) -> DatesValuesByField<String,Field> {
         let fieldToIndex : [Field:Int] = self.stringFieldToIndex
         var rv = DatesValuesByField<String,Field>(fields: stringFields)
         
         var first = true
         
         for (date,row) in zip(dates,strings) {
+            if let start = start, date < start {
+                continue
+            }
             var changed = first
             if !first {
                 for field in stringFields {
@@ -624,6 +633,7 @@ class FlightData {
                 first = false
             }
             
+            
         }
         return rv
     }
@@ -632,17 +642,18 @@ class FlightData {
     /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the
     /// first date in the input value, if the last date is before the end of the data, the end is skipped
     /// if a start is provided the stats starts from the first available row of data
-    /// - Parameter dates: array of dates,
-    /// - Parameter start:first date to start statistics or nil
+    /// - Parameter dates: array of dates corresponding to the first date of the leg
+    /// - Parameter start:first date to start statistics or nil for first date in data
+    /// - Parameter end: last date (included) to collect statistics or nil for last date in data
     /// - Returns: statisitics computed between dates
-    func extract(dates extractDates : [Date], start : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
+    func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
         var rv = DatesValuesByField<ValueStats,Field>(fields: self.doubleFields)
         
         // we need at least one date to extract and one date of data, else we'll return empty
         // last date should be past the last date (+10 seconds) so it's included
         if let firstExtractDate = extractDates.first,
-           let lastDate = self.dates.last?.addingTimeInterval(10.0) {
-            // remote firstExtractDate
+           let lastDate = end ?? self.dates.last {
+            // remove first from extractDates because we already collected it in firstExtractDate
             var remainingDates = extractDates.dropFirst()
             
             var nextExtractDate : Date = remainingDates.first ?? lastDate
@@ -654,37 +665,44 @@ class FlightData {
             let firstDate = max(startDate,firstExtractDate)
             
             var current : [ValueStats] = []
-            var currentDate = startDate
+            var currentExtractDate = startDate
             
             for (date,one) in zip(self.dates,self.values) {
-                if date < firstDate {
-                    continue
+                let include = date >= firstDate
+
+                if date > lastDate {
+                    break
                 }
-                if date >= nextExtractDate {
-                    do {
-                        try rv.append(fields: self.doubleFields, elements: current, for: currentDate)
-                    }catch{
-                        throw error
+                
+                if date > nextExtractDate {
+                    if include {
+                        do {
+                            try rv.append(fields: self.doubleFields, elements: current, for: currentExtractDate)
+                        }catch{
+                            throw error
+                        }
                     }
                     current = []
+                    currentExtractDate = nextExtractDate
                     nextExtractDate = remainingDates.first ?? lastDate
                     if remainingDates.count > 0 {
                         remainingDates.removeFirst()
                     }
                 }
-                if current.count == 0 {
-                    current = one.map { ValueStats(value: $0) }
-                }else{
-                    for (idx,val) in one.enumerated() {
-                        current[idx].update(with: val)
+                if include {
+                    if current.count == 0 {
+                        current = one.map { ValueStats(value: $0) }
+                    }else{
+                        for (idx,val) in one.enumerated() {
+                            current[idx].update(with: val)
+                        }
                     }
                 }
-                currentDate = date
             }
             // add last one if still there
             if current.count > 0 {
                 do {
-                    try rv.append(fields: self.doubleFields, elements: current, for: currentDate)
+                    try rv.append(fields: self.doubleFields, elements: current, for: currentExtractDate)
                 }catch{
                     throw error
                 }

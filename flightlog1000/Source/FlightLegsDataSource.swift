@@ -38,7 +38,7 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
 
         // should be sorted
         self.displayContext = displayContext
-        self.fixedColumnsInfo = [.end_time,.waypoint_to]
+        self.fixedColumnsInfo = [.end_time,.waypoint]
         
     }
     

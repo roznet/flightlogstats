@@ -76,7 +76,7 @@ class TestParsingLogFiles: XCTestCase {
                 let windDirect = runway.headWindSpeed.speed
                 
                 XCTAssertEqual(windCross, wndspdcross, accuracy: 1.0)
-                XCTAssertEqual(windDirect, wndspddirect, accuracy: 1.0)
+                XCTAssertEqual(windDirect, abs(wndspddirect), accuracy: 1.0)
             }else{
                 XCTAssertTrue(false)
             }
@@ -107,8 +107,82 @@ class TestParsingLogFiles: XCTestCase {
 
     }
     
+    func testFlightLegExtract(){
+        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight3.rawValue, withExtension: "csv"),
+              let data = FlightData(url: url)
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+        
+        
+// from flight3 = log_220417_135002_LFAQ
+//
+//        17/04/2022     13:48:43
+//        17/04/2022     13:54:29      PERON
+//        17/04/2022     13:55:45      XORBI
+//        17/04/2022     13:55:47      NEBRU
+//
+//        17/04/2022     14:01:18      NEBRU    32.93
+//        17/04/2022     14:01:19      NEBRU    36.31    flying start
+//
+//        17/04/2022     14:03:00      NEBRU
+//        17/04/2022     14:03:01        ABB
+//
+//        17/04/2022     15:06:29        OCK
+//        17/04/2022     15:06:30      FINAL
+//
+//        17/04/2022     15:08:42      FINAL    35.7    Flying End
+//        17/04/2022     15:08:43      FINAL    33.29
+//
+//        17/04/2022     15:12:16      FINAL
+        
+        do {
+            let summary = try FlightSummary(data: data)
+            
+            let routeFull = FlightLeg.legs(from: data, start: nil)
+            let routeFlying = FlightLeg.legs(from: data, start: summary.flying?.start, end: summary.flying?.end)
+            
+            XCTAssertLessThan(routeFlying.count, routeFull.count)
+            
+            if let firstFlyingLeg = routeFlying.first,
+               let lastFlyingLeg = routeFlying.last,
+               let flying = summary.flying {
+                
+                var fullRouteFirstFlyingLeg : FlightLeg? = nil
+                var fullRouteLastFlyingLeg : FlightLeg? = nil
+
+                for leg in routeFull {
+                    if fullRouteFirstFlyingLeg == nil && leg.timeRange.end >= flying.start  {
+                        fullRouteFirstFlyingLeg = leg
+                    }
+                    if leg.timeRange.start < flying.end {
+                        fullRouteLastFlyingLeg = leg
+                    }
+                }
+                
+                if let fullRouteFirstFlyingLeg = fullRouteFirstFlyingLeg,
+                   let fullRouteLastFlyingLeg = fullRouteLastFlyingLeg{
+                    XCTAssertEqual(flying.start,firstFlyingLeg.timeRange.start)
+                    XCTAssertEqual(fullRouteFirstFlyingLeg.timeRange.end,firstFlyingLeg.timeRange.end)
+                    XCTAssertEqual(firstFlyingLeg.waypoint,fullRouteFirstFlyingLeg.waypoint)
+                    
+                    XCTAssertEqual(lastFlyingLeg.timeRange.end, flying.end)
+                    XCTAssertEqual(lastFlyingLeg.timeRange.start, fullRouteLastFlyingLeg.timeRange.start)
+                }else{
+                    XCTAssertTrue(false)
+                }
+                
+            }else{
+                XCTAssertTrue(false)
+            }
+        }catch{
+            XCTAssertTrue(false)
+        }
+    }
+    
     func testFlightLogFile() {
-        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight2.rawValue, withExtension: "csv"),
+        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight3.rawValue, withExtension: "csv"),
               let logfile = FlightLogFile(url: url)
         else {
             XCTAssertTrue(false)
@@ -124,6 +198,11 @@ class TestParsingLogFiles: XCTestCase {
         if let fuelEndR = summary?.fuelEnd.right,
            let lastFuelR = legs.last?.valueStats(field: .FQtyR) {
             XCTAssertEqual( lastFuelR.end, fuelEndR, accuracy: 1.0e-7)
+        }
+        
+        if let first = legs.first,
+           let flying = summary?.flying {
+            XCTAssertEqual(flying.start, first.timeRange.start)
         }
     }
     
