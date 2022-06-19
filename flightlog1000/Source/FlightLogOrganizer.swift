@@ -361,6 +361,8 @@ class FlightLogOrganizer {
                 }
                 if someNew {
                     Logger.app.info("Local File list has update")
+                    self.addMissingFromLocal()
+                    self.syncCloud()
                     NotificationCenter.default.post(name: .localFileListChanged, object: nil)
                 }
             case .failure(let error):
@@ -473,7 +475,11 @@ class FlightLogOrganizer {
                         copiedToCloud += 1
                         Logger.app.info( "copy to cloud \(localUrl.lastPathComponent)")
                         do {
-                            try FileManager.default.copyItem(at: localUrl, to: cloud)
+                            if !FileManager.default.fileExists(atPath: cloud.path) {
+                                try FileManager.default.copyItem(at: localUrl, to: cloud)
+                            }else{
+                                Logger.app.info("Already copied \(cloud.lastPathComponent), skipping")
+                            }
                         }catch{
                             Logger.app.error("Failed to copy to cloud \(error.localizedDescription)")
                         }
