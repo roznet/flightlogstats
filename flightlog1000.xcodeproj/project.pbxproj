@@ -54,6 +54,7 @@
 		42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */; };
 		42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */; };
 		42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */; };
+		42B3843028609A3C009458CC /* FieldCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B3842F28609A3C009458CC /* FieldCalculations.swift */; };
 		42B90997284D1F8100186FCD /* ProgressReportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B90996284D1F8100186FCD /* ProgressReportViewController.swift */; };
 		42CEA370281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36C281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv */; };
 		42CEA371281C2F7400AB7B5F /* log_220417_125002_LFQA.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36D281C2F7400AB7B5F /* log_220417_125002_LFQA.csv */; };
@@ -135,6 +136,7 @@
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
 		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
 		42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLogFile+Field.swift"; path = "Source/FlightLogFile+Field.swift"; sourceTree = "<group>"; };
+		42B3842F28609A3C009458CC /* FieldCalculations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FieldCalculations.swift; path = Source/FieldCalculations.swift; sourceTree = "<group>"; };
 		42B90996284D1F8100186FCD /* ProgressReportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReportViewController.swift; path = Source/ProgressReportViewController.swift; sourceTree = "<group>"; };
 		42CEA36C281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220417_135002_LFAQ.csv; sourceTree = "<group>"; };
 		42CEA36D281C2F7400AB7B5F /* log_220417_125002_LFQA.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220417_125002_LFQA.csv; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 				4264C23728267F6600F40436 /* Waypoint.swift */,
 				4264C23B282691EF00F40436 /* FuelQuantity.swift */,
 				4268A0C328357E2600A3CB05 /* KnownAirports.swift */,
+				42B3842F28609A3C009458CC /* FieldCalculations.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -499,6 +502,7 @@
 			files = (
 				4280C8BC280D460600A0FB32 /* LogListTableViewController.swift in Sources */,
 				42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */,
+				42B3843028609A3C009458CC /* FieldCalculations.swift in Sources */,
 				42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */,
 				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
 				4268A0C92842851900A3CB05 /* ProgressReport.swift in Sources */,

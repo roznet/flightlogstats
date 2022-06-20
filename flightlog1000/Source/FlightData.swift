@@ -106,6 +106,248 @@ class FlightData {
         try self.parse(inputStream: inputStream)
     }
     
+
+    //MARK: - parse Memory
+    
+    private func parse(array : [String.SubSequence], progress : ProgressReport? = nil){
+        let start = Date()
+        var state = ParsingState(data: self)
+        var done_sofar = 0
+        
+        self.values.reserveCapacity(array.count)
+        self.strings.reserveCapacity(array.count)
+        
+        let trimCharSet = CharacterSet(charactersIn: "\" ")
+        progress?.update(state: .progressing(0.0), message: "Parsing Log")
+        for line in array {
+            progress?.update(state: .progressing(Double(done_sofar)/Double(array.count)))
+            done_sofar += 1
+            let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
+            state.process(line: vals)
+        }
+        progress?.update(state: .complete)
+        Logger.app.info("parsed \(array.count) lines in \(Date().timeIntervalSince(start)) secs")
+    }
+
+
+    //MARK: - external and derived info
+    func fetchAirports(completion : @escaping ([Airport]) -> Void){
+        
+        guard CLLocationCoordinate2DIsValid(self.firstCoordinate) && CLLocationCoordinate2DIsValid(self.lastCoordinate)
+        else {
+            completion([])
+            return
+        }
+            
+        Airport.near(coord: self.firstCoordinate, count: 1, reporting: false){
+            startAirports in
+            Airport.near(coord: self.lastCoordinate, count: 1, reporting: false){
+                endAirports in
+                var rv : [Airport] = []
+                if let start = startAirports.first {
+                    rv.append(start)
+                }
+                if let end = endAirports.first {
+                    rv.append(end)
+                }
+                completion(rv)
+            }
+        }
+    }
+
+    
+    //MARK: - raw extracts
+    
+    /**
+     * return array of values which are dict of field -> value
+     */
+    func values(for doubleFields : [Field]) -> [ [Field:Double] ] {
+        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
+        
+        var rv : [[Field:Double]] = []
+        
+        for row in values {
+            var newRow : [Field:Double] = [:]
+            for field in doubleFields {
+                if let idx = fieldToIndex[field] {
+                    let val = row[idx]
+                    if !val.isNaN {
+                        newRow[field] = val
+                    }
+                }
+            }
+            rv.append(newRow)
+        }
+        return rv
+    }
+    
+    func datesDoubles(for doubleFields : [Field]) -> DatesValuesByField<Double,Field> {
+        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
+        var rv = DatesValuesByField<Double,Field>(fields: doubleFields)
+        
+        var lastDate : Date? = nil
+        
+        for (date,row) in zip(dates,values) {
+            var valid : Bool = true
+            
+            // skip if twice the same date
+            if let lastDate = lastDate, date == lastDate {
+                continue
+            }
+            lastDate = date
+            for field in doubleFields {
+                if let idx = fieldToIndex[field] {
+                    if row[idx].isNaN {
+                        valid = false
+                        break
+                    }
+                }
+            }
+            if valid {
+                for field in doubleFields {
+                    if let idx = fieldToIndex[field] {
+                        let val = row[idx]
+                        do {
+                            try rv.append(field: field, element: val, for: date)
+                        }catch{
+                            Logger.app.error("Failed to create serie for \(field) at \(date)")
+                            continue
+                        }
+                    }
+                }
+            }
+        }
+        return rv
+    }
+
+    /**
+     *
+     return each strings changes and assigned to the first date when the string appeared
+     
+     - Parameters:
+     - stringFields: the field to collect the values for
+     - start: nil or the date when the collection should start
+     - Returns: DatesValuesByField where date is the first appearance of the string
+     */
+    func datesStrings(for stringFields : [Field], start : Date? = nil) -> DatesValuesByField<String,Field> {
+        let fieldToIndex : [Field:Int] = self.stringFieldToIndex
+        
+        var rv = DatesValuesByField<String,Field>(fields: stringFields)
+        
+        var first = true
+        
+        for (date,row) in zip(dates,strings) {
+            if let start = start, date < start {
+                continue
+            }
+            var changed = first
+            if !first {
+                for field in stringFields {
+                    if let idx = fieldToIndex[field] {
+                        let val = row[idx]
+                        if rv.last(field: field)?.value != val {
+                            changed = true
+                        }
+                    }
+                }
+            }
+            
+            if changed {
+                for field in stringFields {
+                    if let idx = fieldToIndex[field] {
+                        let val = row[idx]
+                        do {
+                            try rv.append(field: field, element: val, for: date)
+                        }catch{
+                            Logger.app.error("Failed to create serie for \(field) at \(date)")
+                            continue
+                        }
+                    }
+                }
+                first = false
+            }
+            
+            
+        }
+        return rv
+    }
+        
+    /// Will extract and compute parameters
+    /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the
+    /// first date in the input value, if the last date is before the end of the data, the end is skipped
+    /// if a start is provided the stats starts from the first available row of data
+    /// - Parameter dates: array of dates corresponding to the first date of the leg
+    /// - Parameter start:first date to start statistics or nil for first date in data
+    /// - Parameter end: last date (included) to collect statistics or nil for last date in data
+    /// - Returns: statisitics computed between dates
+    func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
+        var rv = DatesValuesByField<ValueStats,Field>(fields: self.doubleFields)
+        
+        // we need at least one date to extract and one date of data, else we'll return empty
+        // last date should be past the last date (+10 seconds) so it's included
+        if let firstExtractDate = extractDates.first,
+           let lastDate = end ?? self.dates.last {
+            // remove first from extractDates because we already collected it in firstExtractDate
+            var remainingDates = extractDates.dropFirst()
+            
+            var nextExtractDate : Date = remainingDates.first ?? lastDate
+            if remainingDates.count > 0 {
+                remainingDates.removeFirst()
+            }
+            
+            let startDate = start ?? firstExtractDate
+            let firstDate = max(startDate,firstExtractDate)
+            
+            var current : [ValueStats] = []
+            var currentExtractDate = startDate
+            
+            for (date,one) in zip(self.dates,self.values) {
+                let include = date >= firstDate
+
+                if date > lastDate {
+                    break
+                }
+                
+                if date > nextExtractDate {
+                    if include {
+                        do {
+                            try rv.append(fields: self.doubleFields, elements: current, for: currentExtractDate)
+                        }catch{
+                            throw error
+                        }
+                    }
+                    current = []
+                    currentExtractDate = nextExtractDate
+                    nextExtractDate = remainingDates.first ?? lastDate
+                    if remainingDates.count > 0 {
+                        remainingDates.removeFirst()
+                    }
+                }
+                if include {
+                    if current.count == 0 {
+                        current = one.map { ValueStats(value: $0) }
+                    }else{
+                        for (idx,val) in one.enumerated() {
+                            current[idx].update(with: val)
+                        }
+                    }
+                }
+            }
+            // add last one if still there
+            if current.count > 0 {
+                do {
+                    try rv.append(fields: self.doubleFields, elements: current, for: currentExtractDate)
+                }catch{
+                    throw error
+                }
+
+            }
+        }
+        return rv
+    }
+}
+
+extension FlightData {
     //MARK: - Parsing State
 
     //
@@ -139,10 +381,16 @@ class FlightData {
         var doubleLine : [Double] = []
         var stringLine : [String] = []
         
+        var doubleInputs : [Field:[Double]] = [:]
+        
         init(data : FlightData){
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
             self.data = data
-            
+            for calcField in FieldCalculation.calculatedFields {
+                for field in calcField.inputs {
+                    self.doubleInputs[field] = []
+                }
+            }
         }
         
         mutating func process(line : [String]){
@@ -301,6 +549,16 @@ class FlightData {
                 }
                 // match order with what was added for fields
                 doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
+                for field in self.doubleInputs.keys {
+                    if let idx = fieldsMap[field] {
+                        let val = doubleLine[idx]
+                        self.doubleInputs[field]?.append(val)
+                    }
+                    if let count = self.doubleInputs[field]?.count, count > 10 {
+                        self.doubleInputs[field]?.removeFirst()
+                    }
+                }
+                
                 for calcField in FieldCalculation.calculatedFields {
                     doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap))
                 }
@@ -474,241 +732,4 @@ class FlightData {
         }
     }
     
-    //MARK: - parse Memory
-    
-    private func parse(array : [String.SubSequence], progress : ProgressReport? = nil){
-        let start = Date()
-        var state = ParsingState(data: self)
-        var done_sofar = 0
-        
-        self.values.reserveCapacity(array.count)
-        self.strings.reserveCapacity(array.count)
-        
-        let trimCharSet = CharacterSet(charactersIn: "\" ")
-        progress?.update(state: .progressing(0.0), message: "Parsing Log")
-        for line in array {
-            progress?.update(state: .progressing(Double(done_sofar)/Double(array.count)))
-            done_sofar += 1
-            let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
-            state.process(line: vals)
-        }
-        progress?.update(state: .complete)
-        Logger.app.info("parsed \(array.count) lines in \(Date().timeIntervalSince(start)) secs")
-    }
-
-
-    //MARK: - external and derived info
-    func fetchAirports(completion : @escaping ([Airport]) -> Void){
-        
-        guard CLLocationCoordinate2DIsValid(self.firstCoordinate) && CLLocationCoordinate2DIsValid(self.lastCoordinate)
-        else {
-            completion([])
-            return
-        }
-            
-        Airport.near(coord: self.firstCoordinate, count: 1, reporting: false){
-            startAirports in
-            Airport.near(coord: self.lastCoordinate, count: 1, reporting: false){
-                endAirports in
-                var rv : [Airport] = []
-                if let start = startAirports.first {
-                    rv.append(start)
-                }
-                if let end = endAirports.first {
-                    rv.append(end)
-                }
-                completion(rv)
-            }
-        }
-    }
-
-    
-    //MARK: - raw extracts
-    
-    /**
-     * return array of values which are dict of field -> value
-     */
-    func values(for doubleFields : [Field]) -> [ [Field:Double] ] {
-        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
-        
-        var rv : [[Field:Double]] = []
-        
-        for row in values {
-            var newRow : [Field:Double] = [:]
-            for field in doubleFields {
-                if let idx = fieldToIndex[field] {
-                    let val = row[idx]
-                    if !val.isNaN {
-                        newRow[field] = val
-                    }
-                }
-            }
-            rv.append(newRow)
-        }
-        return rv
-    }
-    
-    func datesDoubles(for doubleFields : [Field]) -> DatesValuesByField<Double,Field> {
-        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
-        var rv = DatesValuesByField<Double,Field>(fields: doubleFields)
-        
-        var lastDate : Date? = nil
-        
-        for (date,row) in zip(dates,values) {
-            var valid : Bool = true
-            
-            // skip if twice the same date
-            if let lastDate = lastDate, date == lastDate {
-                continue
-            }
-            lastDate = date
-            for field in doubleFields {
-                if let idx = fieldToIndex[field] {
-                    if row[idx].isNaN {
-                        valid = false
-                        break
-                    }
-                }
-            }
-            if valid {
-                for field in doubleFields {
-                    if let idx = fieldToIndex[field] {
-                        let val = row[idx]
-                        do {
-                            try rv.append(field: field, element: val, for: date)
-                        }catch{
-                            Logger.app.error("Failed to create serie for \(field) at \(date)")
-                            continue
-                        }
-                    }
-                }
-            }
-        }
-        return rv
-    }
-
-    /**
-     *
-     return each strings changes and assigned to the first date when the string appeared
-     
-     - Parameters:
-     - stringFields: the field to collect the values for
-     - start: nil or the date when the collection should start
-     - Returns: DatesValuesByField where date is the first appearance of the string
-     */
-    func datesStrings(for stringFields : [Field], start : Date? = nil) -> DatesValuesByField<String,Field> {
-        let fieldToIndex : [Field:Int] = self.stringFieldToIndex
-        var rv = DatesValuesByField<String,Field>(fields: stringFields)
-        
-        var first = true
-        
-        for (date,row) in zip(dates,strings) {
-            if let start = start, date < start {
-                continue
-            }
-            var changed = first
-            if !first {
-                for field in stringFields {
-                    if let idx = fieldToIndex[field] {
-                        let val = row[idx]
-                        if rv.last(field: field)?.value != val {
-                            changed = true
-                        }
-                    }
-                }
-            }
-            
-            if changed {
-                for field in stringFields {
-                    if let idx = fieldToIndex[field] {
-                        let val = row[idx]
-                        do {
-                            try rv.append(field: field, element: val, for: date)
-                        }catch{
-                            Logger.app.error("Failed to create serie for \(field) at \(date)")
-                            continue
-                        }
-                    }
-                }
-                first = false
-            }
-            
-            
-        }
-        return rv
-    }
-        
-    /// Will extract and compute parameters
-    /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the
-    /// first date in the input value, if the last date is before the end of the data, the end is skipped
-    /// if a start is provided the stats starts from the first available row of data
-    /// - Parameter dates: array of dates corresponding to the first date of the leg
-    /// - Parameter start:first date to start statistics or nil for first date in data
-    /// - Parameter end: last date (included) to collect statistics or nil for last date in data
-    /// - Returns: statisitics computed between dates
-    func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
-        var rv = DatesValuesByField<ValueStats,Field>(fields: self.doubleFields)
-        
-        // we need at least one date to extract and one date of data, else we'll return empty
-        // last date should be past the last date (+10 seconds) so it's included
-        if let firstExtractDate = extractDates.first,
-           let lastDate = end ?? self.dates.last {
-            // remove first from extractDates because we already collected it in firstExtractDate
-            var remainingDates = extractDates.dropFirst()
-            
-            var nextExtractDate : Date = remainingDates.first ?? lastDate
-            if remainingDates.count > 0 {
-                remainingDates.removeFirst()
-            }
-            
-            let startDate = start ?? firstExtractDate
-            let firstDate = max(startDate,firstExtractDate)
-            
-            var current : [ValueStats] = []
-            var currentExtractDate = startDate
-            
-            for (date,one) in zip(self.dates,self.values) {
-                let include = date >= firstDate
-
-                if date > lastDate {
-                    break
-                }
-                
-                if date > nextExtractDate {
-                    if include {
-                        do {
-                            try rv.append(fields: self.doubleFields, elements: current, for: currentExtractDate)
-                        }catch{
-                            throw error
-                        }
-                    }
-                    current = []
-                    currentExtractDate = nextExtractDate
-                    nextExtractDate = remainingDates.first ?? lastDate
-                    if remainingDates.count > 0 {
-                        remainingDates.removeFirst()
-                    }
-                }
-                if include {
-                    if current.count == 0 {
-                        current = one.map { ValueStats(value: $0) }
-                    }else{
-                        for (idx,val) in one.enumerated() {
-                            current[idx].update(with: val)
-                        }
-                    }
-                }
-            }
-            // add last one if still there
-            if current.count > 0 {
-                do {
-                    try rv.append(fields: self.doubleFields, elements: current, for: currentExtractDate)
-                }catch{
-                    throw error
-                }
-
-            }
-        }
-        return rv
-    }
 }
