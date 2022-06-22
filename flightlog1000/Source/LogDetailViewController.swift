@@ -60,12 +60,6 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
 
     func updateUI(){
         AppDelegate.worker.async {
-            let displayContext = DisplayContext()
-            if let log = self.flightLogFileInfo {
-                self.flightLogViewModel = FlightLogViewModel(fileInfo: log, displayContext: displayContext)
-                self.flightLogViewModel?.build()
-            }
-            
             if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
                     if self.name != nil {
