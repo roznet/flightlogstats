@@ -9,7 +9,7 @@ import UIKit
 import OSLog
 import RZUtils
 
-class LogDetailViewController: UIViewController,LogSelectionDelegate {
+class LogDetailViewController: UIViewController,ViewModelDelegate {
     var logFileOrganizer = FlightLogOrganizer.shared
     
     @IBOutlet weak var progressView: UIProgressView!
@@ -20,10 +20,12 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
     
-    var flightLogFileInfo : FlightLogFileInfo? = nil
+    var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
     var legsDataSource : FlightLegsDataSource? = nil
     var fuelDataSource : FlightSummaryFuelDataSource? = nil
     var timeDataSource : FlightSummaryTimeDataSource? = nil
+    
+    var flightLogViewModel : FlightLogViewModel? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,23 +60,19 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
 
     func updateUI(){
         AppDelegate.worker.async {
-            if let summary = self.flightLogFileInfo?.flightSummary {
+            let displayContext = DisplayContext()
+            if let log = self.flightLogFileInfo {
+                self.flightLogViewModel = FlightLogViewModel(fileInfo: log, displayContext: displayContext)
+                self.flightLogViewModel?.build()
+            }
+            
+            if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
-                    let displayContext = DisplayContext()
-                    
                     if self.name != nil {
                         self.name.text = self.flightLogFileInfo?.log_file_name
                         self.date.text = self.flightLogFileInfo?.start_time?.formatted()
-                        var airports : [String] = []
-                        if let from = summary.startAirport {
-                            airports.append("\(from.name) (\(from.icao))")
-                        }
-                        if let to = summary.endAirport {
-                            airports.append("\(to.name) (\(to.icao))")
-                        }
                         
-                        self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary, displayContext: displayContext)
-                        self.fuelDataSource?.prepare()
+                        self.fuelDataSource = self.flightLogViewModel?.fuelDataSource
                         self.fuelCollectionView.dataSource = self.fuelDataSource
                         self.fuelCollectionView.delegate = self.fuelDataSource
                         if let tableCollectionLayout = self.fuelCollectionView.collectionViewLayout as? TableCollectionViewLayout {
@@ -82,8 +80,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                         }else{
                             Logger.app.error("Internal error: Inconsistent layout ")
                         }
-                        self.timeDataSource = FlightSummaryTimeDataSource(flightSummary: summary, displayContext: displayContext)
-                        self.timeDataSource?.prepare()
+                        self.timeDataSource = self.flightLogViewModel?.timeDataSource
                         self.timeCollectionView.dataSource = self.timeDataSource
                         self.timeCollectionView.delegate = self.timeDataSource
                         if let tableCollectionLayout = self.timeCollectionView.collectionViewLayout as? TableCollectionViewLayout {
@@ -95,8 +92,7 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
                     
                     self.view.setNeedsDisplay()
                     
-                    if let legs = self.flightLogFileInfo?.flightLog?.legs {
-                        let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: displayContext)
+                    if let legsDataSource = self.flightLogViewModel?.legsDataSource {
                         self.legsDataSource = legsDataSource
                         self.legsCollectionView.dataSource = self.legsDataSource
                         self.legsCollectionView.delegate = self.legsDataSource
@@ -115,15 +111,16 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
 
     private var progress : ProgressReport? = nil
     
+    // MARK: - Handle updates
     
-    func selectOneIfEmpty() {
-        if self.flightLogFileInfo == nil, let first = self.logFileOrganizer.first {
-            self.logInfoSelected(first)
-        }
+    func viewModelDidFinishBuilding(viewModel : FlightLogViewModel){
+        self.progressView.isHidden = true
+        self.updateUI()
     }
     
-    func logInfoSelected(_ info: FlightLogFileInfo) {
-        self.flightLogFileInfo = info
+    func viewModelHasChanged(viewModel: FlightLogViewModel) {
+        self.flightLogViewModel = viewModel
+        
         if self.progress == nil {
             self.progress = ProgressReport(message: "LogDetail"){
                 report in
@@ -139,13 +136,6 @@ class LogDetailViewController: UIViewController,LogSelectionDelegate {
             self.updateUI()
             self.progressView.setProgress(0.0, animated: false)
             self.progressView.isHidden = false
-        }
-        AppDelegate.worker.async {
-            self.flightLogFileInfo?.parseAndUpdate(progress: self.progress)
-            DispatchQueue.main.async {
-                self.progressView.isHidden = true
-                self.updateUI()
-            }
         }
     }
 }

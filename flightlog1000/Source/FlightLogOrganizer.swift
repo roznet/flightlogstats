@@ -399,6 +399,10 @@ class FlightLogOrganizer {
         }
         self.cachedLocalFlightLogList = local
         
+        if let already = self.cachedQuery?.isGathering, already {
+            Logger.app.info("Query already gathering")
+        }
+        
         self.cachedQuery = NSMetadataQuery()
         if let query = self.cachedQuery {
             NotificationCenter.default.addObserver(self, selector: #selector(didFinishGathering), name: .NSMetadataQueryDidFinishGathering, object: nil)

@@ -14,7 +14,7 @@ import OSLog
 
 protocol LogSelectionDelegate : AnyObject {
     func logInfoSelected(_ info : FlightLogFileInfo)
-    func selectOneIfEmpty()
+    func selectOneIfEmpty(organizer : FlightLogOrganizer)
 }
 
 class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate {
@@ -139,7 +139,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                self.delegate?.selectOneIfEmpty()
+                self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
             }
         }
         NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
@@ -147,7 +147,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                self.delegate?.selectOneIfEmpty()
+                self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
             }
         }
         /*
@@ -210,15 +210,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let info = self.flightInfo(at: indexPath){
             if self.delegate == nil,
-               let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailViewController") as? LogDetailViewController {
-                detailViewController.logFileOrganizer = self.logFileOrganizer
+               let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailTabBarController") as? LogDetailTabBarController {
                 self.delegate = detailViewController
                 self.delegate?.logInfoSelected(info)
                 splitViewController?.showDetailViewController(detailViewController, sender: self)
             }else{
                 self.delegate?.logInfoSelected(info)
-                if let detailViewController = delegate as? LogDetailViewController {
-                    detailViewController.logFileOrganizer = self.logFileOrganizer
+                if let detailViewController = delegate as? LogDetailTabBarController {
                     splitViewController?.showDetailViewController(detailViewController, sender: nil)
                 }
             }
@@ -242,13 +240,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                     self.tableView.reloadData()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now()+0.5){
-                    self.delegate?.selectOneIfEmpty()
+                    self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
                 }
             }
         }else{
             self.logList = self.logFileOrganizer.flightLogFileList
             self.tableView.reloadData()
-            self.delegate?.selectOneIfEmpty()
+            self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
         }
     }
 

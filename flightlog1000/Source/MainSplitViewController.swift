@@ -10,9 +10,20 @@ import UIKit
 
 class MainSplitViewController : UISplitViewController,UISplitViewControllerDelegate {
 
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.delegate = self
+        
+        // find master view
+        guard
+            let leftNavController = self.viewControllers.first as? UINavigationController,
+            let logListController = leftNavController.viewControllers.first as? LogListTableViewController,
+            let rightTabbarController = self.viewControllers.last as? LogDetailTabBarController
+        else { fatalError() }
+        
+        logListController.delegate = rightTabbarController
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -21,7 +32,6 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
             _ in
             FlightLogOrganizer.shared.syncCloud()
         }
-
     }
     
 }

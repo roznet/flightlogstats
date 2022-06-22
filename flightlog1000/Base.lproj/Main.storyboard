@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21179.7" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21169.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
@@ -12,7 +11,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Log Detail View Controller-->
+        <!--Summary-->
         <scene sceneID="aUE-ts-Q69">
             <objects>
                 <viewController storyboardIdentifier="LogDetailViewController" id="jUv-0p-pFh" customClass="LogDetailViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
@@ -21,7 +20,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="i78-1P-54X">
-                                <rect key="frame" x="0.0" y="74" width="834" height="60"/>
+                                <rect key="frame" x="0.0" y="24" width="834" height="60"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" ambiguous="YES" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
                                         <rect key="frame" x="0.0" y="0.0" width="834" height="34.5"/>
@@ -63,7 +62,7 @@
                                 </constraints>
                             </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="s50-2U-Cvg" userLabel="TimeSummary Collection View">
-                                <rect key="frame" x="5" y="139" width="834" height="150"/>
+                                <rect key="frame" x="5" y="89" width="834" height="150"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="150" id="KDg-SL-kLK"/>
@@ -96,7 +95,7 @@
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mee-fG-3c6" userLabel="Fuel Collection View">
-                                <rect key="frame" x="5" y="294" width="824" height="100"/>
+                                <rect key="frame" x="5" y="244" width="824" height="100"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="100" id="uJR-ao-is8"/>
@@ -129,7 +128,7 @@
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="aKL-fC-i7y" userLabel="Legs Collection View">
-                                <rect key="frame" x="5" y="399" width="824" height="766"/>
+                                <rect key="frame" x="5" y="349" width="824" height="771"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="oSQ-lx-eW3" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
@@ -159,7 +158,7 @@
                                 </cells>
                             </collectionView>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="cyP-Hg-ndb">
-                                <rect key="frame" x="342" y="1165" width="150" height="4"/>
+                                <rect key="frame" x="342" y="1120" width="150" height="4"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="Qva-TF-6jV"/>
                                     <constraint firstAttribute="height" constant="4" id="y7G-P6-0Pl"/>
@@ -186,6 +185,7 @@
                             <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="mee-fG-3c6" secondAttribute="bottom" constant="5" id="y5c-0i-9X6"/>
                         </constraints>
                     </view>
+                    <tabBarItem key="tabBarItem" title="Summary" image="tablecells" catalog="system" id="77u-9R-Es2"/>
                     <connections>
                         <outlet property="date" destination="6bN-rh-gIs" id="sL8-AX-MI1"/>
                         <outlet property="fuelCollectionView" destination="mee-fG-3c6" id="ASf-Nf-8NE"/>
@@ -197,47 +197,169 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cr2-EI-nvD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-221.49532710280371" y="867.60259179265665"/>
+            <point key="canvasLocation" x="532.37410071942452" y="867.3366834170854"/>
+        </scene>
+        <!--Map View Controller-->
+        <scene sceneID="SDL-fH-bz2">
+            <objects>
+                <viewController id="tIL-BH-og2" userLabel="Map View Controller" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="yF0-BN-oP4">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="Xjq-va-TNy"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Maps" image="map" catalog="system" id="Wmd-bY-ksl"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Zhf-cq-gzj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-965" y="1711"/>
+        </scene>
+        <!--Calculations View Controller-->
+        <scene sceneID="sKo-Gz-sxa">
+            <objects>
+                <viewController id="Ixv-6V-WSf" userLabel="Calculations View Controller" customClass="FuelAnalysisViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bVa-kJ-IET">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="left" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="9cQ-fA-Zou">
+                                <rect key="frame" x="5" y="74" width="824" height="60"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="noJ-oi-W10">
+                                        <rect key="frame" x="0.0" y="0.0" width="240" height="60"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" text="Fuel Target" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1o7-kq-3OE">
+                                                <rect key="frame" x="5" y="21.5" width="72" height="17"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="60" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="PqG-gQ-uQm">
+                                                <rect key="frame" x="82" y="6" width="131.5" height="39.5"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" enablesReturnKeyAutomatically="YES"/>
+                                            </textField>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" text="/92" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EL0-VA-KsT">
+                                                <rect key="frame" x="218.5" y="21.5" width="21.5" height="17"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="1o7-kq-3OE" firstAttribute="centerY" secondItem="noJ-oi-W10" secondAttribute="centerY" id="6KM-Ga-6UN"/>
+                                            <constraint firstItem="EL0-VA-KsT" firstAttribute="firstBaseline" secondItem="PqG-gQ-uQm" secondAttribute="firstBaseline" id="Rb8-Hg-jOx"/>
+                                            <constraint firstItem="PqG-gQ-uQm" firstAttribute="leading" secondItem="1o7-kq-3OE" secondAttribute="trailing" constant="5" id="gdy-ZU-j98"/>
+                                            <constraint firstItem="EL0-VA-KsT" firstAttribute="leading" secondItem="PqG-gQ-uQm" secondAttribute="trailing" constant="5" id="ihW-tZ-4DW"/>
+                                            <constraint firstItem="1o7-kq-3OE" firstAttribute="leading" secondItem="noJ-oi-W10" secondAttribute="leading" constant="5" id="j13-WI-i37"/>
+                                            <constraint firstItem="PqG-gQ-uQm" firstAttribute="firstBaseline" secondItem="1o7-kq-3OE" secondAttribute="firstBaseline" id="lNE-lZ-ZBz"/>
+                                            <constraint firstAttribute="trailing" secondItem="EL0-VA-KsT" secondAttribute="trailing" id="qMG-97-W1N"/>
+                                        </constraints>
+                                    </view>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="9Nb-pE-2dl">
+                                        <rect key="frame" x="344" y="14.5" width="203" height="32"/>
+                                        <segments>
+                                            <segment title="Full"/>
+                                            <segment title="Tabs"/>
+                                            <segment title="Custom"/>
+                                        </segments>
+                                    </segmentedControl>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="7Ag-KF-YBw">
+                                        <rect key="frame" x="651" y="14.5" width="173" height="32"/>
+                                        <segments>
+                                            <segment title="US Gallons"/>
+                                            <segment title="Liters"/>
+                                        </segments>
+                                    </segmentedControl>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="MLD-kg-7pC"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="89l-r2-Bdg"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="9cQ-fA-Zou" firstAttribute="top" secondItem="89l-r2-Bdg" secondAttribute="top" constant="50" id="ZJ0-pO-xrB"/>
+                            <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="9cQ-fA-Zou" secondAttribute="trailing" constant="5" id="jel-IR-Pcg"/>
+                            <constraint firstItem="9cQ-fA-Zou" firstAttribute="leading" secondItem="89l-r2-Bdg" secondAttribute="leading" constant="5" id="oV4-w0-h07"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Fuel" image="fuelpump" catalog="system" id="sA0-Pk-aM0"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="2eR-rn-c1b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-326.61870503597123" y="1710.5527638190954"/>
+        </scene>
+        <!--Graphs View Controller-->
+        <scene sceneID="VeH-AF-dEi">
+            <objects>
+                <viewController id="9Nf-CY-m6R" userLabel="Graphs View Controller" customClass="LogGraphsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="N8L-EL-blt">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Graphs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ozc-BE-PXl">
+                                <rect key="frame" x="389.5" y="566" width="55.5" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="W2e-Qs-i2X"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Ozc-BE-PXl" firstAttribute="centerX" secondItem="W2e-Qs-i2X" secondAttribute="centerX" id="A5a-Xh-DuR"/>
+                            <constraint firstItem="Ozc-BE-PXl" firstAttribute="centerY" secondItem="W2e-Qs-i2X" secondAttribute="centerY" id="fV0-0Q-oXs"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Graphs" image="chart.xyaxis.line" catalog="system" id="bRF-Na-7CO"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eLc-8L-xlr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="527" y="1559"/>
         </scene>
         <!--Flight Logs-->
         <scene sceneID="ifI-4a-r8r">
             <objects>
                 <tableViewController clearsSelectionOnViewWillAppear="NO" id="JdO-DO-Gh9" customClass="LogListTableViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="oIf-wu-Id9">
-                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <rect key="frame" x="0.0" y="0.0" width="420" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" indentationWidth="10" reuseIdentifier="flightlogcell" rowHeight="99" id="fOk-Uh-ECS" customClass="LogListTableViewCell" customModule="FlightLog1000" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="50" width="834" height="99"/>
+                                <rect key="frame" x="0.0" y="44.5" width="420" height="99"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fOk-Uh-ECS" id="Fpc-Xo-3Um">
-                                    <rect key="frame" x="0.0" y="0.0" width="834" height="99"/>
+                                    <rect key="frame" x="100" y="0.0" width="320" height="99"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="eHV-1q-1DG">
-                                            <rect key="frame" x="5" y="5" width="95.5" height="89"/>
+                                            <rect key="frame" x="5" y="5" width="89" height="89"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22 Apr 22 10:10" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fnr-Qm-BJe" userLabel="date">
-                                                    <rect key="frame" x="0.0" y="0.0" width="95.5" height="16.5"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="89" height="16.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dGn-BM-a9i" userLabel="Airports">
-                                                    <rect key="frame" x="0.0" y="24.5" width="95.5" height="16"/>
+                                                    <rect key="frame" x="0.0" y="24.5" width="89" height="16"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="EGTF,OCK," textAlignment="natural" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BsR-3f-wqd" userLabel="route">
-                                                    <rect key="frame" x="0.0" y="48.5" width="95.5" height="16.5"/>
+                                                    <rect key="frame" x="0.0" y="48.5" width="89" height="16.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="knq-lT-6lR">
-                                                    <rect key="frame" x="0.0" y="73" width="95.5" height="16"/>
+                                                    <rect key="frame" x="0.0" y="73" width="89" height="16"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                     <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
@@ -251,18 +373,18 @@
                                             </constraints>
                                         </stackView>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="f5y-BP-W6W">
-                                            <rect key="frame" x="105.5" y="5" width="723.5" height="89"/>
+                                            <rect key="frame" x="99" y="5" width="316" height="89"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Xjg-gc-MoM">
-                                                    <rect key="frame" x="641.5" y="0.0" width="82" height="22.5"/>
+                                                    <rect key="frame" x="244" y="0.0" width="72" height="22.5"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4PB-Ye-NdT">
-                                                            <rect key="frame" x="0.0" y="5" width="41" height="12"/>
+                                                            <rect key="frame" x="0.0" y="5" width="36" height="12"/>
                                                             <color key="tintColor" systemColor="labelColor"/>
                                                             <imageReference key="image" image="timer" catalog="system" symbolScale="small"/>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y30-6u-gfG" userLabel="totaltime">
-                                                            <rect key="frame" x="41" y="1.5" width="41" height="19.5"/>
+                                                            <rect key="frame" x="36" y="1.5" width="36" height="19.5"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
@@ -273,15 +395,15 @@
                                                     </constraints>
                                                 </stackView>
                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="bSU-XE-FhV">
-                                                    <rect key="frame" x="641.5" y="22.5" width="82" height="22"/>
+                                                    <rect key="frame" x="244" y="22.5" width="72" height="22"/>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kWF-h7-DKy">
-                                                            <rect key="frame" x="0.0" y="3" width="41" height="16"/>
+                                                            <rect key="frame" x="0.0" y="3" width="36" height="16"/>
                                                             <color key="tintColor" systemColor="labelColor"/>
                                                             <imageReference key="image" image="airplane.departure" catalog="system" symbolScale="small"/>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TJ6-sh-rHB" userLabel="flighttime">
-                                                            <rect key="frame" x="41" y="1.5" width="41" height="18.5"/>
+                                                            <rect key="frame" x="36" y="1.5" width="36" height="18.5"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
@@ -292,13 +414,13 @@
                                                     </constraints>
                                                 </stackView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20 gal" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bU9-Ql-uYs" userLabel="fuel">
-                                                    <rect key="frame" x="676" y="44.5" width="47.5" height="22.5"/>
+                                                    <rect key="frame" x="275.5" y="44.5" width="40.5" height="22.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="200 nm" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QPY-lw-LJx" userLabel="distance">
-                                                    <rect key="frame" x="664.5" y="67" width="59" height="22"/>
+                                                    <rect key="frame" x="266.5" y="67" width="49.5" height="22"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -393,7 +515,7 @@
             <objects>
                 <navigationController id="SpX-dd-qC9" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="yUG-iT-RMB">
-                        <rect key="frame" x="0.0" y="24" width="834" height="50"/>
+                        <rect key="frame" x="0.0" y="24" width="420" height="50"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -410,7 +532,7 @@
                 <splitViewController allowDoubleColumnStyle="YES" id="UzS-5f-0Gy" customClass="MainSplitViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <connections>
                         <segue destination="SpX-dd-qC9" kind="relationship" relationship="masterViewController" id="4XW-om-kZr"/>
-                        <segue destination="jUv-0p-pFh" kind="relationship" relationship="detailViewController" id="egr-bJ-nog"/>
+                        <segue destination="VbP-r0-aJq" kind="relationship" relationship="detailViewController" id="egr-bJ-nog"/>
                         <segue destination="SpX-dd-qC9" kind="relationship" relationship="compactViewController" id="4dG-fB-oSt"/>
                     </connections>
                 </splitViewController>
@@ -418,15 +540,40 @@
             </objects>
             <point key="canvasLocation" x="-1633" y="801"/>
         </scene>
+        <!--Log Detail Tab Bar Controller-->
+        <scene sceneID="1mA-0R-1KR">
+            <objects>
+                <tabBarController storyboardIdentifier="LogDetailTabBarController" automaticallyAdjustsScrollViewInsets="NO" id="VbP-r0-aJq" customClass="LogDetailTabBarController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="L3u-cI-Bev">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="jUv-0p-pFh" kind="relationship" relationship="viewControllers" id="0ZO-f2-Ddq"/>
+                        <segue destination="9Nf-CY-m6R" kind="relationship" relationship="viewControllers" id="eLJ-yQ-zhg"/>
+                        <segue destination="Ixv-6V-WSf" kind="relationship" relationship="viewControllers" id="rRH-bd-ha2"/>
+                        <segue destination="tIL-BH-og2" kind="relationship" relationship="viewControllers" id="1af-Bv-7hF"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7Wo-SB-lJ9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-221.58273381294967" y="867.3366834170854"/>
+        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="4dG-fB-oSt"/>
+        <segue reference="4XW-om-kZr"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="airplane.departure" catalog="system" width="128" height="84"/>
-        <image name="timer" catalog="system" width="128" height="123"/>
+        <image name="airplane.departure" catalog="system" width="128" height="83"/>
+        <image name="chart.xyaxis.line" catalog="system" width="128" height="101"/>
+        <image name="fuelpump" catalog="system" width="128" height="122"/>
+        <image name="map" catalog="system" width="128" height="110"/>
+        <image name="tablecells" catalog="system" width="128" height="93"/>
+        <image name="timer" catalog="system" width="128" height="121"/>
         <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>

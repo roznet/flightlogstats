@@ -19,18 +19,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
         
-        guard
-          let splitViewController = window?.rootViewController as? MainSplitViewController,
-          let leftNavController = splitViewController.viewControllers.first
-            as? UINavigationController,
-          let masterViewController = leftNavController.viewControllers.first
-            as? LogListTableViewController,
-          let rightNavController = splitViewController.viewControllers.last as? UINavigationController,
-          let detailViewController = rightNavController.viewControllers.first
-            as? LogDetailViewController
-          else { fatalError() }
-
-        masterViewController.delegate = detailViewController
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
