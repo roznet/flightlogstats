@@ -100,6 +100,13 @@ class DisplayContext {
         return String(format: "%.1f nm", distance )
     }
 
+    func formatValue(numberWithUnit : GCNumberWithUnit, converted to: GCUnit? = nil) -> String {
+        if let to = to {
+            return numberWithUnit.convert(to: to).description
+        }
+        return numberWithUnit.description
+    }
+    
     func formatValue(gallon : Double) -> String {
         let val = GCNumberWithUnit(GCUnit.from(logFileUnit: "gals"), andValue: gallon)
         return val.description

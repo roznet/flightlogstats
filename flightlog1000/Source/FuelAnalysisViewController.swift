@@ -20,7 +20,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate {
     
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     
-    var fuelDataSource : FlightSummaryFuelDataSource? = nil
+    var fuelDataSource : FuelAnalysisDataSource? = nil
     
     var flightLogViewModel : FlightLogViewModel? = nil
     var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
@@ -54,7 +54,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate {
             if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
                     if self.flightLogViewModel != nil && self.fuelCollectionView != nil {
-                        self.fuelDataSource = self.flightLogViewModel?.fuelDataSource
+                        self.fuelDataSource = self.flightLogViewModel?.fuelAnalysisDataSource
                         self.fuelCollectionView.dataSource = self.fuelDataSource
                         self.fuelCollectionView.delegate = self.fuelDataSource
                         if let tableCollectionLayout = self.fuelCollectionView.collectionViewLayout as? TableCollectionViewLayout {

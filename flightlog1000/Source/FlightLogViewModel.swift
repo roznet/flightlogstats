@@ -23,6 +23,7 @@ class FlightLogViewModel {
     var legsDataSource : FlightLegsDataSource? = nil
     var fuelDataSource : FlightSummaryFuelDataSource? = nil
     var timeDataSource : FlightSummaryTimeDataSource? = nil
+    var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
     
     // MARK: - Setup
     init(fileInfo : FlightLogFileInfo, displayContext : DisplayContext, progress : ProgressReport? = nil){
@@ -44,6 +45,9 @@ class FlightLogViewModel {
             
             self.timeDataSource = FlightSummaryTimeDataSource(flightSummary: summary, displayContext: displayContext)
             self.timeDataSource?.prepare()
+            
+            self.fuelAnalysisDataSource = FuelAnalysisDataSource(flightSummary: summary, displayContext: displayContext)
+            self.fuelAnalysisDataSource?.prepare()
             
             if let legs = self.flightLogFileInfo.flightLog?.legs {
                 let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: displayContext)

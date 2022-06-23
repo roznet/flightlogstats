@@ -15,6 +15,7 @@
 		4209D8612860F4A600B79A07 /* LogDetailTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D8602860F4A600B79A07 /* LogDetailTabBarController.swift */; };
 		4209D864286187CB00B79A07 /* FuelAnalysisViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D863286187CB00B79A07 /* FuelAnalysisViewController.swift */; };
 		4209D8662861881300B79A07 /* LogGraphsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D8652861881300B79A07 /* LogGraphsViewController.swift */; };
+		421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */; };
 		42478A5128153EF300212BF2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42478A5028153EF300212BF2 /* Log.swift */; };
 		425D04F72832F47B0028FD67 /* RZFlight in Frameworks */ = {isa = PBXBuildFile; productRef = 425D04F62832F47B0028FD67 /* RZFlight */; };
 		425D04FA2832FCFE0028FD67 /* secrets.json in Resources */ = {isa = PBXBuildFile; fileRef = 425D04F92832FCFE0028FD67 /* secrets.json */; };
@@ -101,6 +102,7 @@
 		4209D8602860F4A600B79A07 /* LogDetailTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailTabBarController.swift; path = Source/LogDetailTabBarController.swift; sourceTree = "<group>"; };
 		4209D863286187CB00B79A07 /* FuelAnalysisViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysisViewController.swift; path = Source/FuelAnalysisViewController.swift; sourceTree = "<group>"; };
 		4209D8652861881300B79A07 /* LogGraphsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogGraphsViewController.swift; path = Source/LogGraphsViewController.swift; sourceTree = "<group>"; };
+		421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysisDataSource.swift; path = Source/FuelAnalysisDataSource.swift; sourceTree = "<group>"; };
 		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
 		425D04F92832FCFE0028FD67 /* secrets.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = secrets.json; sourceTree = "<group>"; };
 		425D04FB283451F30028FD67 /* airports.db */ = {isa = PBXFileReference; lastKnownFileType = file; name = airports.db; path = python/airports.db; sourceTree = SOURCE_ROOT; };
@@ -199,6 +201,7 @@
 				425D04FF2834521C0028FD67 /* FlightLegsDataSource.swift */,
 				4204FCA92855F6BF006D753F /* FlightSummaryFuelDataSource.swift */,
 				4204FCAB2855FF6C006D753F /* FlightSummaryTimeDataSource.swift */,
+				421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */,
 			);
 			name = DataSources;
 			sourceTree = "<group>";
@@ -558,6 +561,7 @@
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,
+				421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */,
 				4264C23E2826922C00F40436 /* TimeRange.swift in Sources */,
 				425D05002834521C0028FD67 /* FlightLegsDataSource.swift in Sources */,
 				4280C8C1280D467400A0FB32 /* FlightLogFile.swift in Sources */,
