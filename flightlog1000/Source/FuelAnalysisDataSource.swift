@@ -13,10 +13,9 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
     let flightSummary : FlightSummary
     let displayContext : DisplayContext
     
-    
-    var fuelTarget : FuelQuantity
-    var fuelAdded : FuelQuantity
-    
+    var aircraft : Aircraft
+    var fuelAnalysis : FuelAnalysis
+        
     var fuelTargetUnit : GCUnit
     var fuelAddedUnit : GCUnit
     
@@ -35,10 +34,13 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
         self.fuelTargetUnit = GCUnit.usgallon()
         self.fuelAddedUnit = GCUnit.liter()
 
-        fuelTarget = FuelQuantity(total: 92.0, unit:self.fuelTargetUnit)
-        
-        self.fuelAdded = FuelQuantity(total: 10.0, unit: self.fuelAddedUnit)
-        
+        self.aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0, unit:GCUnit.usgallon()),
+                                 fuelTab: FuelQuantity(total: 60.0, unit:GCUnit.usgallon()),
+                                 gph: 17.0)
+        self.fuelAnalysis = FuelAnalysis(aircraft: self.aircraft,
+                                         current: flightSummary.fuelEnd,
+                                         target: FuelQuantity(total: 70.0, unit:GCUnit.usgallon()),
+                                         added: FuelQuantity(left: 29.0, right: 31.0, unit: self.fuelAddedUnit))
     }
     
     //MARK: - delegate
@@ -64,6 +66,18 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
         self.sections += 1
     }
     
+    func addLine(name : String, endurance fuel : FuelQuantity) {
+        let value = GCNumberWithUnit(unit: GCUnit.second(), andValue: fuel.total)
+        self.attributedCells.append(NSAttributedString(string: name, attributes: self.titleAttributes))
+        self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(numberWithUnit: value, converted: GCUnit.minute()),
+                                                       attributes: self.cellAttributes))
+        self.attributedCells.append(NSAttributedString(string: "",
+                                                       attributes: self.cellAttributes))
+        self.attributedCells.append(NSAttributedString(string: "",
+                                                       attributes: self.cellAttributes))
+        self.sections += 1
+    }
+    
     func prepare() {
         
         self.attributedCells  = []
@@ -73,21 +87,23 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
         }
         self.sections = 1
         
+        self.addLine(name: "Current", fuel: self.fuelAnalysis.currentFuel, unit: self.fuelTargetUnit)
         self.addSeparator()
         
+        
         for (name,fuel,unit) in [
-            ("Current", self.flightSummary.fuelEnd, GCUnit.usgallon()),
-            ("Target", self.fuelTarget, GCUnit.usgallon()),
-            ("Added", self.fuelAdded, GCUnit.liter()),
+            ("Target", self.self.fuelAnalysis.targetFuel, GCUnit.usgallon()),
+            ("Target Save", self.fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
         ] {
             self.addLine(name: name, fuel: fuel, unit: unit)
         }
         
+        self.addLine(name: "Lost Endurance", endurance: self.fuelAnalysis.targetSave)
         self.addSeparator()
         
         for (name,fuel,unit) in [
-            ("Total", self.flightSummary.fuelEnd+self.fuelAdded, GCUnit.usgallon()),
-            ("Added", self.fuelAdded, GCUnit.avgasKilogram()),
+            ("Total", self.fuelAnalysis.addedTotal, GCUnit.usgallon()),
+            ("Added", self.fuelAnalysis.addedfuel, GCUnit.avgasKilogram()),
         ] {
             self.addLine(name: name, fuel: fuel, unit: unit)
         }

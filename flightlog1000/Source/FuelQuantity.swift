@@ -7,6 +7,7 @@
 
 import Foundation
 import RZUtils
+import OSLog
 
 struct FuelQuantity {
     static let gallon : Double = 3.785411784
@@ -26,22 +27,40 @@ struct FuelQuantity {
     init(left : Double, right : Double, unit : GCUnit = GCUnit.usgallon()) {
         self.left = left
         self.right = right
-        self.unit = GCUnit.usgallon()
+        self.unit = unit
     }
     
     init(total: Double, unit : GCUnit = GCUnit.usgallon()){
         self.left = total / 2.0
         self.right = total / 2.0
-        self.unit = GCUnit.usgallon()
+        self.unit = unit
     }
 }
 
 func -(left: FuelQuantity,right:FuelQuantity) -> FuelQuantity{
-    return FuelQuantity(left: left.left-right.left, right: left.right-right.right)
+    if left.unit.isEqual(to: right.unit){
+        return FuelQuantity(left: left.left-right.left, right: left.right-right.right, unit: left.unit)
+    }else if left.unit.canConvert(to: right.unit) {
+        let converted = right.convert(to: left.unit)
+        return FuelQuantity(left: left.left-converted.left, right: left.right-converted.right, unit: left.unit)
+    }else{
+        // do diff anyway
+        Logger.app.warning("Incompatible FuelQuantity units \(left.unit), \(right.unit)")
+        return FuelQuantity(left: left.left-right.left, right: left.right-right.right, unit: left.unit)
+    }
 }
 
 func +(left: FuelQuantity,right:FuelQuantity) -> FuelQuantity{
-    return FuelQuantity(left: left.left+right.left, right: left.right+right.right)
+    if left.unit.isEqual(to: right.unit){
+        return FuelQuantity(left: left.left+right.left, right: left.right+right.right, unit: left.unit)
+    }else if left.unit.canConvert(to: right.unit) {
+        let converted = right.convert(to: left.unit)
+        return FuelQuantity(left: left.left+converted.left, right: left.right+converted.right, unit: left.unit)
+    }else{
+        // do diff anyway
+        Logger.app.warning("Incompatible FuelQuantity units \(left.unit), \(right.unit)")
+        return FuelQuantity(left: left.left+right.left, right: left.right+right.right, unit: left.unit)
+    }
 }
 
 

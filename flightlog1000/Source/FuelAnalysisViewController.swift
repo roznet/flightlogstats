@@ -8,7 +8,7 @@
 import UIKit
 import OSLog
 
-class FuelAnalysisViewController: UIViewController, ViewModelDelegate {
+class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextViewDelegate {
     
     @IBOutlet weak var fuelTargetField: UITextField!
     @IBOutlet weak var fuelTargetSegment: UISegmentedControl!
@@ -67,6 +67,16 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate {
                     self.view.setNeedsDisplay()
                 }
             }
+        }
+    }
+    
+    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+        return true
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        if textView == self.fuelTargetField {
+            Logger.app.info("Target changed \(textView)")
         }
     }
 }
