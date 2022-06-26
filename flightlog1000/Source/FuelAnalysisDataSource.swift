@@ -10,6 +10,8 @@ import OSLog
 import RZUtils
 
 class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionDelegate {
+    typealias Endurance = Aircraft.Endurance
+    
     let flightSummary : FlightSummary
     let displayContext : DisplayContext
     
@@ -66,10 +68,9 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
         self.sections += 1
     }
     
-    func addLine(name : String, endurance fuel : FuelQuantity) {
-        let value = GCNumberWithUnit(unit: GCUnit.second(), andValue: fuel.total)
+    func addLine(name : String, endurance  : Endurance) {
         self.attributedCells.append(NSAttributedString(string: name, attributes: self.titleAttributes))
-        self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(numberWithUnit: value, converted: GCUnit.minute()),
+        self.attributedCells.append(NSAttributedString(string: self.displayContext.formatHHMM(interval: endurance),
                                                        attributes: self.cellAttributes))
         self.attributedCells.append(NSAttributedString(string: "",
                                                        attributes: self.cellAttributes))
@@ -88,27 +89,39 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
         self.sections = 1
         
         self.addLine(name: "Current", fuel: self.fuelAnalysis.currentFuel, unit: self.fuelTargetUnit)
+        self.addLine(name: "Current Endurance", endurance: self.fuelAnalysis.currentEndurance)
         self.addSeparator()
         
         
         for (name,fuel,unit) in [
             ("Target", self.self.fuelAnalysis.targetFuel, GCUnit.usgallon()),
+            ("Target Required", self.fuelAnalysis.targetAdd, self.fuelAddedUnit),
             ("Target Save", self.fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
         ] {
             self.addLine(name: name, fuel: fuel, unit: unit)
         }
         
-        self.addLine(name: "Lost Endurance", endurance: self.fuelAnalysis.targetSave)
+        self.addLine(name: "Target Endurance", endurance: self.fuelAnalysis.targetEndurance)
+        self.addLine(name: "Target Lost Endurance", endurance: self.fuelAnalysis.targetLostEndurance)
         self.addSeparator()
         
         for (name,fuel,unit) in [
-            ("Total", self.fuelAnalysis.addedTotal, GCUnit.usgallon()),
-            ("Added", self.fuelAnalysis.addedfuel, GCUnit.avgasKilogram()),
+            ("Added", self.fuelAnalysis.addedfuel, self.fuelTargetUnit),
+             ("", self.fuelAnalysis.addedfuel, self.fuelAddedUnit),
         ] {
             self.addLine(name: name, fuel: fuel, unit: unit)
         }
 
-    }
+        self.addSeparator()
+        for (name,fuel,unit) in [
+            ("New Total", self.fuelAnalysis.addedTotal, GCUnit.usgallon()),
+            ("New Save", self.fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
+        ] {
+            self.addLine(name: name, fuel: fuel, unit: unit)
+        }
+        self.addLine(name: "New Endurance", endurance: self.fuelAnalysis.addedTotalEndurance)
+        self.addLine(name: "Lost Endurance", endurance: self.fuelAnalysis.addedLostEndurance)
+   }
     
     func attributedString(at indexPath : IndexPath) -> NSAttributedString {
         let index = indexPath.section * 4 + indexPath.item

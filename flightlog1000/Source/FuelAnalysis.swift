@@ -22,11 +22,13 @@ class FuelAnalysis {
     var addedTotal : FuelQuantity  { return self.currentFuel + self.addedfuel }
     var addedSave : FuelQuantity { return self.aircraft.fuelMax - self.addedTotal }
     
+    var currentEndurance : Endurance { return self.aircraft.endurance(fuel: self.currentFuel) }
     var addedTotalEndurance : Endurance { return self.aircraft.endurance(fuel: self.addedTotal ) }
     var targetEndurance : Endurance { return self.aircraft.endurance(fuel: self.targetFuel) }
     
     var addedLostEndurance : Endurance { return self.aircraft.endurance(fuel: self.addedSave) }
-    
+    var targetLostEndurance : Endurance { return self.aircraft.endurance(fuel: self.targetSave) }
+
     init(aircraft : Aircraft, current : FuelQuantity, target : FuelQuantity, added : FuelQuantity){
         self.aircraft = aircraft
         self.currentFuel = current

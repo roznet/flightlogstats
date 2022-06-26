@@ -38,10 +38,14 @@ class DisplayContext {
         return String(format: "%.1f", timeRange.elapsed / 3600.0 )
     }
     
+    func formatHHMM(interval : TimeInterval) -> String {
+        let hours = floor(interval / 3600.0)
+        let minutes = floor((interval - (hours * 3600.0))/60.0)
+        return String(format: "%02.0fh%02.0fm", hours,minutes )
+    }
+    
     func formatHHMM(timeRange : TimeRange) -> String {
-        let hours = floor(timeRange.elapsed / 3600.0)
-        let minutes = floor((timeRange.elapsed - (hours * 3600.0))/60.0)
-        return String(format: "%02.0f:%02.0f", hours,minutes )
+        return self.formatHHMM(interval: timeRange.elapsed)
     }
     
     func format(route : [Waypoint] ) -> String {
