@@ -12,14 +12,9 @@ import RZUtils
 class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionDelegate {
     typealias Endurance = Aircraft.Endurance
     
+    weak var flightLogViewModel : FlightLogViewModel?
     let flightSummary : FlightSummary
-    let displayContext : DisplayContext
-    
-    var aircraft : Aircraft
-    var fuelAnalysis : FuelAnalysis
-        
-    var fuelTargetUnit : GCUnit
-    var fuelAddedUnit : GCUnit
+    private var displayContext : DisplayContext
     
     private var attributedCells : [NSAttributedString] = []
     
@@ -29,20 +24,11 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
     private(set) var sections : Int = 0
     private(set) var items : Int = 4
     
-    init(flightSummary : FlightSummary, aircraft : Aircraft, displayContext : DisplayContext = DisplayContext()){
+    init(flightSummary : FlightSummary,
+         flightViewModel : FlightLogViewModel){
         self.flightSummary = flightSummary
-        self.displayContext = displayContext
-        
-        self.fuelTargetUnit = GCUnit.usgallon()
-        self.fuelAddedUnit = GCUnit.liter()
-
-        self.aircraft = aircraft
-        
-        self.fuelAnalysis = FuelAnalysis(aircraft: self.aircraft,
-                                         current: flightSummary.fuelEnd,
-                                         target: FuelQuantity(total: 70.0, unit:GCUnit.usgallon()),
-                                         added: FuelQuantity(left: 29.0, right: 31.0, unit: self.fuelAddedUnit))
-
+        self.flightLogViewModel = flightViewModel
+        self.displayContext = DisplayContext()
     }
     
     //MARK: - delegate
@@ -81,46 +67,60 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
     
     func prepare() {
         
-        self.attributedCells  = []
-        
-        for title in [ "Fuel", "Total", "Left", "Right" ] {
-            self.attributedCells.append(NSAttributedString(string: title, attributes: self.titleAttributes))
-        }
-        self.sections = 1
-        
-        self.addLine(name: "Current", fuel: self.fuelAnalysis.currentFuel, unit: self.fuelTargetUnit)
-        self.addLine(name: "Current Endurance", endurance: self.fuelAnalysis.currentEndurance)
-        self.addSeparator()
-        
-        
-        for (name,fuel,unit) in [
-            ("Target", self.self.fuelAnalysis.targetFuel, GCUnit.usgallon()),
-            ("Target Required", self.fuelAnalysis.targetAdd, self.fuelAddedUnit),
-            ("Target Save", self.fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
-        ] {
-            self.addLine(name: name, fuel: fuel, unit: unit)
+        if let displayContext = self.flightLogViewModel?.displayContext {
+            self.displayContext = displayContext
         }
         
-        self.addLine(name: "Target Endurance", endurance: self.fuelAnalysis.targetEndurance)
-        self.addLine(name: "Target Lost Endurance", endurance: self.fuelAnalysis.targetLostEndurance)
-        self.addSeparator()
-        
-        for (name,fuel,unit) in [
-            ("Added", self.fuelAnalysis.addedfuel, self.fuelTargetUnit),
-             ("", self.fuelAnalysis.addedfuel, self.fuelAddedUnit),
-        ] {
-            self.addLine(name: name, fuel: fuel, unit: unit)
+        if let aircraft = self.flightLogViewModel?.aircraft,
+           let inputs = self.flightLogViewModel?.fuelAnalysisInputs,
+           let fuelTargetUnit = self.flightLogViewModel?.fuelTargetUnit,
+           let fuelAddedUnit = self.flightLogViewModel?.fuelAddedUnit {
+            
+            let fuelAnalysis = FuelAnalysis(aircraft: aircraft,
+                                            current: flightSummary.fuelEnd,
+                                            inputs: inputs)
+            
+            
+            self.attributedCells  = []
+            
+            for title in [ "Fuel", "Total", "Left", "Right" ] {
+                self.attributedCells.append(NSAttributedString(string: title, attributes: self.titleAttributes))
+            }
+            self.sections = 1
+            
+            self.addLine(name: "Current", fuel: fuelAnalysis.currentFuel, unit: fuelTargetUnit)
+            self.addLine(name: "Current Endurance", endurance: fuelAnalysis.currentEndurance)
+            self.addSeparator()
+            
+            for (name,fuel,unit) in [
+                ("Target", fuelAnalysis.targetFuel, GCUnit.usgallon()),
+                ("Target Required", fuelAnalysis.targetAdd, fuelAddedUnit),
+                ("Target Save", fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
+            ] {
+                self.addLine(name: name, fuel: fuel, unit: unit)
+            }
+            
+            self.addLine(name: "Target Endurance", endurance: fuelAnalysis.targetEndurance)
+            self.addLine(name: "Target Lost Endurance", endurance: fuelAnalysis.targetLostEndurance)
+            self.addSeparator()
+            
+            for (name,fuel,unit) in [
+                ("Added", fuelAnalysis.addedFuel, fuelTargetUnit),
+                ("", fuelAnalysis.addedFuel, fuelAddedUnit),
+            ] {
+                self.addLine(name: name, fuel: fuel, unit: unit)
+            }
+            
+            self.addSeparator()
+            for (name,fuel,unit) in [
+                ("New Total", fuelAnalysis.addedTotal, GCUnit.usgallon()),
+                ("New Save", fuelAnalysis.addedSave, GCUnit.avgasKilogram()),
+            ] {
+                self.addLine(name: name, fuel: fuel, unit: unit)
+            }
+            self.addLine(name: "New Endurance", endurance: fuelAnalysis.addedTotalEndurance)
+            self.addLine(name: "Lost Endurance", endurance: fuelAnalysis.addedLostEndurance)
         }
-
-        self.addSeparator()
-        for (name,fuel,unit) in [
-            ("New Total", self.fuelAnalysis.addedTotal, GCUnit.usgallon()),
-            ("New Save", self.fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
-        ] {
-            self.addLine(name: name, fuel: fuel, unit: unit)
-        }
-        self.addLine(name: "New Endurance", endurance: self.fuelAnalysis.addedTotalEndurance)
-        self.addLine(name: "Lost Endurance", endurance: self.fuelAnalysis.addedLostEndurance)
    }
     
     func attributedString(at indexPath : IndexPath) -> NSAttributedString {

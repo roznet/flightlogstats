@@ -9,7 +9,7 @@ import Foundation
 import RZUtils
 import OSLog
 
-struct FuelQuantity {
+struct FuelQuantity : Comparable {
     static let gallon : Double = 3.785411784
     static let zero = FuelQuantity(left: 0.0, right: 0.0)
     static let kilogramPerLiter = 0.71
@@ -34,6 +34,30 @@ struct FuelQuantity {
         self.left = total / 2.0
         self.right = total / 2.0
         self.unit = unit
+    }
+    
+    static func < (lhs : FuelQuantity, rhs : FuelQuantity) -> Bool {
+        if lhs.unit.isEqual(to: rhs.unit) {
+            return lhs.total < rhs.total
+        }else if lhs.unit.canConvert(to: rhs.unit) {
+            let converted = rhs.convert(to: lhs.unit)
+            return lhs.total < converted.total
+        }else{
+            Logger.app.warning("Incompatible FuelQuantity units \(lhs.unit), \(rhs.unit)")
+            return lhs.total < rhs.total
+        }
+    }
+    
+    static func == (lhs : FuelQuantity, rhs : FuelQuantity) -> Bool {
+        if lhs.unit.isEqual(to: rhs.unit) {
+            return lhs.total == rhs.total
+        }else if lhs.unit.canConvert(to: rhs.unit) {
+            let converted = rhs.convert(to: lhs.unit)
+            return lhs.total == converted.total
+        }else{
+            Logger.app.warning("Incompatible FuelQuantity units \(lhs.unit), \(rhs.unit)")
+            return lhs.total == rhs.total
+        }
     }
 }
 
@@ -62,6 +86,8 @@ func +(left: FuelQuantity,right:FuelQuantity) -> FuelQuantity{
         return FuelQuantity(left: left.left+right.left, right: left.right+right.right, unit: left.unit)
     }
 }
+
+
 
 
 extension FuelQuantity {

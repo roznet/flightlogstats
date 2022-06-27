@@ -23,10 +23,10 @@ final class TestAnalysis: XCTestCase {
         let aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0),
                                 fuelTab: FuelQuantity(total: 60.0),
                                 gph: 17.0)
+        let fuelInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: 70.0), addedfuel: FuelQuantity(left: 29.0, right: 31.0, unit: GCUnit.liter()))
         let fuelAnalysis = FuelAnalysis(aircraft: aircraft,
                                         current: FuelQuantity(left: 30.5, right: 32.2, unit: GCUnit.usgallon()),
-                                        target: FuelQuantity(total: 70.0),
-                                        added: FuelQuantity(left: 29.0, right: 31.0, unit: GCUnit.liter()))
+                                        inputs: fuelInputs)
         
         XCTAssertEqual( fuelAnalysis.addedTotal.totalWithUnit.description, "78.6 gal")
         let second = GCNumberWithUnit(unit: GCUnit.second(), andValue: fuelAnalysis.addedTotalEndurance)

@@ -21,7 +21,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     
-    var fuelDataSource : FuelAnalysisDataSource? = nil
+    var fuelDataSource : FuelAnalysisDataSource? { return self.flightLogViewModel?.fuelAnalysisDataSource }
     
     var flightLogViewModel : FlightLogViewModel? = nil
     var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
@@ -62,13 +62,10 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     }
     func updateUI(){
         AppDelegate.worker.async {
-            
+            self.flightLogViewModel?.build()
             if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
                     if self.flightLogViewModel != nil && self.fuelCollectionView != nil {
-                        
-                        
-                        self.fuelDataSource = self.flightLogViewModel?.fuelAnalysisDataSource
                         self.fuelCollectionView.dataSource = self.fuelDataSource
                         self.fuelCollectionView.delegate = self.fuelDataSource
                         if let tableCollectionLayout = self.fuelCollectionView.collectionViewLayout as? TableCollectionViewLayout {
@@ -117,14 +114,25 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     }
     
     @objc func textViewDidChange(_ textView: UITextView) {
-        if let value = Double(textView.text) {
+        if let value = Double(textView.text),
+           var newInputs = self.flightLogViewModel?.fuelAnalysisInputs {
             
             if textView == self.fuelTargetField {
                 Logger.app.info("Target changed \(value)")
+                newInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: value, unit: newInputs.targetFuel.unit),
+                                                addedfuel: newInputs.addedfuel)
             }else if( textView == self.fuelAddedLeftField ){
                 Logger.app.info("Left changed \(value)")
+                newInputs = FuelAnalysis.Inputs(targetFuel: newInputs.targetFuel,
+                                                addedfuel: FuelQuantity(left: value, right: newInputs.addedfuel.right, unit: newInputs.addedfuel.unit))
             }else if( textView == self.fuelAddedRightField ){
                 Logger.app.info("Right changed \(value)")
+                newInputs = FuelAnalysis.Inputs(targetFuel: newInputs.targetFuel,
+                                                addedfuel: FuelQuantity(left: newInputs.addedfuel.left, right: value, unit: newInputs.addedfuel.unit))
+            }
+            if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
+                self.flightLogViewModel?.fuelAnalysisInputs = newInputs
+                self.updateUI()
             }
         }
     }

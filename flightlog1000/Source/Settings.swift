@@ -94,5 +94,5 @@ struct Settings {
     @UserStorage(key: .unit_added_fuel, defaultValue: "liter")
     var unitAddedFuel : String
        
-
+    
 }

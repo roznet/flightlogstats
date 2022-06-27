@@ -8,13 +8,15 @@
 import Foundation
 import RZUtils
 
-class Aircraft {
+struct Aircraft {
     typealias Endurance = TimeInterval
     
     let fuelMax : FuelQuantity
     let fuelTab : FuelQuantity
     
     let gph : Double
+    
+    //static let default = Aircraft()
     
     init(fuelMax: FuelQuantity, fuelTab: FuelQuantity, gph: Double) {
         self.fuelMax = fuelMax
@@ -23,7 +25,6 @@ class Aircraft {
     }
     
     func endurance(fuel : FuelQuantity) -> Endurance {
-        
         let inGallon = fuel.convert(to: GCUnit.usgallon())
         return (inGallon.total / gph) * 3600.0
     }
