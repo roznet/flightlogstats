@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RZUtils
 
 extension Notification.Name {
     static let flightLogViewModelChanged : Notification.Name = Notification.Name("Notification.Name.logViewModelChanged")
@@ -25,11 +26,16 @@ class FlightLogViewModel {
     var timeDataSource : FlightSummaryTimeDataSource? = nil
     var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
     
+    var aircraft : Aircraft
+    
     // MARK: - Setup
     init(fileInfo : FlightLogFileInfo, displayContext : DisplayContext, progress : ProgressReport? = nil){
         self.flightLogFileInfo = fileInfo
         self.progress = progress
         self.displayContext = displayContext
+        self.aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0, unit:GCUnit.usgallon()),
+                                 fuelTab: FuelQuantity(total: 60.0, unit:GCUnit.usgallon()),
+                                 gph: 17.0)
     }
 
     func isSameLog(as other : FlightLogFileInfo) -> Bool {
@@ -40,13 +46,15 @@ class FlightLogViewModel {
         self.flightLogFileInfo.parseAndUpdate(progress: self.progress)
         
         if let summary = self.flightLogFileInfo.flightSummary {
+            
+
             self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary, displayContext: displayContext)
             self.fuelDataSource?.prepare()
             
             self.timeDataSource = FlightSummaryTimeDataSource(flightSummary: summary, displayContext: displayContext)
             self.timeDataSource?.prepare()
             
-            self.fuelAnalysisDataSource = FuelAnalysisDataSource(flightSummary: summary, displayContext: displayContext)
+            self.fuelAnalysisDataSource = FuelAnalysisDataSource(flightSummary: summary, aircraft: self.aircraft, displayContext: displayContext)
             self.fuelAnalysisDataSource?.prepare()
             
             if let legs = self.flightLogFileInfo.flightLog?.legs {

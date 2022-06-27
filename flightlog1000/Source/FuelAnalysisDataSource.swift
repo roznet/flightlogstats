@@ -29,20 +29,20 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
     private(set) var sections : Int = 0
     private(set) var items : Int = 4
     
-    init(flightSummary : FlightSummary, displayContext : DisplayContext = DisplayContext()){
+    init(flightSummary : FlightSummary, aircraft : Aircraft, displayContext : DisplayContext = DisplayContext()){
         self.flightSummary = flightSummary
         self.displayContext = displayContext
         
         self.fuelTargetUnit = GCUnit.usgallon()
         self.fuelAddedUnit = GCUnit.liter()
 
-        self.aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0, unit:GCUnit.usgallon()),
-                                 fuelTab: FuelQuantity(total: 60.0, unit:GCUnit.usgallon()),
-                                 gph: 17.0)
+        self.aircraft = aircraft
+        
         self.fuelAnalysis = FuelAnalysis(aircraft: self.aircraft,
                                          current: flightSummary.fuelEnd,
                                          target: FuelQuantity(total: 70.0, unit:GCUnit.usgallon()),
                                          added: FuelQuantity(left: 29.0, right: 31.0, unit: self.fuelAddedUnit))
+
     }
     
     //MARK: - delegate
