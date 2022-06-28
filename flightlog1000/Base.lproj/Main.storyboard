@@ -228,7 +228,7 @@
                                 <rect key="frame" x="5" y="74" width="824" height="60"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5WP-aP-66h">
-                                        <rect key="frame" x="0.0" y="8.5" width="174" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="8.5" width="175" height="43.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" text="Fuel Target" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1o7-kq-3OE">
                                                 <rect key="frame" x="0.0" y="0.0" width="85" height="43.5"/>
@@ -237,12 +237,15 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="60" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="PqG-gQ-uQm">
-                                                <rect key="frame" x="85" y="0.0" width="64" height="43.5"/>
+                                                <rect key="frame" x="85" y="0.0" width="65" height="43.5"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="9k4-OG-Jkm"/>
+                                                </constraints>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                                <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" enablesReturnKeyAutomatically="YES"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" text="/92" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EL0-VA-KsT">
-                                                <rect key="frame" x="149" y="0.0" width="25" height="43.5"/>
+                                                <rect key="frame" x="150" y="0.0" width="25" height="43.5"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -250,7 +253,7 @@
                                         </subviews>
                                     </stackView>
                                     <segmentedControl opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="9Nb-pE-2dl">
-                                        <rect key="frame" x="311" y="14.5" width="203" height="32"/>
+                                        <rect key="frame" x="311.5" y="14.5" width="203" height="32"/>
                                         <segments>
                                             <segment title="Full"/>
                                             <segment title="Tabs"/>
@@ -286,8 +289,11 @@
                                                 <subviews>
                                                     <textField toolTip="Left" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="29" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2Ke-QW-NFk" userLabel="AddedLeft">
                                                         <rect key="frame" x="0.0" y="0.0" width="62" height="43.5"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="62" id="d2J-1I-hK9"/>
+                                                        </constraints>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                                        <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" enablesReturnKeyAutomatically="YES"/>
+                                                        <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     </textField>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Left" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gAz-go-gko">
                                                         <rect key="frame" x="19" y="43.5" width="24" height="16"/>
@@ -309,7 +315,7 @@
                                                     <textField toolTip="Right" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="31" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fCd-gw-jOZ" userLabel="AddedRight">
                                                         <rect key="frame" x="0.0" y="0.0" width="58" height="43.5"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                                        <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" enablesReturnKeyAutomatically="YES"/>
+                                                        <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     </textField>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Right" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="chS-wr-ErF">
                                                         <rect key="frame" x="13" y="43.5" width="32" height="16"/>
@@ -370,9 +376,11 @@
                         <viewLayoutGuide key="safeArea" id="89l-r2-Bdg"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="2Ke-QW-NFk" firstAttribute="width" secondItem="PqG-gQ-uQm" secondAttribute="width" multiplier="0.953846" id="AQL-I2-026"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="bottom" secondItem="hdQ-sd-7Aw" secondAttribute="bottom" constant="20" id="KvZ-81-RcK"/>
                             <constraint firstItem="25Q-Ay-JWf" firstAttribute="top" secondItem="9cQ-fA-Zou" secondAttribute="bottom" constant="10" id="NHR-WX-i6N"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="hdQ-sd-7Aw" secondAttribute="trailing" constant="5" id="PKz-uc-L9y"/>
+                            <constraint firstItem="fCd-gw-jOZ" firstAttribute="width" secondItem="PqG-gQ-uQm" secondAttribute="width" multiplier="0.892308" id="Q7S-0g-MPW"/>
                             <constraint firstItem="hdQ-sd-7Aw" firstAttribute="leading" secondItem="89l-r2-Bdg" secondAttribute="leading" constant="5" id="VjA-w9-n9c"/>
                             <constraint firstItem="9cQ-fA-Zou" firstAttribute="top" secondItem="89l-r2-Bdg" secondAttribute="top" constant="50" id="ZJ0-pO-xrB"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="25Q-Ay-JWf" secondAttribute="trailing" constant="5" id="aly-uJ-NJw"/>
