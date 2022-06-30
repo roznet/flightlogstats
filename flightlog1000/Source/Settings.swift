@@ -75,6 +75,10 @@ struct Settings {
         
         case unit_target_fuel = "unit_target_fuel"
         case unit_added_fuel = "unit_added_fuel"
+        
+        case target_fuel = "target_fuel"
+        case added_fuel_left = "added_fuel_left"
+        case added_fuel_right = "added_fuel_right"
     }
     
     static func registerDefaults() {
@@ -94,5 +98,14 @@ struct Settings {
     @UserStorage(key: .unit_added_fuel, defaultValue: "liter")
     var unitAddedFuel : String
        
+    @UserStorage(key: .added_fuel_left, defaultValue: 5.0)
+    var addedFuelLeft : Double
+
+    @UserStorage(key: .added_fuel_right, defaultValue: 5.0)
+    var addedFuelRight : Double
     
+    @UserStorage(key: .target_fuel, defaultValue: 70.0)
+    var targetFuel : Double
+
+
 }

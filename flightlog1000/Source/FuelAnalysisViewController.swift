@@ -58,8 +58,48 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.setupViewFromSettings()
         self.updateUI()
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.pushViewToSettings()
+    }
+    
+    
+    private func pushViewToSettings() {
+        if let targetFuel =  self.fuelTargetField.text, let value = Double( targetFuel )  {
+            Settings.shared.targetFuel = value
+        }
+        if let addedFuelLeft = self.fuelAddedLeftField.text, let value = Double( addedFuelLeft ) {
+            Settings.shared.addedFuelLeft = value
+        }
+        if let addedFuelRight = self.fuelAddedRightField.text, let value = Double( addedFuelRight ) {
+            Settings.shared.addedFuelRight = value
+        }
+    }
+    
+    private func pushSettingsToView() {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.maximumFractionDigits = 2
+        self.fuelTargetField.text = numberFormatter.string(from: NSNumber(floatLiteral: Settings.shared.targetFuel))
+        self.fuelAddedRightField.text = numberFormatter.string(from: NSNumber(floatLiteral: Settings.shared.addedFuelRight))
+        self.fuelAddedLeftField.text = numberFormatter.string(from: NSNumber(floatLiteral: Settings.shared.addedFuelLeft))
+    }
+    
+    private func setupViewFromSettings() {
+        if let targetUnit = GCUnit(forKey: Settings.shared.unitTargetFuel),
+           let addedUnit = GCUnit(forKey: Settings.shared.unitAddedFuel) {
+            let newInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: Settings.shared.targetFuel, unit: targetUnit),
+                                                addedfuel: FuelQuantity(left: Settings.shared.addedFuelLeft , right: Settings.shared.addedFuelRight , unit: addedUnit))
+            if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
+                viewModel.fuelAnalysisInputs = newInputs
+            }
+        }
+        self.pushSettingsToView()
+    }
+
     func updateUI(){
         AppDelegate.worker.async {
             self.flightLogViewModel?.build()
@@ -133,9 +173,11 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
             if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
                 self.flightLogViewModel?.fuelAnalysisInputs = newInputs
                 self.updateUI()
+                self.pushViewToSettings()
             }
         }
     }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return false
