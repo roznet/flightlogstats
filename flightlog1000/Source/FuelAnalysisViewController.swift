@@ -123,6 +123,9 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     
     // MARK: - Segment and units
     
+    @IBAction func showConfig(_ sender: Any) {
+        
+    }
     @objc func segmentDidChange(_ segment : UISegmentedControl) {
         
         if segment == self.fuelTargetSegment {

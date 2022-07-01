@@ -372,11 +372,20 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r8v-c1-eqN">
+                                <rect key="frame" x="712.5" y="24" width="101.5" height="34.5"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="gearshape" catalog="system" title="Config"/>
+                                <connections>
+                                    <action selector="showConfig:" destination="Ixv-6V-WSf" eventType="touchUpInside" id="UFJ-X8-QRs"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="89l-r2-Bdg"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="2Ke-QW-NFk" firstAttribute="width" secondItem="PqG-gQ-uQm" secondAttribute="width" multiplier="0.953846" id="AQL-I2-026"/>
+                            <constraint firstItem="r8v-c1-eqN" firstAttribute="top" secondItem="89l-r2-Bdg" secondAttribute="top" id="FhG-Kg-QeC"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="bottom" secondItem="hdQ-sd-7Aw" secondAttribute="bottom" constant="20" id="KvZ-81-RcK"/>
                             <constraint firstItem="25Q-Ay-JWf" firstAttribute="top" secondItem="9cQ-fA-Zou" secondAttribute="bottom" constant="10" id="NHR-WX-i6N"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="hdQ-sd-7Aw" secondAttribute="trailing" constant="5" id="PKz-uc-L9y"/>
@@ -386,6 +395,7 @@
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="25Q-Ay-JWf" secondAttribute="trailing" constant="5" id="aly-uJ-NJw"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="9cQ-fA-Zou" secondAttribute="trailing" constant="5" id="jel-IR-Pcg"/>
                             <constraint firstItem="hdQ-sd-7Aw" firstAttribute="top" secondItem="25Q-Ay-JWf" secondAttribute="bottom" constant="50" id="nRB-aa-ywX"/>
+                            <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="r8v-c1-eqN" secondAttribute="trailing" constant="20" id="ncC-m8-gWk"/>
                             <constraint firstItem="9cQ-fA-Zou" firstAttribute="leading" secondItem="89l-r2-Bdg" secondAttribute="leading" constant="5" id="oV4-w0-h07"/>
                             <constraint firstItem="25Q-Ay-JWf" firstAttribute="leading" secondItem="89l-r2-Bdg" secondAttribute="leading" constant="5" id="ydh-gr-7Fy"/>
                         </constraints>
@@ -681,6 +691,7 @@
         <image name="airplane.departure" catalog="system" width="128" height="84"/>
         <image name="chart.xyaxis.line" catalog="system" width="128" height="102"/>
         <image name="fuelpump" catalog="system" width="128" height="122"/>
+        <image name="gearshape" catalog="system" width="128" height="123"/>
         <image name="map" catalog="system" width="128" height="112"/>
         <image name="tablecells" catalog="system" width="128" height="93"/>
         <image name="timer" catalog="system" width="128" height="123"/>
