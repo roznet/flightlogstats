@@ -225,6 +225,10 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
             self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetUnitSegment)
             self.enteredFuelTarget = startFuel
         }
+        if self.flightLogViewModel != nil {
+            self.pushViewToModel()
+            self.updateUI()
+        }
     }
     
     // MARK: - Text Field Editing and fuel values
