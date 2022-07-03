@@ -24,12 +24,12 @@ struct FuelQuantity : Comparable {
     var rightWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: right ) }
     
     /// If one side is negative but total is positive, rebalance to one side to be only positive
-    var rebalancedNegative : FuelQuantity {
-        if self.left < 0.0 && self.right > 0.0 && self.total >= 0.0 {
-            return FuelQuantity(left: 0.0, right: self.total, unit: self.unit)
+    var positiveOnly : FuelQuantity {
+        if self.left < 0.0 && self.right > 0.0  {
+            return FuelQuantity(left: 0.0, right: max(0.0,self.total), unit: self.unit)
         }
-        if self.left > 0.0 && self.right < 0.0 && self.total >= 0.0 {
-            return FuelQuantity(left: self.total, right: 0.0, unit: self.unit)
+        if self.left > 0.0 && self.right < 0.0  {
+            return FuelQuantity(left: max(0.0,self.total), right: 0.0, unit: self.unit)
         }
         return self
     }
@@ -117,12 +117,7 @@ extension FuelQuantity {
 
 func min(_ lhs : FuelQuantity, _ rhs : FuelQuantity) -> FuelQuantity {
     let converted = rhs.convert(to: lhs.unit)
-    var rv = FuelQuantity(left: min(lhs.left,converted.left), right: min(lhs.right,converted.right), unit: lhs.unit)
-    let mintotal = min(lhs.total,converted.total)
-    if mintotal < rv.total {
-        // L:29 R:31  L:30 R:30
-    }
-    return rv
+    return FuelQuantity(left: min(lhs.left,converted.left), right: min(lhs.right,converted.right), unit: lhs.unit)
 }
 
 func max(_ lhs : FuelQuantity, _ rhs : FuelQuantity) -> FuelQuantity {

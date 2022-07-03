@@ -22,7 +22,7 @@ class FuelAnalysis {
     let inputs : Inputs
     
     var targetFuel : FuelQuantity {
-        let toAdd = (self.inputs.targetFuel - self.currentFuel).rebalancedNegative
+        let toAdd = (self.inputs.targetFuel - self.currentFuel).positiveOnly
         
         return max(min(self.currentFuel+toAdd,self.aircraft.fuelMax),self.currentFuel)
         
