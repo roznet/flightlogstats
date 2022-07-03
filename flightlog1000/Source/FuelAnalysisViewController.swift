@@ -132,7 +132,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     private func pushViewToModel() {
         self.flightLogViewModel?.fuelAnalysisInputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded)
         self.flightLogViewModel?.fuelAddedUnit = self.unit(for: self.fuelAddedUnitSegment)
-        self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetSegment)
+        self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetUnitSegment)
     }
         
     private func pushModelToView() {
@@ -140,7 +140,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
             self.enteredFuelAdded = inputs.addedfuel
             self.enteredFuelTarget = inputs.targetFuel
         }
-        self.update(segment: self.fuelTargetSegment, for: self.fuelTargetUnit)
+        self.update(segment: self.fuelTargetUnitSegment, for: self.fuelTargetUnit)
         self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
     }
 
@@ -194,15 +194,23 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     @objc func segmentDidChange(_ segment : UISegmentedControl) {
         
         if segment == self.fuelTargetSegment {
-            
-        }else {
-            let unit : GCUnit = segment.selectedSegmentIndex == 0 ? GCUnit.usgallon() : GCUnit.liter()
-            
-            if segment == self.fuelAddedUnitSegment {
-                print( "fuel added unit \(unit)")
-            }else if segment == self.fuelTargetUnitSegment {
-                
+            if segment.selectedSegmentIndex == 0 {
+                if let newTarget = self.flightLogViewModel?.aircraft.fuelMax {
+                    self.enteredFuelTarget = newTarget
+                }
+            }else if segment.selectedSegmentIndex == 1 {
+                if let newTarget = self.flightLogViewModel?.aircraft.fuelTab {
+                    self.enteredFuelTarget = newTarget
+                }
             }
+        }else if segment == self.fuelAddedUnitSegment {
+            let startFuel = self.enteredFuelAdded
+            self.flightLogViewModel?.fuelAddedUnit = self.unit(for: self.fuelAddedUnitSegment)
+            self.enteredFuelAdded = startFuel
+        }else if segment == self.fuelTargetUnitSegment {
+            let startFuel = self.enteredFuelTarget
+            self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetUnitSegment)
+            self.enteredFuelTarget = startFuel
         }
     }
     
