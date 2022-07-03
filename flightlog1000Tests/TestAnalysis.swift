@@ -55,6 +55,15 @@ final class TestAnalysis: XCTestCase {
                                    inputs: fuelInputs)
         XCTAssertEqual(fuelAnalysis.targetFuel, fuelInputs.targetFuel)
 
+        for one in [
+            FuelQuantity(left: 0.0, right: -1.0),
+            FuelQuantity(left: -1.0, right: -1.0),
+            FuelQuantity(left: 1.0, right: -1.0),
+            FuelQuantity(left: 2.0, right: -1.0),
+        ] {
+            XCTAssertGreaterThanOrEqual(one.positiveOnly.total, 0.0)
+        }
+        
     }
 
 }

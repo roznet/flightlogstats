@@ -23,7 +23,7 @@ struct FuelQuantity : Comparable {
     var leftWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: left ) }
     var rightWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: right ) }
     
-    /// If one side is negative but total is positive, rebalance to one side to be only positive
+    /// make sure the quantity is positive only, but rebalances if one side is positive the other is negative
     var positiveOnly : FuelQuantity {
         if self.left < 0.0 && self.right > 0.0  {
             return FuelQuantity(left: 0.0, right: max(0.0,self.total), unit: self.unit)
@@ -31,7 +31,7 @@ struct FuelQuantity : Comparable {
         if self.left > 0.0 && self.right < 0.0  {
             return FuelQuantity(left: max(0.0,self.total), right: 0.0, unit: self.unit)
         }
-        return self
+        return FuelQuantity(left: max(0.0,self.left), right: max(0.0,self.right), unit: self.unit)
     }
     
     init(left : Double, right : Double, unit : GCUnit = GCUnit.usgallon()) {
