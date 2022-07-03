@@ -28,7 +28,7 @@ class FlightLogFileInfo: NSManagedObject {
     
     weak var container : FlightLogOrganizer? = nil
     
-    /*private*/ var flightLog : FlightLogFile? = nil {
+    var flightLog : FlightLogFile? = nil {
         didSet {
             if let fromLog = self.flightLog?.flightSummary {
                 self.flightSummary = fromLog
@@ -36,6 +36,9 @@ class FlightLogFileInfo: NSManagedObject {
             }
         }
     }
+    
+    var legs : [FlightLeg] { return self.flightLog?.legs ?? [] }
+    
     var infoStatus : InfoStatus {
         get {
             if let status = self.info_status {
@@ -83,11 +86,15 @@ class FlightLogFileInfo: NSManagedObject {
             flightLog.parse(progress:progress)
             do {
                 try self.updateFromFlightLog(flightLog: flightLog)
-                container?.saveContext()
+                self.saveContext()
             }catch{
                 Logger.app.error("Failed to update \(error.localizedDescription)")
             }
         }
+    }
+    
+    func saveContext() {
+        self.container?.saveContext()
     }
     
     //MARK: - get require data from files
@@ -166,15 +173,17 @@ class FlightLogFileInfo: NSManagedObject {
         }
     }
     
-    var totalFuelDescription : String {
-        guard self.requiresVersionUpdate else { return "??" }
-        
-        let end_fuel_r = self.end_fuel_quantity_right
-        let end_fuel_l = self.end_fuel_quantity_left
-        let start_fuel_r = self.start_fuel_quantity_right
-        let start_fuel_l = self.start_fuel_quantity_left
-        let total = (start_fuel_r+start_fuel_l) - (end_fuel_l+end_fuel_r)
-        return String(format: "%.1f gal", total)
+    //MARK: - Fuel Records
+    
+    func ensureFuelRecord() {
+        if self.fuel_record == nil,
+           let container = self.container {
+            let context = container.persistentContainer.viewContext
+            let record = FlightFuelRecord(context: context)
+            // initialise with default
+            record.setupFromSettings()
+            self.fuel_record = record
+            self.saveContext()
+        }
     }
-
 }

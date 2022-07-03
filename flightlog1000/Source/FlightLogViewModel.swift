@@ -30,6 +30,16 @@ class FlightLogViewModel {
         return self.buildState < self.writeState
     }
     
+    private func save() {
+        AppDelegate.worker.async {
+            self.flightLogFileInfo.ensureFuelRecord()
+            if let record = self.flightLogFileInfo.fuel_record {
+                record.fuelAnalysisInputs = self.fuelAnalysisInputs
+                self.flightLogFileInfo.saveContext()
+            }
+        }
+    }
+    
     // MARK: - Utilities
     var progress : ProgressReport?
     
@@ -52,13 +62,17 @@ class FlightLogViewModel {
         self.flightLogFileInfo = fileInfo
         self.progress = progress
         self.displayContext = displayContext
-        self.aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0, unit:GCUnit.usgallon()),
-                                 fuelTab: FuelQuantity(total: 60.0, unit:GCUnit.usgallon()),
-                                 gph: 17.0)
-        self.fuelAnalysisInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: 70.0, unit: GCUnit.usgallon()),
-                                                     addedfuel: FuelQuantity(left: 31, right: 29, unit: GCUnit.liter()))
-        self.fuelTargetUnit = GCUnit.usgallon()
-        self.fuelAddedUnit = GCUnit.liter()
+        self.aircraft = Settings.shared.aircraft
+        fileInfo.ensureFuelRecord()
+        if let record = fileInfo.fuel_record {
+            self.fuelAnalysisInputs = record.fuelAnalysisInputs
+        }else{
+            self.fuelAnalysisInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel,
+                                                          addedfuel: Settings.shared.addedFuel)
+        }
+        
+        self.fuelTargetUnit = Settings.shared.unitTargetFuel
+        self.fuelAddedUnit = Settings.shared.unitAddedFuel
     }
 
     func isSameLog(as other : FlightLogFileInfo) -> Bool {
@@ -81,7 +95,7 @@ class FlightLogViewModel {
             return true
         }
     }
-
+    
     func build() {
         if self.shouldBuild {
             self.flightLogFileInfo.parseAndUpdate(progress: self.progress)
@@ -96,7 +110,8 @@ class FlightLogViewModel {
                 self.fuelAnalysisDataSource = FuelAnalysisDataSource(flightSummary: summary, flightViewModel: self)
                 self.fuelAnalysisDataSource?.prepare()
                 
-                if let legs = self.flightLogFileInfo.flightLog?.legs {
+                let legs = self.flightLogFileInfo.legs
+                if legs.count > 0 {
                     let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: self.displayContext)
                     self.legsDataSource = legsDataSource
                 }else{
@@ -104,7 +119,7 @@ class FlightLogViewModel {
                 }
             }
             NotificationCenter.default.post(name: .flightLogViewModelChanged, object: self)
-            
+            self.save()
             self.didBuild()
         }
     }

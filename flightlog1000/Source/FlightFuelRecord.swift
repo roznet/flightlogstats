@@ -7,7 +7,55 @@
 
 import UIKit
 import CoreData
+import RZUtils
 
 class FlightFuelRecord: NSManagedObject {
 
+    var fuelAnalysisInputs : FuelAnalysis.Inputs {
+        get {
+            return FuelAnalysis.Inputs(targetFuel: self.targetFuel, addedfuel: self.addedFuel)
+        }
+        set {
+            self.targetFuel = newValue.targetFuel
+            self.addedFuel = newValue.addedfuel
+        }
+    }
+    
+    var addedFuel : FuelQuantity {
+        get { return FuelQuantity(left: self.added_fuel_left, right: self.added_fuel_right, unit: Settings.fuelStoreUnit) }
+        set {
+            let ingallons = newValue.convert(to: Settings.fuelStoreUnit)
+            self.added_fuel_left = ingallons.left
+            self.added_fuel_right = ingallons.right
+        }
+    }
+
+    var targetFuel : FuelQuantity {
+        get { return FuelQuantity(total: self.target_fuel, unit: Settings.fuelStoreUnit) }
+        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.target_fuel = ingallons.total }
+    }
+
+    var totalizerStart : FuelQuantity {
+        get { return FuelQuantity(total: self.totalizer_fuel_start, unit: Settings.fuelStoreUnit) }
+        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.totalizer_fuel_start = ingallons.total }
+    }
+    var totalizerEnd : FuelQuantity {
+        get { return FuelQuantity(total: self.totalizer_fuel_end, unit: Settings.fuelStoreUnit) }
+        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.totalizer_fuel_end = ingallons.total }
+    }
+
+    /// setup default from settings
+    func setupFromSettings() {
+        self.target_fuel = Settings.shared.targetFuelTotal
+        self.added_fuel_left = Settings.shared.addedFuelLeft
+        self.added_fuel_right = Settings.shared.addedFuelRight
+    }
+    
+    /// save latest to settings so next new one is same default
+    func saveToSettings() {
+        Settings.shared.targetFuelTotal = self.target_fuel
+        Settings.shared.addedFuelLeft = self.added_fuel_left
+        Settings.shared.addedFuelRight = self.added_fuel_right
+    }
+    
 }

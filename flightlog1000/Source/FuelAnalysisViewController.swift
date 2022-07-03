@@ -21,6 +21,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     
+    
     var fuelDataSource : FuelAnalysisDataSource? { return self.flightLogViewModel?.fuelAnalysisDataSource }
     
     var flightLogViewModel : FlightLogViewModel? = nil
@@ -33,6 +34,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     func viewModelHasChanged(viewModel: FlightLogViewModel) {
         self.flightLogViewModel = viewModel
         DispatchQueue.main.async {
+            self.setupViewFromModel()
             self.updateUI()
         }
     }
@@ -58,46 +60,109 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.setupViewFromSettings()
+        self.setupViewFromModel()
         self.updateUI()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.pushViewToSettings()
+        self.pushViewToModel()
     }
     
+    //MARK: - field to view object links
+    var fuelTargetUnit : GCUnit { return self.flightLogViewModel?.fuelTargetUnit ?? Settings.fuelStoreUnit }
+    var fuelAddedUnit : GCUnit { return self.flightLogViewModel?.fuelAddedUnit ?? Settings.fuelStoreUnit }
     
-    private func pushViewToSettings() {
-        if let targetFuel =  self.fuelTargetField.text, let value = Double( targetFuel )  {
-            Settings.shared.targetFuel = value
+    var enteredFuelTarget : FuelQuantity {
+        get {
+            if let targetFuel =  self.fuelTargetField.text, let value = Double( targetFuel )  {
+                return FuelQuantity(total: value, unit: self.fuelTargetUnit)
+            }
+            return Settings.shared.targetFuel
         }
-        if let addedFuelLeft = self.fuelAddedLeftField.text, let value = Double( addedFuelLeft ) {
-            Settings.shared.addedFuelLeft = value
-        }
-        if let addedFuelRight = self.fuelAddedRightField.text, let value = Double( addedFuelRight ) {
-            Settings.shared.addedFuelRight = value
+        set {
+            let converted = newValue.convert(to: self.fuelTargetUnit)
+            self.fuelTargetField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.total))
         }
     }
-    
-    private func pushSettingsToView() {
+
+    var enteredFuelAdded : FuelQuantity {
+        get {
+            if let addedFuelLeft = self.fuelAddedLeftField.text, let left = Double( addedFuelLeft ),
+               let addedFuelRight = self.fuelAddedRightField.text, let right = Double( addedFuelRight ){
+                return FuelQuantity(left: left, right: right, unit: self.fuelAddedUnit)
+            }
+            return Settings.shared.addedFuel
+        }
+        set {
+            let converted = newValue.convert(to: self.fuelAddedUnit)
+            self.fuelAddedLeftField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.left))
+            self.fuelAddedRightField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.right))
+        }
+    }
+
+    static let fuelFormatter : NumberFormatter = {
         let numberFormatter = NumberFormatter()
         numberFormatter.maximumFractionDigits = 2
-        self.fuelTargetField.text = numberFormatter.string(from: NSNumber(floatLiteral: Settings.shared.targetFuel))
-        self.fuelAddedRightField.text = numberFormatter.string(from: NSNumber(floatLiteral: Settings.shared.addedFuelRight))
-        self.fuelAddedLeftField.text = numberFormatter.string(from: NSNumber(floatLiteral: Settings.shared.addedFuelLeft))
+        return numberFormatter
+    }()
+    
+    
+    func update(segment : UISegmentedControl, for unit : GCUnit){
+        if unit.isEqual(to: GCUnit.usgallon() ){
+            segment.selectedSegmentIndex = 0
+        }else if unit.isEqual(to: GCUnit.liter()){
+            segment.selectedSegmentIndex = 1
+        }else{
+            Logger.app.error("Invalid unit \(unit) for segment")
+        }
     }
     
-    private func setupViewFromSettings() {
-        if let targetUnit = GCUnit(forKey: Settings.shared.unitTargetFuel),
-           let addedUnit = GCUnit(forKey: Settings.shared.unitAddedFuel) {
-            let newInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: Settings.shared.targetFuel, unit: targetUnit),
+    func unit(for segment : UISegmentedControl) -> GCUnit {
+        if segment.selectedSegmentIndex == 0 {
+            return GCUnit.usgallon()
+        }else if segment.selectedSegmentIndex == 1 {
+            return GCUnit.liter()
+        }
+        Logger.app.error("Invalid segment for unit")
+        return GCUnit.usgallon()
+    }
+    
+    //MARK: - sync view and model
+    private func pushViewToModel() {
+        self.flightLogViewModel?.fuelAnalysisInputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded)
+        self.flightLogViewModel?.fuelAddedUnit = self.unit(for: self.fuelAddedUnitSegment)
+        self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetSegment)
+    }
+        
+    private func pushModelToView() {
+        if let inputs = self.flightLogViewModel?.fuelAnalysisInputs {
+            self.enteredFuelAdded = inputs.addedfuel
+            self.enteredFuelTarget = inputs.targetFuel
+        }
+        self.update(segment: self.fuelTargetSegment, for: self.fuelTargetUnit)
+        self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
+    }
+
+    private func setupViewFromModel() {
+        // Make sure UI ready
+        guard self.fuelTargetField != nil else { return }
+        
+        self.flightLogFileInfo?.ensureFuelRecord()
+        if let record = self.flightLogFileInfo?.fuel_record {
+            self.enteredFuelAdded = record.addedFuel
+            self.enteredFuelTarget = record.targetFuel
+        }else{
+            let targetUnit = Settings.shared.unitTargetFuel
+            let addedUnit = Settings.shared.unitAddedFuel
+            let newInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: Settings.shared.targetFuelTotal, unit: targetUnit),
                                                 addedfuel: FuelQuantity(left: Settings.shared.addedFuelLeft , right: Settings.shared.addedFuelRight , unit: addedUnit))
             if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
                 viewModel.fuelAnalysisInputs = newInputs
             }
         }
-        self.pushSettingsToView()
+        self.update(segment: self.fuelTargetSegment, for: self.fuelTargetUnit)
+        self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
     }
 
     func updateUI(){
@@ -148,36 +213,17 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if let previousString = textField.text,
+        /*if let previousString = textField.text,
            let range = Range(range, in: previousString) {
             let newString = previousString.replacingCharacters(in: range, with: string)
-            print(newString)
-        }
+        }*/
         return true
     }
     
     @objc func textViewDidChange(_ textView: UITextView) {
-        if let value = Double(textView.text),
-           var newInputs = self.flightLogViewModel?.fuelAnalysisInputs {
-            
-            if textView == self.fuelTargetField {
-                Logger.app.info("Target changed \(value)")
-                newInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: value, unit: newInputs.targetFuel.unit),
-                                                addedfuel: newInputs.addedfuel)
-            }else if( textView == self.fuelAddedLeftField ){
-                Logger.app.info("Left changed \(value)")
-                newInputs = FuelAnalysis.Inputs(targetFuel: newInputs.targetFuel,
-                                                addedfuel: FuelQuantity(left: value, right: newInputs.addedfuel.right, unit: newInputs.addedfuel.unit))
-            }else if( textView == self.fuelAddedRightField ){
-                Logger.app.info("Right changed \(value)")
-                newInputs = FuelAnalysis.Inputs(targetFuel: newInputs.targetFuel,
-                                                addedfuel: FuelQuantity(left: newInputs.addedfuel.left, right: value, unit: newInputs.addedfuel.unit))
-            }
-            if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
-                self.flightLogViewModel?.fuelAnalysisInputs = newInputs
-                self.updateUI()
-                self.pushViewToSettings()
-            }
+        self.pushViewToModel()
+        if let viewModel = self.flightLogViewModel {
+            self.updateUI()
         }
     }
     

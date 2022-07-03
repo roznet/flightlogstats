@@ -200,13 +200,24 @@ class TestOrganizer: XCTestCase {
         XCTAssertEqual(reload.managedFlightLogs.count,1)
         organizer.loadFromContainer()
         XCTAssertEqual(reload.managedFlightLogs.count,1)
+        XCTAssertNotNil(reload.flightLogFileInfos.first?.fuel_record)
         if let info = reload.flightLogFileInfos.first,
            let record = info.fuel_record {
             XCTAssertEqual( record.target_fuel, 75.0)
+            record.target_fuel = 80.0
+            organizer.saveContext()
         }
-
+        
+        let reload2 = FlightLogOrganizer()
+        reload2.persistentContainer = container
+        XCTAssertEqual(reload2.managedFlightLogs.count,0)
+        reload2.loadFromContainer()
+        XCTAssertNotNil(reload2.flightLogFileInfos.first?.fuel_record)
+        if let info = reload2.flightLogFileInfos.first,
+           let record = info.fuel_record {
+            XCTAssertEqual( record.target_fuel, 80.0)
+        }
+        
         expectation.fulfill()
     }
-
-
 }

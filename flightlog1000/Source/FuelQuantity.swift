@@ -87,7 +87,11 @@ func +(left: FuelQuantity,right:FuelQuantity) -> FuelQuantity{
     }
 }
 
-
+extension FuelQuantity : CustomStringConvertible {
+    var description: String {
+        return "FuelQuantity(total: \(self.total) \(self.unit.abbr))"
+    }
+}
 
 
 extension FuelQuantity {
@@ -97,4 +101,14 @@ extension FuelQuantity {
         }
         return self
     }
+}
+
+func min(_ lhs : FuelQuantity, _ rhs : FuelQuantity) -> FuelQuantity {
+    let converted = rhs.convert(to: lhs.unit)
+    return FuelQuantity(left: min(lhs.left,converted.left), right: min(lhs.right,converted.right), unit: lhs.unit)
+}
+
+func max(_ lhs : FuelQuantity, _ rhs : FuelQuantity) -> FuelQuantity {
+    let converted = rhs.convert(to: lhs.unit)
+    return FuelQuantity(left: max(lhs.left,converted.left), right: max(lhs.right,converted.right), unit: lhs.unit)
 }
