@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="FlightFuelRecord" representedClassName=".FlightFuelRecord" syncable="YES" codeGenerationType="category">
+        <attribute name="added_fuel_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="added_fuel_right" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="log_file_name" optional="YES" attributeType="String"/>
+        <attribute name="target_fuel" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="totalizer_fuel_end" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="totalizer_fuel_start" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileInfo" inverseName="fuel_record" inverseEntity="FlightLogFileInfo"/>
+    </entity>
     <entity name="FlightLogFileInfo" representedClassName=".FlightLogFileInfo" syncable="YES" codeGenerationType="category">
         <attribute name="airframe_name" optional="YES" attributeType="String"/>
         <attribute name="end_airport_icao" optional="YES" attributeType="String"/>
@@ -20,8 +29,10 @@
         <attribute name="system_id" optional="YES" attributeType="String"/>
         <attribute name="total_distance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="fuel_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFuelRecord" inverseName="log_file_info" inverseEntity="FlightFuelRecord"/>
     </entity>
     <elements>
-        <element name="FlightLogFileInfo" positionX="-63" positionY="-18" width="128" height="314"/>
+        <element name="FlightFuelRecord" positionX="-327.4898681640625" positionY="165.2957763671875" width="128" height="148"/>
+        <element name="FlightLogFileInfo" positionX="-533.6739501953125" positionY="160.4337158203125" width="128" height="343"/>
     </elements>
 </model>
