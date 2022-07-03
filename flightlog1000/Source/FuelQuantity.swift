@@ -14,7 +14,6 @@ struct FuelQuantity : Comparable {
     static let zero = FuelQuantity(left: 0.0, right: 0.0)
     static let kilogramPerLiter = 0.71
     
-    
     let unit : GCUnit
     let left : Double
     let right : Double
@@ -23,6 +22,17 @@ struct FuelQuantity : Comparable {
     var totalWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: left+right) }
     var leftWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: left ) }
     var rightWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: right ) }
+    
+    /// If one side is negative but total is positive, rebalance to one side to be only positive
+    var rebalancedNegative : FuelQuantity {
+        if self.left < 0.0 && self.right > 0.0 && self.total >= 0.0 {
+            return FuelQuantity(left: 0.0, right: self.total, unit: self.unit)
+        }
+        if self.left > 0.0 && self.right < 0.0 && self.total >= 0.0 {
+            return FuelQuantity(left: self.total, right: 0.0, unit: self.unit)
+        }
+        return self
+    }
     
     init(left : Double, right : Double, unit : GCUnit = GCUnit.usgallon()) {
         self.left = left
@@ -93,9 +103,11 @@ extension FuelQuantity : CustomStringConvertible {
     }
 }
 
-
 extension FuelQuantity {
     func convert(to : GCUnit) -> FuelQuantity{
+        if self.unit.isEqual(to: to) {
+            return self
+        }
         if to.canConvert(to: self.unit) {
             return FuelQuantity(left: to.convert(self.left, from: self.unit), right: to.convert(self.right, from: self.unit), unit: to)
         }
@@ -105,7 +117,12 @@ extension FuelQuantity {
 
 func min(_ lhs : FuelQuantity, _ rhs : FuelQuantity) -> FuelQuantity {
     let converted = rhs.convert(to: lhs.unit)
-    return FuelQuantity(left: min(lhs.left,converted.left), right: min(lhs.right,converted.right), unit: lhs.unit)
+    var rv = FuelQuantity(left: min(lhs.left,converted.left), right: min(lhs.right,converted.right), unit: lhs.unit)
+    let mintotal = min(lhs.total,converted.total)
+    if mintotal < rv.total {
+        // L:29 R:31  L:30 R:30
+    }
+    return rv
 }
 
 func max(_ lhs : FuelQuantity, _ rhs : FuelQuantity) -> FuelQuantity {

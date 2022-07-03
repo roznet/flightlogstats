@@ -80,11 +80,7 @@ class FlightLogViewModel {
     }
     
     func isValid(target : FuelQuantity) -> Bool {
-        if let summary = self.flightLogFileInfo.flightSummary {
-            return target >= summary.fuelEnd && target < self.aircraft.fuelMax
-        }else{
-            return true
-        }
+        return true
     }
 
     func isValid(added : FuelQuantity) -> Bool {

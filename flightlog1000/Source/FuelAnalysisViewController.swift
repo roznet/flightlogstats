@@ -144,6 +144,18 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
         self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
     }
 
+    private func checkViewConsistency() {
+        if let aircraft = self.flightLogViewModel?.aircraft {
+            if self.enteredFuelTarget == aircraft.fuelMax {
+                self.fuelTargetSegment.selectedSegmentIndex = 0
+            }else if self.enteredFuelTarget == aircraft.fuelTab {
+                self.fuelTargetSegment.selectedSegmentIndex = 1
+            }else{
+                self.fuelTargetSegment.selectedSegmentIndex = 2
+            }
+        }
+    }
+    
     private func setupViewFromModel() {
         // Make sure UI ready
         guard self.fuelTargetField != nil else { return }
@@ -163,6 +175,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
         }
         self.update(segment: self.fuelTargetSegment, for: self.fuelTargetUnit)
         self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
+        self.checkViewConsistency()
     }
 
     func updateUI(){
@@ -230,7 +243,8 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
     
     @objc func textViewDidChange(_ textView: UITextView) {
         self.pushViewToModel()
-        if let viewModel = self.flightLogViewModel {
+        self.checkViewConsistency()
+        if self.flightLogViewModel != nil {
             self.updateUI()
         }
     }
