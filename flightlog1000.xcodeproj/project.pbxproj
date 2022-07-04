@@ -19,6 +19,7 @@
 		4239290D2864D08800CD33C0 /* Aircraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290C2864D08800CD33C0 /* Aircraft.swift */; };
 		4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */; };
 		423929112864D58800CD33C0 /* TestAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423929102864D58800CD33C0 /* TestAnalysis.swift */; };
+		423EF3532872E78900EA7415 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423EF3522872E78900EA7415 /* SettingsViewController.swift */; };
 		42478A5128153EF300212BF2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42478A5028153EF300212BF2 /* Log.swift */; };
 		425A8DE2287094BD002DCB0C /* FlightFuelRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425A8DE1287094BD002DCB0C /* FlightFuelRecord.swift */; };
 		425D04F72832F47B0028FD67 /* RZFlight in Frameworks */ = {isa = PBXBuildFile; productRef = 425D04F62832F47B0028FD67 /* RZFlight */; };
@@ -110,6 +111,7 @@
 		4239290C2864D08800CD33C0 /* Aircraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Aircraft.swift; path = Source/Aircraft.swift; sourceTree = "<group>"; };
 		4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysis.swift; path = Source/FuelAnalysis.swift; sourceTree = "<group>"; };
 		423929102864D58800CD33C0 /* TestAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAnalysis.swift; sourceTree = "<group>"; };
+		423EF3522872E78900EA7415 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsViewController.swift; path = Source/SettingsViewController.swift; sourceTree = "<group>"; };
 		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
 		425A8DE1287094BD002DCB0C /* FlightFuelRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightFuelRecord.swift; path = Source/FlightFuelRecord.swift; sourceTree = "<group>"; };
 		425D04F92832FCFE0028FD67 /* secrets.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = secrets.json; sourceTree = "<group>"; };
@@ -226,12 +228,23 @@
 		4209D8622861878900B79A07 /* DetailViews */ = {
 			isa = PBXGroup;
 			children = (
+				423EF3522872E78900EA7415 /* SettingsViewController.swift */,
 				4209D8602860F4A600B79A07 /* LogDetailTabBarController.swift */,
 				4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */,
 				4209D863286187CB00B79A07 /* FuelAnalysisViewController.swift */,
 				4209D8652861881300B79A07 /* LogGraphsViewController.swift */,
 			);
 			name = DetailViews;
+			sourceTree = "<group>";
+		};
+		423EF3512872E74900EA7415 /* MainListViews */ = {
+			isa = PBXGroup;
+			children = (
+				4264C22F281D830000F40436 /* MainSplitViewController.swift */,
+				4280C8B9280D460500A0FB32 /* LogListTableViewController.swift */,
+				4264C231281D9A0700F40436 /* LogListTableViewCell.swift */,
+			);
+			name = MainListViews;
 			sourceTree = "<group>";
 		};
 		42478A4F28153EBE00212BF2 /* Utils */ = {
@@ -310,15 +323,13 @@
 		4280C8AE280D458B00A0FB32 /* UserInterface */ = {
 			isa = PBXGroup;
 			children = (
+				423EF3512872E74900EA7415 /* MainListViews */,
+				4209D8622861878900B79A07 /* DetailViews */,
 				4209D85D2860DDBE00B79A07 /* Table */,
 				4209D85C2860DD9500B79A07 /* DataSources */,
-				4209D8622861878900B79A07 /* DetailViews */,
 				4280C886280D43E500A0FB32 /* Assets.xcassets */,
 				4280C883280D43E400A0FB32 /* Main.storyboard */,
 				4209D85E2860DDF000B79A07 /* FlightLogViewModel.swift */,
-				4264C22F281D830000F40436 /* MainSplitViewController.swift */,
-				4280C8B9280D460500A0FB32 /* LogListTableViewController.swift */,
-				4264C231281D9A0700F40436 /* LogListTableViewCell.swift */,
 			);
 			name = UserInterface;
 			sourceTree = "<group>";
@@ -584,6 +595,7 @@
 				429949D7282816A100CA1B89 /* DisplayContext.swift in Sources */,
 				4264C23828267F6600F40436 /* Waypoint.swift in Sources */,
 				429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */,
+				423EF3532872E78900EA7415 /* SettingsViewController.swift in Sources */,
 				429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */,
 				4209D8612860F4A600B79A07 /* LogDetailTabBarController.swift in Sources */,
 				4280C8BD280D460600A0FB32 /* SceneDelegate.swift in Sources */,
@@ -777,6 +789,7 @@
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlog1000/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -810,6 +823,7 @@
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlog1000/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

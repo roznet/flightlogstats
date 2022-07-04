@@ -103,7 +103,7 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
 
     static let fuelFormatter : NumberFormatter = {
         let numberFormatter = NumberFormatter()
-        numberFormatter.maximumFractionDigits = 2
+        numberFormatter.maximumFractionDigits = 1
         return numberFormatter
     }()
     
@@ -167,8 +167,8 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
         }else{
             let targetUnit = Settings.shared.unitTargetFuel
             let addedUnit = Settings.shared.unitAddedFuel
-            let newInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: Settings.shared.targetFuelTotal, unit: targetUnit),
-                                                addedfuel: FuelQuantity(left: Settings.shared.addedFuelLeft , right: Settings.shared.addedFuelRight , unit: addedUnit))
+            let newInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel.convert(to: targetUnit),
+                                                addedfuel: Settings.shared.addedFuel.convert(to: addedUnit))
             if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
                 viewModel.fuelAnalysisInputs = newInputs
             }

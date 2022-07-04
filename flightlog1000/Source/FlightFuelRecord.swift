@@ -46,16 +46,14 @@ class FlightFuelRecord: NSManagedObject {
 
     /// setup default from settings
     func setupFromSettings() {
-        self.target_fuel = Settings.shared.targetFuelTotal
-        self.added_fuel_left = Settings.shared.addedFuelLeft
-        self.added_fuel_right = Settings.shared.addedFuelRight
+        self.targetFuel = Settings.shared.targetFuel
+        self.addedFuel = Settings.shared.addedFuel
     }
     
     /// save latest to settings so next new one is same default
     func saveToSettings() {
-        Settings.shared.targetFuelTotal = self.target_fuel
-        Settings.shared.addedFuelLeft = self.added_fuel_left
-        Settings.shared.addedFuelRight = self.added_fuel_right
+        Settings.shared.addedFuel = self.addedFuel
+        Settings.shared.targetFuel = self.targetFuel
     }
     
 }

@@ -383,6 +383,9 @@
                                 <buttonConfiguration key="configuration" style="plain" image="gearshape" catalog="system" title="Config"/>
                                 <connections>
                                     <action selector="showConfig:" destination="Ixv-6V-WSf" eventType="touchUpInside" id="UFJ-X8-QRs"/>
+                                    <segue destination="rwj-Ou-8lY" kind="popoverPresentation" popoverAnchorView="r8v-c1-eqN" id="216-YI-8DU">
+                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                    </segue>
                                 </connections>
                             </button>
                         </subviews>
@@ -417,6 +420,90 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2eR-rn-c1b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-326.61870503597123" y="1710.5527638190954"/>
+        </scene>
+        <!--Settings View Controller-->
+        <scene sceneID="1Ya-r9-PFR">
+            <objects>
+                <viewController id="rwj-Ou-8lY" customClass="SettingsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="2uz-q1-TX9">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="493"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="GU4-th-mSz">
+                                <rect key="frame" x="5" y="8" width="195.5" height="102"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I29-fW-aax">
+                                        <rect key="frame" x="0.0" y="0.0" width="195.5" height="34"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Maximum Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J16-lI-GnY">
+                                                <rect key="frame" x="0.0" y="0.0" width="149.5" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="92" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="iGY-wM-bHq">
+                                                <rect key="frame" x="149.5" y="0.0" width="46" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits"/>
+                                            </textField>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QgF-xl-L95">
+                                        <rect key="frame" x="0.0" y="34" width="195.5" height="34"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tab Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qpd-JB-xKS">
+                                                <rect key="frame" x="0.0" y="0.0" width="149.5" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="60" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="q97-GF-00Q">
+                                                <rect key="frame" x="149.5" y="0.0" width="46" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits"/>
+                                            </textField>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BvO-CV-F3f">
+                                        <rect key="frame" x="0.0" y="68" width="195.5" height="34"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="gal / hour" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pag-k2-e0X">
+                                                <rect key="frame" x="0.0" y="0.0" width="133.5" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="17" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wH9-FN-Lpe">
+                                                <rect key="frame" x="133.5" y="0.0" width="62" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits"/>
+                                            </textField>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="iGY-wM-bHq" firstAttribute="width" secondItem="q97-GF-00Q" secondAttribute="width" id="0eV-bd-kfD"/>
+                                    <constraint firstAttribute="trailing" secondItem="I29-fW-aax" secondAttribute="trailing" constant="5" id="QrZ-64-LOm"/>
+                                    <constraint firstItem="q97-GF-00Q" firstAttribute="width" secondItem="wH9-FN-Lpe" secondAttribute="width" multiplier="0.742972" id="wGW-eK-AlS"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="PAF-0K-2Ab"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="GU4-th-mSz" firstAttribute="leading" secondItem="PAF-0K-2Ab" secondAttribute="leading" constant="5" id="4Gf-x7-1dr"/>
+                            <constraint firstItem="PAF-0K-2Ab" firstAttribute="top" secondItem="GU4-th-mSz" secondAttribute="top" constant="5" id="NLO-Wh-Gyt"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="gphField" destination="wH9-FN-Lpe" id="NMU-N6-jsf"/>
+                        <outlet property="maxFuelField" destination="iGY-wM-bHq" id="aP4-Z6-e89"/>
+                        <outlet property="tabFuelField" destination="q97-GF-00Q" id="ac7-lh-EGW"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Mp6-Mv-eJF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-616.54676258992811" y="2403.5175879396984"/>
         </scene>
         <!--Graphs View Controller-->
         <scene sceneID="VeH-AF-dEi">

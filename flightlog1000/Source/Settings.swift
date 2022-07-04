@@ -128,22 +128,22 @@ struct Settings {
     var unitAddedFuel : GCUnit
        
     @UserStorage(key: .added_fuel_left, defaultValue: 5.0)
-    var addedFuelLeft : Double
+    private var addedFuelLeft : Double
 
     @UserStorage(key: .added_fuel_right, defaultValue: 5.0)
-    var addedFuelRight : Double
+    private var addedFuelRight : Double
     
     @UserStorage(key: .target_fuel, defaultValue: 70.0)
-    var targetFuelTotal : Double
+    private var targetFuelTotal : Double
 
     @UserStorage(key: .aircraft_max_fuel, defaultValue: 92.0)
-    var aircraftMaxFuelTotal : Double
+    private var aircraftMaxFuelTotal : Double
     
     @UserStorage(key: .aircraft_tab_fuel, defaultValue: 60.0)
-    var aircraftTabFuelTotal : Double
+    private var aircraftTabFuelTotal : Double
 
     @UserStorage(key: .aircraft_gph, defaultValue: 17.0)
-    var aircraftGph : Double
+    private var aircraftGph : Double
 
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }
@@ -162,6 +162,11 @@ struct Settings {
         get { return Aircraft(fuelMax: FuelQuantity(total: self.aircraftMaxFuelTotal, unit: Self.fuelStoreUnit),
                               fuelTab: FuelQuantity(total: self.aircraftTabFuelTotal, unit: Self.fuelStoreUnit),
                               gph: self.aircraftGph)}
+        set {
+            self.aircraftMaxFuelTotal = newValue.fuelMax.total
+            self.aircraftTabFuelTotal = newValue.fuelTab.total
+            self.aircraftGph = newValue.gph
+        }
     }
 }
 
