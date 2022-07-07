@@ -19,6 +19,7 @@ class FlightLogFileList {
     
     var urls : [URL] { return self.flightLogFiles.map { $0.url } }
         
+    var first : FlightLogFile? { return self.flightLogFiles.first }
     
     var count : Int { return urls.count }
     

@@ -139,7 +139,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
+                if let first = self.logList?.first,let info = self.logFileOrganizer[first.name]  {
+                    self.delegate?.logInfoSelected(info)
+                }else{
+                    self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
+                }
             }
         }
         NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
@@ -147,7 +151,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
+                if let first = self.logList?.first,
+                   let info = self.logFileOrganizer[first.name] {
+                    self.delegate?.logInfoSelected(info)
+                }else{
+                    self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
+                }
             }
         }
         /*
@@ -163,6 +172,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         self.buildList()
     }
     
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self)
@@ -240,7 +250,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                     self.tableView.reloadData()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now()+0.5){
-                    self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
+                    if let first = self.logList?.first,
+                       let info = self.logFileOrganizer[first.name] {
+                        self.delegate?.logInfoSelected(info)
+                    }else{
+                        self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
+                    }
                 }
             }
         }else{
