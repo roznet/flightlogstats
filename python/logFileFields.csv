@@ -24,13 +24,14 @@ WptDst,22,nm,Distance to next waypoint ,nm
 FQtyT,23,gals,Fuel Qty Total,gals
 FQtyL,24,gals,Fuel Qty Left ,gals
 FQtyR,25,gals,Fuel Qty Right ,gals
-HSIS,26,enum,HSI source,
-NAV1,27,MHz,Nav1 frequency,
-NAV2,28,MHz,Nav2 frequency,
-COM1,29,MHz,Com1 frequency,
-COM2,30,MHz,Com2 frequency,
-AfcsOn,31,bool,Autopilot On/Off,
-GPSfix,32,enum,GPSfix,
+FTotalizerT,26,gals,Fuel Totalizer Total,gals
+HSIS,27,enum,HSI source,
+NAV1,28,MHz,Nav1 frequency,
+NAV2,29,MHz,Nav2 frequency,
+COM1,30,MHz,Com1 frequency,
+COM2,31,MHz,Com2 frequency,
+AfcsOn,32,bool,Autopilot On/Off,
+GPSfix,33,enum,GPSfix,
 E1 FFlow,100,gph,Fuel Flow ,gph
 E1 MAP,101,Hg,E1 MAP,
 E1 RPM,102,rpm,E1 RPM,

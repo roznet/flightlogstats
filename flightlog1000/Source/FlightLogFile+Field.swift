@@ -101,6 +101,7 @@ extension FlightLogFile {
         case Distance = "Distance"
         case WndDirect = "WndDirect"
         case WndCross  = "WndCross"
+        case FTotalizerT = "FTotalizerT"
         
         var displayName : String { return self.rawValue }
         
@@ -341,9 +342,12 @@ extension FlightLogFile.Field {
             return context.formatStats(speed: valueStats)
         case .WndDirect:
             return context.formatStats(speed: valueStats)
+        case .FTotalizerT:
+            return context.formatStats(gallon: valueStats, used: false)
         case .UTCOfst:
             return ""
         }
+    
     }
 }
 

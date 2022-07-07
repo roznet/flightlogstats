@@ -11,23 +11,39 @@ struct FieldCalculation {
     typealias Field = FlightLogFile.Field
     let output : Field
     let inputs : [Field]
+    let initial : Double
     let calcFunc : ([Double]) -> Double
     
-    init(output : Field, inputs: [Field], calcFunc : @escaping ([Double])->Double){
+    init(output : Field, inputs: [Field], initial : Double = 0.0, calcFunc : @escaping ([Double])->Double){
         self.output = output
         self.inputs = inputs
         self.calcFunc = calcFunc
+        self.initial = initial
     }
     
-    func evaluate(line : [Double], fieldsMap : [Field:Int]) -> Double{
+    func evaluate(line : [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> Double{
         var doubles : [Double] = []
         for field in self.inputs {
-            if let idx = fieldsMap[field],
-               let val = line[safe: idx],
-               val.isFinite {
-                doubles.append(val)
+            if field == self.output {
+                if let previousLine = previousLine {
+                    if let idx = fieldsMap[field],
+                       let val = previousLine[safe: idx],
+                       val.isFinite {
+                        doubles.append(val)
+                    }else{
+                        return .nan
+                    }
+                }else{
+                    doubles.append(self.initial)
+                }
             }else{
-                return .nan
+                if let idx = fieldsMap[field],
+                   let val = line[safe: idx],
+                   val.isFinite {
+                    doubles.append(val)
+                }else{
+                    return .nan
+                }
             }
         }
         return self.calcFunc(doubles)
@@ -56,6 +72,10 @@ struct FieldCalculation {
             }
             let component = __cospi(diff/180.0) * -1.0
             return x[1] * component
+        },
+        FieldCalculation(output: .FTotalizerT, inputs: [.FTotalizerT,.E1_FFlow]){
+            x in
+            return x[0] + (x[1]/3600.0)
         }
     ]
 }

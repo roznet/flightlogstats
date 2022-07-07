@@ -459,6 +459,7 @@ extension FlightData {
                 // add calculated fields
                 data.doubleFields.append(.Distance)
                 for field in FieldCalculation.calculatedFields {
+                    fieldsMap[field.output] = data.doubleFields.count
                     data.doubleFields.append(field.output)
                 }
             }else if line.count == columnIsDouble.count {
@@ -549,6 +550,11 @@ extension FlightData {
                 }
                 // match order with what was added for fields
                 doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
+                
+                for calcField in FieldCalculation.calculatedFields {
+                    doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                }
+
                 for field in self.doubleInputs.keys {
                     if let idx = fieldsMap[field] {
                         let val = doubleLine[idx]
@@ -558,11 +564,7 @@ extension FlightData {
                         self.doubleInputs[field]?.removeFirst()
                     }
                 }
-                
-                for calcField in FieldCalculation.calculatedFields {
-                    doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap))
-                }
-                
+
                 data.values.append(doubleLine)
                 data.strings.append(stringLine)
             }

@@ -175,50 +175,57 @@
     "unit_description": "gals"
   },
   {
-    "field": "HSIS",
+    "field": "FTotalizerT",
     "order": 26,
+    "unit": "gals",
+    "description": "Fuel Totalizer Total",
+    "unit_description": "gals"
+  },
+  {
+    "field": "HSIS",
+    "order": 27,
     "unit": "enum",
     "description": "HSI source",
     "unit_description": ""
   },
   {
     "field": "NAV1",
-    "order": 27,
+    "order": 28,
     "unit": "MHz",
     "description": "Nav1 frequency",
     "unit_description": ""
   },
   {
     "field": "NAV2",
-    "order": 28,
+    "order": 29,
     "unit": "MHz",
     "description": "Nav2 frequency",
     "unit_description": ""
   },
   {
     "field": "COM1",
-    "order": 29,
+    "order": 30,
     "unit": "MHz",
     "description": "Com1 frequency",
     "unit_description": ""
   },
   {
     "field": "COM2",
-    "order": 30,
+    "order": 31,
     "unit": "MHz",
     "description": "Com2 frequency",
     "unit_description": ""
   },
   {
     "field": "AfcsOn",
-    "order": 31,
+    "order": 32,
     "unit": "bool",
     "description": "Autopilot On/Off",
     "unit_description": ""
   },
   {
     "field": "GPSfix",
-    "order": 32,
+    "order": 33,
     "unit": "enum",
     "description": "GPSfix",
     "unit_description": ""
