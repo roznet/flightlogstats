@@ -30,6 +30,7 @@ class FlightSummary {
     let fuelStart : FuelQuantity
     let fuelEnd : FuelQuantity
     var fuelUsed : FuelQuantity { return self.fuelStart - self.fuelEnd }
+    var fuelTotalizer : FuelQuantity
     
     private let engineOn : TimeRange?
     let moving : TimeRange?
@@ -77,6 +78,7 @@ class FlightSummary {
         
         self.fuelStart = FuelQuantity(left: info.start_fuel_quantity_left, right: info.start_fuel_quantity_right)
         self.fuelEnd = FuelQuantity(left: info.end_fuel_quantity_left, right: info.end_fuel_quantity_right)
+        self.fuelTotalizer = FuelQuantity(total: info.fuel_totalizer_total)
         self.distance = info.total_distance
         
         if let start_airport_icao = info.start_airport_icao {
@@ -88,7 +90,7 @@ class FlightSummary {
     }
     
     init( data : FlightData) throws {
-        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance] )
+        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT] )
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd, minimumMatchCount: 5) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
@@ -103,6 +105,7 @@ class FlightSummary {
             
             self.fuelEnd = FuelQuantity.zero
             self.fuelStart = FuelQuantity.zero
+            self.fuelTotalizer = FuelQuantity.zero
             self.distance = 0.0
             self.route = []
             return
@@ -131,9 +134,11 @@ class FlightSummary {
         let fuel_start_r = values.first(field: .FQtyR)?.value ?? 0.0
         let fuel_end_l = values.last(field: .FQtyL)?.value ?? 0.0
         let fuel_end_r = values.last(field: .FQtyR)?.value ?? 0.0
+        let fuel_totalizer = values.last(field: .FTotalizerT)?.value ?? 0.0
         
         self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r)
         self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
+        self.fuelTotalizer = FuelQuantity(total: fuel_totalizer)
         
         self.distance = values.last(field: .Distance)?.value ?? 0.0
 

@@ -38,22 +38,28 @@ class FlightSummaryFuelDataSource: NSObject, UICollectionViewDataSource, UIColle
         
         self.attributedCells  = []
         
-        for title in [ "Fuel", "Total", "Left", "Right" ] {
+        for title in [ "Fuel", "Total", "Left", "Right", "Totalizer" ] {
             self.attributedCells.append(NSAttributedString(string: title, attributes: self.titleAttributes))
         }
-        for (name,fuel) in [("Start", self.flightSummary.fuelStart),
-                          ("End", self.flightSummary.fuelEnd),
-                          ("Used", self.flightSummary.fuelUsed)
+        for (name,fuel,totalizer) in [("Start", self.flightSummary.fuelStart,FuelQuantity.zero),
+                                      ("End", self.flightSummary.fuelEnd,FuelQuantity.zero),
+                                      ("Used", self.flightSummary.fuelUsed,self.flightSummary.fuelTotalizer)
         ] {
             self.attributedCells.append(NSAttributedString(string: name, attributes: self.titleAttributes))
             self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.total), attributes: self.cellAttributes))
             self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.left), attributes: self.cellAttributes))
             self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: fuel.right), attributes: self.cellAttributes))
+            if totalizer.total != 0.0 {
+                self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(gallon: totalizer.total),
+                                                               attributes: self.cellAttributes))
+            }else{
+                self.attributedCells.append(NSAttributedString(string: "", attributes: self.cellAttributes))
+            }
         }
     }
     
     func attributedString(at indexPath : IndexPath) -> NSAttributedString {
-        let index = indexPath.section * 4 + indexPath.item
+        let index = indexPath.section * 5 + indexPath.item
         return self.attributedCells[index]
     }
     
@@ -62,7 +68,7 @@ class FlightSummaryFuelDataSource: NSObject, UICollectionViewDataSource, UIColle
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
+        return 5
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

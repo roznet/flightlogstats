@@ -35,13 +35,9 @@ class FlightFuelRecord: NSManagedObject {
         set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.target_fuel = ingallons.total }
     }
 
-    var totalizerStart : FuelQuantity {
-        get { return FuelQuantity(total: self.totalizer_fuel_start, unit: Settings.fuelStoreUnit) }
-        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.totalizer_fuel_start = ingallons.total }
-    }
-    var totalizerEnd : FuelQuantity {
-        get { return FuelQuantity(total: self.totalizer_fuel_end, unit: Settings.fuelStoreUnit) }
-        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.totalizer_fuel_end = ingallons.total }
+    var totalizerUsed : FuelQuantity {
+        get { return FuelQuantity(total: self.totalizer_fuel_used, unit: Settings.fuelStoreUnit) }
+        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.totalizer_fuel_used = ingallons.total }
     }
 
     /// setup default from settings
