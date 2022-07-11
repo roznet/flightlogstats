@@ -11,17 +11,77 @@ struct FieldCalculation {
     typealias Field = FlightLogFile.Field
     let output : Field
     let inputs : [Field]
-    let initial : Double
-    let calcFunc : ([Double]) -> Double
+    let calcType : CalcType
+    private let initial : Double
+    private let calcFunc : ([Double]) -> Double
+    private let calcFuncTextMulti : ([[Double]]) -> String
+    
+    var inputType : InputType {
+        switch self.calcType {
+        case .doublesArrayToString:
+            return .doublesArray
+        case .doublesToDouble:
+            return .doubles
+        }
+    }
+    
+    var outputType : OutputType {
+        switch self.calcType {
+        case .doublesToDouble:
+            return .double
+        case .doublesArrayToString:
+            return .string
+        }
+    }
+    
+    enum InputType {
+        case doubles
+        case doublesArray
+    }
+    
+    enum OutputType {
+        case double
+        case string
+    }
+    
+    enum CalcType {
+        case doublesToDouble
+        case doublesArrayToString
+    }
     
     init(output : Field, inputs: [Field], initial : Double = 0.0, calcFunc : @escaping ([Double])->Double){
         self.output = output
         self.inputs = inputs
         self.calcFunc = calcFunc
+        self.calcFuncTextMulti = { _ in return "" }
+        self.calcType = .doublesToDouble
         self.initial = initial
     }
     
+    init(stringOutput: Field, multiInputs: [Field], calcFunc : @escaping ([[Double]])->String ){
+        self.output = stringOutput
+        self.inputs = multiInputs
+        self.calcFuncTextMulti = calcFunc
+        self.calcFunc = { _ in return 0.0 }
+        self.calcType = .doublesArrayToString
+        self.initial = 0.0
+    }
+    
+    func evaluateToString(lines : [Field:[Double]], fieldsMap : [Field:Int]) -> String {
+        guard self.calcType == .doublesArrayToString else { return "" }
+        
+        var doublesArray : [[Double]] = []
+        for field in self.inputs {
+            if let vals = lines[field] {
+                doublesArray.append(vals)
+            }
+        }
+        return self.calcFuncTextMulti(doublesArray)
+    }
+    
     func evaluate(line : [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> Double{
+        guard self.calcType == .doublesToDouble else { return .nan }
+        
         var doubles : [Double] = []
         for field in self.inputs {
             if field == self.output {
@@ -76,6 +136,27 @@ struct FieldCalculation {
         FieldCalculation(output: .FTotalizerT, inputs: [.FTotalizerT,.E1_FFlow]){
             x in
             return x[0] + (x[1]/3600.0)
+        },
+        FieldCalculation(stringOutput: .FltPhase, multiInputs: [.IAS,.GndSpd,.AltMSL,.AltGPS,.E1_FFlow]){
+            x in
+            guard x[0].count == 10 else { return "Ground" }
+            
+            if let ias = x[0].last,
+               let gndspd = x[1].min(),
+               let altend = x[2].last,
+               let altstart = x[2].first {
+                if ias > 35.0 {
+                    if altend > altstart + 50 {
+                        return "Climb"
+                    }else if altend < altstart - 50 {
+                        return "Descent"
+                    }
+                    return "Flight"
+                }else{
+                    return "Ground"
+                }
+            }
+            return "Unknown"
         }
     ]
 }

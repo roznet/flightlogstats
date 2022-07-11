@@ -143,6 +143,8 @@ class TestParsingLogFiles: XCTestCase {
             let routeFull = FlightLeg.legs(from: data, start: nil)
             let routeFlying = FlightLeg.legs(from: data, start: summary.flying?.start, end: summary.flying?.end)
             
+            let phases = FlightLeg.legs(from: data, byfield: .FltPhase)
+            print( phases ) 
             XCTAssertLessThan(routeFlying.count, routeFull.count)
             
             if let firstFlyingLeg = routeFlying.first,

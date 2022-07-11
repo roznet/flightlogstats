@@ -459,8 +459,13 @@ extension FlightData {
                 // add calculated fields
                 data.doubleFields.append(.Distance)
                 for field in FieldCalculation.calculatedFields {
-                    fieldsMap[field.output] = data.doubleFields.count
-                    data.doubleFields.append(field.output)
+                    switch field.outputType {
+                    case .double:
+                        fieldsMap[field.output] = data.doubleFields.count
+                        data.doubleFields.append(field.output)
+                    case .string:
+                        data.stringFields.append(field.output)
+                    }
                 }
             }else if line.count == columnIsDouble.count {
                 // Usually date are +1, +2 or same, saves a lot of time vs date parsing to try to guess...
@@ -552,7 +557,9 @@ extension FlightData {
                 doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
                 
                 for calcField in FieldCalculation.calculatedFields {
-                    doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                    if calcField.calcType == .doublesToDouble {
+                        doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                    }
                 }
 
                 for field in self.doubleInputs.keys {
@@ -562,6 +569,12 @@ extension FlightData {
                     }
                     if let count = self.doubleInputs[field]?.count, count > 10 {
                         self.doubleInputs[field]?.removeFirst()
+                    }
+                }
+                
+                for calcField in FieldCalculation.calculatedFields {
+                    if calcField.calcType == .doublesArrayToString {
+                        stringLine.append(calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap))
                     }
                 }
 

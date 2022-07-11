@@ -50,15 +50,18 @@ struct FlightLeg {
         }
     }
     
-    static func legs(from data : FlightData, start : Date? = nil, end : Date? = nil) -> [FlightLeg] {
+    static func legs(from data : FlightData,
+                     start : Date? = nil,
+                     end : Date? = nil,
+                     byfield : Field = .AtvWpt) -> [FlightLeg] {
         var rv : [FlightLeg] = []
-        let identifiers : DatesValuesByField<String,Field> = data.datesStrings(for: [.AtvWpt], start: start)
+        let identifiers : DatesValuesByField<String,Field> = data.datesStrings(for: [byfield], start: start)
         
         do {
             let stats : DatesValuesByField<ValueStats,Field> = try data.extract(dates: identifiers.dates, start: start, end : end)
             
             for idx in 0..<identifiers.count {
-                if let identifier = identifiers.value(for: .AtvWpt, at: idx),
+                if let identifier = identifiers.value(for: byfield, at: idx),
                    let waypoint = Waypoint(name: identifier),
                    var endTime = end ?? identifiers.dates.last {
                    let startTime = identifiers.dates[idx]

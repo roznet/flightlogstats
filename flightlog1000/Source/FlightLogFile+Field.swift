@@ -103,6 +103,9 @@ extension FlightLogFile {
         case WndCross  = "WndCross"
         case FTotalizerT = "FTotalizerT"
         
+        // calculated strings
+        case FltPhase = "FltPhase"
+        
         var displayName : String { return self.rawValue }
         
         //calc
@@ -345,6 +348,9 @@ extension FlightLogFile.Field {
         case .FTotalizerT:
             return context.formatStats(gallon: valueStats, used: false)
         case .UTCOfst:
+            return ""
+            
+        case .FltPhase:
             return ""
         }
     
