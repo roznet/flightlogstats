@@ -382,13 +382,17 @@ extension FlightData {
         var stringLine : [String] = []
         
         var doubleInputs : [Field:[Double]] = [:]
+        var doubleInputsCount : Int = 0
         
         init(data : FlightData){
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
             self.data = data
             for calcField in FieldCalculation.calculatedFields {
-                for field in calcField.inputs {
-                    self.doubleInputs[field] = []
+                if calcField.requiredObservationCount > 0 {
+                    self.doubleInputsCount = max(self.doubleInputsCount,calcField.requiredObservationCount)
+                    for field in calcField.inputs {
+                        self.doubleInputs[field] = []
+                    }
                 }
             }
         }
@@ -567,7 +571,7 @@ extension FlightData {
                         let val = doubleLine[idx]
                         self.doubleInputs[field]?.append(val)
                     }
-                    if let count = self.doubleInputs[field]?.count, count > 10 {
+                    if let count = self.doubleInputs[field]?.count, count > self.doubleInputsCount {
                         self.doubleInputs[field]?.removeFirst()
                     }
                 }

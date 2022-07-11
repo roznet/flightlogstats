@@ -144,7 +144,23 @@ class TestParsingLogFiles: XCTestCase {
             let routeFlying = FlightLeg.legs(from: data, start: summary.flying?.start, end: summary.flying?.end)
             
             let phases = FlightLeg.legs(from: data, byfield: .FltPhase)
-            print( phases ) 
+            var phasesCount : [String:Int] = [:]
+            for phase in phases {
+                let str = phase.waypoint.name
+                if let oldCount = phasesCount[str] {
+                    phasesCount[str] = oldCount + 1
+                }else{
+                    phasesCount[str] = 1
+                }
+            }
+            for name in [ "Ground", "Climb", "Flight", "Descent"] {
+                if let count = phasesCount[name] {
+                    XCTAssertGreaterThanOrEqual(count, 1)
+                }else{
+                    XCTAssertTrue(false)
+                }
+            }
+            
             XCTAssertLessThan(routeFlying.count, routeFull.count)
             
             if let firstFlyingLeg = routeFlying.first,

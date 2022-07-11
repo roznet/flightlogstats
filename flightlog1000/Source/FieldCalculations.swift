@@ -12,6 +12,7 @@ struct FieldCalculation {
     let output : Field
     let inputs : [Field]
     let calcType : CalcType
+    let requiredObservationCount : Int
     private let initial : Double
     private let calcFunc : ([Double]) -> Double
     private let calcFuncTextMulti : ([[Double]]) -> String
@@ -56,15 +57,17 @@ struct FieldCalculation {
         self.calcFuncTextMulti = { _ in return "" }
         self.calcType = .doublesToDouble
         self.initial = initial
+        self.requiredObservationCount = 1
     }
     
-    init(stringOutput: Field, multiInputs: [Field], calcFunc : @escaping ([[Double]])->String ){
+    init(stringOutput: Field, multiInputs: [Field], obsCount : Int, calcFunc : @escaping ([[Double]])->String ){
         self.output = stringOutput
         self.inputs = multiInputs
         self.calcFuncTextMulti = calcFunc
         self.calcFunc = { _ in return 0.0 }
         self.calcType = .doublesArrayToString
         self.initial = 0.0
+        self.requiredObservationCount = obsCount
     }
     
     func evaluateToString(lines : [Field:[Double]], fieldsMap : [Field:Int]) -> String {
@@ -137,9 +140,9 @@ struct FieldCalculation {
             x in
             return x[0] + (x[1]/3600.0)
         },
-        FieldCalculation(stringOutput: .FltPhase, multiInputs: [.IAS,.GndSpd,.AltMSL,.AltGPS,.E1_FFlow]){
+        FieldCalculation(stringOutput: .FltPhase, multiInputs: [.IAS,.GndSpd,.AltMSL,.AltGPS,.E1_FFlow], obsCount: 10){
             x in
-            guard x[0].count == 10 else { return "Ground" }
+            guard x[0].count >= 10 else { return "Ground" }
             
             if let ias = x[0].last,
                let gndspd = x[1].min(),
