@@ -19,7 +19,7 @@ protocol LogSelectionDelegate : AnyObject {
 
 class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate {
 
-    var logList : FlightLogFileList? = nil
+    var logInfoList : [FlightLogFileInfo] = []
     var logFileOrganizer = FlightLogOrganizer.shared
     
     var progressReportViewController : ProgressReportViewController? = nil
@@ -139,7 +139,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                if let first = self.logList?.first,let info = self.logFileOrganizer[first.name]  {
+                if let info = self.logInfoList.first  {
                     self.delegate?.logInfoSelected(info)
                 }else{
                     self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
@@ -151,8 +151,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                if let first = self.logList?.first,
-                   let info = self.logFileOrganizer[first.name] {
+                if let info = self.logInfoList.first {
                     self.delegate?.logInfoSelected(info)
                 }else{
                     self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
@@ -179,16 +178,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let list = self.logList {
-            return list.flightLogFiles.count
-        }else{
-            return 0
-        }
+        return self.logInfoList.count
     }
     
     func flightInfo(at indexPath : IndexPath) -> FlightLogFileInfo? {
-        guard let list = self.logList else { return nil }
-        return FlightLogOrganizer.shared[list.flightLogFiles[ indexPath.row].name]
+        return self.logInfoList[indexPath.row]
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -238,13 +232,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         
         if self.filterEmpty {
             AppDelegate.worker.async {
-                self.logList = self.logFileOrganizer.nonEmptyLogFileList
+                self.logInfoList = self.logFileOrganizer.nonEmptyLogFileInfos
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now()+0.5){
-                    if let first = self.logList?.first,
-                       let info = self.logFileOrganizer[first.name] {
+                    if let info = self.logInfoList.first
+                       {
                         self.delegate?.logInfoSelected(info)
                     }else{
                         self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
@@ -252,7 +246,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 }
             }
         }else{
-            self.logList = self.logFileOrganizer.flightLogFileList
+            self.logInfoList = self.logFileOrganizer.flightLogFileInfos
             self.tableView.reloadData()
             self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
         }

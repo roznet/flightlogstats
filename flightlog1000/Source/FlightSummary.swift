@@ -42,6 +42,7 @@ class FlightSummary {
     var startAirport : Airport? = nil
     var endAirport : Airport? = nil
     
+    /// in nm
     let distance : Double
     
     init?( info : FlightLogFileInfo ) {

@@ -22,7 +22,7 @@ class FlightLogOrganizer {
     enum OrganizerError : Error {
         case failedToReadFolder
     }
-    private(set) var managedFlightLogs : [String:FlightLogFileInfo] = [:]
+    private var managedFlightLogs : [String:FlightLogFileInfo] = [:]
     
     public static var shared = FlightLogOrganizer()
     private let queue = OperationQueue()
@@ -37,7 +37,7 @@ class FlightLogOrganizer {
     private var currentState : UpdateState = .complete
     private var missingCount : Int = 0
 
-    var flightLogFileList : FlightLogFileList {
+    private var flightLogFileList : FlightLogFileList {
         let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
         return list
     }
@@ -530,20 +530,18 @@ extension FlightLogOrganizer {
     subscript(log: FlightLogFile) -> FlightLogFileInfo? {
         return self.managedFlightLogs[log.name]
     }
-    func filter(flightLogFileList : FlightLogFileList, filter : (FlightLogFileInfo) -> Bool) -> FlightLogFileList {
-        var logs : [FlightLogFile] = []
-        for one in flightLogFileList.flightLogFiles {
-            if let info = self.managedFlightLogs[one.name] {
-                if filter(info) {
-                    logs.append(one)
-                }
+    func filter(filter : (FlightLogFileInfo) -> Bool) -> [FlightLogFileInfo] {
+        var logs : [FlightLogFileInfo] = []
+        for info in self.flightLogFileInfos {
+            if filter(info) {
+                logs.append(info)
             }
         }
-        return FlightLogFileList(logs: logs)
+        return logs
     }
     
-    var nonEmptyLogFileList : FlightLogFileList {
-        return self.filter(flightLogFileList: self.flightLogFileList) {
+    var nonEmptyLogFileInfos : [FlightLogFileInfo] {
+        return self.filter() {
             info in
             return !info.isEmpty
         }

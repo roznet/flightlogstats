@@ -21,7 +21,7 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
         }
     }
     
-    var logList : FlightLogFileList? = nil
+    var logInfos : [FlightLogFileInfo]
     var logFileOrganizer = FlightLogOrganizer.shared
     
     let displayContext : DisplayContext
@@ -38,7 +38,7 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
     //    Remaining
     
     init(displayContext : DisplayContext = DisplayContext()){
-        self.logList = self.logFileOrganizer.nonEmptyLogFileList
+        self.logInfos = self.logFileOrganizer.nonEmptyLogFileInfos
         self.displayContext = displayContext
     }
     
@@ -52,8 +52,10 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
         self.cellHolders  = []
         self.geometries = []
         
+        let fields : [FlightSummary.Field] = [.Hobbs, .Moving, .Flying, .FuelStart, .FuelEnd, .FuelUsed, .FuelTotalizer, .Distance]
         
-        for title in [ "Date", "From", "To", "Start", "Takeoff", "Landing", "End", "Flight",  ] {
+        
+        for title in [ "Date", "From", "To"] {
             self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
             let geometry = RZNumberWithUnitGeometry()
             geometry.defaultUnitAttribute = self.cellAttributes
@@ -63,6 +65,18 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
             geometry.alignment = .center
             self.geometries.append(geometry)
         }
+        
+        for field in fields {
+            self.cellHolders.append(CellHolder(string: field.rawValue, attributes: self.titleAttributes))
+            let geometry = RZNumberWithUnitGeometry()
+            geometry.defaultUnitAttribute = self.cellAttributes
+            geometry.defaultNumberAttribute = self.cellAttributes
+            geometry.numberAlignment = .right
+            geometry.unitAlignment = .left
+            geometry.alignment = .center
+            self.geometries.append(geometry)
+        }
+        
     }
     
     func cellHolder(at indexPath : IndexPath) -> CellHolder {
