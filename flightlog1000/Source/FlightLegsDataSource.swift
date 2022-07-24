@@ -98,6 +98,10 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
         return self.attributedCells[index]
     }
     
+    func size(at indexPath: IndexPath) -> CGSize {
+        return self.attributedString(at: indexPath).size()
+    }
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         guard legs.count > 0 else { return 0 }
         return legs.count + 1 /* for header */

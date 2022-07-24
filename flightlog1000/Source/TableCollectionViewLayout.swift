@@ -13,7 +13,8 @@ protocol TableCollectionDelegate : AnyObject {
     var frozenColumns : Int { get }
     var frozenRows : Int { get }
 
-    func attributedString(at : IndexPath) -> NSAttributedString
+    func size(at : IndexPath) -> CGSize
+    //func attributedString(at : IndexPath) -> NSAttributedString
     
     func prepare()
 }
@@ -77,7 +78,6 @@ class TableCollectionViewLayout: UICollectionViewLayout {
             return
         }
         sizeDelegate.prepare()
-        
 
         let frozenColumns = sizeDelegate.frozenColumns
         let frozenRows = sizeDelegate.frozenRows
@@ -181,15 +181,14 @@ class TableCollectionViewLayout: UICollectionViewLayout {
                 var rowHeight : CGFloat = 0.0
                 for item in 00..<collectionView.numberOfItems(inSection: section) {
                     let indexPath = IndexPath(item: item, section: section)
-                    let textAttributed = tableCollectionDelegate.attributedString(at: indexPath)
-                    let textSize = textAttributed.size()
-                    self.cellSizes.append(textSize)
+                    let cellSize = tableCollectionDelegate.size(at: indexPath)
+                    self.cellSizes.append(cellSize)
                     if item < self.columnsWidth.count {
-                        self.columnsWidth[item] = max(self.columnsWidth[item], textSize.width*marginMultiplier.width)
+                        self.columnsWidth[item] = max(self.columnsWidth[item], cellSize.width*marginMultiplier.width)
                     }else{
-                        self.columnsWidth.append(textSize.width * marginMultiplier.width)
+                        self.columnsWidth.append(cellSize.width * marginMultiplier.width)
                     }
-                    rowHeight  = max(rowHeight, textSize.height * marginMultiplier.height)
+                    rowHeight  = max(rowHeight, cellSize.height * marginMultiplier.height)
                 }
                 self.rowsHeight.append(rowHeight)
                 self.contentSize.height += rowHeight

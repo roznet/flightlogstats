@@ -143,7 +143,10 @@ class FlightSummaryTimeDataSource: NSObject, UICollectionViewDataSource, UIColle
         let index = indexPath.section * self.items + indexPath.item
         return self.attributedCells[index]
     }
-    
+    func size(at indexPath: IndexPath) -> CGSize {
+        return self.attributedString(at: indexPath).size()
+    }
+
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return self.sections
     }

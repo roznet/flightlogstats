@@ -99,6 +99,11 @@ class DisplayContext {
         return field.format(valueStats: valueStats, context: self)
     }
     
+    //MARK: - NumberWithUnits convert
+    func numberWithUnit(gallon : Double) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: GCUnit.usgallon(), andValue: gallon)
+    }
+    
     //MARK: - format values
     func formatValue(distance : Double) -> String {
         return String(format: "%.1f nm", distance )

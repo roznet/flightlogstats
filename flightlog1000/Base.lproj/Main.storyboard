@@ -126,6 +126,28 @@
                                             <outlet property="label" destination="UPy-Qe-KvO" id="LJt-OJ-iG1"/>
                                         </connections>
                                     </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="paF-PK-qkC" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="HWf-3q-Qzz">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aeQ-Lh-78q" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="aeQ-Lh-78q" firstAttribute="top" secondItem="HWf-3q-Qzz" secondAttribute="top" id="0Ea-sm-HFK"/>
+                                                <constraint firstItem="aeQ-Lh-78q" firstAttribute="leading" secondItem="HWf-3q-Qzz" secondAttribute="leading" id="Bmv-AW-6iA"/>
+                                                <constraint firstAttribute="bottom" secondItem="aeQ-Lh-78q" secondAttribute="bottom" id="RTM-c5-6M3"/>
+                                                <constraint firstAttribute="trailing" secondItem="aeQ-Lh-78q" secondAttribute="trailing" id="pHx-Ms-1HG"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="numberWithUnitView" destination="aeQ-Lh-78q" id="x5e-od-JLH"/>
+                                        </connections>
+                                    </collectionViewCell>
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="aKL-fC-i7y" userLabel="Legs Collection View">

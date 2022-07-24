@@ -128,6 +128,10 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
         return self.attributedCells[index]
     }
     
+    func size(at indexPath: IndexPath) -> CGSize {
+        return self.attributedString(at: indexPath).size()
+    }
+
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return self.sections
     }
