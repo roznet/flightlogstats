@@ -30,6 +30,8 @@
 		425D0502283452320028FD67 /* ValueStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425D0501283452320028FD67 /* ValueStats.swift */; };
 		42606A1C288DC57600AE858C /* RZNumberWithUnitCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42606A1B288DC57600AE858C /* RZNumberWithUnitCollectionViewCell.swift */; };
 		42606A1E288DC5A500AE858C /* RZNumberWithUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42606A1D288DC5A500AE858C /* RZNumberWithUnitView.swift */; };
+		42606A20288DE0A300AE858C /* FlightListDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42606A1F288DE0A300AE858C /* FlightListDataSource.swift */; };
+		42606A22288DE2FC00AE858C /* FlightSummary+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */; };
 		4264C230281D830000F40436 /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C22F281D830000F40436 /* MainSplitViewController.swift */; };
 		4264C232281D9A0700F40436 /* LogListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C231281D9A0700F40436 /* LogListTableViewCell.swift */; };
 		4264C2342825B58F00F40436 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C2332825B58F00F40436 /* Settings.swift */; };
@@ -123,6 +125,9 @@
 		425D0501283452320028FD67 /* ValueStats.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ValueStats.swift; path = Source/ValueStats.swift; sourceTree = "<group>"; };
 		42606A1B288DC57600AE858C /* RZNumberWithUnitCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RZNumberWithUnitCollectionViewCell.swift; path = Source/RZNumberWithUnitCollectionViewCell.swift; sourceTree = "<group>"; };
 		42606A1D288DC5A500AE858C /* RZNumberWithUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RZNumberWithUnitView.swift; path = Source/RZNumberWithUnitView.swift; sourceTree = "<group>"; };
+		42606A1F288DE0A300AE858C /* FlightListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightListDataSource.swift; path = Source/FlightListDataSource.swift; sourceTree = "<group>"; };
+		42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightSummary+Field.swift"; path = "Source/FlightSummary+Field.swift"; sourceTree = "<group>"; };
+		42606A23288DE9A200AE858C /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		4264C22F281D830000F40436 /* MainSplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainSplitViewController.swift; path = Source/MainSplitViewController.swift; sourceTree = "<group>"; };
 		4264C231281D9A0700F40436 /* LogListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogListTableViewCell.swift; path = Source/LogListTableViewCell.swift; sourceTree = "<group>"; };
 		4264C2332825B58F00F40436 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Source/Settings.swift; sourceTree = "<group>"; };
@@ -216,6 +221,7 @@
 				4204FCA92855F6BF006D753F /* FlightSummaryFuelDataSource.swift */,
 				4204FCAB2855FF6C006D753F /* FlightSummaryTimeDataSource.swift */,
 				421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */,
+				42606A1F288DE0A300AE858C /* FlightListDataSource.swift */,
 			);
 			name = DataSources;
 			sourceTree = "<group>";
@@ -273,6 +279,7 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
+				42606A23288DE9A200AE858C /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLog1000.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlog1000 */,
 				4280C893280D43E500A0FB32 /* flightlog1000Tests */,
@@ -347,6 +354,7 @@
 				4280C8BE280D467400A0FB32 /* FlightLogFile.swift */,
 				42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */,
 				4264C2392826858700F40436 /* FlightSummary.swift */,
+				42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */,
 				4264C23528267EDC00F40436 /* FlightLeg.swift */,
 				4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */,
 				4264C23728267F6600F40436 /* Waypoint.swift */,
@@ -584,6 +592,7 @@
 				4264C23628267EDC00F40436 /* FlightLeg.swift in Sources */,
 				4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */,
 				425A8DE2287094BD002DCB0C /* FlightFuelRecord.swift in Sources */,
+				42606A20288DE0A300AE858C /* FlightListDataSource.swift in Sources */,
 				4239290D2864D08800CD33C0 /* Aircraft.swift in Sources */,
 				4209D8662861881300B79A07 /* LogGraphsViewController.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
@@ -593,6 +602,7 @@
 				4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */,
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
+				42606A22288DE2FC00AE858C /* FlightSummary+Field.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,
 				421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */,
 				42606A1E288DC5A500AE858C /* RZNumberWithUnitView.swift in Sources */,

@@ -238,14 +238,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         
         if self.filterEmpty {
             AppDelegate.worker.async {
-                self.logList = self.logFileOrganizer.filter(flightLogFileList: self.logFileOrganizer.flightLogFileList){
-                    info in
-                    if let elapsed = info.flightSummary?.moving?.elapsed,
-                       let distance = info.flightSummary?.distance {
-                        return elapsed > 0.0 && distance > 0.2
-                    }
-                    return false
-                }
+                self.logList = self.logFileOrganizer.nonEmptyLogFileList
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }

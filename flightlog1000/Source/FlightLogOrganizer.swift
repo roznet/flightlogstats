@@ -223,18 +223,6 @@ class FlightLogOrganizer {
         }
     }
     
-    func filter(flightLogFileList : FlightLogFileList, filter : (FlightLogFileInfo) -> Bool) -> FlightLogFileList {
-        var logs : [FlightLogFile] = []
-        for one in flightLogFileList.flightLogFiles {
-            if let info = self.managedFlightLogs[one.name] {
-                if filter(info) {
-                    logs.append(one)
-                }
-            }
-        }
-        return FlightLogFileList(logs: logs)
-    }
-    
     func delete(info : FlightLogFileInfo){
         info.delete()
         self.persistentContainer.viewContext.delete(info)
@@ -531,6 +519,7 @@ extension URL {
     var isLogFile : Bool { return self.lastPathComponent.isLogFile }
 }
 
+//MARK: - List management
 extension FlightLogOrganizer {
     var count : Int { return managedFlightLogs.count }
     
@@ -541,4 +530,23 @@ extension FlightLogOrganizer {
     subscript(log: FlightLogFile) -> FlightLogFileInfo? {
         return self.managedFlightLogs[log.name]
     }
+    func filter(flightLogFileList : FlightLogFileList, filter : (FlightLogFileInfo) -> Bool) -> FlightLogFileList {
+        var logs : [FlightLogFile] = []
+        for one in flightLogFileList.flightLogFiles {
+            if let info = self.managedFlightLogs[one.name] {
+                if filter(info) {
+                    logs.append(one)
+                }
+            }
+        }
+        return FlightLogFileList(logs: logs)
+    }
+    
+    var nonEmptyLogFileList : FlightLogFileList {
+        return self.filter(flightLogFileList: self.flightLogFileList) {
+            info in
+            return !info.isEmpty
+        }
+    }
+
 }

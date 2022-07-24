@@ -35,17 +35,15 @@ class DisplayContext {
     
     //MARK: - format model objets
     func formatDecimal(timeRange : TimeRange) -> String {
-        return String(format: "%.1f", timeRange.elapsed / 3600.0 )
+        return timeRange.numberWithUnit.convert(to: GCUnit.decimalhour()).description
     }
     
     func formatHHMM(interval : TimeInterval) -> String {
-        let hours = floor(interval / 3600.0)
-        let minutes = floor((interval - (hours * 3600.0))/60.0)
-        return String(format: "%02.0fh%02.0fm", hours,minutes )
+        return GCNumberWithUnit(unit: GCUnit.second(), andValue: interval).convert(to: GCUnit.hobbshour()).description
     }
     
     func formatHHMM(timeRange : TimeRange) -> String {
-        return self.formatHHMM(interval: timeRange.elapsed)
+        return timeRange.numberWithUnit.convert(to: GCUnit.hobbshour()).description
     }
     
     func format(route : [Waypoint] ) -> String {

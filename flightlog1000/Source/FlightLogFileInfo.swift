@@ -186,4 +186,14 @@ class FlightLogFileInfo: NSManagedObject {
             self.saveContext()
         }
     }
+    
+    //MARK: - Analysis
+    
+    var isEmpty : Bool {
+        if let elapsed = self.flightSummary?.moving?.elapsed,
+           let distance = self.flightSummary?.distance {
+            return elapsed == 0.0 || distance < 0.2
+        }
+        return true
+    }
 }

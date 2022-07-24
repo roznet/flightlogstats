@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RZUtils
 
 struct TimeRange {
     typealias Field = FlightLogFile.Field
@@ -13,7 +14,9 @@ struct TimeRange {
     let start : Date
     let end : Date
     var elapsed : TimeInterval { return end.timeIntervalSince(start) }
-        
+    
+    var numberWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: GCUnit.second(), andValue: self.elapsed)}
+    
     init?(valuesByField : DatesValuesByField<Double,Field>?, field : FlightLogFile.Field) {
         guard let start = valuesByField?.first(field: field)?.date,
            let end = valuesByField?.last(field: field)?.date else {
