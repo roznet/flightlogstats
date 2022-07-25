@@ -549,20 +549,79 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Graphs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ozc-BE-PXl">
-                                <rect key="frame" x="389.5" y="566" width="55" height="21"/>
+                                <rect key="frame" x="389.5" y="24" width="55" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="lQ6-9W-6VF" userLabel="Log List View">
+                                <rect key="frame" x="5" y="45" width="824" height="1084"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewLayout key="collectionViewLayout" id="G8h-hA-8yJ" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="Y3z-vO-Gim" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="QEe-mA-BEW">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KTQ-Pq-7uX">
+                                                    <rect key="frame" x="4" y="14.5" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="KTQ-Pq-7uX" firstAttribute="centerY" secondItem="QEe-mA-BEW" secondAttribute="centerY" id="815-Ig-nK9"/>
+                                                <constraint firstItem="KTQ-Pq-7uX" firstAttribute="centerX" secondItem="QEe-mA-BEW" secondAttribute="centerX" id="XN9-bB-xDN"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="label" destination="KTQ-Pq-7uX" id="Vmb-3Z-Fhr"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="qqh-oE-BIb" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="pJT-VO-ZfA">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8kJ-v7-UsD" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="8kJ-v7-UsD" secondAttribute="trailing" id="g8l-RE-660"/>
+                                                <constraint firstItem="8kJ-v7-UsD" firstAttribute="leading" secondItem="pJT-VO-ZfA" secondAttribute="leading" id="gkH-LF-WyT"/>
+                                                <constraint firstItem="8kJ-v7-UsD" firstAttribute="top" secondItem="pJT-VO-ZfA" secondAttribute="top" id="kdf-4g-zoN"/>
+                                                <constraint firstAttribute="bottom" secondItem="8kJ-v7-UsD" secondAttribute="bottom" id="qzg-FY-Rzq"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="numberWithUnitView" destination="8kJ-v7-UsD" id="zis-df-UOC"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="W2e-Qs-i2X"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="lQ6-9W-6VF" firstAttribute="top" secondItem="Ozc-BE-PXl" secondAttribute="bottom" id="44X-dl-lS4"/>
+                            <constraint firstItem="W2e-Qs-i2X" firstAttribute="trailing" secondItem="lQ6-9W-6VF" secondAttribute="trailing" constant="5" id="4x5-nZ-61v"/>
                             <constraint firstItem="Ozc-BE-PXl" firstAttribute="centerX" secondItem="W2e-Qs-i2X" secondAttribute="centerX" id="A5a-Xh-DuR"/>
-                            <constraint firstItem="Ozc-BE-PXl" firstAttribute="centerY" secondItem="W2e-Qs-i2X" secondAttribute="centerY" id="fV0-0Q-oXs"/>
+                            <constraint firstItem="lQ6-9W-6VF" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" constant="5" id="CVk-S6-n2S"/>
+                            <constraint firstItem="W2e-Qs-i2X" firstAttribute="bottom" secondItem="lQ6-9W-6VF" secondAttribute="bottom" id="aqa-l8-z3S"/>
+                            <constraint firstItem="Ozc-BE-PXl" firstAttribute="top" secondItem="W2e-Qs-i2X" secondAttribute="top" id="i68-tp-k2D"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Graphs" image="chart.xyaxis.line" catalog="system" id="bRF-Na-7CO"/>
+                    <connections>
+                        <outlet property="logListCollectionView" destination="lQ6-9W-6VF" id="6dt-rc-f74"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eLc-8L-xlr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

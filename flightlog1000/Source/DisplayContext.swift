@@ -50,11 +50,15 @@ class DisplayContext {
         return route.map { $0.name }.joined(separator: ",")
     }
     
-    func format(airport : Airport, icao : Bool = true) -> String {
-        if icao {
-            return "\(airport.icao) \(airport.name)"
+    func format(airport : Airport?, icao : Bool = true) -> String {
+        if let airport = airport {
+            if icao {
+                return "\(airport.icao) \(airport.name)"
+            }else{
+                return airport.name
+            }
         }else{
-            return airport.name
+            return ""
         }
     }
     

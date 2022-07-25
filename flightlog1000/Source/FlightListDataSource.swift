@@ -26,6 +26,9 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
     
     let displayContext : DisplayContext
     
+    let fields : [FlightSummary.Field] = [.Hobbs, .Moving, .Flying, .FuelStart, .FuelEnd, .FuelUsed, .FuelTotalizer, .Distance]
+    let headers : [String] = [ "Date", "From", "To"]
+    
     private var cellHolders : [CellHolder] = []
     private var geometries : [RZNumberWithUnitGeometry] = []
     
@@ -52,11 +55,7 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
         self.cellHolders  = []
         self.geometries = []
         
-        let fields : [FlightSummary.Field] = [.Hobbs, .Moving, .Flying, .FuelStart, .FuelEnd, .FuelUsed, .FuelTotalizer, .Distance]
-        
-        
-        for title in [ "Date", "From", "To"] {
-            self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
+        for title in headers {
             let geometry = RZNumberWithUnitGeometry()
             geometry.defaultUnitAttribute = self.cellAttributes
             geometry.defaultNumberAttribute = self.cellAttributes
@@ -64,23 +63,42 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
             geometry.unitAlignment = .left
             geometry.alignment = .center
             self.geometries.append(geometry)
+            self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
         }
         
         for field in fields {
-            self.cellHolders.append(CellHolder(string: field.rawValue, attributes: self.titleAttributes))
             let geometry = RZNumberWithUnitGeometry()
             geometry.defaultUnitAttribute = self.cellAttributes
             geometry.defaultNumberAttribute = self.cellAttributes
             geometry.numberAlignment = .right
             geometry.unitAlignment = .left
-            geometry.alignment = .center
+            geometry.alignment = .left
             self.geometries.append(geometry)
+            self.cellHolders.append(CellHolder(string: field.rawValue, attributes: self.titleAttributes))
         }
         
+        for info in self.logInfos {
+            if let summary = info.flightSummary, let hobbs = summary.hobbs {
+                
+                self.cellHolders.append(CellHolder(string:  self.displayContext.format(date: hobbs.start), attributes: self.titleAttributes))
+                self.cellHolders.append(CellHolder(string:  self.displayContext.format(airport: summary.startAirport, icao: true), attributes: self.titleAttributes))
+                self.cellHolders.append(CellHolder(string:  self.displayContext.format(airport: summary.endAirport, icao: true), attributes: self.titleAttributes))
+                var geoIndex = 3
+                for field in fields {
+                    if let nu = summary.numberWithUnit(for: field) {
+                        geometries[geoIndex].adjust(for: nu)
+                        self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                    }else{
+                        self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+                    }
+                    geoIndex += 1
+                }
+            }
+        }
     }
     
     func cellHolder(at indexPath : IndexPath) -> CellHolder {
-        let index = indexPath.section * 5 + indexPath.item
+        let index = indexPath.section * (self.headers.count + self.fields.count) + indexPath.item
         return self.cellHolders[index]
     }
     
@@ -94,11 +112,11 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 4
+        return self.logInfos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return self.headers.count + self.fields.count
     }
     
     func setBackground(for tableCell: UICollectionViewCell, itemAt indexPath : IndexPath) {
@@ -114,7 +132,8 @@ class FlightListDataSource: NSObject, UICollectionViewDataSource, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        switch self.cellHolder(at: indexPath) {
+        let holder = self.cellHolder(at: indexPath)
+        switch holder {
         case .attributedString(let attributedString):
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TableCollectionViewCell", for: indexPath)
             if let tableCell = cell as? TableCollectionViewCell {

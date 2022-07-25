@@ -71,13 +71,12 @@ class TableCollectionViewLayout: UICollectionViewLayout {
     }
     
     //MARK: - utils
-    func buildCellsAttributes() {
+    private func buildCellsAttributes() {
         guard let collectionView = collectionView,
               let sizeDelegate = self.tableCollectionDelegate
         else{
             return
         }
-        sizeDelegate.prepare()
 
         let frozenColumns = sizeDelegate.frozenColumns
         let frozenRows = sizeDelegate.frozenRows

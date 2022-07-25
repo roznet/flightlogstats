@@ -28,7 +28,7 @@ extension FlightSummary {
         case .Distance:
             return GCNumberWithUnit(unit: GCUnit.nm(), andValue: self.distance)
         case .Flying:
-            return self.flying?.numberWithUnit
+            return self.flying?.numberWithUnit.convert(to: GCUnit.decimalhour())
         case .FuelStart:
             return self.fuelStart.totalWithUnit
         case .FuelEnd:
@@ -36,9 +36,9 @@ extension FlightSummary {
         case .FuelTotalizer:
             return self.fuelTotalizer.totalWithUnit
         case .Hobbs:
-            return self.hobbs?.numberWithUnit
+            return self.hobbs?.numberWithUnit.convert(to: GCUnit.decimalhour())
         case .Moving:
-            return self.moving?.numberWithUnit
+            return self.moving?.numberWithUnit.convert(to: GCUnit.decimalhour())
         case .FuelUsed:
             return self.fuelUsed.totalWithUnit
         }

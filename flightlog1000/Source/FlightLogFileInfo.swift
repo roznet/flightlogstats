@@ -146,6 +146,7 @@ class FlightLogFileInfo: NSManagedObject {
         self.start_fuel_quantity_right = flightSummary.fuelStart.right
         self.end_fuel_quantity_left = flightSummary.fuelEnd.left
         self.end_fuel_quantity_right = flightSummary.fuelEnd.right
+        self.fuel_totalizer_total = flightSummary.fuelTotalizer.total
         
         self.route = flightSummary.route.map { $0.name }.joined(separator: ",")
         
