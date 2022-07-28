@@ -222,6 +222,114 @@
             </objects>
             <point key="canvasLocation" x="532.37410071942452" y="867.3366834170854"/>
         </scene>
+        <!--Calendar Stats-->
+        <scene sceneID="Gii-1t-ydh">
+            <objects>
+                <viewController id="le0-J7-zW3" userLabel="Calendar Stats" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="hiS-AS-56c">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="1jp-Ar-Cmm"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Calendar" image="calendar" catalog="system" id="fQo-7t-sfx"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fOc-RZ-0gg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2631" y="1174"/>
+        </scene>
+        <!--Trips Stats-->
+        <scene sceneID="QSF-FC-Rbl">
+            <objects>
+                <viewController id="EYb-e7-uL0" userLabel="Trips Stats" customClass="TripsStatsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="3G4-GW-ic3">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="8Xl-gc-ZSL" userLabel="Log List View">
+                                <rect key="frame" x="5" y="55" width="824" height="1084"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewLayout key="collectionViewLayout" id="6w5-OM-45w" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="zwF-zT-Nri" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="hdn-PS-YVS">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Sr-H7-nn6">
+                                                    <rect key="frame" x="4" y="14.5" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="6Sr-H7-nn6" firstAttribute="centerX" secondItem="hdn-PS-YVS" secondAttribute="centerX" id="4vN-bz-ZXm"/>
+                                                <constraint firstItem="6Sr-H7-nn6" firstAttribute="centerY" secondItem="hdn-PS-YVS" secondAttribute="centerY" id="u9m-eH-bz4"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="label" destination="6Sr-H7-nn6" id="gmS-BM-CVJ"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="XLr-Rs-Yso" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="05i-ve-m4u">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0fZ-ZT-4RI" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="bottom" secondItem="0fZ-ZT-4RI" secondAttribute="bottom" id="0ua-xo-rg0"/>
+                                                <constraint firstItem="0fZ-ZT-4RI" firstAttribute="top" secondItem="05i-ve-m4u" secondAttribute="top" id="H1A-lL-TwX"/>
+                                                <constraint firstItem="0fZ-ZT-4RI" firstAttribute="leading" secondItem="05i-ve-m4u" secondAttribute="leading" id="gBh-AA-isW"/>
+                                                <constraint firstAttribute="trailing" secondItem="0fZ-ZT-4RI" secondAttribute="trailing" id="kgj-iH-tSL"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="numberWithUnitView" destination="0fZ-ZT-4RI" id="xpn-yU-Vuq"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="hBr-FW-esI"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Trips" image="tablecells" catalog="system" id="gvR-GP-vzb"/>
+                    <connections>
+                        <outlet property="logListCollectionView" destination="8Xl-gc-ZSL" id="kCQ-MP-bhc"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kK2-AM-Zyw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2631" y="571"/>
+        </scene>
+        <!--Stats Tab Bar Controller-->
+        <scene sceneID="TPK-Bo-bnt">
+            <objects>
+                <tabBarController storyboardIdentifier="statsTabBarController" id="myV-fl-FL9" userLabel="Stats Tab Bar Controller" customClass="StatsTabBarController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="rYU-MD-ceZ">
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="EYb-e7-uL0" kind="relationship" relationship="viewControllers" id="qk3-XF-kf6"/>
+                        <segue destination="le0-J7-zW3" kind="relationship" relationship="viewControllers" id="u9C-iP-1yy"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="EFI-dU-jWu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1888" y="872"/>
+        </scene>
         <!--Map View Controller-->
         <scene sceneID="SDL-fH-bz2">
             <objects>
@@ -873,6 +981,7 @@
     </inferredMetricsTieBreakers>
     <resources>
         <image name="airplane.departure" catalog="system" width="128" height="84"/>
+        <image name="calendar" catalog="system" width="128" height="107"/>
         <image name="chart.xyaxis.line" catalog="system" width="128" height="102"/>
         <image name="fuelpump" catalog="system" width="128" height="122"/>
         <image name="gearshape" catalog="system" width="128" height="123"/>

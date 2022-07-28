@@ -25,6 +25,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     var progressReportViewController : ProgressReportViewController? = nil
     
     weak var delegate : LogSelectionDelegate? = nil
+    weak var userInterfaceModeManager : UserInterfaceModeManager? = nil
+    
     var filterEmpty = true
     
     func moreFunctionMenu() -> UIMenu {
@@ -120,8 +122,10 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         // Do any additional setup after loading the view.
         let addButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(addLog(button:)))
         let moreFunctionButton = UIBarButtonItem(title: "More", image: UIImage(systemName: "ellipsis.circle"), menu: self.moreFunctionMenu())
+        let sumButton = UIBarButtonItem(image: UIImage(systemName: "sum"), style: .plain, target: self, action: #selector(sum(button:)))
+        
         self.navigationItem.leftBarButtonItem = addButton
-        self.navigationItem.rightBarButtonItem = moreFunctionButton
+        self.navigationItem.rightBarButtonItems = [moreFunctionButton, sumButton]
         
         self.tableView.estimatedRowHeight = 100
         self.tableView.rowHeight = UITableView.automaticDimension
@@ -253,6 +257,14 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
 
     //MARK: - add functionality
+    
+    @objc func sum(button : UIBarButtonItem) {
+        if self.userInterfaceModeManager?.userInterfaceMode == .detail {
+            self.userInterfaceModeManager?.userInterfaceMode = .stats
+        }else{
+            self.userInterfaceModeManager?.userInterfaceMode = .detail
+        }
+    }
     
     @objc func addLog(button : UIBarButtonItem){
         // mac should select files, ios just import folder

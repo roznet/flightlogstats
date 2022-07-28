@@ -8,9 +8,20 @@
 import Foundation
 import UIKit
 
-class MainSplitViewController : UISplitViewController,UISplitViewControllerDelegate {
+enum UserInterfaceMode {
+    case stats
+    case detail
+}
 
-    
+protocol UserInterfaceModeManager : AnyObject {
+    var userInterfaceMode : UserInterfaceMode { get set }
+}
+
+class MainSplitViewController : UISplitViewController,UISplitViewControllerDelegate,UserInterfaceModeManager {
+
+    var logListController : LogListTableViewController? = nil
+    var logDetailTabBarController : LogDetailTabBarController? = nil
+    var statsTabBarController : StatsTabBarController? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +34,11 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
             let rightTabbarController = self.viewControllers.last as? LogDetailTabBarController
         else { fatalError() }
         
-        logListController.delegate = rightTabbarController
+        self.logListController = logListController
+        self.logDetailTabBarController = rightTabbarController
+        
+        self.logListController?.delegate = rightTabbarController
+        self.logListController?.userInterfaceModeManager = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -31,6 +46,39 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             FlightLogOrganizer.shared.syncCloud()
+        }
+    }
+    
+    var userInterfaceMode : UserInterfaceMode = .detail {
+        didSet {
+            switch userInterfaceMode {
+            case .detail:
+                self.displayDetail()
+            case .stats:
+                self.displayStats()
+            }
+        }
+    }
+    
+    func displayStats() {
+        if self.statsTabBarController == nil {
+            let storyBoard = UIStoryboard(name: "Main", bundle: Bundle.main)
+            guard
+                  let controller = storyBoard.instantiateViewController(withIdentifier: "statsTabBarController") as? StatsTabBarController
+            else {
+                return
+            }
+            self.statsTabBarController = controller
+        }
+        
+        if let controller = self.statsTabBarController {
+            self.showDetailViewController(controller, sender: self)
+        }
+    }
+    
+    func displayDetail() {
+        if let detail = self.logDetailTabBarController {
+            self.showDetailViewController(detail, sender: self)
         }
     }
     
