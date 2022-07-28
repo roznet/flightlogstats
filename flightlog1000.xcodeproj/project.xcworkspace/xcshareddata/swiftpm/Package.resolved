@@ -1,52 +1,59 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "FMDB",
-        "repositoryURL": "https://github.com/ccgus/fmdb",
-        "state": {
-          "branch": null,
-          "revision": "61e51fde7f7aab6554f30ab061cc588b28a97d04",
-          "version": "2.7.7"
-        }
-      },
-      {
-        "package": "Geomagnetism",
-        "repositoryURL": "https://github.com/roznet/Geomagnetism",
-        "state": {
-          "branch": null,
-          "revision": "74049c87ab58b6e004342a64de2884c60b0c4734",
-          "version": "1.0.0"
-        }
-      },
-      {
-        "package": "KDTree",
-        "repositoryURL": "https://github.com/Bersaelor/KDTree.git",
-        "state": {
-          "branch": null,
-          "revision": "490df2848e3f497bdc2edf61667f4ab669cff26e",
-          "version": "1.4.1"
-        }
-      },
-      {
-        "package": "RZFlight",
-        "repositoryURL": "https://github.com/roznet/rzflight",
-        "state": {
-          "branch": null,
-          "revision": "496d0a50843cd6daa586a6d2ca01d922e06fc82e",
-          "version": "1.0.1"
-        }
-      },
-      {
-        "package": "RZUtilsTouch",
-        "repositoryURL": "https://github.com/roznet/rzutils-touch",
-        "state": {
-          "branch": null,
-          "revision": "5a396243777c14257c4e0b23c9f2229fd25252ae",
-          "version": "1.0.2"
-        }
+  "pins" : [
+    {
+      "identity" : "fmdb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ccgus/fmdb",
+      "state" : {
+        "revision" : "61e51fde7f7aab6554f30ab061cc588b28a97d04",
+        "version" : "2.7.7"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "geomagnetism",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/Geomagnetism",
+      "state" : {
+        "revision" : "74049c87ab58b6e004342a64de2884c60b0c4734",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "kdtree",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Bersaelor/KDTree.git",
+      "state" : {
+        "revision" : "490df2848e3f497bdc2edf61667f4ab669cff26e",
+        "version" : "1.4.1"
+      }
+    },
+    {
+      "identity" : "rzflight",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/rzflight",
+      "state" : {
+        "revision" : "496d0a50843cd6daa586a6d2ca01d922e06fc82e",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "rzutils",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/rzutils",
+      "state" : {
+        "branch" : "1.0.20",
+        "revision" : "74a47c9b70853e1c0b47c9e9a27bd11fae4dea78"
+      }
+    },
+    {
+      "identity" : "rzutils-touch",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/rzutils-touch",
+      "state" : {
+        "revision" : "5a396243777c14257c4e0b23c9f2229fd25252ae",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 2
 }

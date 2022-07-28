@@ -127,7 +127,6 @@
 		42606A1D288DC5A500AE858C /* RZNumberWithUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RZNumberWithUnitView.swift; path = Source/RZNumberWithUnitView.swift; sourceTree = "<group>"; };
 		42606A1F288DE0A300AE858C /* FlightListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightListDataSource.swift; path = Source/FlightListDataSource.swift; sourceTree = "<group>"; };
 		42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightSummary+Field.swift"; path = "Source/FlightSummary+Field.swift"; sourceTree = "<group>"; };
-		42606A23288DE9A200AE858C /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		4264C22F281D830000F40436 /* MainSplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainSplitViewController.swift; path = Source/MainSplitViewController.swift; sourceTree = "<group>"; };
 		4264C231281D9A0700F40436 /* LogListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogListTableViewCell.swift; path = Source/LogListTableViewCell.swift; sourceTree = "<group>"; };
 		4264C2332825B58F00F40436 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Source/Settings.swift; sourceTree = "<group>"; };
@@ -279,7 +278,6 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
-				42606A23288DE9A200AE858C /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLog1000.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlog1000 */,
 				4280C893280D43E500A0FB32 /* flightlog1000Tests */,
@@ -1000,7 +998,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/roznet/rzutils";
 			requirement = {
-				branch = master;
+				branch = 1.0.20;
 				kind = branch;
 			};
 		};
