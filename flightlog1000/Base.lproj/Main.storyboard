@@ -524,6 +524,28 @@
                                             <outlet property="label" destination="fec-4C-dvz" id="f00-HL-VdU"/>
                                         </connections>
                                     </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="2wB-hT-H6C" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="zpy-2L-hDf">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rsr-6B-SM9" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Rsr-6B-SM9" firstAttribute="top" secondItem="zpy-2L-hDf" secondAttribute="top" id="3AX-Do-7Rj"/>
+                                                <constraint firstItem="Rsr-6B-SM9" firstAttribute="leading" secondItem="zpy-2L-hDf" secondAttribute="leading" id="M5q-1z-cvQ"/>
+                                                <constraint firstAttribute="trailing" secondItem="Rsr-6B-SM9" secondAttribute="trailing" id="RPd-sA-tFe"/>
+                                                <constraint firstAttribute="bottom" secondItem="Rsr-6B-SM9" secondAttribute="bottom" id="j2N-CI-eyx"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="numberWithUnitView" destination="Rsr-6B-SM9" id="9FJ-tj-wpf"/>
+                                        </connections>
+                                    </collectionViewCell>
                                 </cells>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r8v-c1-eqN">

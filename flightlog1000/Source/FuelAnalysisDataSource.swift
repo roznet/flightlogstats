@@ -8,27 +8,27 @@
 import UIKit
 import OSLog
 import RZUtils
+import RZUtilsSwift
 
-class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionDelegate {
+extension TimeInterval {
+    var numberWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: GCUnit.second(), andValue: self) }
+}
+
+class FuelAnalysisDataSource: TableDataSource {
+    
     typealias Endurance = Aircraft.Endurance
     
     weak var flightLogViewModel : FlightLogViewModel?
     let flightSummary : FlightSummary
     private var displayContext : DisplayContext
     
-    private var attributedCells : [NSAttributedString] = []
-    
-    var frozenColumns : Int = 1
-    var frozenRows : Int = 1
-    
-    private(set) var sections : Int = 0
-    private(set) var items : Int = 4
-    
     init(flightSummary : FlightSummary,
          flightViewModel : FlightLogViewModel){
         self.flightSummary = flightSummary
         self.flightLogViewModel = flightViewModel
         self.displayContext = DisplayContext()
+        
+        super.init(rows: 0, columns: 4, frozenColumns: 1, frozenRows: 1)
     }
     
     //MARK: - delegate
@@ -38,34 +38,40 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
     
     func addSeparator() {
         for _ in 0..<4 {
-            self.attributedCells.append(NSAttributedString(string: "", attributes: self.titleAttributes))
+            self.cellHolders.append(CellHolder(string: "", attributes: self.titleAttributes))
         }
-        self.sections += 1
+        self.rowsCount += 1
     }
     
     func addLine(name : String, fuel : FuelQuantity, unit : GCUnit) {
-        self.attributedCells.append(NSAttributedString(string: name, attributes: self.titleAttributes))
-        self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(numberWithUnit: fuel.totalWithUnit, converted: unit),
-                                                       attributes: self.cellAttributes))
-        self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(numberWithUnit: fuel.leftWithUnit, converted: unit),
-                                                       attributes: self.cellAttributes))
-        self.attributedCells.append(NSAttributedString(string: self.displayContext.formatValue(numberWithUnit: fuel.rightWithUnit, converted: unit),
-                                                       attributes: self.cellAttributes))
-        self.sections += 1
+        self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
+        var geoIndex = 1
+        for nu in [fuel.totalWithUnit.convert(to: unit),
+                   fuel.leftWithUnit.convert(to: unit),
+                   fuel.rightWithUnit.convert(to: unit)] {
+            self.geometries[geoIndex].adjust(for: nu)
+            self.cellHolders.append(CellHolder.numberWithUnit(nu))
+            geoIndex += 1
+        }
+        self.rowsCount += 1
     }
     
     func addLine(name : String, endurance  : Endurance) {
-        self.attributedCells.append(NSAttributedString(string: name, attributes: self.titleAttributes))
-        self.attributedCells.append(NSAttributedString(string: self.displayContext.formatHHMM(interval: endurance),
-                                                       attributes: self.cellAttributes))
-        self.attributedCells.append(NSAttributedString(string: "",
-                                                       attributes: self.cellAttributes))
-        self.attributedCells.append(NSAttributedString(string: "",
-                                                       attributes: self.cellAttributes))
-        self.sections += 1
+        self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
+        let nu = endurance.numberWithUnit.convert(to: GCUnit.minute())
+        self.cellHolders.append(CellHolder.numberWithUnit(nu))
+        self.geometries[1].adjust(for: nu)
+        self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+        self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+        self.rowsCount += 1
     }
     
-    func prepare() {
+    override func prepare() {
+        self.cellHolders = []
+        self.geometries = []
+        
+        self.cellAttributes = ViewConfig.shared.cellAttributes
+        self.titleAttributes = ViewConfig.shared.titleAttributes
         
         if let displayContext = self.flightLogViewModel?.displayContext {
             self.displayContext = displayContext
@@ -81,12 +87,19 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
                                             inputs: inputs)
             
             
-            self.attributedCells  = []
             
             for title in [ "Fuel", "Total", "Left", "Right" ] {
-                self.attributedCells.append(NSAttributedString(string: title, attributes: self.titleAttributes))
+                let geometry = RZNumberWithUnitGeometry()
+                geometry.defaultUnitAttribute = cellAttributes
+                geometry.defaultNumberAttribute = cellAttributes
+                geometry.numberAlignment = .decimalSeparator
+                geometry.unitAlignment = .left
+                geometry.alignment = .left
+                self.geometries.append(geometry)
+
+                self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
             }
-            self.sections = 1
+            self.rowsCount = 1
             
             self.addLine(name: "Current", fuel: fuelAnalysis.currentFuel, unit: fuelTargetUnit)
             self.addLine(name: "Current Endurance", endurance: fuelAnalysis.currentEndurance)
@@ -122,45 +135,5 @@ class FuelAnalysisDataSource: NSObject, UICollectionViewDataSource, UICollection
             self.addLine(name: "Lost Endurance", endurance: fuelAnalysis.addedLostEndurance)
         }
    }
-    
-    func attributedString(at indexPath : IndexPath) -> NSAttributedString {
-        let index = indexPath.section * 4 + indexPath.item
-        return self.attributedCells[index]
-    }
-    
-    func size(at indexPath: IndexPath) -> CGSize {
-        return self.attributedString(at: indexPath).size()
-    }
-
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return self.sections
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.items
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TableCollectionViewCell", for: indexPath)
-        if let tableCell = cell as? TableCollectionViewCell {
-            tableCell.label.attributedText = self.attributedString(at: indexPath)
-            
-            if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
-                tableCell.backgroundColor = UIColor.systemCyan
-            }else{
-                if indexPath.section % 2 == 0{
-                    tableCell.backgroundColor = UIColor.systemBackground
-                }else{
-                    tableCell.backgroundColor = UIColor.systemGroupedBackground
-                }
-            }
-        }
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        Logger.app.info("Selected \(indexPath)")
-    }
 }
 
