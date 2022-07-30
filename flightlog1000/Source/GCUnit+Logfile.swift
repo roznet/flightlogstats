@@ -12,7 +12,7 @@ extension GCUnit {
     static let mapping : [String:GCUnit] = [
         "%" : GCUnit(forKey: "percent")!,
         "G" : GCUnit(forKey: "dimensionless")!,
-        "Hg" : GCUnit(forKey: "dimensionless")!, // manifold pressure
+        "Hg" : GCUnit(forKey: "inHg")!, // manifold pressure
         "MHz" : GCUnit(forKey: "MHz")!, // radio frequency
         "amps" : GCUnit(forKey: "dimensionless")!,
         "bool" : GCUnit(forKey: "dimensionless")!,
@@ -33,7 +33,7 @@ extension GCUnit {
         "kt" : GCUnit(forKey: "knot")!,
         "mt" : GCUnit(forKey: "dimensionless")!,
         "nm" : GCUnit(forKey: "nm")!,
-        "psi" : GCUnit(forKey: "dimensionless")!, // oil pressure
+        "psi" : GCUnit(forKey: "psi")!, // oil pressure
         "rpm" : GCUnit(forKey: "dimensionless")!,
         "volts" : GCUnit(forKey: "dimensionless")!,
     ]
