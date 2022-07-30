@@ -52,7 +52,7 @@ class LogListTableViewCell: UITableViewCell {
             self.fuel.text = self.displayContext.formatValue(gallon: flightSummary.fuelUsed.total)
             if let endAirport = flightSummary.endAirport {
                 self.route.isHidden = false
-                self.route.text = self.displayContext.format(airport: endAirport, icao: false)
+                self.route.text = self.displayContext.format(airport: endAirport, style: .nameOnly)
             }else{
                 self.route.isHidden = true
             }

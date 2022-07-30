@@ -42,7 +42,7 @@ class FlightSummaryTimeDataSource: NSObject, UICollectionViewDataSource, UIColle
         self.attributedCells.append(NSAttributedString(string: description, attributes: self.cellAttributes))
         
         if let date = since?.end {
-            self.attributedCells.append(NSAttributedString(string: self.displayContext.format(date: date),
+            self.attributedCells.append(NSAttributedString(string: self.displayContext.format(time: date),
                                                            attributes: self.cellAttributes))
         }else{
             self.attributedCells.append(NSAttributedString(string: "", attributes: self.cellAttributes))

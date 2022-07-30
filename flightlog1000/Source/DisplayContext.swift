@@ -9,6 +9,7 @@ import Foundation
 import CoreLocation
 import RZUtils
 import RZFlight
+import RZUtilsSwift
 
 class DisplayContext {
     typealias Field = FlightLogFile.Field
@@ -23,14 +24,25 @@ class DisplayContext {
         case reference
     }
     
+    enum AirportStyle {
+        case icaoOnly
+        case nameOnly
+        case both
+    }
+    
     var style : Style = .value
     var dateStyle : DateStyle = .reference
     var timeFormatter : DateFormatter
+    var dateFormatter : DateFormatter
 
     init() {
         self.timeFormatter = DateFormatter()
         self.timeFormatter.dateStyle = .none
         self.timeFormatter.timeStyle = .short
+        
+        self.dateFormatter = DateFormatter()
+        self.dateFormatter.dateStyle = .medium
+        self.dateFormatter.timeStyle = .none
     }
     
     //MARK: - format model objets
@@ -50,12 +62,15 @@ class DisplayContext {
         return route.map { $0.name }.joined(separator: ",")
     }
     
-    func format(airport : Airport?, icao : Bool = true) -> String {
+    func format(airport : Airport?, style : AirportStyle = .both) -> String {
         if let airport = airport {
-            if icao {
+            switch style {
+            case .both:
                 return "\(airport.icao) \(airport.name)"
-            }else{
+            case .nameOnly:
                 return airport.name
+            case .icaoOnly:
+                return airport.icao
             }
         }else{
             return ""
@@ -76,25 +91,29 @@ class DisplayContext {
     ///   - since: the beginning of the period that date is relevant, for example in a leg that would be the start the leg
     ///   - reference: This is the reference date of which to compute general elapsed, typically the first date of the log
     /// - Returns: formatted date according to the convention
-    func format(date : Date, since : Date? = nil, reference : Date? = nil) -> String {
+    func format(time : Date, since : Date? = nil, reference : Date? = nil) -> String {
         switch self.dateStyle {
         case .elapsed:
             if let since = since {
-                return self.formatHHMM(timeRange: TimeRange(start: since, end: date))
+                return self.formatHHMM(timeRange: TimeRange(start: since, end: time))
             }else{
-                return self.timeFormatter.string(from: date)
+                return self.timeFormatter.string(from: time)
             }
         case .reference:
             if let reference = reference {
-                return self.formatHHMM(timeRange: TimeRange(start: reference, end: date))
+                return self.formatHHMM(timeRange: TimeRange(start: reference, end: time))
             }else{
-                return self.timeFormatter.string(from: date)
+                return self.timeFormatter.string(from: time)
             }
         case .absolute:
-            return self.timeFormatter.string(from: date)
+            return self.timeFormatter.string(from: time)
         }
     }
-    
+
+    func format(date : Date) -> String {
+        return self.dateFormatter.string(from: date)
+    }
+
 
     //MARK: - format Fields
     func formatStats(field : Field, valueStats : ValueStats) -> String {

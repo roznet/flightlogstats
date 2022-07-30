@@ -547,4 +547,11 @@ extension FlightLogOrganizer {
         }
     }
 
+    var actualFlightLogFileInfos : [FlightLogFileInfo] {
+        return self.filter() {
+            info in
+            return info.isFlight
+        }
+    }
+
 }

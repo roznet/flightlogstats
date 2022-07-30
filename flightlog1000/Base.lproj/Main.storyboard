@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21179.7" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21219" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21169.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21200"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
@@ -246,9 +246,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="8Xl-gc-ZSL" userLabel="Log List View">
-                                <rect key="frame" x="5" y="55" width="824" height="1084"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="8Xl-gc-ZSL" userLabel="Log List View">
+                                <rect key="frame" x="5" y="29" width="824" height="1105"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="6w5-OM-45w" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
@@ -302,6 +301,12 @@
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="hBr-FW-esI"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="8Xl-gc-ZSL" firstAttribute="leading" secondItem="hBr-FW-esI" secondAttribute="leading" constant="5" id="8Kc-1p-EW6"/>
+                            <constraint firstItem="8Xl-gc-ZSL" firstAttribute="bottom" secondItem="hBr-FW-esI" secondAttribute="bottom" constant="5" id="Xhn-G4-63q"/>
+                            <constraint firstItem="8Xl-gc-ZSL" firstAttribute="top" secondItem="hBr-FW-esI" secondAttribute="top" constant="5" id="iHw-BA-MWu"/>
+                            <constraint firstItem="hBr-FW-esI" firstAttribute="trailing" secondItem="8Xl-gc-ZSL" secondAttribute="trailing" constant="5" id="q8v-lJ-9U2"/>
+                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Trips" image="tablecells" catalog="system" id="gvR-GP-vzb"/>
                     <connections>

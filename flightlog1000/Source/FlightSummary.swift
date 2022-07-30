@@ -17,7 +17,6 @@ class FlightSummary {
         case missingFuel
     }
     
-    
     enum SummaryType : String {
         case empty
         case preflight

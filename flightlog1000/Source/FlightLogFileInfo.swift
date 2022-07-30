@@ -197,4 +197,15 @@ class FlightLogFileInfo: NSManagedObject {
         }
         return true
     }
+    
+    var isFlight : Bool {
+        if self.isEmpty {
+            return false
+        }
+        if let summary = self.flightSummary {
+            return summary.summaryType == .flight
+        }
+        return false
+    }
+    
 }
