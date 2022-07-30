@@ -157,6 +157,13 @@ class FlightSummary {
 
     }
     
+    func contains(_ searchText : String) -> Bool {
+        if (self.startAirport?.contains(searchText) ?? false) || (self.endAirport?.contains(searchText) ?? false) {
+            return true
+        }
+        return false
+    }
+    
 }
 
 extension FlightSummary : CustomStringConvertible {

@@ -208,4 +208,16 @@ class FlightLogFileInfo: NSManagedObject {
         return false
     }
     
+    func contains(_ searchText : String ) -> Bool {
+        if let summary = self.flightSummary {
+            if summary.contains(searchText) {
+                return true
+            }
+        }
+        if log_file_name?.contains(searchText) ?? false {
+            return true
+        }
+        return false
+    }
+    
 }

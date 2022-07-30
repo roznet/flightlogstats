@@ -170,6 +170,7 @@
 		429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewCell.swift; path = Source/TableCollectionViewCell.swift; sourceTree = "<group>"; };
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
 		429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewLayout.swift; path = Source/TableCollectionViewLayout.swift; sourceTree = "<group>"; };
+		429CE7DF28951BA10063EF97 /* rzflight */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzflight; path = ../rzflight; sourceTree = "<group>"; };
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
 		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
 		42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLogFile+Field.swift"; path = "Source/FlightLogFile+Field.swift"; sourceTree = "<group>"; };
@@ -297,6 +298,7 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
+				429CE7DF28951BA10063EF97 /* rzflight */,
 				425B34572893E12900548557 /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLog1000.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlog1000 */,

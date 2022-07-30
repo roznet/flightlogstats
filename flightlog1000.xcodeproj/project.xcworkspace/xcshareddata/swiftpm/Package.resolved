@@ -29,15 +29,6 @@
         }
       },
       {
-        "package": "RZFlight",
-        "repositoryURL": "https://github.com/roznet/rzflight",
-        "state": {
-          "branch": null,
-          "revision": "496d0a50843cd6daa586a6d2ca01d922e06fc82e",
-          "version": "1.0.1"
-        }
-      },
-      {
         "package": "RZUtilsTouch",
         "repositoryURL": "https://github.com/roznet/rzutils-touch",
         "state": {

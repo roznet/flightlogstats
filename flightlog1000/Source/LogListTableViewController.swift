@@ -17,15 +17,20 @@ protocol LogSelectionDelegate : AnyObject {
     func selectOneIfEmpty(organizer : FlightLogOrganizer)
 }
 
-class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate {
+class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate, UISearchResultsUpdating {
 
     var logInfoList : [FlightLogFileInfo] = []
+    var fullLogInfoList : [FlightLogFileInfo] = []
+    
     var logFileOrganizer = FlightLogOrganizer.shared
     
     var progressReportViewController : ProgressReportViewController? = nil
     
     weak var delegate : LogSelectionDelegate? = nil
     weak var userInterfaceModeManager : UserInterfaceModeManager? = nil
+    
+    var searchController : UISearchController = UISearchController()
+    var isSearchBarEmpty : Bool { return searchController.searchBar.text?.isEmpty ?? true }
     
     var filterEmpty = true
     
@@ -117,6 +122,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
     }
     
+    func updateSearchResults(for searchController: UISearchController) {
+        self.updateSearchedList()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -129,6 +141,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         
         self.tableView.estimatedRowHeight = 100
         self.tableView.rowHeight = UITableView.automaticDimension
+        
+        self.searchController.searchResultsUpdater = self
+        self.searchController.obscuresBackgroundDuringPresentation = false
+        self.searchController.searchBar.placeholder = "Search Flights"
+        
+        self.navigationItem.searchController = self.searchController
+        self.navigationItem.hidesSearchBarWhenScrolling = true
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -236,7 +255,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         
         if self.filterEmpty {
             AppDelegate.worker.async {
-                self.logInfoList = self.logFileOrganizer.nonEmptyLogFileInfos
+                self.fullLogInfoList = self.logFileOrganizer.nonEmptyLogFileInfos
+                self.updateSearchedList()
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
@@ -250,12 +270,21 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 }
             }
         }else{
-            self.logInfoList = self.logFileOrganizer.flightLogFileInfos
+            self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos
+            self.updateSearchedList()
             self.tableView.reloadData()
             self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
         }
     }
 
+    func updateSearchedList() {
+        if self.isSearchBarEmpty {
+            self.logInfoList = self.fullLogInfoList
+        }else if let searchText = self.searchController.searchBar.text {
+            self.logInfoList = self.fullLogInfoList.filter { $0.contains(searchText) }
+        }
+    }
+    
     //MARK: - add functionality
     
     @objc func sum(button : UIBarButtonItem) {
