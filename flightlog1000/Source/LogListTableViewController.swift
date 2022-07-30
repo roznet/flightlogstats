@@ -256,8 +256,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         if self.filterEmpty {
             AppDelegate.worker.async {
                 self.fullLogInfoList = self.logFileOrganizer.nonEmptyLogFileInfos
-                self.updateSearchedList()
                 DispatchQueue.main.async {
+                    self.updateSearchedList()
                     self.tableView.reloadData()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now()+0.5){
