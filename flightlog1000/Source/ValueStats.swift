@@ -6,8 +6,11 @@
 //
 
 import Foundation
+import RZUtils
 
 public struct ValueStats {
+    private(set) var unit : GCUnit
+    
     private(set) var start : Double
     private(set) var end   : Double
     
@@ -26,7 +29,7 @@ public struct ValueStats {
     
     static let invalid = ValueStats(value: .nan)
     
-    init(value : Double, weight : Double = 1.0) {
+    init(value : Double, weight : Double = 1.0, unit : GCUnit = GCUnit.dimensionless()) {
         self.start = value
         self.end = value
         self.sum = value
@@ -35,6 +38,7 @@ public struct ValueStats {
         self.count = value.isFinite ? 1 : 0
         self.weight = weight
         self.weightedSum = value * weight
+        self.unit = unit
     }
     
     mutating func update(with value : Double, weight : Double = 1) {

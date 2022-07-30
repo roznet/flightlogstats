@@ -13,7 +13,7 @@ extension GCUnit {
         "%" : GCUnit(forKey: "percent")!,
         "G" : GCUnit(forKey: "dimensionless")!,
         "Hg" : GCUnit(forKey: "dimensionless")!, // manifold pressure
-        "MHz" : GCUnit(forKey: "dimensionless")!, // radio frequency
+        "MHz" : GCUnit(forKey: "MHz")!, // radio frequency
         "amps" : GCUnit(forKey: "dimensionless")!,
         "bool" : GCUnit(forKey: "dimensionless")!,
         "deg" : GCUnit(forKey: "dimensionless")!, // headings degree

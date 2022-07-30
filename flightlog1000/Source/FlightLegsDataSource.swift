@@ -9,8 +9,9 @@ import Foundation
 import UIKit
 import OSLog
 import RZUtils
+import RZUtilsSwift
 
-class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionDelegate {
+class FlightLegsDataSource : TableDataSource {
         
     typealias Field = FlightLogFile.Field
     typealias LegInfo = FlightLeg.LegInfo
@@ -19,11 +20,6 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     let fields : [Field]
     let fixedColumnsInfo : [LegInfo]
     let displayContext : DisplayContext
-    
-    private var attributedCells : [NSAttributedString] = []
-
-    var frozenColumns : Int { return self.fixedColumnsInfo.count }
-    var frozenRows : Int = 1
     
     init(legs : [FlightLeg], displayContext : DisplayContext = DisplayContext()){
         self.legs = legs
@@ -40,6 +36,11 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
         self.displayContext = displayContext
         self.fixedColumnsInfo = [.end_time,.waypoint]
         
+        super.init(rows: self.legs.count+1,
+                   columns: self.fixedColumnsInfo.count + self.fields.count,
+                   frozenColumns: self.fixedColumnsInfo.count,
+                   frozenRows: 1)
+        
     }
     
     //MARK: - delegate
@@ -47,21 +48,25 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
     var titleAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.boldSystemFont(ofSize: 14.0)]
     var cellAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.systemFont(ofSize: 14.0)]
     
-    func formattedValueFor(field : Field, row : Int) -> String {
+    func formattedValueFor(field : Field, row : Int) -> GCNumberWithUnit? {
         guard let leg = self.legs[safe: row],
               let value = leg.valueStats(field: field)
         else {
             // empty string if missing for a blank in the table
-            return ""
+            return nil
         }
         
-        return field.format(valueStats: value, context: self.displayContext)
+        return field.numberWithUnit(valueStats: value, context: self.displayContext)
     }
     
     
-    func prepare() {
-        self.attributedCells  = []
+    override func prepare() {
+        self.cellHolders  = []
+        self.geometries   = []
         
+        self.cellAttributes = ViewConfig.shared.cellAttributes
+        self.titleAttributes = ViewConfig.shared.titleAttributes
+
         if let first = legs.first {
             // col 0 = time since start
             // col 1 = leg waypoints
@@ -70,68 +75,40 @@ class FlightLegsDataSource : NSObject, UICollectionViewDataSource, UICollectionV
             
             // first headers
             for title in self.fixedColumnsInfo {
-                let titleAttributed = NSAttributedString(string: title.description, attributes: self.titleAttributes)
-                self.attributedCells.append(titleAttributed)
+                let titleAttributed = CellHolder(string: title.description, attributes: self.titleAttributes)
+                self.cellHolders.append(titleAttributed)
+                self.geometries.append(RZNumberWithUnitGeometry())
             }
 
             for field in fields {
-                let fieldAttributed = NSAttributedString(string: field.description, attributes: self.titleAttributes)
-                self.attributedCells.append(fieldAttributed)
+                let fieldAttributed = CellHolder(string: field.description, attributes: self.titleAttributes)
+                self.cellHolders.append(fieldAttributed)
+                let geometry = RZNumberWithUnitGeometry()
+                geometry.defaultUnitAttribute = self.cellAttributes
+                geometry.defaultNumberAttribute = self.cellAttributes
+                geometry.numberAlignment = .decimalSeparator
+                geometry.unitAlignment = .left
+                geometry.alignment = .center
+                self.geometries.append(geometry)
             }
             
             
             for (row,leg) in legs.enumerated() {
                 for info in self.fixedColumnsInfo {
-                    let fixedAttributed = NSAttributedString(string: leg.format(which: info, displayContext: self.displayContext, reference: reference), attributes: self.titleAttributes)
-                    self.attributedCells.append(fixedAttributed)
+                    let fixedAttributed = CellHolder(string: leg.format(which: info, displayContext: self.displayContext, reference: reference), attributes: self.titleAttributes)
+                    self.cellHolders.append(fixedAttributed)
                 }
+                var geoIndex = self.fixedColumnsInfo.count
                 for field in fields {
-                    let fieldAttributed = NSAttributedString(string: self.formattedValueFor(field: field, row: row), attributes: self.cellAttributes)
-                    self.attributedCells.append(fieldAttributed)
+                    if let nu = self.formattedValueFor(field: field, row: row) {
+                        self.geometries[geoIndex].adjust(for: nu)
+                        self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                    }else{
+                        self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+                    }
+                    geoIndex += 1
                 }
             }
         }
-    }
-    
-    func attributedString(at indexPath : IndexPath) -> NSAttributedString {
-        let index = indexPath.section * (fields.count+fixedColumnsInfo.count) + indexPath.item
-        return self.attributedCells[index]
-    }
-    
-    func size(at indexPath: IndexPath) -> CGSize {
-        return self.attributedString(at: indexPath).size()
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        guard legs.count > 0 else { return 0 }
-        return legs.count + 1 /* for header */
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard legs.count > 0 else { return 0 }
-        return self.fixedColumnsInfo.count + self.fields.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TableCollectionViewCell", for: indexPath)
-        if let tableCell = cell as? TableCollectionViewCell {
-            tableCell.label.attributedText = self.attributedString(at: indexPath)
-            
-            if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
-                tableCell.backgroundColor = UIColor.systemBrown
-            }else{
-                if indexPath.section % 2 == 0{
-                    tableCell.backgroundColor = UIColor.systemBackground
-                }else{
-                    tableCell.backgroundColor = UIColor.systemGroupedBackground
-                }
-            }
-        }
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        Logger.app.info("Selected \(indexPath)")
     }
 }

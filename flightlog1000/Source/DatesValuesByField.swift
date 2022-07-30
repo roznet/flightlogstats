@@ -212,7 +212,7 @@ public struct DatesValuesByField<T,F : Hashable> {
     
 }
 
-extension DatesValuesByField  where T == Double {
+extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
     public func valueStats(from : Date, to : Date) -> [F:ValueStats] {
         var rv : [F:ValueStats] = [:]
         var started : Bool = false
@@ -227,7 +227,7 @@ extension DatesValuesByField  where T == Double {
                     }
                 }else{
                     for (field,values) in self.values {
-                        rv[field] = ValueStats(value: values[idx], weight: 1.0)
+                        rv[field] = ValueStats(value: values[idx], weight: 1.0, unit: field.unit)
                     }
                     started = true
                 }

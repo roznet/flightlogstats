@@ -178,6 +178,28 @@
                                             <outlet property="label" destination="poO-1U-1lH" id="2u1-LC-b6s"/>
                                         </connections>
                                     </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="ncd-3e-VYh" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="zZd-lG-HaM">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zT3-ET-M7b" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="zT3-ET-M7b" firstAttribute="leading" secondItem="zZd-lG-HaM" secondAttribute="leading" id="Jin-e9-tel"/>
+                                                <constraint firstAttribute="trailing" secondItem="zT3-ET-M7b" secondAttribute="trailing" id="Ub7-7H-zdg"/>
+                                                <constraint firstAttribute="bottom" secondItem="zT3-ET-M7b" secondAttribute="bottom" id="hMG-vD-aCj"/>
+                                                <constraint firstItem="zT3-ET-M7b" firstAttribute="top" secondItem="zZd-lG-HaM" secondAttribute="top" id="jUz-Ne-M7l"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="numberWithUnitView" destination="zT3-ET-M7b" id="Oxm-ID-6rI"/>
+                                        </connections>
+                                    </collectionViewCell>
                                 </cells>
                             </collectionView>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="cyP-Hg-ndb">

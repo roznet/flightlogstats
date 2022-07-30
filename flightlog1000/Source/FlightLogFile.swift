@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 import RZUtils
 
-class FlightLogFile {
+public class FlightLogFile {
     enum FlightLogFileError : Error, Comparable {
         case fileDoesNotExist
         case fileIsNotALogFile

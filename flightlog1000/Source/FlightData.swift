@@ -325,7 +325,7 @@ class FlightData {
                 }
                 if include {
                     if current.count == 0 {
-                        current = one.map { ValueStats(value: $0) }
+                        current = zip(one,self.doubleFields).map { ValueStats(value: $0, unit: $1.unit) }
                     }else{
                         for (idx,val) in one.enumerated() {
                             current[idx].update(with: val)

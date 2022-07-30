@@ -7,9 +7,10 @@
 
 import Foundation
 import OSLog
+import RZUtils
 
 extension FlightLogFile {
-    enum Field : String {
+    public enum Field : String {
         // the rawValue needs to be the same as in the original csv log file
         case Unknown = "Unknown"
         
@@ -114,6 +115,251 @@ extension FlightLogFile {
         //E1CHTMax
         //E1TITMax
         //FQtyT
+        
+        struct FieldDef : Codable {
+            let field : String
+            let order : Int
+            let unit_key : String
+            let description : String
+            let unit_description : String
+
+            lazy var unit : GCUnit = { return GCUnit.from(logFileUnit: self.unit_key) }()
+            
+            private enum CodingKeys : String, CodingKey {
+                case field, order, unit_key = "unit", description, unit_description
+            }
+        }
+        static var fieldDefinitions : [FlightLogFile.Field:FieldDef] = {
+            var rv : [FlightLogFile.Field:FieldDef] = [:]
+            do {
+                if let bundlePath = Bundle.main.path(forResource: "logFileFields", ofType: "json"),
+                   let jsonData = try String(contentsOfFile: bundlePath).data(using: .utf8) {
+                    let defs = try JSONDecoder().decode([FieldDef].self, from: jsonData)
+                    for def in defs {
+                        if let field = FlightLogFile.Field(rawValue: def.field) {
+                            rv[field] = def
+                        }else{
+                            Logger.app.error("Incompatible field \(def.field)")
+                        }
+                    }
+                }
+            } catch {
+                Logger.app.error( "failed to decode field json \(error.localizedDescription)" )
+            }
+            return rv
+        }()
+        
+        static func unit(for field: Field) -> GCUnit {
+            if var def = Self.fieldDefinitions[field] {
+                return def.unit
+            }
+            return GCUnit.dimensionless()
+
+        }
+        
+        var localizedDescription : String {
+            if let def = Self.fieldDefinitions[self] {
+                return def.description
+            }
+            return self.rawValue
+        }
+        
+        var unit : GCUnit {
+            if var def = Self.fieldDefinitions[self] {
+                return def.unit
+            }
+            return GCUnit.dimensionless()
+        }
+        
+        var order : Int {
+            if let def = Self.fieldDefinitions[self] {
+                return def.order
+            }
+            return 9999
+        }
+        
+        func numberWithUnit(valueStats : ValueStats, context : DisplayContext = DisplayContext() ) -> GCNumberWithUnit? {
+            switch self {
+            case .AltInd:
+                return context.numberWithUnit(altitude: valueStats)
+            case .BaroA:
+                return context.numberWithUnit(baro: valueStats)
+            case .AltMSL:
+                return context.numberWithUnit(altitude: valueStats)
+            case .OAT:
+                return context.numberWithUnit(valueStats)
+            case .IAS:
+                return context.numberWithUnit(speed: valueStats)
+            case .GndSpd:
+                return context.numberWithUnit(speed: valueStats)
+            case .VSpd:
+                return context.numberWithUnit(fpm: valueStats)
+            case .Pitch:
+                return context.numberWithUnit(valueStats)
+            case .Roll:
+                return context.numberWithUnit(valueStats)
+            case .LatAc:
+                return context.numberWithUnit(valueStats)
+            case .NormAc:
+                return context.numberWithUnit(valueStats)
+            case .HDG:
+                return context.numberWithUnit(degree: valueStats)
+            case .TRK:
+                return context.numberWithUnit(degree: valueStats)
+            case .volt1:
+                return context.numberWithUnit(valueStats)
+            case .volt2:
+                return context.numberWithUnit(valueStats)
+            case .amp1:
+                return context.numberWithUnit(valueStats)
+            case .FQtyL:
+                return context.numberWithUnit(gallon: valueStats)
+            case .FQtyR:
+                return context.numberWithUnit(gallon: valueStats)
+            case .E1_FFlow:
+                return context.numberWithUnit(gph: valueStats)
+            case .E1_OilT:
+                return context.numberWithUnit(valueStats)
+            case .E1_OilP:
+                return context.numberWithUnit(valueStats)
+            case .E1_MAP:
+                return context.numberWithUnit(map: valueStats)
+            case .E1_RPM:
+                return context.numberWithUnit(valueStats)
+            case .E1_PctPwr:
+                return context.numberWithUnit(percent: valueStats)
+            case .E1_CHT1:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_CHT2:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_CHT3:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_CHT4:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_CHT5:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_CHT6:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_EGT1:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_EGT2:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_EGT3:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_EGT4:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_EGT5:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_EGT6:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_TIT1:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_TIT2:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_Torq:
+                return context.numberWithUnit(valueStats)
+            case .E1_NG:
+                return context.numberWithUnit(valueStats)
+            case .E1_ITT:
+                return context.numberWithUnit(valueStats)
+            case .E2_FFlow:
+                return context.numberWithUnit(gph: valueStats)
+            case .E2_MAP:
+                return context.numberWithUnit(map: valueStats)
+            case .E2_RPM:
+                return context.numberWithUnit(valueStats)
+            case .E2_Torq:
+                return context.numberWithUnit(valueStats)
+            case .E2_NG:
+                return context.numberWithUnit(valueStats)
+            case .E2_ITT:
+                return context.numberWithUnit(valueStats)
+            case .AltGPS:
+                return context.numberWithUnit(altitude: valueStats)
+            case .TAS:
+                return context.numberWithUnit(speed: valueStats)
+            case .HSIS:
+                return context.numberWithUnit(valueStats)
+            case .CRS:
+                return context.numberWithUnit(degree: valueStats)
+            case .NAV1:
+                return context.numberWithUnit(frequency: valueStats)
+            case .NAV2:
+                return context.numberWithUnit(frequency: valueStats)
+            case .COM1:
+                return context.numberWithUnit(frequency: valueStats)
+            case .COM2:
+                return context.numberWithUnit(frequency: valueStats)
+            case .HCDI:
+                return context.numberWithUnit(valueStats)
+            case .VCDI:
+                return context.numberWithUnit(valueStats)
+            case .WndSpd:
+                return context.numberWithUnit(speed: valueStats)
+            case .WndDr:
+                return context.numberWithUnit(degree: valueStats)
+            case .WptDst:
+                return context.numberWithUnit(distance: valueStats, total: true)
+            case .WptBrg:
+                return context.numberWithUnit(degree: valueStats)
+            case .MagVar:
+                return context.numberWithUnit(degree: valueStats)
+            case .AfcsOn:
+                return context.numberWithUnit(autopilot: valueStats)
+            case .RollM:
+                return context.numberWithUnit(valueStats)
+            case .PitchM:
+                return context.numberWithUnit(valueStats)
+            case .RollC:
+                return context.numberWithUnit(degree: valueStats)
+            case .PichC:
+                return context.numberWithUnit(degree: valueStats)
+            case .VSpdG:
+                return context.numberWithUnit(fpm: valueStats)
+            case .GPSfix:
+                return context.numberWithUnit(valueStats)
+            case .HAL:
+                return context.numberWithUnit(valueStats)
+            case .VAL:
+                return context.numberWithUnit(valueStats)
+            case .HPLwas:
+                return context.numberWithUnit(valueStats)
+            case .HPLfd:
+                return context.numberWithUnit(valueStats)
+            case .VPLwas:
+                return context.numberWithUnit(valueStats)
+            case .Unknown:
+                return context.numberWithUnit(valueStats)
+            case .AtvWpt:
+                return context.numberWithUnit(valueStats)
+            case .Latitude:
+                return context.numberWithUnit(valueStats)
+            case .Longitude:
+                return context.numberWithUnit(valueStats)
+            case .Lcl_Date:
+                return nil
+            case .Lcl_Time:
+                return nil
+            
+            // Calculated
+            case .FQtyT:
+                return context.numberWithUnit(gallon: valueStats, used: false)
+            case .Distance:
+                return context.numberWithUnit(distance: valueStats, total: true)
+            case .WndCross:
+                return context.numberWithUnit(speed: valueStats)
+            case .WndDirect:
+                return context.numberWithUnit(speed: valueStats)
+            case .FTotalizerT:
+                return context.numberWithUnit(gallon: valueStats, used: false)
+            case .UTCOfst:
+                return nil
+                
+            case .FltPhase:
+                return nil
+            }
+        
+        }
     }
     
     enum MetaField : String {
@@ -130,235 +376,8 @@ extension FlightLogFile {
     }
 }
 
-extension FlightLogFile.Field {
-    struct FieldDef : Codable {
-        let field : String
-        let order : Int
-        let unit : String
-        let description : String
-        let unit_description : String
-        
-    }
-    static var fieldDefinitions : [FlightLogFile.Field:FieldDef] = {
-        var rv : [FlightLogFile.Field:FieldDef] = [:]
-        do {
-            if let bundlePath = Bundle.main.path(forResource: "logFileFields", ofType: "json"),
-               let jsonData = try String(contentsOfFile: bundlePath).data(using: .utf8) {
-                let defs = try JSONDecoder().decode([FieldDef].self, from: jsonData)
-                for def in defs {
-                    if let field = FlightLogFile.Field(rawValue: def.field) {
-                        rv[field] = def
-                    }else{
-                        Logger.app.error("Incompatible field \(def.field)")
-                    }
-                }
-            }
-        } catch {
-            Logger.app.error( "failed to decode field json \(error.localizedDescription)" )
-        }
-        return rv
-    }()
-    
-    var localizedDescription : String {
-        if let def = Self.fieldDefinitions[self] {
-            return def.description
-        }
-        return self.rawValue
-    }
-    
-    var order : Int {
-        if let def = Self.fieldDefinitions[self] {
-            return def.order
-        }
-        return 9999
-    }
-    
-    func format(valueStats : ValueStats, context : DisplayContext = DisplayContext() ) -> String {
-        switch self {
-        case .AltInd:
-            return context.formatStats(altitude: valueStats)
-        case .BaroA:
-            return context.formatStats(baro: valueStats)
-        case .AltMSL:
-            return context.formatStats(altitude: valueStats)
-        case .OAT:
-            return context.formatStats(valueStats)
-        case .IAS:
-            return context.formatStats(speed: valueStats)
-        case .GndSpd:
-            return context.formatStats(speed: valueStats)
-        case .VSpd:
-            return context.formatStats(fpm: valueStats)
-        case .Pitch:
-            return context.formatStats(valueStats)
-        case .Roll:
-            return context.formatStats(valueStats)
-        case .LatAc:
-            return context.formatStats(valueStats)
-        case .NormAc:
-            return context.formatStats(valueStats)
-        case .HDG:
-            return context.formatStats(degree: valueStats)
-        case .TRK:
-            return context.formatStats(degree: valueStats)
-        case .volt1:
-            return context.formatStats(valueStats)
-        case .volt2:
-            return context.formatStats(valueStats)
-        case .amp1:
-            return context.formatStats(valueStats)
-        case .FQtyL:
-            return context.formatStats(gallon: valueStats)
-        case .FQtyR:
-            return context.formatStats(gallon: valueStats)
-        case .E1_FFlow:
-            return context.formatStats(gph: valueStats)
-        case .E1_OilT:
-            return context.formatStats(valueStats)
-        case .E1_OilP:
-            return context.formatStats(valueStats)
-        case .E1_MAP:
-            return context.formatStats(map: valueStats)
-        case .E1_RPM:
-            return context.formatStats(valueStats)
-        case .E1_PctPwr:
-            return context.formatStats(percent: valueStats)
-        case .E1_CHT1:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_CHT2:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_CHT3:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_CHT4:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_CHT5:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_CHT6:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_EGT1:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_EGT2:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_EGT3:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_EGT4:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_EGT5:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_EGT6:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_TIT1:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_TIT2:
-            return context.formatStats(engineTemp: valueStats)
-        case .E1_Torq:
-            return context.formatStats(valueStats)
-        case .E1_NG:
-            return context.formatStats(valueStats)
-        case .E1_ITT:
-            return context.formatStats(valueStats)
-        case .E2_FFlow:
-            return context.formatStats(gph: valueStats)
-        case .E2_MAP:
-            return context.formatStats(map: valueStats)
-        case .E2_RPM:
-            return context.formatStats(valueStats)
-        case .E2_Torq:
-            return context.formatStats(valueStats)
-        case .E2_NG:
-            return context.formatStats(valueStats)
-        case .E2_ITT:
-            return context.formatStats(valueStats)
-        case .AltGPS:
-            return context.formatStats(altitude: valueStats)
-        case .TAS:
-            return context.formatStats(speed: valueStats)
-        case .HSIS:
-            return context.formatStats(valueStats)
-        case .CRS:
-            return context.formatStats(degree: valueStats)
-        case .NAV1:
-            return context.formatStats(frequency: valueStats)
-        case .NAV2:
-            return context.formatStats(frequency: valueStats)
-        case .COM1:
-            return context.formatStats(frequency: valueStats)
-        case .COM2:
-            return context.formatStats(frequency: valueStats)
-        case .HCDI:
-            return context.formatStats(valueStats)
-        case .VCDI:
-            return context.formatStats(valueStats)
-        case .WndSpd:
-            return context.formatStats(speed: valueStats)
-        case .WndDr:
-            return context.formatStats(degree: valueStats)
-        case .WptDst:
-            return context.formatStats(distance: valueStats, total: true)
-        case .WptBrg:
-            return context.formatStats(degree: valueStats)
-        case .MagVar:
-            return context.formatStats(degree: valueStats)
-        case .AfcsOn:
-            return context.formatStats(autopilot: valueStats)
-        case .RollM:
-            return context.formatStats(valueStats)
-        case .PitchM:
-            return context.formatStats(valueStats)
-        case .RollC:
-            return context.formatStats(degree: valueStats)
-        case .PichC:
-            return context.formatStats(degree: valueStats)
-        case .VSpdG:
-            return context.formatStats(fpm: valueStats)
-        case .GPSfix:
-            return context.formatStats(valueStats)
-        case .HAL:
-            return context.formatStats(valueStats)
-        case .VAL:
-            return context.formatStats(valueStats)
-        case .HPLwas:
-            return context.formatStats(valueStats)
-        case .HPLfd:
-            return context.formatStats(valueStats)
-        case .VPLwas:
-            return context.formatStats(valueStats)
-        case .Unknown:
-            return context.formatStats(valueStats)
-        case .AtvWpt:
-            return context.formatStats(valueStats)
-        case .Latitude:
-            return context.formatStats(valueStats)
-        case .Longitude:
-            return context.formatStats(valueStats)
-        case .Lcl_Date:
-            return ""
-        case .Lcl_Time:
-            return ""
-        
-        // Calculated
-        case .FQtyT:
-            return context.formatStats(gallon: valueStats, used: false)
-        case .Distance:
-            return context.formatStats(distance: valueStats, total: true)
-        case .WndCross:
-            return context.formatStats(speed: valueStats)
-        case .WndDirect:
-            return context.formatStats(speed: valueStats)
-        case .FTotalizerT:
-            return context.formatStats(gallon: valueStats, used: false)
-        case .UTCOfst:
-            return ""
-            
-        case .FltPhase:
-            return ""
-        }
-    
-    }
-}
-
 extension FlightLogFile.Field : CustomStringConvertible {
-    var description: String { return self.rawValue }
+    public var description: String { return self.rawValue }
 }
 
 extension FlightLogFile.MetaField : CustomStringConvertible {

@@ -117,7 +117,7 @@ class DisplayContext {
 
     //MARK: - format Fields
     func formatStats(field : Field, valueStats : ValueStats) -> String {
-        return field.format(valueStats: valueStats, context: self)
+        return field.numberWithUnit(valueStats: valueStats)?.description ?? ""
     }
     
     //MARK: - NumberWithUnits convert
@@ -143,74 +143,63 @@ class DisplayContext {
     }
     
     //MARK: - format stats
-    func formatStats(baro inch : ValueStats) -> String {
-        let val = GCNumberWithUnit(GCUnit.from(logFileUnit: "inch"), andValue: inch.average)
-        return val.description
+    func numberWithUnit(baro inch : ValueStats) -> GCNumberWithUnit {
+        let val = GCNumberWithUnit(unit: inch.unit, andValue: inch.end)
+        return val
     }
 
-    func formatStats(fpm : ValueStats) -> String {
-        return String(format: "%.0f fpm", fpm.average)
+    func numberWithUnit(fpm : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: fpm.unit, andValue: fpm.average)
     }
 
-    func formatStats(degree : ValueStats) -> String {
+    func numberWithUnit(degree : ValueStats) -> GCNumberWithUnit {
         if degree.average > 0 {
-            return String(format: "%.0f deg", degree.average)
+            return GCNumberWithUnit(unit: degree.unit, andValue: degree.average)
         }else{
-            return String(format: "%.0f deg", 360.0 + degree.average)
+            return GCNumberWithUnit(unit: degree.unit, andValue: degree.average+360.0)
         }
     }
     
-    func formatStats(gallon : ValueStats, used : Bool = true) -> String {
+    func numberWithUnit(gallon : ValueStats, used : Bool = true) -> GCNumberWithUnit {
         if used {
-            return String(format: "%.1f gal", gallon.max-gallon.min)
+            return GCNumberWithUnit(unit: gallon.unit, andValue: gallon.max-gallon.min)
         }else{
-            return String(format: "%.1f gal", gallon.end)
+            return GCNumberWithUnit(unit: gallon.unit, andValue: gallon.end)
         }
     }
     
-    func formatStats(distance: ValueStats, total : Bool = false) -> String {
-        if total {
-            return String(format: "%.1f nm", distance.end)
-        }else{
-            return String(format: "%.1f - %.1f nm", distance.min,distance.max)
-        }
+    func numberWithUnit(distance: ValueStats, total : Bool = false) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: distance.unit, andValue: distance.end)
     }
     
-    func formatStats(autopilot : ValueStats) -> String {
-        if autopilot.end == 0 {
-            return "Off"
-        }else{
-            return "On"
-        }
+    func numberWithUnit(autopilot : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: GCUnit.dimensionless(), andValue: autopilot.end)
     }
-    func formatStats(engineTemp : ValueStats) -> String {
-        return String(format: "%.0f - %.0f", engineTemp.min,engineTemp.max)
+    func numberWithUnit(engineTemp : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: engineTemp.unit, andValue: engineTemp.max)
     }
-    func formatStats(map: ValueStats) -> String {
-        return String(format: "%.2f", map.average)
+    func numberWithUnit(map: ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: map.unit, andValue: map.average)
     }
-    func formatStats(gph : ValueStats) -> String {
-        return String(format: "%.1f - %.1f gph", gph.min, gph.max)
+    func numberWithUnit(gph : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: gph.unit, andValue: gph.average)
     }
-    func formatStats(speed : ValueStats) -> String {
-        return String(format: "%.0f kt", speed.average)
+    func numberWithUnit(speed : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: speed.unit, andValue: speed.average)
     }
-    func formatStats(altitude : ValueStats) -> String {
-         return String(format: "%.0f ft", altitude.average)
+    func numberWithUnit(altitude : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: altitude.unit, andValue: altitude.max)
     }
-    func formatStats(percent : ValueStats) -> String {
-        return String(format: "%.0f %", percent.average * 100.0)
+    func numberWithUnit(percent : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: percent.unit, andValue: percent.average*100.0)
     }
 
-    func formatStats(frequency : ValueStats) -> String {
-        return String(format: "%.3f", frequency.end)
+    func numberWithUnit(frequency : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: frequency.unit, andValue: frequency.end)
     }
     // default
-    func formatStats(_ stat : ValueStats) -> String {
-        return String(format: "%.0f", stat.average)
-    }
-    func formatStats1(_ stat : ValueStats) -> String {
-        return String(format: "%.1f", stat.average)
+    func numberWithUnit(_ stat : ValueStats) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: stat.unit, andValue: stat.average)
     }
 
 }

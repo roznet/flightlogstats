@@ -31,7 +31,7 @@ class FlightSummaryTimeDataSource: TableDataSource {
     ///   - description: a text for description
     ///   - since: this will display elapsed time in the range in time format (should be start = turn on, end beginning of event/section to report)
     ///   - elapsed: this will display elapsed time in the range in decimal format (should be start of period (start of moving, start of flight, etc) to end of period (moving, flight, etc)
-    func prepareRow(title : String, description : String, since : TimeRange? = nil, elapsed : TimeRange? = nil){
+    func addLine(title : String, description : String, since : TimeRange? = nil, elapsed : TimeRange? = nil){
         self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
         self.cellHolders.append(CellHolder(string: description, attributes: self.cellAttributes))
         
@@ -77,6 +77,9 @@ class FlightSummaryTimeDataSource: TableDataSource {
         self.geometries   = []
         self.rowsCount = 0
         
+        self.cellAttributes = ViewConfig.shared.cellAttributes
+        self.titleAttributes = ViewConfig.shared.titleAttributes
+
         for title in [ "", "", "Time", "Since Start", "Elapsed", "Logbook" ] {
             self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
         }
@@ -84,39 +87,39 @@ class FlightSummaryTimeDataSource: TableDataSource {
         
         if let hobbs = self.flightSummary.hobbs,
            let airport = self.flightSummary.startAirport{
-            self.prepareRow(title: "Start",
+            self.addLine(title: "Start",
                             description: self.displayContext.format(airport: airport),
                             since: hobbs.startTo(start: hobbs))
             
         }else{
-            self.prepareRow(title: "Start", description: "")
+            self.addLine(title: "Start", description: "")
         }
         
         if  let hobbs = self.flightSummary.hobbs,
             let moving = self.flightSummary.moving {
             let taxi = hobbs.startTo(start: moving)
-            self.prepareRow(title: "Taxi", description: "", since: taxi)
+            self.addLine(title: "Taxi", description: "", since: taxi)
         }else{
-            self.prepareRow(title: "Taxi", description: "")
+            self.addLine(title: "Taxi", description: "")
         }
         
         if let hobbs = self.flightSummary.hobbs,
             let flying = self.flightSummary.flying {
             let takeoff = hobbs.startTo(start: flying)
-            self.prepareRow(title: "Takeoff", description: "", since: takeoff)
+            self.addLine(title: "Takeoff", description: "", since: takeoff)
             let landing = hobbs.startTo(end: flying)
-            self.prepareRow(title: "Landing", description: "", since: landing, elapsed: flying)
+            self.addLine(title: "Landing", description: "", since: landing, elapsed: flying)
         }else{
-            self.prepareRow(title: "Takeoff", description: "")
-            self.prepareRow(title: "Landing", description: "")
+            self.addLine(title: "Takeoff", description: "")
+            self.addLine(title: "Landing", description: "")
         }
 
         if  let hobbs = self.flightSummary.hobbs,
             let moving = self.flightSummary.moving {
             let taxi = hobbs.startTo(end: moving)
-            self.prepareRow(title: "Parked", description: "", since: taxi, elapsed: moving)
+            self.addLine(title: "Parked", description: "", since: taxi, elapsed: moving)
         }else{
-            self.prepareRow(title: "Parked", description: "")
+            self.addLine(title: "Parked", description: "")
         }
 
         if let hobbs = self.flightSummary.hobbs {
@@ -125,9 +128,9 @@ class FlightSummaryTimeDataSource: TableDataSource {
                 endAirport = self.displayContext.format(airport: airport)
             }
 
-            self.prepareRow(title: "Shutdown", description: endAirport, since: hobbs, elapsed: hobbs)
+            self.addLine(title: "Shutdown", description: endAirport, since: hobbs, elapsed: hobbs)
         }else{
-            self.prepareRow(title: "Shutdown", description: "")
+            self.addLine(title: "Shutdown", description: "")
         }
     }
 }
