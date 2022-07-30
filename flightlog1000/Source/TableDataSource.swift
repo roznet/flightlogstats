@@ -32,6 +32,8 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     var columnsCount : Int
     var rowsCount : Int
     
+    var selectedIndexPath : IndexPath? = nil
+    
     //               Total    Left   Right
     //    Start
     //    End
@@ -55,11 +57,17 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
         }
     }
     
+    var frozenColor : UIColor = UIColor.systemCyan
+    var selectedColor : UIColor = UIColor.systemTeal
+    
     func setBackgroundColor(for tableCell: UICollectionViewCell, itemAt indexPath : IndexPath) {
         if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
-            tableCell.backgroundColor = UIColor.systemCyan
+            tableCell.backgroundColor = self.frozenColor
         }else{
-            if indexPath.section % 2 == 0{
+            if let selectedIndexPath = self.selectedIndexPath,
+               selectedIndexPath.section == indexPath.section {
+                tableCell.backgroundColor = self.selectedColor
+            }else if indexPath.section % 2 == 0{
                 tableCell.backgroundColor = UIColor.systemBackground
             }else{
                 tableCell.backgroundColor = UIColor.systemGroupedBackground
@@ -119,7 +127,23 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        Logger.app.info("Selected \(indexPath)")
+        var indexSection : [Int] = []
+        if let selectedIndexPath = self.selectedIndexPath {
+            indexSection.append(selectedIndexPath.section)
+            
+            if selectedIndexPath.section == indexPath.section {
+                self.selectedIndexPath = nil
+            }else{
+                self.selectedIndexPath = indexPath
+                indexSection.append(indexPath.section)
+            }
+        }else{
+            indexSection.append(indexPath.section)
+            self.selectedIndexPath = indexPath
+        }
+        for i in indexSection {
+            collectionView.reloadSections(IndexSet(integer:i))
+        }
     }
 
 

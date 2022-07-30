@@ -59,25 +59,13 @@ class FlightLegsDataSource : TableDataSource {
         return field.numberWithUnit(valueStats: value, context: self.displayContext)
     }
     
-    override func setBackgroundColor(for tableCell: UICollectionViewCell, itemAt indexPath : IndexPath) {
-        if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
-            tableCell.backgroundColor = UIColor.systemBrown
-        }else{
-            if indexPath.section % 2 == 0{
-                tableCell.backgroundColor = UIColor.systemBackground
-            }else{
-                tableCell.backgroundColor = UIColor.systemGroupedBackground
-            }
-        }
-    }
-
-    
     override func prepare() {
         self.cellHolders  = []
         self.geometries   = []
         
         self.cellAttributes = ViewConfig.shared.cellAttributes
         self.titleAttributes = ViewConfig.shared.titleAttributes
+        self.frozenColor = UIColor.systemBrown
 
         if let first = legs.first {
             // col 0 = time since start
