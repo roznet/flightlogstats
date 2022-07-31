@@ -62,18 +62,20 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     }
     */
     func updateMinimumUI() {
-        if let logname = self.flightLogFileInfo?.log_file_name {
-            self.date.attributedText = NSAttributedString(string: "Loading", attributes: ViewConfig.shared.cellAttributes)
-            self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
-            self.name.textColor = UIColor.systemGray
-        }else{
-            self.date.attributedText = NSAttributedString(string: "Pending", attributes: ViewConfig.shared.cellAttributes)
-            self.name.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.cellAttributes)
-            self.name.textColor = UIColor.systemGray
+        if self.name != nil {
+            if let logname = self.flightLogFileInfo?.log_file_name {
+                self.date.attributedText = NSAttributedString(string: "Loading", attributes: ViewConfig.shared.cellAttributes)
+                self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
+                self.name.textColor = UIColor.systemGray
+            }else{
+                self.date.attributedText = NSAttributedString(string: "Pending", attributes: ViewConfig.shared.cellAttributes)
+                self.name.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.cellAttributes)
+                self.name.textColor = UIColor.systemGray
+            }
+            self.timeCollectionView.isHidden = true
+            self.fuelCollectionView.isHidden = true
+            self.legsCollectionView.isHidden = true
         }
-        self.timeCollectionView.isHidden = true
-        self.fuelCollectionView.isHidden = true
-        self.legsCollectionView.isHidden = true
     }
 
     func updateUI(){

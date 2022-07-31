@@ -54,8 +54,9 @@ class LogListTableViewCell: UITableViewCell {
                 self.flightTime.attributedText = NSAttributedString(string: "", attributes: titleAttribute)
             }
             
-            if let fuel = flightSummary.numberWithUnit(for: .FuelTotalizer)?.formatDouble() {
-                self.fuel.attributedText = NSAttributedString(string: fuel, attributes: cellAttribute)
+            if let total = flightSummary.numberWithUnit(for: .FuelTotalizer),
+               let used = flightSummary.numberWithUnit(for: .FuelUsed) {
+                self.fuel.attributedText = NSAttributedString(string: total.value != 0.0 ? total.formatDouble() : used.formatDouble(), attributes: cellAttribute)
             }else{
                 self.fuel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
             }
