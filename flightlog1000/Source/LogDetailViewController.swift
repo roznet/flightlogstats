@@ -32,9 +32,13 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
 
         // Do any additional setup after loading the view.
     }
+
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if self.flightLogViewModel?.shouldBuild ?? true {
+            self.updateMinimumUI()
+        }
         NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue:nil){
             notification in
             DispatchQueue.main.async{
@@ -57,12 +61,30 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
         // Pass the selected object to the new view controller.
     }
     */
+    func updateMinimumUI() {
+        if let logname = self.flightLogFileInfo?.log_file_name {
+            self.date.attributedText = NSAttributedString(string: "Loading", attributes: ViewConfig.shared.cellAttributes)
+            self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
+            self.name.textColor = UIColor.systemGray
+        }else{
+            self.date.attributedText = NSAttributedString(string: "Pending", attributes: ViewConfig.shared.cellAttributes)
+            self.name.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.cellAttributes)
+            self.name.textColor = UIColor.systemGray
+        }
+        self.timeCollectionView.isHidden = true
+        self.fuelCollectionView.isHidden = true
+        self.legsCollectionView.isHidden = true
+    }
 
     func updateUI(){
         AppDelegate.worker.async {
             if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
                     if self.name != nil {
+                        self.timeCollectionView.isHidden = false
+                        self.fuelCollectionView.isHidden = false
+                        self.legsCollectionView.isHidden = false
+
                         if let logname = self.flightLogFileInfo?.log_file_name {
                             self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
                             self.name.textColor = UIColor.systemGray
@@ -125,8 +147,13 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     }
     
     func viewModelHasChanged(viewModel: FlightLogViewModel) {
+        var changed : Bool = !(self.flightLogViewModel?.isSameLog(as: viewModel.flightLogFileInfo) ?? false)
         self.flightLogViewModel = viewModel
         
+        if changed {
+            self.updateMinimumUI()
+        }
+
         if self.progress == nil {
             self.progress = ProgressReport(message: "LogDetail"){
                 report in
