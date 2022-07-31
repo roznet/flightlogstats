@@ -13,7 +13,18 @@ struct ViewConfig {
     
     static let shared : ViewConfig = ViewConfig()
     
-    var titleAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.boldSystemFont(ofSize: 14.0)]
-    var cellAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.systemFont(ofSize: 14.0)]
+    func setDefaultAppearances() {
+        UILabel.appearance().font = UIFont(name: "Avenir", size: 14.0)!
+    }
+    
+    var titleAttributes : [NSAttributedString.Key:Any] = [
+        //.font:UIFont.boldSystemFont(ofSize: 14.0)
+        .font:UIFont(name: "Verdana-Bold", size: 14.0)!
+    ]
+    var cellAttributes : [NSAttributedString.Key:Any] = [
+        //.font:UIFont.systemFont(ofSize: 14.0)
+        //.font:UIFont(name: "AvenirNext-Regular", size: 14.0)!
+        .font:UIFont(name: "Verdana", size: 14.0)!
+    ]
 
 }
