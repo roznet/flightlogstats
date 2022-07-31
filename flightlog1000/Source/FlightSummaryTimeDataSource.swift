@@ -79,15 +79,6 @@ class FlightSummaryTimeDataSource: TableDataSource {
         
         self.cellAttributes = ViewConfig.shared.cellAttributes
         self.titleAttributes = ViewConfig.shared.titleAttributes
-        self.titleAttributes = [
-            //.font:UIFont.boldSystemFont(ofSize: 14.0)
-            .font:UIFont(name: "AvenirNext-Bold", size: 14.0)!
-        ]
-        self.cellAttributes = [
-            //.font:UIFont.systemFont(ofSize: 14.0)
-            .font:UIFont(name: "AvenirNext-Medium", size: 14.0)!
-            //.font:UIFont(name: "Verdana", size: 14.0)!
-        ]
 
         for title in [ "", "", "Time", "Since Start", "Elapsed", "Logbook" ] {
             self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))

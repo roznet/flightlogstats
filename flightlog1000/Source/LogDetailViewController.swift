@@ -63,8 +63,20 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
             if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
                     if self.name != nil {
-                        self.name.text = self.flightLogFileInfo?.log_file_name
-                        self.date.text = self.flightLogFileInfo?.start_time?.formatted()
+                        if let logname = self.flightLogFileInfo?.log_file_name {
+                            self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
+                            self.name.textColor = UIColor.systemGray
+                        }else{
+                            self.name.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.cellAttributes)
+                        }
+                        let formatter = DateFormatter()
+                        formatter.dateStyle = .medium
+                        formatter.timeStyle = .short
+                        if let date = self.flightLogFileInfo?.start_time {
+                            self.date.attributedText = NSAttributedString(string: formatter.string(from: date), attributes: ViewConfig.shared.titleAttributes)
+                        }else{
+                            self.date.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.titleAttributes)
+                        }
                         
                         self.fuelDataSource = self.flightLogViewModel?.fuelDataSource
                         self.fuelCollectionView.dataSource = self.fuelDataSource

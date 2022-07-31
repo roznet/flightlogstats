@@ -31,8 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FlightLogOrganizer.shared.loadFromContainer()
         FlightLogOrganizer.shared.addMissingFromLocal()
         
-        //ViewConfig.shared.setDefaultAppearances()
-        
         return true
     }
 

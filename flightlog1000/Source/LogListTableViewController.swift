@@ -129,15 +129,26 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    func updateButtons() {
         // Do any additional setup after loading the view.
         let addButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(addLog(button:)))
         let moreFunctionButton = UIBarButtonItem(title: "More", image: UIImage(systemName: "ellipsis.circle"), menu: self.moreFunctionMenu())
-        let sumButton = UIBarButtonItem(image: UIImage(systemName: "sum"), style: .plain, target: self, action: #selector(sum(button:)))
         
         self.navigationItem.leftBarButtonItem = addButton
-        self.navigationItem.rightBarButtonItems = [moreFunctionButton, sumButton]
+        
+        if self.userInterfaceModeManager?.userInterfaceMode == .detail {
+            let sumButton = UIBarButtonItem(image: UIImage(systemName: "sum"), style: .plain, target: self, action: #selector(sum(button:)))
+            self.navigationItem.rightBarButtonItems = [moreFunctionButton, sumButton]
+        }else{
+            let planeButton = UIBarButtonItem(image: UIImage(systemName: "airplane.circle"), style: .plain, target: self, action: #selector(sum(button:)))
+            self.navigationItem.rightBarButtonItems = [moreFunctionButton, planeButton]
+        }
+
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.updateButtons()
         
         self.tableView.estimatedRowHeight = 100
         self.tableView.rowHeight = UITableView.automaticDimension
@@ -231,7 +242,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 120.0
+        return 100.0
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -293,6 +304,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }else{
             self.userInterfaceModeManager?.userInterfaceMode = .detail
         }
+        self.updateButtons()
     }
     
     @objc func addLog(button : UIBarButtonItem){

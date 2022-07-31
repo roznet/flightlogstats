@@ -25,38 +25,54 @@ class LogListTableViewCell: UITableViewCell {
     func update(with info: FlightLogFileInfo){
         self.fileName.text = info.log_file_name
         self.flightLogFileInfo = info
+        
+        let titleAttribute = ViewConfig.shared.titleAttributes
+        let cellAttribute = ViewConfig.shared.cellAttributes
+        
         if let flightSummary = info.flightSummary {
             let formatter = DateFormatter()
-            formatter.dateStyle = .short
+            formatter.dateStyle = .medium
             formatter.timeStyle = .short
             if let start_time = info.start_time {
-                self.date.text = formatter.string(from: start_time)
+                self.date.attributedText = NSAttributedString(string: formatter.string(from: start_time), attributes: cellAttribute)
             }else{
-                self.date.text = "Missing"
+                self.date.attributedText = NSAttributedString(string: "Missing", attributes: cellAttribute)
             }
             if let hobbs = flightSummary.hobbs {
-                self.totalTime.text = self.displayContext.formatDecimal(timeRange: hobbs)
+                self.totalTime.attributedText = NSAttributedString(string: self.displayContext.formatDecimal(timeRange: hobbs), attributes: cellAttribute)
             }else{
                 self.totalTime.text = nil
             }
             if let flying = flightSummary.flying {
                 self.flightTime.isHidden = false
                 self.flightIcon.isHidden = false
-                self.flightTime.text = self.displayContext.formatDecimal(timeRange: flying)
+                self.flightTime.attributedText = NSAttributedString(string: self.displayContext.formatDecimal(timeRange: flying), attributes: titleAttribute)
             }else{
                 self.flightIcon.isHidden = true
                 self.flightTime.isHidden = true
                 
-                self.flightTime.text = "0.0"
+                self.flightTime.attributedText = NSAttributedString(string: "", attributes: titleAttribute)
             }
-            self.fuel.text = self.displayContext.formatValue(gallon: flightSummary.fuelUsed.total)
+            
+            if let fuel = flightSummary.numberWithUnit(for: .FuelTotalizer)?.formatDouble() {
+                self.fuel.attributedText = NSAttributedString(string: fuel, attributes: cellAttribute)
+            }else{
+                self.fuel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+            }
+            
             if let endAirport = flightSummary.endAirport {
                 self.route.isHidden = false
-                self.route.text = self.displayContext.format(airport: endAirport, style: .nameOnly)
+                self.route.attributedText = NSAttributedString(string: self.displayContext.format(airport: endAirport, style: .nameOnly), attributes: cellAttribute)
             }else{
                 self.route.isHidden = true
             }
-            self.distance.text = self.displayContext.formatValue(distance: flightSummary.distance)
+            
+            if let distance = flightSummary.numberWithUnit(for: .Distance)?.formatDouble() {
+                self.distance.attributedText = NSAttributedString(string: distance, attributes: cellAttribute)
+            }else{
+                self.distance.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+            }
+            
             var airports : [String] = []
             if let from = flightSummary.startAirport {
                 airports.append(from.icao)
@@ -64,15 +80,15 @@ class LogListTableViewCell: UITableViewCell {
             if let to = flightSummary.endAirport {
                 airports.append(to.icao)
             }
-            self.airports.text = airports.joined(separator: "-")
+            self.airports.attributedText = NSAttributedString(string: airports.joined(separator: "-"), attributes: titleAttribute)
         }else{
-            self.date.text = "Empty"
-            self.totalTime.text = "??"
-            self.flightTime.text = nil
-            self.fuel.text = nil
-            self.route.text = nil
-            self.distance.text = nil
-            self.airports.text = nil
+            self.date.attributedText = NSAttributedString(string: "Empty", attributes: cellAttribute)
+            self.totalTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+            self.flightTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+            self.fuel.attributedText = nil
+            self.route.attributedText = nil
+            self.distance.attributedText = nil
+            self.airports.attributedText = nil
 
         }
     }

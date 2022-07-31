@@ -18,7 +18,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
+        ViewConfig.shared.setDefaultAttributes()
         
+
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -30,6 +32,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         Logger.app.info("active")
+        ViewConfig.shared.setDefaultAttributes()
+
         FlightLogOrganizer.shared.syncCloud()
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
@@ -42,6 +46,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
+        ViewConfig.shared.setDefaultAttributes()
+
         Logger.app.info("foreground")
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
