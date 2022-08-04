@@ -190,6 +190,10 @@ class FlightLogFileInfo: NSManagedObject {
     
     //MARK: - Analysis
     
+    func isNewer(than other : FlightLogFileInfo) -> Bool {
+        return self.log_file_name! > other.log_file_name!
+    }
+    
     var isEmpty : Bool {
         if let elapsed = self.flightSummary?.moving?.elapsed,
            let distance = self.flightSummary?.distance {

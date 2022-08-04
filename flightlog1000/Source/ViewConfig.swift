@@ -34,11 +34,14 @@ class ViewConfig {
         }else{
             
             self.titleAttributes = [
-                .font:UIFont(name: "AvenirNext-Bold", size: 14.0)!
+                .font:UIFont(name: "AvenirNext-Bold", size: 14.0)!,
+                .foregroundColor: UIColor.label
+                    
             ]
             self.cellAttributes = [
                 //.font:UIFont(descriptor: fontDesc, size: 0.0)
-                .font:UIFont(name: "AvenirNext-Medium", size: 14.0)!
+                .font:UIFont(name: "AvenirNext-Medium", size: 14.0)!,
+                .foregroundColor: UIColor.label
             ]
         }
     }

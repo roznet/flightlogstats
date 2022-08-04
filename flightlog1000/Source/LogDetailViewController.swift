@@ -149,7 +149,7 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     }
     
     func viewModelHasChanged(viewModel: FlightLogViewModel) {
-        var changed : Bool = !(self.flightLogViewModel?.isSameLog(as: viewModel.flightLogFileInfo) ?? false)
+        let changed : Bool = !(self.flightLogViewModel?.isSameLog(as: viewModel.flightLogFileInfo) ?? false)
         self.flightLogViewModel = viewModel
         
         if changed {

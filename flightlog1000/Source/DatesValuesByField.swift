@@ -223,7 +223,7 @@ extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
             if runningdate >= from {
                 if started {
                     for (field,values) in self.values {
-                        rv[field]?.update(with: values[idx])
+                        rv[field]?.update(double: values[idx])
                     }
                 }else{
                     for (field,values) in self.values {

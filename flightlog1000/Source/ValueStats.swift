@@ -41,7 +41,16 @@ public struct ValueStats {
         self.unit = unit
     }
     
-    mutating func update(with value : Double, weight : Double = 1) {
+    init(numberWithUnit : GCNumberWithUnit, weight : Double = 1.0) {
+        self.init(value: numberWithUnit.value,weight: weight, unit: numberWithUnit.unit)
+    }
+    
+    mutating func update(numberWithUnit : GCNumberWithUnit, weight : Double = 1){
+        let nu = numberWithUnit.convert(to: self.unit)
+        self.update(double: nu.value, weight: weight)
+    }
+    
+    mutating func update(double value : Double, weight : Double = 1) {
         // if we got initial value correct
         if self.start.isFinite {
             if value.isFinite {

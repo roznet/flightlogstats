@@ -69,6 +69,8 @@
 		429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */; };
 		429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */; };
 		429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */; };
+		42A20B522896F0CF00439880 /* Trips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B512896F0CF00439880 /* Trips.swift */; };
+		42A20B55289C577F00439880 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B54289C577F00439880 /* Trip.swift */; };
 		42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */; };
 		42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */; };
 		42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */; };
@@ -171,6 +173,8 @@
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
 		429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewLayout.swift; path = Source/TableCollectionViewLayout.swift; sourceTree = "<group>"; };
 		429CE7DF28951BA10063EF97 /* rzflight */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzflight; path = ../rzflight; sourceTree = "<group>"; };
+		42A20B512896F0CF00439880 /* Trips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trips.swift; path = Source/Trips.swift; sourceTree = "<group>"; };
+		42A20B54289C577F00439880 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trip.swift; path = Source/Trip.swift; sourceTree = "<group>"; };
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
 		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
 		42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLogFile+Field.swift"; path = "Source/FlightLogFile+Field.swift"; sourceTree = "<group>"; };
@@ -372,19 +376,10 @@
 		4280C8C4280D467A00A0FB32 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4280C8C0280D467400A0FB32 /* FlightData.swift */,
-				4280C8BE280D467400A0FB32 /* FlightLogFile.swift */,
-				4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */,
-				42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */,
+				42A20B53289C576600439880 /* Trips */,
+				42A20B502896F0A200439880 /* Entities */,
+				42A20B4F2896F07C00439880 /* Flight */,
 				42B3842F28609A3C009458CC /* FieldCalculations.swift */,
-				4264C2392826858700F40436 /* FlightSummary.swift */,
-				42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */,
-				4264C23528267EDC00F40436 /* FlightLeg.swift */,
-				4264C23728267F6600F40436 /* Waypoint.swift */,
-				4264C23B282691EF00F40436 /* FuelQuantity.swift */,
-				4268A0C328357E2600A3CB05 /* KnownAirports.swift */,
-				4239290C2864D08800CD33C0 /* Aircraft.swift */,
-				4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -426,6 +421,41 @@
 				4280C8D6280D70CB00A0FB32 /* CloudKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		42A20B4F2896F07C00439880 /* Flight */ = {
+			isa = PBXGroup;
+			children = (
+				4280C8C0280D467400A0FB32 /* FlightData.swift */,
+				4280C8BE280D467400A0FB32 /* FlightLogFile.swift */,
+				4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */,
+				42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */,
+				4264C2392826858700F40436 /* FlightSummary.swift */,
+				42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */,
+				4264C23528267EDC00F40436 /* FlightLeg.swift */,
+			);
+			name = Flight;
+			sourceTree = "<group>";
+		};
+		42A20B502896F0A200439880 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				4264C23728267F6600F40436 /* Waypoint.swift */,
+				4264C23B282691EF00F40436 /* FuelQuantity.swift */,
+				4268A0C328357E2600A3CB05 /* KnownAirports.swift */,
+				4239290C2864D08800CD33C0 /* Aircraft.swift */,
+				4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */,
+			);
+			name = Entities;
+			sourceTree = "<group>";
+		};
+		42A20B53289C576600439880 /* Trips */ = {
+			isa = PBXGroup;
+			children = (
+				42A20B512896F0CF00439880 /* Trips.swift */,
+				42A20B54289C577F00439880 /* Trip.swift */,
+			);
+			name = Trips;
 			sourceTree = "<group>";
 		};
 		42E13B8B2813DBA100AF38AC /* Storage */ = {
@@ -606,6 +636,7 @@
 				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
 				4268A0C92842851900A3CB05 /* ProgressReport.swift in Sources */,
 				42478A5128153EF300212BF2 /* Log.swift in Sources */,
+				42A20B55289C577F00439880 /* Trip.swift in Sources */,
 				425F4EDB2893288A00F691BD /* StatsTabBarController.swift in Sources */,
 				4280C8C3280D467400A0FB32 /* FlightData.swift in Sources */,
 				42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */,
@@ -626,6 +657,7 @@
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
 				425B345B2894140800548557 /* ViewConfig.swift in Sources */,
+				42A20B522896F0CF00439880 /* Trips.swift in Sources */,
 				425B3459289408D500548557 /* TableDataSource.swift in Sources */,
 				42606A22288DE2FC00AE858C /* FlightSummary+Field.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,

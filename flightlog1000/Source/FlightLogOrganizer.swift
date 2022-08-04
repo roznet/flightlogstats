@@ -22,36 +22,54 @@ class FlightLogOrganizer {
     enum OrganizerError : Error {
         case failedToReadFolder
     }
-    private var managedFlightLogs : [String:FlightLogFileInfo] = [:]
-    
     public static var shared = FlightLogOrganizer()
-    private let queue = OperationQueue()
     
-    var progress : ProgressReport? = nil
-    
-    enum UpdateState {
-        case ready
-        case complete
-        case updatingInfoFromData
-    }
-    private var currentState : UpdateState = .complete
-    private var missingCount : Int = 0
-
-    private var flightLogFileList : FlightLogFileList {
-        let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
-        return list
-    }
-    
+    //MARK: - List management
     var flightLogFileInfos : [FlightLogFileInfo] {
         let list = Array(self.managedFlightLogs.values)
-                                     
-        return list.sorted { $0.log_file_name! > $1.log_file_name! }
+        return list.sorted { $0.isNewer(than: $1) }
     }
     
     var first : FlightLogFileInfo? {
         self.flightLogFileInfos.first
     }
     
+    var count : Int { return managedFlightLogs.count }
+    
+    subscript(_ name : String) -> FlightLogFileInfo? {
+        return self.managedFlightLogs[name]
+    }
+    
+    subscript(log: FlightLogFile) -> FlightLogFileInfo? {
+        return self.managedFlightLogs[log.name]
+    }
+    func filter(filter : (FlightLogFileInfo) -> Bool) -> [FlightLogFileInfo] {
+        var logs : [FlightLogFileInfo] = []
+        for info in self.flightLogFileInfos {
+            if filter(info) {
+                logs.append(info)
+            }
+        }
+        return logs
+    }
+    
+    var nonEmptyLogFileInfos : [FlightLogFileInfo] {
+        return self.filter() {
+            info in
+            return !info.isEmpty
+        }
+    }
+
+    var actualFlightLogFileInfos : [FlightLogFileInfo] {
+        return self.filter() {
+            info in
+            return info.isFlight
+        }
+    }
+
+    //MARK: - Progress management
+    var progress : ProgressReport? = nil
+
     func ensureProgressReport(callback : @escaping ProgressReport.Callback = { _ in }) {
         if self.progress == nil {
             self.progress = ProgressReport(message: "Organizer", callback: callback)
@@ -60,6 +78,22 @@ class FlightLogOrganizer {
     
     //MARK: - containers
     
+    enum UpdateState {
+        case ready
+        case complete
+        case updatingInfoFromData
+    }
+
+    private var managedFlightLogs : [String:FlightLogFileInfo] = [:]
+    private var currentState : UpdateState = .complete
+    private var missingCount : Int = 0
+    private let queue = OperationQueue()
+
+    private var flightLogFileList : FlightLogFileList {
+        let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
+        return list
+    }
+
     lazy var persistentContainer : NSPersistentContainer = {
         let container = NSPersistentContainer(name: "FlightLogModel")
         container.loadPersistentStores() {
@@ -102,6 +136,11 @@ class FlightLogOrganizer {
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
             Logger.app.info("Loaded \(fetchedInfo.count) existing \(existing) added \(added) ")
             self.updateInfo(count: 1)
+            AppDelegate.worker.async {
+                let trips = Trips(infos: self.flightLogFileInfos)
+                trips.computeVisits()
+                trips.computeTrips()
+            }
         }catch{
             Logger.app.error("Failed to query for files")
         }
@@ -519,39 +558,3 @@ extension URL {
     var isLogFile : Bool { return self.lastPathComponent.isLogFile }
 }
 
-//MARK: - List management
-extension FlightLogOrganizer {
-    var count : Int { return managedFlightLogs.count }
-    
-    subscript(_ name : String) -> FlightLogFileInfo? {
-        return self.managedFlightLogs[name]
-    }
-    
-    subscript(log: FlightLogFile) -> FlightLogFileInfo? {
-        return self.managedFlightLogs[log.name]
-    }
-    func filter(filter : (FlightLogFileInfo) -> Bool) -> [FlightLogFileInfo] {
-        var logs : [FlightLogFileInfo] = []
-        for info in self.flightLogFileInfos {
-            if filter(info) {
-                logs.append(info)
-            }
-        }
-        return logs
-    }
-    
-    var nonEmptyLogFileInfos : [FlightLogFileInfo] {
-        return self.filter() {
-            info in
-            return !info.isEmpty
-        }
-    }
-
-    var actualFlightLogFileInfos : [FlightLogFileInfo] {
-        return self.filter() {
-            info in
-            return info.isFlight
-        }
-    }
-
-}

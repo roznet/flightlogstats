@@ -9,7 +9,7 @@ import Foundation
 import RZUtils
 
 extension FlightSummary {
-    enum Field : String {
+    enum Field : String, CaseIterable {
         case FuelStart
         case FuelEnd
         case FuelUsed
