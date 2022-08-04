@@ -49,7 +49,7 @@ extension FlightSummary {
             return self.fuelTotalizer.totalWithUnit
             
         case .GpH:
-            if let flying = self.flying?.elapsed {
+            if let flying = self.moving?.elapsed {
                 let fuelTotal = (self.fuelTotalizer.total > 0.0 ? self.fuelTotalizer.total : self.fuelUsed.total)
                 return GCNumberWithUnit(unit: GCUnit.gph(), andValue: fuelTotal / (flying/3600.0))
             }else{

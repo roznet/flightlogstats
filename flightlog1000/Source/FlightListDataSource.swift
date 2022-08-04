@@ -15,6 +15,7 @@ class FlightListDataSource: TableDataSource  {
     var logInfos : [FlightLogFileInfo]
     var logFileOrganizer = FlightLogOrganizer.shared
     
+    var trips : Trips
     let displayContext : DisplayContext
     
     let fields : [FlightSummary.Field]
@@ -30,7 +31,8 @@ class FlightListDataSource: TableDataSource  {
         self.headers = [ "Date", "From", "To", "Start", "End"]
         self.logInfos = self.logFileOrganizer.actualFlightLogFileInfos
         self.displayContext = displayContext
-
+        self.trips = Trips(infos: self.logInfos)
+        
         super.init(rows: self.logInfos.count, columns: self.fields.count + self.headers.count, frozenColumns: 1, frozenRows: 1)
     }
     
@@ -41,8 +43,14 @@ class FlightListDataSource: TableDataSource  {
         self.cellHolders  = []
         self.geometries = []
         
+        self.trips.compute()
+        self.rowsCount = self.trips.infoCount + self.trips.tripCount
+        
+        self.frozenColor = UIColor.secondarySystemBackground
         let titleAttributes : [NSAttributedString.Key:Any] = ViewConfig.shared.titleAttributes
         let cellAttributes : [NSAttributedString.Key:Any] = ViewConfig.shared.cellAttributes
+        
+        var row : Int = 0
         
         for title in headers {
             let geometry = RZNumberWithUnitGeometry()
@@ -65,27 +73,49 @@ class FlightListDataSource: TableDataSource  {
             self.geometries.append(geometry)
             self.cellHolders.append(CellHolder(string: field.rawValue, attributes: titleAttributes))
         }
-        
-        for info in self.logInfos {
-            if let summary = info.flightSummary, let hobbs = summary.hobbs {
-                self.cellHolders.append(CellHolder(string:  self.displayContext.format(date: hobbs.start), attributes: titleAttributes))
-                self.cellHolders.append(CellHolder(string:  self.displayContext.format(airport: summary.startAirport, style: .icaoOnly), attributes: titleAttributes))
-                self.cellHolders.append(CellHolder(string:  self.displayContext.format(airport: summary.endAirport, style: .icaoOnly), attributes: titleAttributes))
-                self.cellHolders.append(CellHolder(string:  self.displayContext.format(time: hobbs.start), attributes: cellAttributes))
-                self.cellHolders.append(CellHolder(string:  self.displayContext.format(time: hobbs.end), attributes: cellAttributes))
-                var geoIndex = self.headers.count
-                for field in fields {
-                    if let nu = summary.numberWithUnit(for: field) {
-                        geometries[geoIndex].adjust(for: nu)
-                        self.cellHolders.append(CellHolder.numberWithUnit(nu))
-                    }else{
-                        self.cellHolders.append(CellHolder(string: "", attributes: cellAttributes))
+        row += 1
+        for trip in trips.trips {
+            for info in trip.flightLogFileInfos {
+                if let summary = info.flightSummary, let hobbs = summary.hobbs {
+                    self.cellHolders.append(CellHolder(string:  self.displayContext.format(date: hobbs.start), attributes: titleAttributes))
+                    self.cellHolders.append(CellHolder(string:  self.displayContext.format(airport: summary.startAirport, style: .icaoOnly), attributes: titleAttributes))
+                    self.cellHolders.append(CellHolder(string:  self.displayContext.format(airport: summary.endAirport, style: .icaoOnly), attributes: titleAttributes))
+                    self.cellHolders.append(CellHolder(string:  self.displayContext.format(time: hobbs.start), attributes: cellAttributes))
+                    self.cellHolders.append(CellHolder(string:  self.displayContext.format(time: hobbs.end), attributes: cellAttributes))
+                    var geoIndex = self.headers.count
+                    for field in fields {
+                        if let nu = summary.numberWithUnit(for: field) {
+                            geometries[geoIndex].adjust(for: nu)
+                            self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                        }else{
+                            self.cellHolders.append(CellHolder(string: "", attributes: cellAttributes))
+                        }
+                        geoIndex += 1
                     }
-                    geoIndex += 1
+                    row += 1
+                }else{
+                    print( "Why?")
                 }
-            }else{
-                print( "Why?")
+                
             }
+            // Summary
+            self.cellHolders.append(CellHolder(string:  "Trip Total", attributes: titleAttributes))
+            self.cellHolders.append(CellHolder(string:  "", attributes: titleAttributes))
+            self.cellHolders.append(CellHolder(string:  "", attributes: titleAttributes))
+            self.cellHolders.append(CellHolder(string:  "", attributes: cellAttributes))
+            self.cellHolders.append(CellHolder(string:  "", attributes: cellAttributes))
+            var geoIndex = self.headers.count
+            for field in fields {
+                if let nu = trip.numberWithUnit(field: field) {
+                    geometries[geoIndex].adjust(for: nu)
+                    self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                }else{
+                    self.cellHolders.append(CellHolder(string: "", attributes: cellAttributes))
+                }
+                geoIndex += 1
+            }
+            self.highlightedBackgroundRows.insert(row)
+            row += 1
         }
     }
 }

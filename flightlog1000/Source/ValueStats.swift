@@ -21,7 +21,18 @@ public struct ValueStats {
     
     private(set) var count : Int
     private(set) var weight : Double
+
+    var startWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: start) }
+    var endWithUnit  : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: end) }
     
+    var sumWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: sum) }
+    var weightedSumWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: weightedSum) }
+    var maxWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: max) }
+    var minWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: min) }
+
+    var averageWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: average) }
+    var weighterdAverageWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: weightedAverage) }
+
     var average : Double { return self.sum / Double(self.count) }
     var weightedAverage : Double { return self.weightedSum / self.weight }
 

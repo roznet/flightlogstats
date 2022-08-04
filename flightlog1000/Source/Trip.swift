@@ -57,5 +57,46 @@ struct Trip {
         }
         return rv
     }
+    
+    func numberWithUnit(field : Field) -> GCNumberWithUnit? {
+        if let stats = self.stats[field] {
+            switch field {
+            case .FuelStart:
+                return nil
+            case .FuelEnd:
+                return nil
+            case .FuelUsed,.FuelTotalizer:
+                return stats.sumWithUnit
+            case .Distance:
+                return stats.sumWithUnit
+            case .Hobbs,.Flying,.Moving:
+                return stats.sumWithUnit
+            case .GroundSpeed:
+                if let dist = self.stats[.Distance]?.sumWithUnit.convert(to: GCUnit.nm()),
+                   let elapsed = self.stats[.Flying]?.sumWithUnit.convert(to: GCUnit.second()) {
+                    return GCNumberWithUnit(unit: GCUnit.knot(), andValue: dist.value/(elapsed.value/3600.0))
+                }else{
+                    return nil
+                }
+            case .GpH:
+                if let total = self.stats[.FuelTotalizer]?.sumWithUnit.convert(to: GCUnit.usgallon()),
+                   let elapsed = self.stats[.Moving]?.sumWithUnit.convert(to: GCUnit.second()) {
+                    return GCNumberWithUnit(unit: GCUnit.gph(), andValue: total.value/(elapsed.value/3600.0))
+                }else{
+                    return nil
+                }
+            case .NmpG:
+                if let total = self.stats[.FuelTotalizer]?.sumWithUnit.convert(to: GCUnit.usgallon()),
+                   let dist = self.stats[.Distance]?.sumWithUnit.convert(to: GCUnit.nm()) {
+                    return GCNumberWithUnit(unit: GCUnit.nmpergallon(), andValue: dist.value/total.value)
+                }else{
+                    return nil
+                }
+            }
+        }
+        return nil
+    }
+    
 }
+
 

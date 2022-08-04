@@ -136,11 +136,11 @@ class FlightLogOrganizer {
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
             Logger.app.info("Loaded \(fetchedInfo.count) existing \(existing) added \(added) ")
             self.updateInfo(count: 1)
-            AppDelegate.worker.async {
+            /*AppDelegate.worker.async {
                 let trips = Trips(infos: self.flightLogFileInfos)
                 trips.computeVisits()
                 trips.computeTrips()
-            }
+            }*/
         }catch{
             Logger.app.error("Failed to query for files")
         }

@@ -34,6 +34,14 @@ class Trips {
         self.flightFileInfos = infos
     }
     
+    var infoCount : Int {
+        return trips.reduce(0) {
+            c, t in return c+t.count
+        }
+    }
+    var tripCount : Int {
+        return trips.count
+    }
     
     func compute() {
         self.computeVisits()
@@ -53,6 +61,7 @@ class Trips {
                 }
             }
         }
+        self.trips = trips
     }
     
     func computeVisits() {
@@ -107,7 +116,6 @@ class Trips {
         for (airport,days) in airportVisits {
             let count = days.count
             let nights = days.reduce(0, +)
-            print( "\(airport.icao) visits: \(count) days: \(nights))))" )
             if nights > baseNights {
                 baseFound = airport
                 baseNights = nights

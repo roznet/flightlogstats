@@ -34,6 +34,8 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     
     var selectedIndexPath : IndexPath? = nil
     
+    var highlightedBackgroundRows : Set<Int> = []
+    
     //               Total    Left   Right
     //    Start
     //    End
@@ -59,9 +61,12 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     
     var frozenColor : UIColor = UIColor.systemCyan
     var selectedColor : UIColor = UIColor.systemTeal
+    var highlightedBackgroundColor : UIColor = UIColor.secondarySystemBackground
     
     func setBackgroundColor(for tableCell: UICollectionViewCell, itemAt indexPath : IndexPath) {
-        if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
+        if self.highlightedBackgroundRows.contains(indexPath.section){
+            tableCell.backgroundColor = self.highlightedBackgroundColor
+        }else if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
             tableCell.backgroundColor = self.frozenColor
         }else{
             if let selectedIndexPath = self.selectedIndexPath,
