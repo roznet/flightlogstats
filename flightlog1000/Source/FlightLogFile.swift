@@ -108,4 +108,13 @@ extension FlightLogFile {
         
         return rv
     }
+    
+    func dataSerie(fields : [Field]) -> [Field:GCStatsDataSerie] {
+        if let data = self.data {
+            let values = data.datesDoubles(for: fields)
+            return values.dataSeries()
+        }
+        return [:]
+    }
+    
 }

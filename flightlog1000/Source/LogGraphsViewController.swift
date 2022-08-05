@@ -30,7 +30,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if self.flightLogViewModel?.shouldBuild ?? true {
-            self.updateMinimumUI()
+            self.updateUI()
         }
         NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue:nil){
             notification in
@@ -56,8 +56,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     */
     func updateMinimumUI() {
         if self.legsCollectionView != nil {
-            self.legsCollectionView.isHidden = true
-            self.graphView.isHidden = true
+            //self.legsCollectionView.isHidden = true
+            //self.graphView.isHidden = true
         }
     }
 
@@ -81,6 +81,11 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                         }else{
                             self.legsDataSource = nil
                         }
+                        
+                        let ds = self.flightLogViewModel?.graphDataSource(field: .AltInd)
+                        self.graphView.dataSource = ds
+                        self.graphView.displayConfig = ds
+                        
                         self.view.setNeedsDisplay()
                     }
                 }

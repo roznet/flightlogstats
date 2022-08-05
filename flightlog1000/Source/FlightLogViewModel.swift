@@ -7,6 +7,7 @@
 
 import Foundation
 import RZUtils
+import RZUtilsUniversal
 
 extension Notification.Name {
     static let flightLogViewModelChanged : Notification.Name = Notification.Name("Notification.Name.logViewModelChanged")
@@ -118,6 +119,25 @@ class FlightLogViewModel {
             self.save()
             self.didBuild()
         }
+    }
+    
+    func graphDataSerie(field : FlightLogFile.Field) -> GCStatsDataSerie? {
+        if self.shouldBuild {
+            return nil
+        }
+        
+        let series = self.flightLogFileInfo.dataSerie(fields: [field])
+        return series[field]
+    }
+    
+    func graphDataSource(field : FlightLogFile.Field) -> GCSimpleGraphCachedDataSource? {
+        let serie = self.graphDataSerie(field: field)
+        let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: UIColor.systemBlue, andUnit: field.unit)
+        let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnit.second())
+        if data != nil {
+            ds?.add(data)
+        }
+        return ds
     }
     
 }

@@ -223,5 +223,10 @@ class FlightLogFileInfo: NSManagedObject {
         }
         return false
     }
-    
+    func dataSerie(fields : [FlightLogFile.Field]) -> [FlightLogFile.Field:GCStatsDataSerie] {
+        if let flightLog = self.flightLog {
+            return flightLog.dataSerie(fields: fields)
+        }
+        return [:]
+    }
 }

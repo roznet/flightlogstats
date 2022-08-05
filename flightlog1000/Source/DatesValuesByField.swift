@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RZUtils
 
 public struct DatesValuesByField<T,F : Hashable> {
     public enum TimeDataByFieldError : Error {
@@ -228,6 +229,33 @@ extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
                 }else{
                     for (field,values) in self.values {
                         rv[field] = ValueStats(value: values[idx], weight: 1.0, unit: field.unit)
+                    }
+                    started = true
+                }
+            }
+        }
+        return rv
+    }
+
+}
+
+extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
+    public func dataSeries(from : Date? = nil, to : Date? = nil) -> [F:GCStatsDataSerie] {
+        var rv : [F:GCStatsDataSerie] = [:]
+        var started : Bool = false
+        for (idx,runningdate) in self.dates.enumerated(){
+            if let to = to, runningdate > to {
+                break
+            }
+            if from == nil || runningdate >= from! {
+                if started {
+                    for (field,values) in self.values {
+                        rv[field]?.add(GCStatsDataPoint(date: runningdate, andValue: values[idx]))
+                    }
+                }else{
+                    for (field,values) in self.values {
+                        rv[field] = GCStatsDataSerie()
+                        rv[field]?.add(GCStatsDataPoint(date: runningdate, andValue: values[idx]))
                     }
                     started = true
                 }
