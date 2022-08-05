@@ -1,29 +1,31 @@
 //
-//  LogGraphsViewController.swift
+//  LogMapViewController.swift
 //  FlightLog1000
 //
-//  Created by Brice Rosenzweig on 21/06/2022.
+//  Created by Brice Rosenzweig on 05/08/2022.
 //
 
 import UIKit
+import MapKit
 import OSLog
 import RZUtils
-import RZUtilsUniversal
 
-class LogGraphsViewController: UIViewController, ViewModelDelegate {
+class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelegate {
 
-    @IBOutlet weak var graphView: GCSimpleGraphView!
+    @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
     
     var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
     var legsDataSource : FlightLegsDataSource? = nil
     
     var flightLogViewModel : FlightLogViewModel? = nil
+    private var mapViewOverlay : FlightDataMapOverlay? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        self.mapView.delegate = self
     }
 
     
@@ -45,19 +47,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         NotificationCenter.default.removeObserver(self)
     }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
     func updateMinimumUI() {
         if self.legsCollectionView != nil {
-            //self.legsCollectionView.isHidden = true
-            //self.graphView.isHidden = true
         }
     }
 
@@ -70,7 +61,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
             if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
                     if self.legsCollectionView != nil {
-                        self.graphView.isHidden = false
+                        self.mapView.isHidden = false
                         self.legsCollectionView.isHidden = false
                         
                         if let legsDataSource = self.flightLogViewModel?.legsDataSource {
@@ -86,10 +77,14 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                             self.legsDataSource = nil
                         }
                         
-                        let ds = self.flightLogViewModel?.graphDataSource(field: .AltInd)
-                        self.graphView.dataSource = ds
-                        self.graphView.displayConfig = ds
-                        self.graphView.setNeedsDisplay()
+                        if let overlay = self.flightLogFileInfo?.flightLog?.mapOverlayView {
+                            if let oldOverlay = self.mapViewOverlay {
+                                self.mapView.removeOverlay(oldOverlay)
+                            }
+                            self.mapViewOverlay = overlay
+                            self.mapView.addOverlay(overlay)
+                            self.mapView.setVisibleMapRect(overlay.boundingMapRect, edgePadding: .init(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0), animated: true)
+                        }
                         self.view.setNeedsDisplay()
                     }
                 }
@@ -97,8 +92,6 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         }
     }
 
-    private var progress : ProgressReport? = nil
-    
     // MARK: - Handle updates
     
     func viewModelDidFinishBuilding(viewModel : FlightLogViewModel){
@@ -117,5 +110,13 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
             self.updateUI()
         }
     }
-
+    
+    //MARK: - Mapview Delegate
+    
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if (overlay as? FlightDataMapOverlay) == self.mapViewOverlay {
+            return FlightDataMapOverlayView(overlay: overlay)
+        }
+        return MKOverlayRenderer()
+    }
 }

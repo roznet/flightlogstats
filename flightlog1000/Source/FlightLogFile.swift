@@ -117,4 +117,12 @@ extension FlightLogFile {
         return [:]
     }
     
+    var mapOverlayView : FlightDataMapOverlay? {
+        if let data = self.data {
+            return FlightDataMapOverlay(data: data)
+        }else{
+            return nil
+        }
+    }
+
 }

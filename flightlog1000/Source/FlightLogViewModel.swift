@@ -131,13 +131,16 @@ class FlightLogViewModel {
     }
     
     func graphDataSource(field : FlightLogFile.Field) -> GCSimpleGraphCachedDataSource? {
-        let serie = self.graphDataSerie(field: field)
-        let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: UIColor.systemBlue, andUnit: field.unit)
-        let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnit.second())
-        if data != nil {
-            ds?.add(data)
+        if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,
+           let serie = self.graphDataSerie(field: field) {
+            let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: UIColor.systemBlue, andUnit: field.unit)
+            let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start))
+            if data != nil {
+                ds?.add(data)
+            }
+            return ds
         }
-        return ds
+        return nil
     }
     
 }

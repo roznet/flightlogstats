@@ -9,7 +9,7 @@ import UIKit
 import OSLog
 import RZUtils
 
-class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFieldDelegate {
+class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFieldDelegate {
     
     @IBOutlet weak var fuelTargetField: UITextField!
     @IBOutlet weak var fuelTargetSegment: UISegmentedControl!
@@ -53,7 +53,6 @@ class FuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFie
         self.fuelTargetSegment.addTarget(self, action: #selector(self.segmentDidChange(_:)), for: .valueChanged)
         self.fuelTargetUnitSegment.addTarget(self, action: #selector(self.segmentDidChange(_:)), for: .valueChanged)
         self.fuelAddedUnitSegment.addTarget(self, action: #selector(self.segmentDidChange(_:)), for: .valueChanged)
-        
 
         // Do any additional setup after loading the view.
     }

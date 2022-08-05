@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21200"/>
         <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -340,14 +341,86 @@
         <!--Map View Controller-->
         <scene sceneID="SDL-fH-bz2">
             <objects>
-                <viewController id="tIL-BH-og2" userLabel="Map View Controller" sceneMemberID="viewController">
+                <viewController id="tIL-BH-og2" userLabel="Map View Controller" customClass="LogMapViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="yF0-BN-oP4">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Kna-gp-9gB">
+                                <rect key="frame" x="0.0" y="24" width="834" height="552.5"/>
+                                <standardMapConfiguration key="preferredConfiguration"/>
+                            </mapView>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="b18-pk-RPc" userLabel="Legs Collection View">
+                                <rect key="frame" x="0.0" y="576.5" width="834" height="296"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewLayout key="collectionViewLayout" id="lyT-6t-B01" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="BIA-GU-Ufd" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="kKH-3M-Srp">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GYx-tf-2kC" userLabel="label">
+                                                    <rect key="frame" x="4" y="14.5" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="GYx-tf-2kC" firstAttribute="centerX" secondItem="kKH-3M-Srp" secondAttribute="centerX" id="DDC-Sy-yUZ"/>
+                                                <constraint firstItem="GYx-tf-2kC" firstAttribute="centerY" secondItem="kKH-3M-Srp" secondAttribute="centerY" id="Eqj-Ej-Bt8"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="label" destination="GYx-tf-2kC" id="pFo-Fj-hrO"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="oox-Kb-ZBZ" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="60.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="YAh-xf-iLj">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v2d-IM-YZp" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="v2d-IM-YZp" firstAttribute="top" secondItem="YAh-xf-iLj" secondAttribute="top" id="B50-vI-9ru"/>
+                                                <constraint firstAttribute="bottom" secondItem="v2d-IM-YZp" secondAttribute="bottom" id="De9-R3-foY"/>
+                                                <constraint firstItem="v2d-IM-YZp" firstAttribute="leading" secondItem="YAh-xf-iLj" secondAttribute="leading" id="WYX-Fy-Imv"/>
+                                                <constraint firstAttribute="trailing" secondItem="v2d-IM-YZp" secondAttribute="trailing" id="fWE-LD-u2c"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="numberWithUnitView" destination="v2d-IM-YZp" id="oWd-eA-PxW"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="Xjq-va-TNy"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Xjq-va-TNy" firstAttribute="bottom" secondItem="b18-pk-RPc" secondAttribute="bottom" constant="256.5" id="2dD-1h-HHZ"/>
+                            <constraint firstItem="Kna-gp-9gB" firstAttribute="height" secondItem="Xjq-va-TNy" secondAttribute="height" multiplier="0.5" id="3bh-xz-RGP"/>
+                            <constraint firstItem="Kna-gp-9gB" firstAttribute="leading" secondItem="Xjq-va-TNy" secondAttribute="leading" id="IUC-KX-J3F"/>
+                            <constraint firstItem="b18-pk-RPc" firstAttribute="leading" secondItem="Xjq-va-TNy" secondAttribute="leading" id="WR1-JG-2Nj"/>
+                            <constraint firstItem="Kna-gp-9gB" firstAttribute="top" secondItem="Xjq-va-TNy" secondAttribute="top" id="dzp-pa-RS4"/>
+                            <constraint firstItem="Xjq-va-TNy" firstAttribute="trailing" secondItem="b18-pk-RPc" secondAttribute="trailing" id="mdH-Rm-45x"/>
+                            <constraint firstItem="Xjq-va-TNy" firstAttribute="trailing" secondItem="Kna-gp-9gB" secondAttribute="trailing" id="mxU-vI-Msr"/>
+                            <constraint firstItem="b18-pk-RPc" firstAttribute="top" secondItem="Kna-gp-9gB" secondAttribute="bottom" id="rJz-dF-xeR"/>
+                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Maps" image="map" catalog="system" id="Wmd-bY-ksl"/>
+                    <connections>
+                        <outlet property="legsCollectionView" destination="b18-pk-RPc" id="FsN-zr-35j"/>
+                        <outlet property="mapView" destination="Kna-gp-9gB" id="tfg-qF-ZZd"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Zhf-cq-gzj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -356,7 +429,7 @@
         <!--Calculations View Controller-->
         <scene sceneID="sKo-Gz-sxa">
             <objects>
-                <viewController id="Ixv-6V-WSf" userLabel="Calculations View Controller" customClass="FuelAnalysisViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Ixv-6V-WSf" userLabel="Calculations View Controller" customClass="LogFuelAnalysisViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="bVa-kJ-IET">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
