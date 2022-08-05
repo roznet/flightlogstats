@@ -114,7 +114,6 @@ class Trips {
         var baseNights : Int = 0
         
         for (airport,days) in airportVisits {
-            let count = days.count
             let nights = days.reduce(0, +)
             if nights > baseNights {
                 baseFound = airport
