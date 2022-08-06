@@ -128,7 +128,11 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
                 }
                 last = current
             }
-            context.setStrokeColor(UIColor.systemRed.cgColor)
+            if pathState == .highlight {
+                context.setStrokeColor(UIColor.systemBlue.cgColor)
+            }else{
+                context.setStrokeColor(UIColor.systemRed.cgColor)
+            }
             context.strokePath()
         }
     }
