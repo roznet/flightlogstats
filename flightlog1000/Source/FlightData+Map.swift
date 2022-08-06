@@ -66,6 +66,9 @@ class FlightDataMapOverlay : NSObject, MKOverlay {
 
     var flightData : FlightData
     
+    var highlightTimeRange : TimeRange? = nil
+    var colorChange : [Date] = []
+    
     init(data : FlightData) {
         self.flightData = data
         if let boundingPoints = data.boundingPoints {
@@ -82,24 +85,50 @@ class FlightDataMapOverlay : NSObject, MKOverlay {
 
 class FlightDataMapOverlayView : MKOverlayRenderer {
     
+    enum PathState {
+        case primary
+        case highlight
+        case secondary
+    }
+    
     override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
         if let mapOverlay = self.overlay as? FlightDataMapOverlay {
             var last : CGPoint? = nil
             context.beginPath()
             context.setLineWidth( 2.0 / zoomScale )
-            for coord in mapOverlay.flightData.coordinates {
+            var pathState : PathState = .primary
+            for (date,coord) in zip(mapOverlay.flightData.dates, mapOverlay.flightData.coordinates) {
                 if coord.longitude <= -180.0 {
                     continue
                 }
                 let mapPoint = MKMapPoint(coord)
                 let current = self.point(for: mapPoint)
+                if let range = mapOverlay.highlightTimeRange {
+                    if range.start <= date && pathState == .primary {
+                        // start new path with new color
+                        context.setStrokeColor(UIColor.systemRed.cgColor)
+                        context.strokePath()
+                        context.beginPath()
+                        context.setLineWidth( 5.0 / zoomScale )
+                        pathState = .highlight
+                    }
+                    if range.end <= date && pathState == .highlight{
+                        context.setStrokeColor(UIColor.systemBlue.cgColor)
+                        context.strokePath()
+                        context.beginPath()
+                        context.setLineWidth( 2.0 / zoomScale )
+                        context.setStrokeColor(UIColor.systemRed.cgColor)
+                        pathState = .primary
+                    }
+                }
+                
                 if let last = last {
                     context.move(to: last)
                     context.addLine(to: current)
                 }
                 last = current
             }
-            UIColor.systemRed.setStroke()
+            context.setStrokeColor(UIColor.systemRed.cgColor)
             context.strokePath()
         }
     }

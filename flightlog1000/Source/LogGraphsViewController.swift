@@ -64,8 +64,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         }
     }
 
-    func legsTable(selected : IndexPath) {
-        if let field = self.legsDataSource?.field(at: selected) {
+    func legsTable(selected : IndexPath?) {
+        if let selected = selected, let field = self.legsDataSource?.field(at: selected) {
             self.graphField = field
             self.updateUI()
         }

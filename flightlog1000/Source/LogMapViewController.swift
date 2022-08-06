@@ -20,6 +20,7 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
     
     var flightLogViewModel : FlightLogViewModel? = nil
     private var mapViewOverlay : FlightDataMapOverlay? = nil
+    private var selectedLeg : FlightLeg? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +45,7 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        self.legsDataSource?.indexPathSelectedCallback = nil
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -68,6 +70,7 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
                             self.legsDataSource = legsDataSource
                             self.legsCollectionView.dataSource = self.legsDataSource
                             self.legsCollectionView.delegate = self.legsDataSource
+                            self.legsDataSource?.indexPathSelectedCallback = { indexPath in self.legsTable(selected: indexPath) }
                             if let tableCollectionLayout = self.legsCollectionView.collectionViewLayout as? TableCollectionViewLayout {
                                 tableCollectionLayout.tableCollectionDelegate = self.legsDataSource
                             }else{
@@ -81,6 +84,11 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
                             if let oldOverlay = self.mapViewOverlay {
                                 self.mapView.removeOverlay(oldOverlay)
                             }
+                            if let selectedLeg = self.selectedLeg {
+                                overlay.highlightTimeRange = selectedLeg.timeRange
+                            }else{
+                                overlay.highlightTimeRange = nil
+                            }
                             self.mapViewOverlay = overlay
                             self.mapView.addOverlay(overlay)
                             self.mapView.setVisibleMapRect(overlay.boundingMapRect, edgePadding: .init(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0), animated: true)
@@ -90,6 +98,15 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
                 }
             }
         }
+    }
+
+    func legsTable(selected : IndexPath?) {
+        if let selected = selected, let leg = self.legsDataSource?.legs[selected.section] {
+            self.selectedLeg = leg
+        }else{
+            self.selectedLeg = nil
+        }
+        self.updateUI()
     }
 
     // MARK: - Handle updates

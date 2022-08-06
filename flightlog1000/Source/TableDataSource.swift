@@ -14,7 +14,7 @@ import RZUtilsSwift
 
 class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionDelegate   {
 
-    typealias IndexPathSelectedCallback = (_ : IndexPath) -> Void
+    typealias IndexPathSelectedCallback = (_ : IndexPath?) -> Void
     
     enum CellHolder {
         case attributedString(NSAttributedString)
@@ -154,7 +154,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
             collectionView.reloadSections(IndexSet(integer:i))
         }
         if let callback = self.indexPathSelectedCallback {
-            callback(indexPath)
+            callback(self.selectedIndexPath)
         }
     }
 
