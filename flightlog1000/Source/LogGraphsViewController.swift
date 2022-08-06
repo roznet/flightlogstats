@@ -20,6 +20,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     
     var flightLogViewModel : FlightLogViewModel? = nil
     
+    var graphField : FlightLogFile.Field? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -42,6 +44,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        self.legsDataSource?.indexPathSelectedCallback = nil
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -61,6 +64,13 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         }
     }
 
+    func legsTable(selected : IndexPath) {
+        if let field = self.legsDataSource?.field(at: selected) {
+            self.graphField = field
+            self.updateUI()
+        }
+    }
+    
     func updateUI(){
         if self.legsCollectionView == nil {
             // not ready
@@ -77,6 +87,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                             self.legsDataSource = legsDataSource
                             self.legsCollectionView.dataSource = self.legsDataSource
                             self.legsCollectionView.delegate = self.legsDataSource
+                            self.legsDataSource?.indexPathSelectedCallback = { indexPath in self.legsTable(selected: indexPath ) }
+                            
                             if let tableCollectionLayout = self.legsCollectionView.collectionViewLayout as? TableCollectionViewLayout {
                                 tableCollectionLayout.tableCollectionDelegate = self.legsDataSource
                             }else{
@@ -86,7 +98,10 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                             self.legsDataSource = nil
                         }
                         
-                        let ds = self.flightLogViewModel?.graphDataSource(field: .AltInd)
+                        if self.graphField == nil {
+                            self.graphField = .AltInd
+                        }
+                        let ds = self.flightLogViewModel?.graphDataSource(field: self.graphField!)
                         self.graphView.dataSource = ds
                         self.graphView.displayConfig = ds
                         self.graphView.setNeedsDisplay()

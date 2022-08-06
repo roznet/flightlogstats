@@ -14,6 +14,8 @@ import RZUtilsSwift
 
 class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, TableCollectionDelegate   {
 
+    typealias IndexPathSelectedCallback = (_ : IndexPath) -> Void
+    
     enum CellHolder {
         case attributedString(NSAttributedString)
         case numberWithUnit(GCNumberWithUnit)
@@ -22,6 +24,8 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
             self = .attributedString(NSAttributedString(string: string, attributes: attributes))
         }
     }
+    
+    var indexPathSelectedCallback : IndexPathSelectedCallback? = nil
     
     var cellHolders : [CellHolder] = []
     var geometries : [RZNumberWithUnitGeometry] = []
@@ -148,6 +152,9 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
         }
         for i in indexSection {
             collectionView.reloadSections(IndexSet(integer:i))
+        }
+        if let callback = self.indexPathSelectedCallback {
+            callback(indexPath)
         }
     }
 

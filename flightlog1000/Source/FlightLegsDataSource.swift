@@ -59,6 +59,16 @@ class FlightLegsDataSource : TableDataSource {
         return field.numberWithUnit(valueStats: value, context: self.displayContext)
     }
     
+    // helpers:
+    
+    func field(at indexPath: IndexPath) -> Field? {
+        let fieldIdx = indexPath.item - self.fixedColumnsInfo.count
+        if self.fields.indices.contains(fieldIdx) {
+            return self.fields[fieldIdx]
+        }
+        return nil
+    }
+    
     override func prepare() {
         self.cellHolders  = []
         self.geometries   = []
