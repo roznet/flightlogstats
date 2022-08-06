@@ -10,9 +10,13 @@ import Foundation
 
 class FuelAnalysis {
     
-    struct Inputs {
+    struct Inputs : Equatable {
         let targetFuel : FuelQuantity
         let addedfuel : FuelQuantity
+        
+        static func ==(lhs: Inputs, rhs: Inputs) -> Bool {
+            return lhs.targetFuel == rhs.targetFuel && lhs.addedfuel == rhs.addedfuel
+        }
     }
     
     typealias Endurance = Aircraft.Endurance

@@ -8,6 +8,8 @@
 import Foundation
 import RZUtils
 import RZUtilsUniversal
+import OSLog
+
 
 extension Notification.Name {
     static let flightLogViewModelChanged : Notification.Name = Notification.Name("Notification.Name.logViewModelChanged")
@@ -46,10 +48,10 @@ class FlightLogViewModel {
     
     // MARK: - Configurations and user inputs
     var displayContext : DisplayContext { didSet { self.didWrite() } }
-    var aircraft : Aircraft { didSet { self.didWrite() } }
-    var fuelAnalysisInputs : FuelAnalysis.Inputs { didSet { self.didWrite() } }
-    var fuelTargetUnit : GCUnit { didSet { self.didWrite() } }
-    var fuelAddedUnit : GCUnit { didSet { self.didWrite() } }
+    var aircraft : Aircraft { didSet { if oldValue != self.aircraft { self.didWrite() } } }
+    var fuelAnalysisInputs : FuelAnalysis.Inputs { didSet { if oldValue != self.fuelAnalysisInputs { self.didWrite() } } }
+    var fuelTargetUnit : GCUnit { didSet { if oldValue != self.fuelTargetUnit { self.didWrite() } } }
+    var fuelAddedUnit : GCUnit { didSet { if oldValue != self.fuelAddedUnit { self.didWrite() } } }
 
     // MARK: Outputs
     private(set) var legsDataSource : FlightLegsDataSource? = nil

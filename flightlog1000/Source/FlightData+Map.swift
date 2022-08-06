@@ -96,7 +96,6 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
                 if let last = last {
                     context.move(to: last)
                     context.addLine(to: current)
-                    
                 }
                 last = current
             }

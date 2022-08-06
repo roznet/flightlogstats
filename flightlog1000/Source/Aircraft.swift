@@ -8,7 +8,7 @@
 import Foundation
 import RZUtils
 
-struct Aircraft {
+struct Aircraft : Equatable {
     typealias Endurance = TimeInterval
     
     let fuelMax : FuelQuantity
@@ -27,5 +27,9 @@ struct Aircraft {
     func endurance(fuel : FuelQuantity) -> Endurance {
         let inGallon = fuel.convert(to: GCUnit.usgallon())
         return (inGallon.total / gph) * 3600.0
+    }
+    
+    static func ==(lhs: Aircraft, rhs: Aircraft) -> Bool {
+        return lhs.fuelMax == rhs.fuelMax && lhs.fuelTab == rhs.fuelTab && lhs.gph == rhs.gph
     }
 }

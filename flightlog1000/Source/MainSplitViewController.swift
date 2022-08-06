@@ -39,10 +39,13 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
         
         self.logListController?.delegate = rightTabbarController
         self.logListController?.userInterfaceModeManager = self
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
             FlightLogOrganizer.shared.syncCloud()

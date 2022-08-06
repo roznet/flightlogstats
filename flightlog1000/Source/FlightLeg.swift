@@ -22,6 +22,8 @@ struct FlightLeg {
     let waypoint : Waypoint
     
     let timeRange : TimeRange
+    var start : Date { return timeRange.start }
+    var end : Date { return timeRange.end }
     
     private var data : [Field:ValueStats]
     

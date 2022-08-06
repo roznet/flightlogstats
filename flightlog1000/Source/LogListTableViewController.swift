@@ -136,12 +136,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         
         self.navigationItem.leftBarButtonItem = addButton
         
-        if self.userInterfaceModeManager?.userInterfaceMode == .detail {
-            let sumButton = UIBarButtonItem(image: UIImage(systemName: "sum"), style: .plain, target: self, action: #selector(sum(button:)))
-            self.navigationItem.rightBarButtonItems = [moreFunctionButton, sumButton]
-        }else{
+        if self.userInterfaceModeManager?.userInterfaceMode == .stats {
             let planeButton = UIBarButtonItem(image: UIImage(systemName: "airplane.circle"), style: .plain, target: self, action: #selector(sum(button:)))
             self.navigationItem.rightBarButtonItems = [moreFunctionButton, planeButton]
+        }else{ // this include the case userInterfaceModeManager is nil
+            let sumButton = UIBarButtonItem(image: UIImage(systemName: "sum"), style: .plain, target: self, action: #selector(sum(button:)))
+            self.navigationItem.rightBarButtonItems = [moreFunctionButton, sumButton]
         }
 
     }
@@ -247,19 +247,24 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let info = self.flightInfo(at: indexPath){
-            if self.delegate == nil,
-               let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailTabBarController") as? LogDetailTabBarController {
-                self.delegate = detailViewController
-                self.delegate?.logInfoSelected(info)
-                splitViewController?.showDetailViewController(detailViewController, sender: self)
+            self.ensureDelegate()
+            self.delegate?.logInfoSelected(info)
+            self.userInterfaceModeManager?.userInterfaceMode = .detail
+            self.updateButtons()
+        }
+    }
+    
+    // for iphone, or start in list more delegate may not be instantiated yet
+    func ensureDelegate(){
+        if self.delegate == nil {
+            if let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailTabBarController") as? LogDetailTabBarController {
+             self.delegate = detailViewController
             }else{
-                self.delegate?.logInfoSelected(info)
-                if let detailViewController = delegate as? LogDetailTabBarController {
-                    splitViewController?.showDetailViewController(detailViewController, sender: nil)
-                }
+                Logger.app.error("Could not create detailViewController from storyboard")
             }
         }
     }
+    
     //MARK: - build list functionality
     
     func buildList() {
@@ -299,6 +304,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     //MARK: - add functionality
     
     @objc func sum(button : UIBarButtonItem) {
+        self.ensureDelegate()
         if self.userInterfaceModeManager?.userInterfaceMode == .detail {
             self.userInterfaceModeManager?.userInterfaceMode = .stats
         }else{

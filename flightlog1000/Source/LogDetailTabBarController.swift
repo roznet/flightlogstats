@@ -15,9 +15,7 @@ protocol ViewModelDelegate : AnyObject {
 class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
     var logViewModel : FlightLogViewModel? = nil
     
-    func logInfoSelected(_ info: FlightLogFileInfo) {
-        let viewModel = FlightLogViewModel(fileInfo: info, displayContext: DisplayContext())
-        self.logViewModel = viewModel
+    private func viewModelHasChanged(viewModel: FlightLogViewModel){
         if let viewControllers = self.viewControllers {
             for controller in viewControllers {
                 if let selectionDelegate = controller as? ViewModelDelegate  {
@@ -25,9 +23,15 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
                 }
             }
         }
+    }
+    
+    func logInfoSelected(_ info: FlightLogFileInfo) {
+        let viewModel = FlightLogViewModel(fileInfo: info, displayContext: DisplayContext())
+        self.logViewModel = viewModel
+        // notifiy it change but may not be complete
+        self.viewModelHasChanged(viewModel: viewModel)
         AppDelegate.worker.async {
             self.logViewModel?.build()
-            
         }
     }
     

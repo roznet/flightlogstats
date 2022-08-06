@@ -351,7 +351,7 @@
                                 <standardMapConfiguration key="preferredConfiguration"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="b18-pk-RPc" userLabel="Legs Collection View">
-                                <rect key="frame" x="0.0" y="576.5" width="834" height="296"/>
+                                <rect key="frame" x="0.0" y="576.5" width="834" height="552.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="lyT-6t-B01" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
@@ -406,7 +406,7 @@
                         <viewLayoutGuide key="safeArea" id="Xjq-va-TNy"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="Xjq-va-TNy" firstAttribute="bottom" secondItem="b18-pk-RPc" secondAttribute="bottom" constant="256.5" id="2dD-1h-HHZ"/>
+                            <constraint firstItem="Xjq-va-TNy" firstAttribute="bottom" secondItem="b18-pk-RPc" secondAttribute="bottom" id="2dD-1h-HHZ"/>
                             <constraint firstItem="Kna-gp-9gB" firstAttribute="height" secondItem="Xjq-va-TNy" secondAttribute="height" multiplier="0.5" id="3bh-xz-RGP"/>
                             <constraint firstItem="Kna-gp-9gB" firstAttribute="leading" secondItem="Xjq-va-TNy" secondAttribute="leading" id="IUC-KX-J3F"/>
                             <constraint firstItem="b18-pk-RPc" firstAttribute="leading" secondItem="Xjq-va-TNy" secondAttribute="leading" id="WR1-JG-2Nj"/>
@@ -1055,7 +1055,6 @@
                     <connections>
                         <segue destination="SpX-dd-qC9" kind="relationship" relationship="masterViewController" id="4XW-om-kZr"/>
                         <segue destination="VbP-r0-aJq" kind="relationship" relationship="detailViewController" id="egr-bJ-nog"/>
-                        <segue destination="SpX-dd-qC9" kind="relationship" relationship="compactViewController" id="4dG-fB-oSt"/>
                     </connections>
                 </splitViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QCp-oM-GSX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1083,10 +1082,21 @@
             </objects>
             <point key="canvasLocation" x="-221.58273381294967" y="867.3366834170854"/>
         </scene>
+        <!--View Controller-->
+        <scene sceneID="drQ-r2-Ldx">
+            <objects>
+                <viewController id="Qjg-1V-exz" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="AGA-vi-ZkH">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yEi-nx-WAO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1443" y="146"/>
+        </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="4XW-om-kZr"/>
-    </inferredMetricsTieBreakers>
     <resources>
         <image name="airplane.departure" catalog="system" width="128" height="84"/>
         <image name="calendar" catalog="system" width="128" height="107"/>

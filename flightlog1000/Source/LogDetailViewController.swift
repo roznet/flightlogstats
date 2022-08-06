@@ -169,8 +169,10 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
         
         DispatchQueue.main.async {
             self.updateUI()
-            self.progressView.setProgress(0.0, animated: false)
-            self.progressView.isHidden = false
+            if self.progressView != nil {
+                self.progressView.setProgress(0.0, animated: false)
+                self.progressView.isHidden = false
+            }
         }
     }
 }
