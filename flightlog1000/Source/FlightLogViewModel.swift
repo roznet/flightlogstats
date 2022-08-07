@@ -132,17 +132,38 @@ class FlightLogViewModel {
         return series[field]
     }
     
-    func graphDataSource(field : FlightLogFile.Field) -> GCSimpleGraphCachedDataSource? {
+    func graphDataSource(field : FlightLogFile.Field, leg : FlightLeg? = nil) -> GCSimpleGraphCachedDataSource? {
         if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,
-           let serie = self.graphDataSerie(field: field) {
-            let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: UIColor.systemBlue, andUnit: field.unit)
-            let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start))
-            if data != nil {
-                ds?.add(data)
+           let serie = self.graphDataSerie(field: field),
+           let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)) {
+            
+            if let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: UIColor.systemBlue, andUnit: field.unit) {
+                if let leg = leg,
+                   let gradientSerie = GCStatsDataSerie() {
+                    for point in serie {
+                        if let point = point as? GCStatsDataPoint,
+                           let date = point.date() {
+                            if date >= leg.start && date <= leg.end {
+                                gradientSerie.add(GCStatsDataPoint(date: date, andValue: 1.0))
+                            }else{
+                                gradientSerie.add(GCStatsDataPoint(date: date, andValue: 0.0))
+                            }
+                        }else{
+                            break
+                        }
+                    }
+                    if gradientSerie.count() == serie.count() {
+                        data.gradientColors = GCViewGradientColors([ UIColor.systemBlue, UIColor.systemBlue])
+                        data.gradientDataSerie = gradientSerie
+                        data.gradientColorsFill = GCViewGradientColors([ UIColor.clear, UIColor.systemBlue.withAlphaComponent(0.3)])
+                    }
+                }
+                ds.add(data)
+                
             }
+            
             return ds
         }
         return nil
     }
-    
 }

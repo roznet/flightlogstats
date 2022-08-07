@@ -21,6 +21,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     var flightLogViewModel : FlightLogViewModel? = nil
     
     var graphField : FlightLogFile.Field? = nil
+    var legSelected : FlightLeg? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,9 +66,19 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     }
 
     func legsTable(selected : IndexPath?) {
-        if let selected = selected, let field = self.legsDataSource?.field(at: selected) {
-            self.graphField = field
+        if let selected = selected {
+            if let field = self.legsDataSource?.field(at: selected),
+               let leg = self.legsDataSource?.leg(at: selected){
+                self.graphField = field
+                self.legSelected = leg
+            }
             self.updateUI()
+        }else{
+            // just unselected row, remove highlight
+            if self.legSelected != nil {
+                self.legSelected = nil
+                self.updateUI()
+            }
         }
     }
     
@@ -101,7 +112,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                         if self.graphField == nil {
                             self.graphField = .AltInd
                         }
-                        let ds = self.flightLogViewModel?.graphDataSource(field: self.graphField!)
+                        let ds = self.flightLogViewModel?.graphDataSource(field: self.graphField!, leg: self.legSelected)
                         self.graphView.dataSource = ds
                         self.graphView.displayConfig = ds
                         self.graphView.setNeedsDisplay()

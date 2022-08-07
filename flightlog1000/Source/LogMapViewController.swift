@@ -101,7 +101,7 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
     }
 
     func legsTable(selected : IndexPath?) {
-        if let selected = selected, let leg = self.legsDataSource?.legs[safe: selected.section-1] {
+        if let selected = selected, let leg = self.legsDataSource?.leg(at: selected) {
             self.selectedLeg = leg
         }else{
             self.selectedLeg = nil

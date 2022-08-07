@@ -69,6 +69,14 @@ class FlightLegsDataSource : TableDataSource {
         return nil
     }
     
+    func leg(at indexPath : IndexPath) -> FlightLeg? {
+        let legIdx = indexPath.section - 1
+        if self.legs.indices.contains(legIdx) {
+            return self.legs[legIdx]
+        }
+        return nil
+    }
+    
     override func prepare() {
         self.cellHolders  = []
         self.geometries   = []
