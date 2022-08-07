@@ -15,6 +15,15 @@ protocol ViewModelDelegate : AnyObject {
 class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
     var logViewModel : FlightLogViewModel? = nil
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Delay a bit so rest of the UI/list if applicable is drawn
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2){
+            self.selectOneIfEmpty(organizer: FlightLogOrganizer.shared)
+        }
+    }
+    
     private func viewModelHasChanged(viewModel: FlightLogViewModel){
         if let viewControllers = self.viewControllers {
             for controller in viewControllers {

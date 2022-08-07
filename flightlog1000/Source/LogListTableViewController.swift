@@ -276,14 +276,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                     self.updateSearchedList()
                     self.tableView.reloadData()
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now()+0.5){
-                    if let info = self.logInfoList.first
-                       {
-                        self.delegate?.logInfoSelected(info)
-                    }else{
-                        self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
-                    }
-                }
             }
         }else{
             self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos

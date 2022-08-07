@@ -33,7 +33,10 @@ class FlightLogOrganizer {
     var first : FlightLogFileInfo? {
         self.flightLogFileInfos.first
     }
-    
+    var firstNonEmpty : FlightLogFileInfo? {
+        self.nonEmptyLogFileInfos.first
+    }
+
     var count : Int { return managedFlightLogs.count }
     
     subscript(_ name : String) -> FlightLogFileInfo? {
