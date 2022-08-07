@@ -9,6 +9,8 @@ import UIKit
 
 class ProgressReportViewController: UIViewController {
 
+    typealias Message = ProgressReport.Message
+    
     @IBOutlet weak var progressBar: UIProgressView!
     @IBOutlet weak var statusLabel: UILabel!
     
@@ -18,14 +20,32 @@ class ProgressReportViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-
+    
+    private var lastMessage : Message? = nil
+    
+    /// Animate if message is same, just update else set at once
+    func shouldAnimate(for message : Message) -> Bool {
+        var rv = false
+        if let lastMessage = self.lastMessage {
+            rv = (message == lastMessage)
+        }
+        self.lastMessage = message
+        return rv
+    }
+    
+    func reset(with message : Message) {
+        self.lastMessage = message
+        self.statusLabel.attributedText = NSAttributedString(string: message.description, attributes: ViewConfig.shared.progressAttributes)
+        self.progressBar.setProgress(0, animated: false)
+    }
+    
     func update(for report: ProgressReport) -> Bool {
         var rv = false
-        let animate = self.statusLabel.text == report.message
-        self.statusLabel.text = report.message
+        let animate = self.shouldAnimate(for: report.message)
+        self.statusLabel.attributedText = NSAttributedString(string: report.message.description, attributes: ViewConfig.shared.progressAttributes)
         switch report.state {
         case .progressing(let pct):
-            self.progressBar.setProgress(Float(pct), animated: (animate && pct != 0.0))
+            self.progressBar.setProgress(Float(pct), animated: animate && pct != 0.0)
         case .complete:
             self.progressBar.setProgress(1.0, animated: true)
             rv = true
@@ -35,15 +55,4 @@ class ProgressReportViewController: UIViewController {
         }
         return rv
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-    
 }

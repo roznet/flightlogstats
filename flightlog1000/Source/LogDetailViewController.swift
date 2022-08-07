@@ -157,7 +157,7 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
         }
 
         if self.progress == nil {
-            self.progress = ProgressReport(message: "LogDetail"){
+            self.progress = ProgressReport(message: .parsingInfo){
                 report in
                 DispatchQueue.main.async {
                     if case .progressing(let val) = report.state {

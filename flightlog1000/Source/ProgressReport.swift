@@ -18,25 +18,34 @@ extension Notification.Name {
         case error(String)
     }
     
+    enum Message : String, CustomStringConvertible{
+        case updatingInfo = "Updating Info"
+        case iCloudSync = "Sync iCloud"
+        case parsingInfo = "Parsing Info"
+        case addingFiles = "Adding Files"
+        
+        var description: String { return self.rawValue }
+    }
+    
     /**
      * state and message
      */
     typealias Callback = (_ : ProgressReport) -> Void
     
-    private(set) var message : String
+    private(set) var message : Message
     private(set) var state : State
     
     private var lastDate : Date
     private let callback : Callback
     
-    init(message : String, callback : @escaping Callback = { _ in }){
+    init(message : Message, callback : @escaping Callback = { _ in }){
         self.message = message
         self.lastDate = Date()
         self.callback = callback
         self.state = .complete
     }
     
-    func update(state : State, message : String? = nil) {
+    func update(state : State, message : Message? = nil) {
         // if already reported, return
         guard state != self.state else { return }
         

@@ -666,6 +666,11 @@
                         <outlet property="fuelTargetField" destination="PqG-gQ-uQm" id="MRl-Dc-OKN"/>
                         <outlet property="fuelTargetSegment" destination="9Nb-pE-2dl" id="O8B-nB-u8e"/>
                         <outlet property="fuelTargetUnitSegment" destination="7Ag-KF-YBw" id="XWw-TE-AOm"/>
+                        <outletCollection property="fixedLabels" destination="1o7-kq-3OE" collectionClass="NSMutableArray" id="0hA-bO-afa"/>
+                        <outletCollection property="fixedLabels" destination="bbh-zw-XXR" collectionClass="NSMutableArray" id="jZF-n0-yKB"/>
+                        <outletCollection property="fixedLabels" destination="chS-wr-ErF" collectionClass="NSMutableArray" id="8JH-Pe-ISt"/>
+                        <outletCollection property="fixedLabels" destination="gAz-go-gko" collectionClass="NSMutableArray" id="W67-gA-LyO"/>
+                        <outletCollection property="fixedLabels" destination="dsr-WL-qO3" collectionClass="NSMutableArray" id="WZM-Yf-Hc2"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2eR-rn-c1b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -997,16 +1002,16 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="WT2-Fm-Wdg">
-                                <rect key="frame" x="0.0" y="569" width="834" height="60"/>
+                                <rect key="frame" x="5" y="569" width="824" height="60"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="M4c-Vf-S9S">
-                                        <rect key="frame" x="0.0" y="20" width="413" height="20.5"/>
+                                        <rect key="frame" x="0.0" y="20" width="408" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="H3B-NS-cpr">
-                                        <rect key="frame" x="421" y="28" width="413" height="4"/>
+                                        <rect key="frame" x="416" y="28" width="408" height="4"/>
                                     </progressView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -1018,8 +1023,8 @@
                         <viewLayoutGuide key="safeArea" id="w54-te-JoD"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="WT2-Fm-Wdg" firstAttribute="leading" secondItem="w54-te-JoD" secondAttribute="leading" id="S4f-v3-Uee"/>
-                            <constraint firstItem="w54-te-JoD" firstAttribute="trailing" secondItem="WT2-Fm-Wdg" secondAttribute="trailing" id="cF7-99-C4d"/>
+                            <constraint firstItem="WT2-Fm-Wdg" firstAttribute="leading" secondItem="w54-te-JoD" secondAttribute="leading" constant="5" id="S4f-v3-Uee"/>
+                            <constraint firstItem="w54-te-JoD" firstAttribute="trailing" secondItem="WT2-Fm-Wdg" secondAttribute="trailing" constant="5" id="cF7-99-C4d"/>
                             <constraint firstItem="WT2-Fm-Wdg" firstAttribute="centerY" secondItem="w54-te-JoD" secondAttribute="centerY" id="dVy-Do-NzP"/>
                         </constraints>
                     </view>
@@ -1081,20 +1086,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7Wo-SB-lJ9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-221.58273381294967" y="867.3366834170854"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="drQ-r2-Ldx">
-            <objects>
-                <viewController id="Qjg-1V-exz" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="AGA-vi-ZkH">
-                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="yEi-nx-WAO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1443" y="146"/>
         </scene>
     </scenes>
     <resources>

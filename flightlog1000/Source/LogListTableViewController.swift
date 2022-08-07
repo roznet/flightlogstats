@@ -34,6 +34,75 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     var filterEmpty = true
     
+    func flightInfo(at indexPath : IndexPath) -> FlightLogFileInfo? {
+        return self.logInfoList[indexPath.row]
+    }
+    
+    // for iphone, or start in list more delegate may not be instantiated yet
+    func ensureDelegate(){
+        if self.delegate == nil {
+            if let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailTabBarController") as? LogDetailTabBarController {
+             self.delegate = detailViewController
+            }else{
+                Logger.app.error("Could not create detailViewController from storyboard")
+            }
+        }
+    }
+
+    //MARK: - progress overlay
+    func displayOverlay() {
+        if self.progressReportViewController == nil {
+            let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+            if let progressReport = storyBoard.instantiateViewController(withIdentifier: "ProgressReport") as? ProgressReportViewController {
+                self.progressReportViewController = progressReport
+            }
+        }
+        
+        if let progressReport = self.progressReportViewController,
+           let navigationController = self.navigationController {
+            
+            navigationController.view.addSubview(progressReport.view)
+            navigationController.view.bringSubviewToFront(progressReport.view)
+            progressReport.view.isHidden = false
+            var frame = navigationController.view.frame
+            frame.origin.x = 0
+            frame.origin.y = frame.size.height - 60.0
+            frame.size.height = 60.0
+            progressReport.view.frame = frame
+        }
+    }
+    
+    func removeOverlay(delay : Double = 2.0){
+        DispatchQueue.main.asyncAfter(deadline: .now()+delay) {
+            if let progressReportViewController = self.progressReportViewController {
+                progressReportViewController.view.removeFromSuperview()
+                self.progressReportViewController = nil
+            }
+        }
+    }
+    
+    func prepareOverlay(message : ProgressReport.Message){
+        if self.progressReportViewController == nil {
+            self.displayOverlay()
+        }
+        self.progressReportViewController?.reset(with: message)
+    }
+    
+    func update(for report : ProgressReport ){
+        DispatchQueue.main.async {
+            if report.state != .complete && self.progressReportViewController == nil {
+                self.displayOverlay()
+            }
+            if let controller = self.progressReportViewController {
+                if controller.update(for: report) {
+                    self.removeOverlay()
+                }
+            }
+        }
+    }
+    
+    //MARK: - ui interactions (menu, search, button, etc)
+    
     func moreFunctionMenu() -> UIMenu {
         let menuItems : [UIAction] = [
             UIAction(title: "Toggle Filter", image: UIImage(systemName: "minus.circle")){
@@ -69,59 +138,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         
     }
     
-    func displayOverlay() {
-        if self.progressReportViewController == nil {
-            let storyBoard = UIStoryboard(name: "Main", bundle: nil)
-            if let progressReport = storyBoard.instantiateViewController(withIdentifier: "ProgressReport") as? ProgressReportViewController {
-                self.progressReportViewController = progressReport
-            }
-        }
-        
-        if let progressReport = self.progressReportViewController,
-           let navigationController = self.navigationController {
-            
-            navigationController.view.addSubview(progressReport.view)
-            navigationController.view.bringSubviewToFront(progressReport.view)
-            progressReport.view.isHidden = false
-            var frame = navigationController.view.frame
-            frame.origin.x = 0
-            frame.origin.y = frame.size.height - 60.0
-            frame.size.height = 60.0
-            progressReport.view.frame = frame
-        }
-    }
-    
-    func removeOverlay(delay : Double = 2.0){
-        DispatchQueue.main.asyncAfter(deadline: .now()+delay) {
-            if let progressReportViewController = self.progressReportViewController {
-                progressReportViewController.view.removeFromSuperview()
-                self.progressReportViewController = nil
-            }
-        }
-    }
-    
-    func prepareOverlay(message : String){
-        if self.progressReportViewController == nil {
-            self.displayOverlay()
-        }
-        self.progressReportViewController?.statusLabel.text = message
-        self.progressReportViewController?.progressBar.setProgress(0, animated: false)
-        
-    }
-    
-    func update(for report : ProgressReport ){
-        DispatchQueue.main.async {
-            if report.state != .complete && self.progressReportViewController == nil {
-                self.displayOverlay()
-            }
-            if let controller = self.progressReportViewController {
-                if controller.update(for: report) {
-                    self.removeOverlay()
-                }
-            }
-        }
-    }
-    
     func updateSearchResults(for searchController: UISearchController) {
         self.updateSearchedList()
         DispatchQueue.main.async {
@@ -146,6 +162,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
 
     }
     
+    
+    //MARK: - UIViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateButtons()
@@ -215,10 +233,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         return self.logInfoList.count
     }
     
-    func flightInfo(at indexPath : IndexPath) -> FlightLogFileInfo? {
-        return self.logInfoList[indexPath.row]
-    }
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
         if let cell = cell as? LogListTableViewCell,
@@ -251,17 +265,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.delegate?.logInfoSelected(info)
             self.userInterfaceModeManager?.userInterfaceMode = .detail
             self.updateButtons()
-        }
-    }
-    
-    // for iphone, or start in list more delegate may not be instantiated yet
-    func ensureDelegate(){
-        if self.delegate == nil {
-            if let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailTabBarController") as? LogDetailTabBarController {
-             self.delegate = detailViewController
-            }else{
-                Logger.app.error("Could not create detailViewController from storyboard")
-            }
         }
     }
     
@@ -322,7 +325,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
 
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        self.prepareOverlay(message: "Adding Files")
+        self.prepareOverlay(message: .addingFiles)
         self.logFileOrganizer.copyMissingToLocal(urls: urls)
         
         controller.dismiss(animated: true)
@@ -332,12 +335,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         print( "cancelled")
         controller.dismiss(animated: true)
     }
-    
-    //MARK: - Edit functionality
-    @objc func showMoreFunctions(button : UIBarButtonItem){
-        
-    }
-    
 
 }
 

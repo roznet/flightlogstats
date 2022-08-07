@@ -97,6 +97,14 @@ class LogListTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        let cellAttribute = ViewConfig.shared.cellAttributes
+        self.date.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+        self.totalTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+        self.flightTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+        self.fuel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+        self.route.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+        self.distance.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+        self.airports.attributedText = NSAttributedString(string: "Pending", attributes: cellAttribute)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -21,6 +21,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     
+    @IBOutlet private var fixedLabels : [UILabel]!
     
     var fuelDataSource : FuelAnalysisDataSource? { return self.flightLogViewModel?.fuelAnalysisDataSource }
     
@@ -54,6 +55,12 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         self.fuelTargetUnitSegment.addTarget(self, action: #selector(self.segmentDidChange(_:)), for: .valueChanged)
         self.fuelAddedUnitSegment.addTarget(self, action: #selector(self.segmentDidChange(_:)), for: .valueChanged)
 
+        for label in self.fixedLabels {
+            label.font = ViewConfig.shared.defaultBodyFont
+        }
+        self.fuelTargetField.font = ViewConfig.shared.defaultTextEntryFont
+        self.fuelAddedLeftField.font = ViewConfig.shared.defaultTextEntryFont
+        self.fuelAddedRightField.font = ViewConfig.shared.defaultTextEntryFont
         // Do any additional setup after loading the view.
     }
     

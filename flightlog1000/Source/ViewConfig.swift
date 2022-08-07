@@ -15,6 +15,12 @@ class ViewConfig {
     static let fontFamily : String = "Avenir Next"//"Verdana"//
 
     var dynamicFont : Bool = false
+    
+    var defaultBodyFont : UIFont = UIFont(name: "AvenirNext-Medium", size: 14.0)!
+    var defaultHeadlineFont : UIFont = UIFont(name: "AvenirNext-Bold", size: 14.0)!
+    var defaultTitleFont : UIFont = UIFont(name: "AvenirNext-Bold", size: 17.0)!
+    var defaultTextEntryFont : UIFont = UIFont(name: "AvenirNext-Medium", size: 20.0)!
+    
     func setDefaultAttributes() {
         //print( UIFont.familyNames)
         //UILabel.appearance().font = UIFont(name: "Avenir", size: 14.0)!
@@ -34,13 +40,13 @@ class ViewConfig {
         }else{
             
             self.titleAttributes = [
-                .font:UIFont(name: "AvenirNext-Bold", size: 14.0)!,
+                .font:self.defaultHeadlineFont,
                 .foregroundColor: UIColor.label
                     
             ]
             self.cellAttributes = [
                 //.font:UIFont(descriptor: fontDesc, size: 0.0)
-                .font:UIFont(name: "AvenirNext-Medium", size: 14.0)!,
+                .font:self.defaultBodyFont,
                 .foregroundColor: UIColor.label
             ]
         }
@@ -49,4 +55,5 @@ class ViewConfig {
     var cellAttributes : [NSAttributedString.Key:Any] = [:]
     var titleAttributes : [NSAttributedString.Key:Any] = [:]
 
+    var progressAttributes : [NSAttributedString.Key:Any] { return self.cellAttributes }
 }

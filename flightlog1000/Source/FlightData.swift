@@ -118,7 +118,7 @@ class FlightData {
         self.strings.reserveCapacity(array.count)
         
         let trimCharSet = CharacterSet(charactersIn: "\" ")
-        progress?.update(state: .progressing(0.0), message: "Parsing Log")
+        progress?.update(state: .progressing(0.0), message: .parsingInfo)
         for line in array {
             progress?.update(state: .progressing(Double(done_sofar)/Double(array.count)))
             done_sofar += 1

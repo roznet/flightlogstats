@@ -75,7 +75,7 @@ class FlightLogOrganizer {
 
     func ensureProgressReport(callback : @escaping ProgressReport.Callback = { _ in }) {
         if self.progress == nil {
-            self.progress = ProgressReport(message: "Organizer", callback: callback)
+            self.progress = ProgressReport(message: .addingFiles, callback: callback)
         }
     }
     
@@ -166,7 +166,7 @@ class FlightLogOrganizer {
             if !missing.isEmpty {
                 if firstMissingCheck {
                     self.missingCount = missing.count
-                    self.progress?.update(state: .progressing(0.0), message: "Updating Info")
+                    self.progress?.update(state: .progressing(0.0), message: .updatingInfo)
                 }
                 var done : [String] = []
                 // do more recent first
@@ -208,7 +208,7 @@ class FlightLogOrganizer {
                 // need to switch state before starting next
                 NotificationCenter.default.post(name: .flightLogInfoUpdated, object: nil)
                 let percent = 1.0 - (Double(missing.count)/Double(self.missingCount))
-                self.progress?.update(state: .progressing(percent), message: "Updating Info")
+                self.progress?.update(state: .progressing(percent), message: .updatingInfo)
                 self.currentState = .ready
                 // if did something, schedule another batch
                 self.updateInfo(count: count, force: force)
@@ -410,7 +410,7 @@ class FlightLogOrganizer {
             Logger.app.info("iCloud not setup, skipping sync")
             return
         }
-        self.progress?.update(state: .progressing(0.0), message: "Sync iCloud")
+        self.progress?.update(state: .progressing(0.0), message: .iCloudSync)
         Self.search(in: [localFolder]){
             result in
             switch result {
@@ -532,7 +532,7 @@ class FlightLogOrganizer {
                 if error == nil {
                     do {
                         for intent in copyCloudToLocal {
-                            self.progress?.update(state: .progressing(done/totalCount), message: "Sync iCloud")
+                            self.progress?.update(state: .progressing(done/totalCount), message: .iCloudSync)
                             done += 1.0
                             try FileManager.default.copyItem(at: intent.url, to: self.localFolder.appendingPathComponent(intent.url.lastPathComponent))
                         }
@@ -549,7 +549,7 @@ class FlightLogOrganizer {
         }else{
             Logger.app.info("Nothing new in cloud to copy to local")
         }
-        self.progress?.update(state: .complete, message: "Sync iCloud")
+        self.progress?.update(state: .complete, message: .iCloudSync)
     }
 }
 
