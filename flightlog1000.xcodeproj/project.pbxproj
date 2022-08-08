@@ -73,6 +73,7 @@
 		42A20B55289C577F00439880 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B54289C577F00439880 /* Trip.swift */; };
 		42A20B57289D78D700439880 /* LogMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B56289D78D700439880 /* LogMapViewController.swift */; };
 		42A20B5A289D7D1500439880 /* FlightData+Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B59289D7D1500439880 /* FlightData+Map.swift */; };
+		42A20B5C28A09F1100439880 /* ProgressReportOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B5B28A09F1100439880 /* ProgressReportOverlay.swift */; };
 		42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */; };
 		42A7A0C128155B0E00DF4495 /* DatesValuesByField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */; };
 		42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */; };
@@ -179,6 +180,7 @@
 		42A20B54289C577F00439880 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trip.swift; path = Source/Trip.swift; sourceTree = "<group>"; };
 		42A20B56289D78D700439880 /* LogMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogMapViewController.swift; path = Source/LogMapViewController.swift; sourceTree = "<group>"; };
 		42A20B59289D7D1500439880 /* FlightData+Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightData+Map.swift"; path = "Source/FlightData+Map.swift"; sourceTree = "<group>"; };
+		42A20B5B28A09F1100439880 /* ProgressReportOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReportOverlay.swift; path = Source/ProgressReportOverlay.swift; sourceTree = "<group>"; };
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
 		42A7A0C028155B0E00DF4495 /* DatesValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatesValuesByField.swift; path = Source/DatesValuesByField.swift; sourceTree = "<group>"; };
 		42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLogFile+Field.swift"; path = "Source/FlightLogFile+Field.swift"; sourceTree = "<group>"; };
@@ -291,6 +293,7 @@
 				429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */,
 				4268A0C82842851900A3CB05 /* ProgressReport.swift */,
 				42B90996284D1F8100186FCD /* ProgressReportViewController.swift */,
+				42A20B5B28A09F1100439880 /* ProgressReportOverlay.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -675,6 +678,7 @@
 				42A20B522896F0CF00439880 /* Trips.swift in Sources */,
 				425B3459289408D500548557 /* TableDataSource.swift in Sources */,
 				42606A22288DE2FC00AE858C /* FlightSummary+Field.swift in Sources */,
+				42A20B5C28A09F1100439880 /* ProgressReportOverlay.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,
 				421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */,
 				42606A1E288DC5A500AE858C /* RZNumberWithUnitView.swift in Sources */,

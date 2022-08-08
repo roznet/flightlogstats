@@ -24,8 +24,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     var logFileOrganizer = FlightLogOrganizer.shared
     
-    var progressReportViewController : ProgressReportViewController? = nil
-    
     weak var delegate : LogSelectionDelegate? = nil
     weak var userInterfaceModeManager : UserInterfaceModeManager? = nil
     
@@ -50,56 +48,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
 
     //MARK: - progress overlay
-    func displayOverlay() {
-        if self.progressReportViewController == nil {
-            let storyBoard = UIStoryboard(name: "Main", bundle: nil)
-            if let progressReport = storyBoard.instantiateViewController(withIdentifier: "ProgressReport") as? ProgressReportViewController {
-                self.progressReportViewController = progressReport
-            }
-        }
-        
-        if let progressReport = self.progressReportViewController,
-           let navigationController = self.navigationController {
-            
-            navigationController.view.addSubview(progressReport.view)
-            navigationController.view.bringSubviewToFront(progressReport.view)
-            progressReport.view.isHidden = false
-            var frame = navigationController.view.frame
-            frame.origin.x = 0
-            frame.origin.y = frame.size.height - 60.0
-            frame.size.height = 60.0
-            progressReport.view.frame = frame
-        }
-    }
+    var progressReportOverlay : ProgressReportOverlay? = nil
     
-    func removeOverlay(delay : Double = 2.0){
-        DispatchQueue.main.asyncAfter(deadline: .now()+delay) {
-            if let progressReportViewController = self.progressReportViewController {
-                progressReportViewController.view.removeFromSuperview()
-                self.progressReportViewController = nil
-            }
-        }
-    }
-    
-    func prepareOverlay(message : ProgressReport.Message){
-        if self.progressReportViewController == nil {
-            self.displayOverlay()
-        }
-        self.progressReportViewController?.reset(with: message)
-    }
-    
-    func update(for report : ProgressReport ){
-        DispatchQueue.main.async {
-            if report.state != .complete && self.progressReportViewController == nil {
-                self.displayOverlay()
-            }
-            if let controller = self.progressReportViewController {
-                if controller.update(for: report) {
-                    self.removeOverlay()
-                }
-            }
-        }
-    }
     
     //MARK: - ui interactions (menu, search, button, etc)
     
@@ -129,7 +79,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             UIAction(title: "Try Overlay", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Reset All")
-                self.displayOverlay()
+                self.progressReportOverlay?.displayOverlay()
             }
 
         ]
@@ -182,9 +132,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        if self.progressReportOverlay == nil, let navigationController = self.navigationController {
+            self.progressReportOverlay = ProgressReportOverlay(viewController: navigationController)
+        }
         self.logFileOrganizer.ensureProgressReport() {
             progress in
-            self.update(for: progress)
+            self.progressReportOverlay?.update(for: progress)
         }
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
@@ -325,7 +278,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
 
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        self.prepareOverlay(message: .addingFiles)
+        self.progressReportOverlay?.prepareOverlay(message: .addingFiles)
         self.logFileOrganizer.copyMissingToLocal(urls: urls)
         
         controller.dismiss(animated: true)

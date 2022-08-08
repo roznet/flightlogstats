@@ -6,13 +6,15 @@
 //
 
 import Foundation
+import OSLog
 
 extension Notification.Name {
-    static let kProgressUpdate = Notification.Name("kProgressUpdate")
+    static let progressUpdate = Notification.Name("progressUpdate")
 }
 
 @objc class ProgressReport : NSObject {
     enum State : Comparable {
+        case start
         case complete
         case progressing(Double)
         case error(String)
@@ -35,14 +37,25 @@ extension Notification.Name {
     private(set) var message : Message
     private(set) var state : State
     
+    private var startDate : Date
     private var lastDate : Date
     private let callback : Callback
     
+    static let minimumTimeInterval : TimeInterval = 0.2
+    
+    var fastProcessing : Bool {
+        let interval = lastDate.timeIntervalSince(startDate) < Self.minimumTimeInterval
+        Logger.app.info("Done in \(interval)")
+        return interval
+        
+    }
+    
     init(message : Message, callback : @escaping Callback = { _ in }){
         self.message = message
+        self.startDate = Date()
         self.lastDate = Date()
         self.callback = callback
-        self.state = .complete
+        self.state = .start
     }
     
     func update(state : State, message : Message? = nil) {
@@ -51,21 +64,21 @@ extension Notification.Name {
         
         // if progressing only update after 0.1seconds
         let now = Date()
+        if state == .start {
+            self.startDate = Date()
+        }
         switch state {
         case .progressing(let pct):
             // if not at 0 (start) or end (1.0) only report once every few 100ms
-            if pct > 0.0 && pct < 1.0 && now.timeIntervalSince(self.lastDate) < 0.2 {
+            if pct > 0.0 && pct < 1.0 && now.timeIntervalSince(self.lastDate) < Self.minimumTimeInterval {
                 return
             }
             fallthrough
         default:
-            if let message = message {
-                self.message = message
-            }
             self.state = state
             self.lastDate = now
             self.callback(self)
-            NotificationCenter.default.post(name: .kProgressUpdate, object: self)
+            NotificationCenter.default.post(name: .progressUpdate, object: self)
         }
     }
 }
@@ -79,6 +92,8 @@ extension ProgressReport.State : CustomStringConvertible {
             return "State<.error(\(error)>"
         case .progressing(let pct):
             return "State<.progressing(\(pct))>"
+        case .start:
+            return "State<.none)>"
         }
     }
 }

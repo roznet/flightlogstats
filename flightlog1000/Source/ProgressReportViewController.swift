@@ -44,10 +44,12 @@ class ProgressReportViewController: UIViewController {
         let animate = self.shouldAnimate(for: report.message)
         self.statusLabel.attributedText = NSAttributedString(string: report.message.description, attributes: ViewConfig.shared.progressAttributes)
         switch report.state {
+        case .start:
+            self.progressBar.setProgress(0.0, animated: false)
         case .progressing(let pct):
             self.progressBar.setProgress(Float(pct), animated: animate && pct != 0.0)
         case .complete:
-            self.progressBar.setProgress(1.0, animated: true)
+            self.progressBar.setProgress(1.0, animated: !report.fastProcessing)
             rv = true
         case .error(let error):
             self.statusLabel.text = error

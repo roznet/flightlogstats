@@ -14,9 +14,15 @@ protocol ViewModelDelegate : AnyObject {
 
 class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
     var logViewModel : FlightLogViewModel? = nil
+    var progress : ProgressReport? = nil
+    var progressReportOverlay : ProgressReportOverlay? = nil
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if self.progressReportOverlay == nil {
+            self.progressReportOverlay = ProgressReportOverlay(viewController: self)
+        }
         
         // Delay a bit so rest of the UI/list if applicable is drawn
         DispatchQueue.main.asyncAfter(deadline: .now()+0.2){
@@ -35,7 +41,14 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
     }
     
     func logInfoSelected(_ info: FlightLogFileInfo) {
-        let viewModel = FlightLogViewModel(fileInfo: info, displayContext: DisplayContext())
+        if self.progress == nil {
+            self.progress = ProgressReport(message: .parsingInfo) {
+                progress in
+                self.progressReportOverlay?.update(for: progress)
+            }
+        }
+        self.progressReportOverlay?.prepareOverlay(message: .parsingInfo)
+        let viewModel = FlightLogViewModel(fileInfo: info, displayContext: DisplayContext(), progress: self.progress)
         self.logViewModel = viewModel
         // notifiy it change but may not be complete
         self.viewModelHasChanged(viewModel: viewModel)
