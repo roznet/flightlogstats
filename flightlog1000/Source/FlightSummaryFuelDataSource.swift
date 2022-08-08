@@ -49,8 +49,8 @@ class FlightSummaryFuelDataSource: TableDataSource {
             geometry.alignment = .center
             self.geometries.append(geometry)
         }
-        for (name,fuel,totalizer) in [("Start", self.flightSummary.fuelStart,FuelQuantity.zero),
-                                      ("End", self.flightSummary.fuelEnd,FuelQuantity.zero),
+        for (name,fuel,totalizer) in [("Start", self.flightSummary.fuelStart,self.flightSummary.fuelStart),
+                                      ("End", self.flightSummary.fuelEnd,self.flightSummary.fuelStart-self.flightSummary.fuelTotalizer),
                                       ("Used", self.flightSummary.fuelUsed,self.flightSummary.fuelTotalizer)
         ] {
             self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
