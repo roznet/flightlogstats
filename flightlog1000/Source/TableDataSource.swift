@@ -18,10 +18,13 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     
     enum CellHolder {
         case attributedString(NSAttributedString)
-        case numberWithUnit(GCNumberWithUnit)
+        case numberWithUnit(GCNumberWithUnit,[NSAttributedString.Key:Any]?)
         
         init(string : String, attributes: [NSAttributedString.Key:Any] ) {
             self = .attributedString(NSAttributedString(string: string, attributes: attributes))
+        }
+        init(numberWithUnit : GCNumberWithUnit, attributes : [NSAttributedString.Key:Any]? = nil){
+            self = .numberWithUnit(numberWithUnit, attributes)
         }
     }
     
@@ -124,11 +127,12 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
             self.setBackgroundColor(for: cell, itemAt: indexPath)
             
             return cell
-        case .numberWithUnit(let nu):
+        case .numberWithUnit(let nu,let attr):
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NumberWithUnitCollectionViewCell", for: indexPath)
             if let nuCell = cell as? RZNumberWithUnitCollectionViewCell {
                 nuCell.numberWithUnitView.numberWithUnit = nu
                 nuCell.numberWithUnitView.geometry = self.geometries[indexPath.item]
+                nuCell.numberWithUnitView.attributes = attr
             }
             self.setBackgroundColor(for: cell, itemAt: indexPath)
             return cell

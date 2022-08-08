@@ -45,9 +45,7 @@ extension Notification.Name {
     
     var fastProcessing : Bool {
         let interval = lastDate.timeIntervalSince(startDate) < Self.minimumTimeInterval
-        Logger.app.info("Done in \(interval)")
-        return interval
-        
+        return interval        
     }
     
     init(message : Message, callback : @escaping Callback = { _ in }){

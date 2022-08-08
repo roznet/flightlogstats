@@ -50,7 +50,7 @@ class FuelAnalysisDataSource: TableDataSource {
                    fuel.leftWithUnit.convert(to: unit),
                    fuel.rightWithUnit.convert(to: unit)] {
             self.geometries[geoIndex].adjust(for: nu)
-            self.cellHolders.append(CellHolder.numberWithUnit(nu))
+            self.cellHolders.append(CellHolder(numberWithUnit: nu))
             geoIndex += 1
         }
         self.rowsCount += 1
@@ -59,7 +59,7 @@ class FuelAnalysisDataSource: TableDataSource {
     func addLine(name : String, endurance  : Endurance) {
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
         let nu = endurance.numberWithUnit.convert(to: GCUnit.minute())
-        self.cellHolders.append(CellHolder.numberWithUnit(nu))
+        self.cellHolders.append(CellHolder(numberWithUnit: nu))
         self.geometries[1].adjust(for: nu)
         self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
         self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))

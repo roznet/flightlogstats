@@ -86,7 +86,7 @@ class FlightListDataSource: TableDataSource  {
                     for field in fields {
                         if let nu = summary.numberWithUnit(for: field) {
                             geometries[geoIndex].adjust(for: nu)
-                            self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                            self.cellHolders.append(CellHolder(numberWithUnit: nu))
                         }else{
                             self.cellHolders.append(CellHolder(string: "", attributes: cellAttributes))
                         }
@@ -94,9 +94,8 @@ class FlightListDataSource: TableDataSource  {
                     }
                     row += 1
                 }else{
-                    print( "Why?")
+                    Logger.app.error("internal inconsistency")
                 }
-                
             }
             // Summary
             self.cellHolders.append(CellHolder(string:  "Trip Total", attributes: titleAttributes))
@@ -107,8 +106,8 @@ class FlightListDataSource: TableDataSource  {
             var geoIndex = self.headers.count
             for field in fields {
                 if let nu = trip.numberWithUnit(field: field) {
-                    geometries[geoIndex].adjust(for: nu)
-                    self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                    geometries[geoIndex].adjust(for: nu, numberAttribute: titleAttributes)
+                    self.cellHolders.append(CellHolder(numberWithUnit: nu, attributes: titleAttributes))
                 }else{
                     self.cellHolders.append(CellHolder(string: "", attributes: cellAttributes))
                 }

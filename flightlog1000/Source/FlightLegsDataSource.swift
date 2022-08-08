@@ -120,7 +120,7 @@ class FlightLegsDataSource : TableDataSource {
                 for field in fields {
                     if let nu = self.formattedValueFor(field: field, row: row) {
                         self.geometries[geoIndex].adjust(for: nu)
-                        self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                        self.cellHolders.append(CellHolder(numberWithUnit: nu))
                     }else{
                         self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
                     }

@@ -59,7 +59,7 @@ class FlightSummaryFuelDataSource: TableDataSource {
                 if fuelVal != 0.0 {
                     let nu = self.displayContext.numberWithUnit(gallon: fuelVal)
                     self.geometries[geoIndex].adjust(for: nu)
-                    self.cellHolders.append(CellHolder.numberWithUnit(nu))
+                    self.cellHolders.append(CellHolder(numberWithUnit: nu))
                 }else{
                     self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
                 }

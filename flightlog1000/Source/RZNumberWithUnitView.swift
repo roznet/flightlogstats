@@ -13,10 +13,12 @@ import OSLog
 class RZNumberWithUnitView: UIView {
     var geometry : RZNumberWithUnitGeometry { didSet { self.setNeedsDisplay(); self.setNeedsLayout() }}
     var numberWithUnit : GCNumberWithUnit { didSet { self.setNeedsDisplay(); self.setNeedsLayout() }}
+    var attributes : [NSAttributedString.Key:Any]? { didSet { self.setNeedsDisplay(); self.setNeedsLayout() }}
     
     init(numberWithUnit : GCNumberWithUnit, geometry:RZNumberWithUnitGeometry){
         self.numberWithUnit = numberWithUnit
         self.geometry = geometry
+        self.attributes = nil
         super.init(frame: .zero)
     }
     
@@ -38,7 +40,7 @@ class RZNumberWithUnitView: UIView {
     // An empty implementation adversely affects performance during animation.
     override func draw(_ rect: CGRect) {
         // Drawing code
-        self.geometry.drawInRect(rect, numberWithUnit: self.numberWithUnit)
+        self.geometry.drawInRect(rect, numberWithUnit: self.numberWithUnit, numberAttribute: self.attributes)
     }
     
 
