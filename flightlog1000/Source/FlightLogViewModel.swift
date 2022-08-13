@@ -141,8 +141,31 @@ class FlightLogViewModel {
         return series[field]
     }
     
+    let colors : [UIColor] = [UIColor.systemBlue, UIColor.systemRed]
+    
+    func scatterDataSource(fields : [FlightLogFile.Field], leg : FlightLeg? = nil) -> GCSimpleGraphCachedDataSource? {
+        if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,
+           let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)),
+           let first = fields.suffix(2).first,
+           let last = fields.suffix(2).last {
+            ds.xUnit = first.unit
+            if let firstSerie = self.graphDataSerie(field: first),
+               let lastSerie = self.graphDataSerie(field: last){
+                
+                GCStatsDataSerie.reduce(toCommonRange: firstSerie, and: lastSerie)
+                let xy = GCStatsInterpFunction.xySerieFor(x: firstSerie, andY: lastSerie)
+                
+                if let data = GCSimpleGraphDataHolder(xy, type:gcGraphType.scatterPlot, color: self.colors.first!, andUnit: last.unit) {
+                    ds.add(data)
+                }
+            }
+            ds.title = fields.map { $0.rawValue }.joined(separator: " x ")
+            return ds
+        }
+        return nil
+    }
+    
     func graphDataSource(fields : [FlightLogFile.Field], leg : FlightLeg? = nil) -> GCSimpleGraphCachedDataSource? {
-        let colors : [UIColor] = [UIColor.systemBlue, UIColor.systemRed]
         var colorIdx = 0
         
         if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,

@@ -38,7 +38,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         case scatterPlot
     }
     
-    var legDisplayType : LegDisplayType = .phasesOfFlight
+    var legDisplayType : LegDisplayType = .waypoints
     var graphDisplayType : GraphStyle = .singleGraph
     
     var useLegsDataSource : FlightLegsDataSource?  {
@@ -158,11 +158,15 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                             self.legsDataSource = nil
                         }
 
-                        let ds = self.flightLogViewModel?.graphDataSource(fields: self.graphFields.suffix(self.graphDisplayType == .singleGraph ? 1 : 2), leg: self.legSelected)
-                        
-                        
-                        self.graphView.dataSource = ds
-                        self.graphView.displayConfig = ds
+                        if self.graphDisplayType == .scatterPlot {
+                            let ds = self.flightLogViewModel?.scatterDataSource(fields: self.graphFields.suffix(2))
+                            self.graphView.dataSource = ds
+                            self.graphView.displayConfig = ds
+                        }else{
+                            let ds = self.flightLogViewModel?.graphDataSource(fields: self.graphFields.suffix(self.graphDisplayType == .singleGraph ? 1 : 2), leg: self.legSelected)
+                            self.graphView.dataSource = ds
+                            self.graphView.displayConfig = ds
+                        }
                         self.graphView.setNeedsDisplay()
                         self.view.setNeedsDisplay()
                     }
