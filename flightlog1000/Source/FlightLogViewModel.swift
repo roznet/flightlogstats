@@ -141,36 +141,44 @@ class FlightLogViewModel {
         return series[field]
     }
     
-    func graphDataSource(field : FlightLogFile.Field, leg : FlightLeg? = nil) -> GCSimpleGraphCachedDataSource? {
+    func graphDataSource(fields : [FlightLogFile.Field], leg : FlightLeg? = nil) -> GCSimpleGraphCachedDataSource? {
+        let colors : [UIColor] = [UIColor.systemBlue, UIColor.systemRed]
+        var colorIdx = 0
+        
         if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,
-           let serie = self.graphDataSerie(field: field),
-           let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)) {
-            
-            if let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: UIColor.systemBlue, andUnit: field.unit) {
-                if let leg = leg,
-                   let gradientSerie = GCStatsDataSerie() {
-                    for point in serie {
-                        if let point = point as? GCStatsDataPoint,
-                           let date = point.date() {
-                            if date >= leg.start && date <= leg.end {
-                                gradientSerie.add(GCStatsDataPoint(date: date, andValue: 1.0))
-                            }else{
-                                gradientSerie.add(GCStatsDataPoint(date: date, andValue: 0.0))
+           let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)){
+            for field in fields {
+                if let serie = self.graphDataSerie(field: field) {
+                    let color = colors[colorIdx % colors.count]
+                    
+                    if let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: color, andUnit: field.unit) {
+                        data.axisForSerie = UInt( colorIdx )
+                        if colorIdx == 0, let leg = leg,
+                           let gradientSerie = GCStatsDataSerie() {
+                            for point in serie {
+                                if let point = point as? GCStatsDataPoint,
+                                   let date = point.date() {
+                                    if date >= leg.start && date <= leg.end {
+                                        gradientSerie.add(GCStatsDataPoint(date: date, andValue: 1.0))
+                                    }else{
+                                        gradientSerie.add(GCStatsDataPoint(date: date, andValue: 0.0))
+                                    }
+                                }else{
+                                    break
+                                }
                             }
-                        }else{
-                            break
+                            if gradientSerie.count() == serie.count() {
+                                data.gradientColors = GCViewGradientColors([ color, color])
+                                data.gradientDataSerie = gradientSerie
+                                data.gradientColorsFill = GCViewGradientColors([ UIColor.clear, color.withAlphaComponent(0.3)])
+                            }
                         }
-                    }
-                    if gradientSerie.count() == serie.count() {
-                        data.gradientColors = GCViewGradientColors([ UIColor.systemBlue, UIColor.systemBlue])
-                        data.gradientDataSerie = gradientSerie
-                        data.gradientColorsFill = GCViewGradientColors([ UIColor.clear, UIColor.systemBlue.withAlphaComponent(0.3)])
+                        ds.add(data)
+                        colorIdx += 1
                     }
                 }
-                ds.add(data)
-                
             }
-            
+            ds.title = fields.map { $0.rawValue }.joined(separator: ", ")
             return ds
         }
         return nil

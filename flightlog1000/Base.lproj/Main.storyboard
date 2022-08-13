@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21219" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21223" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21200"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21204"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -772,8 +772,37 @@
                                 <rect key="frame" x="0.0" y="24" width="834" height="552.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="5He-7J-abp">
+                                <rect key="frame" x="0.0" y="576.5" width="834" height="60"/>
+                                <subviews>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="5cU-4P-yg2">
+                                        <rect key="frame" x="0.0" y="14.5" width="191" height="32"/>
+                                        <segments>
+                                            <segment title="Waypoints"/>
+                                            <segment title="Flight Phase"/>
+                                        </segments>
+                                        <connections>
+                                            <action selector="segmentChanged:" destination="9Nf-CY-m6R" eventType="valueChanged" id="pBG-De-SuF"/>
+                                        </connections>
+                                    </segmentedControl>
+                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="sKJ-SE-YlV">
+                                        <rect key="frame" x="538" y="14.5" width="296" height="32"/>
+                                        <segments>
+                                            <segment title="Single Graph"/>
+                                            <segment title="Two Graphs"/>
+                                            <segment title="Scatter Plot"/>
+                                        </segments>
+                                        <connections>
+                                            <action selector="segmentChanged:" destination="9Nf-CY-m6R" eventType="valueChanged" id="qVV-Rl-x1h"/>
+                                        </connections>
+                                    </segmentedControl>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="WTT-h8-NSF"/>
+                                </constraints>
+                            </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="RIe-Tr-gEa" userLabel="Legs Collection View">
-                                <rect key="frame" x="0.0" y="576.5" width="834" height="552.5"/>
+                                <rect key="frame" x="0.0" y="636.5" width="834" height="492.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="Ouf-s9-dep" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
                                 <cells>
@@ -785,7 +814,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p0j-z5-OXB" userLabel="label">
-                                                    <rect key="frame" x="4" y="14.5" width="42" height="21"/>
+                                                    <rect key="frame" x="4.5" y="15" width="41.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -830,17 +859,22 @@
                         <constraints>
                             <constraint firstItem="4M1-lB-EUH" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" id="2F8-SF-plS"/>
                             <constraint firstItem="4M1-lB-EUH" firstAttribute="top" secondItem="W2e-Qs-i2X" secondAttribute="top" id="3M6-31-sNB"/>
+                            <constraint firstItem="W2e-Qs-i2X" firstAttribute="trailing" secondItem="5He-7J-abp" secondAttribute="trailing" id="DBU-yh-0pd"/>
+                            <constraint firstItem="5He-7J-abp" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" id="DUc-oV-3et"/>
                             <constraint firstItem="W2e-Qs-i2X" firstAttribute="bottom" secondItem="RIe-Tr-gEa" secondAttribute="bottom" id="FOS-mY-xwr"/>
+                            <constraint firstItem="RIe-Tr-gEa" firstAttribute="top" secondItem="5He-7J-abp" secondAttribute="bottom" id="M9o-sg-5cV"/>
                             <constraint firstItem="4M1-lB-EUH" firstAttribute="height" secondItem="W2e-Qs-i2X" secondAttribute="height" multiplier="0.5" id="ODi-6K-rbF"/>
                             <constraint firstItem="RIe-Tr-gEa" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" id="X8U-Ix-Yh2"/>
                             <constraint firstItem="W2e-Qs-i2X" firstAttribute="trailing" secondItem="RIe-Tr-gEa" secondAttribute="trailing" id="drB-Hq-JQs"/>
-                            <constraint firstItem="RIe-Tr-gEa" firstAttribute="top" secondItem="4M1-lB-EUH" secondAttribute="bottom" id="q2G-hw-nFv"/>
+                            <constraint firstItem="5He-7J-abp" firstAttribute="top" secondItem="4M1-lB-EUH" secondAttribute="bottom" id="mnv-Vu-K7c"/>
                             <constraint firstItem="W2e-Qs-i2X" firstAttribute="trailing" secondItem="4M1-lB-EUH" secondAttribute="trailing" id="rZP-cF-84l"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Graphs" image="chart.xyaxis.line" catalog="system" id="bRF-Na-7CO"/>
                     <connections>
+                        <outlet property="graphTypeSegment" destination="sKJ-SE-YlV" id="zju-1d-Yub"/>
                         <outlet property="graphView" destination="4M1-lB-EUH" id="2CR-Z2-IkI"/>
+                        <outlet property="legTypeSegment" destination="5cU-4P-yg2" id="mZU-jR-mgH"/>
                         <outlet property="legsCollectionView" destination="RIe-Tr-gEa" id="vBy-FA-dKQ"/>
                     </connections>
                 </viewController>

@@ -15,12 +15,16 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     @IBOutlet weak var graphView: GCSimpleGraphView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
     
+    @IBOutlet weak var graphTypeSegment: UISegmentedControl!
+    @IBOutlet weak var legTypeSegment: UISegmentedControl!
+    
     var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
     var legsDataSource : FlightLegsDataSource? = nil
     
     var flightLogViewModel : FlightLogViewModel? = nil
     
-    var graphField : FlightLogFile.Field? = nil
+    // start with two decent default
+    var graphFields : [FlightLogFile.Field] = [.IAS, .AltInd]
     var legSelected : FlightLeg? = nil
     
     enum LegDisplayType {
@@ -28,7 +32,14 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         case phasesOfFlight
     }
     
+    enum GraphStyle {
+        case singleGraph
+        case twoGraphs
+        case scatterPlot
+    }
+    
     var legDisplayType : LegDisplayType = .phasesOfFlight
+    var graphDisplayType : GraphStyle = .singleGraph
     
     var useLegsDataSource : FlightLegsDataSource?  {
         switch self.legDisplayType {
@@ -85,7 +96,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         if let selected = selected {
             if let field = self.legsDataSource?.field(at: selected),
                let leg = self.legsDataSource?.leg(at: selected){
-                self.graphField = field
+                self.graphFields = self.graphFields.filter { $0 != field }
+                self.graphFields.append(field)
                 self.legSelected = leg
             }
             self.updateUI()
@@ -97,6 +109,27 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
             }
         }
     }
+    
+    @IBAction func segmentChanged(_ sender: UISegmentedControl) {
+        if self.legTypeSegment == sender {
+            if self.legTypeSegment.selectedSegmentIndex == 0 {
+                self.legDisplayType = .waypoints
+            }else{
+                self.legDisplayType = .phasesOfFlight
+            }
+            self.updateUI()
+        }else if self.graphTypeSegment == sender {
+            if sender.selectedSegmentIndex == 0 {
+                self.graphDisplayType = .singleGraph
+            }else if sender.selectedSegmentIndex == 1 {
+                self.graphDisplayType = .twoGraphs
+            }else if sender.selectedSegmentIndex == 2 {
+                self.graphDisplayType = .scatterPlot
+            }
+            self.updateUI()
+        }
+    }
+    
     
     func updateUI(){
         if self.legsCollectionView == nil {
@@ -124,11 +157,10 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                         }else{
                             self.legsDataSource = nil
                         }
+
+                        let ds = self.flightLogViewModel?.graphDataSource(fields: self.graphFields.suffix(self.graphDisplayType == .singleGraph ? 1 : 2), leg: self.legSelected)
                         
-                        if self.graphField == nil {
-                            self.graphField = .AltInd
-                        }
-                        let ds = self.flightLogViewModel?.graphDataSource(field: self.graphField!, leg: self.legSelected)
+                        
                         self.graphView.dataSource = ds
                         self.graphView.displayConfig = ds
                         self.graphView.setNeedsDisplay()
