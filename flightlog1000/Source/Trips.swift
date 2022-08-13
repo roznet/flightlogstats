@@ -77,8 +77,6 @@ class Trips {
         
         let calendar = Calendar.current
         
-        let check = "LFMD"
-        
         for info in self.flightFileInfos {
             if let summary = info.flightSummary,
                let startAirport = summary.startAirport,
@@ -89,9 +87,6 @@ class Trips {
                     continue
                 }
                 
-                if endAirport.icao == check || startAirport.icao == check {
-                    print( "\(hobbs.start): \(startAirport.icao)-\(endAirport.icao)")
-                }
                 if let lastTimeReported = lastTime,
                     let lastAirportReported = lastAirport {
                     let days = calendar.numberOfNights(from: hobbs.end, to: lastTimeReported)
