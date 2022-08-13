@@ -578,7 +578,31 @@ extension FlightData {
                 
                 for calcField in FieldCalculation.calculatedFields {
                     if calcField.calcType == .doublesArrayToString {
-                        stringLine.append(calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap))
+                        let previous = data.strings.last?[stringLine.count]
+                        let newVal = calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap, previous: previous)
+                        // reset when value changes
+                        var amountToFill : Int = 0
+                        if let prevVal = previous, prevVal != newVal {
+                            for field in self.doubleInputs.keys {
+                                if let idx = fieldsMap[field] {
+                                    let val = doubleLine[idx]
+                                    if let cnt = self.doubleInputs[field]?.count, cnt > amountToFill {
+                                        amountToFill = cnt
+                                    }
+                                    self.doubleInputs[field] = [val]
+                                }
+                            }
+                        }
+                        if amountToFill != 0 {
+                            let cnt = data.strings.count
+                            let downto = max(0,cnt - amountToFill)
+                            for idx in downto..<cnt {
+                                data.strings[idx][stringLine.count] = newVal
+                            }
+                            
+                        }
+                        stringLine.append(newVal)
+                            
                     }
                 }
 

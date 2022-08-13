@@ -23,6 +23,22 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     var graphField : FlightLogFile.Field? = nil
     var legSelected : FlightLeg? = nil
     
+    enum LegDisplayType {
+        case waypoints
+        case phasesOfFlight
+    }
+    
+    var legDisplayType : LegDisplayType = .phasesOfFlight
+    
+    var useLegsDataSource : FlightLegsDataSource?  {
+        switch self.legDisplayType {
+        case .waypoints:
+            return self.flightLogViewModel?.legsDataSource
+        case .phasesOfFlight:
+            return self.flightLogViewModel?.phasesOfFlightDataSource
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -94,7 +110,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                         self.graphView.isHidden = false
                         self.legsCollectionView.isHidden = false
                         
-                        if let legsDataSource = self.flightLogViewModel?.legsDataSource {
+                        if let legsDataSource = self.useLegsDataSource {
                             self.legsDataSource = legsDataSource
                             self.legsCollectionView.dataSource = self.legsDataSource
                             self.legsCollectionView.delegate = self.legsDataSource

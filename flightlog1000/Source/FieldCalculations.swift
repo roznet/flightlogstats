@@ -9,13 +9,15 @@ import Foundation
 
 struct FieldCalculation {
     typealias Field = FlightLogFile.Field
+    typealias FuncTextMulti = ([[Double]], String?) -> String
+    
     let output : Field
     let inputs : [Field]
     let calcType : CalcType
     let requiredObservationCount : Int
     private let initial : Double
     private let calcFunc : ([Double]) -> Double
-    private let calcFuncTextMulti : ([[Double]]) -> String
+    private let calcFuncTextMulti : FuncTextMulti
     
     var inputType : InputType {
         switch self.calcType {
@@ -54,13 +56,13 @@ struct FieldCalculation {
         self.output = output
         self.inputs = inputs
         self.calcFunc = calcFunc
-        self.calcFuncTextMulti = { _ in return "" }
+        self.calcFuncTextMulti = { _,_ in return "" }
         self.calcType = .doublesToDouble
         self.initial = initial
         self.requiredObservationCount = 1
     }
     
-    init(stringOutput: Field, multiInputs: [Field], obsCount : Int, calcFunc : @escaping ([[Double]])->String ){
+    init(stringOutput: Field, multiInputs: [Field], obsCount : Int, calcFunc : @escaping FuncTextMulti ){
         self.output = stringOutput
         self.inputs = multiInputs
         self.calcFuncTextMulti = calcFunc
@@ -70,7 +72,7 @@ struct FieldCalculation {
         self.requiredObservationCount = obsCount
     }
     
-    func evaluateToString(lines : [Field:[Double]], fieldsMap : [Field:Int]) -> String {
+    func evaluateToString(lines : [Field:[Double]], fieldsMap : [Field:Int], previous : String?) -> String {
         guard self.calcType == .doublesArrayToString else { return "" }
         
         var doublesArray : [[Double]] = []
@@ -79,7 +81,7 @@ struct FieldCalculation {
                 doublesArray.append(vals)
             }
         }
-        return self.calcFuncTextMulti(doublesArray)
+        return self.calcFuncTextMulti(doublesArray,previous)
     }
     
     func evaluate(line : [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> Double{
@@ -140,9 +142,9 @@ struct FieldCalculation {
             x in
             return x[0] + (x[1]/3600.0)
         },
-        FieldCalculation(stringOutput: .FltPhase, multiInputs: [.IAS,.GndSpd,.AltMSL,.AltGPS,.E1_FFlow], obsCount: 10){
-            x in
-            guard x[0].count >= 10 else { return "Ground" }
+        FieldCalculation(stringOutput: .FltPhase, multiInputs: [.IAS,.GndSpd,.AltMSL,.AltGPS,.E1_FFlow], obsCount: 20){
+            x, previous in
+            guard x[0].count >= 15 else { return previous ?? "Ground" }
             
             if let ias = x[0].last,
                let gndspd = x[1].min(),
@@ -154,7 +156,7 @@ struct FieldCalculation {
                     }else if altend < altstart - 50 {
                         return "Descent"
                     }
-                    return "Flight"
+                    return "Cruise"
                 }else{
                     return "Ground"
                 }

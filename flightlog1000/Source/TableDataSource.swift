@@ -93,17 +93,25 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     }
 
     //MARK: - common logic
-    private func cellHolder(at indexPath : IndexPath) -> CellHolder {
+    private func cellHolder(at indexPath : IndexPath) -> CellHolder? {
         let index = indexPath.section * self.columnsCount + indexPath.item
-        return self.cellHolders[index]
+        if index < self.cellHolders.count {
+            return self.cellHolders[index]
+        }else{
+            return nil
+        }
     }
     
     func size(at indexPath: IndexPath) -> CGSize {
-        switch self.cellHolder(at: indexPath) {
-        case .attributedString(let attributedString):
-            return attributedString.size()
-        case .numberWithUnit:
-            return self.geometries[indexPath.item].totalSize
+        if let holder = self.cellHolder(at: indexPath) {
+            switch holder {
+            case .attributedString(let attributedString):
+                return attributedString.size()
+            case .numberWithUnit:
+                return self.geometries[indexPath.item].totalSize
+            }
+        }else{
+            return CGSize.zero
         }
     }
     
@@ -117,23 +125,28 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let holder = self.cellHolder(at: indexPath)
-        switch holder {
-        case .attributedString(let attributedString):
+        if let holder = self.cellHolder(at: indexPath) {
+            switch holder {
+            case .attributedString(let attributedString):
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TableCollectionViewCell", for: indexPath)
+                if let tableCell = cell as? TableCollectionViewCell {
+                    tableCell.label.attributedText = attributedString
+                }
+                self.setBackgroundColor(for: cell, itemAt: indexPath)
+                
+                return cell
+            case .numberWithUnit(let nu,let attr):
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NumberWithUnitCollectionViewCell", for: indexPath)
+                if let nuCell = cell as? RZNumberWithUnitCollectionViewCell {
+                    nuCell.numberWithUnitView.numberWithUnit = nu
+                    nuCell.numberWithUnitView.geometry = self.geometries[indexPath.item]
+                    nuCell.numberWithUnitView.attributes = attr
+                }
+                self.setBackgroundColor(for: cell, itemAt: indexPath)
+                return cell
+            }
+        }else{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TableCollectionViewCell", for: indexPath)
-            if let tableCell = cell as? TableCollectionViewCell {
-                tableCell.label.attributedText = attributedString
-            }
-            self.setBackgroundColor(for: cell, itemAt: indexPath)
-            
-            return cell
-        case .numberWithUnit(let nu,let attr):
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NumberWithUnitCollectionViewCell", for: indexPath)
-            if let nuCell = cell as? RZNumberWithUnitCollectionViewCell {
-                nuCell.numberWithUnitView.numberWithUnit = nu
-                nuCell.numberWithUnitView.geometry = self.geometries[indexPath.item]
-                nuCell.numberWithUnitView.attributes = attr
-            }
             self.setBackgroundColor(for: cell, itemAt: indexPath)
             return cell
         }

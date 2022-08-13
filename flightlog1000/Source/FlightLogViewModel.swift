@@ -58,6 +58,7 @@ class FlightLogViewModel {
     private(set) var fuelDataSource : FlightSummaryFuelDataSource? = nil
     private(set) var timeDataSource : FlightSummaryTimeDataSource? = nil
     private(set) var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
+    private(set) var phasesOfFlightDataSource : FlightLegsDataSource? = nil
     
     
     // MARK: - Setup
@@ -116,6 +117,11 @@ class FlightLogViewModel {
                     self.legsDataSource = legsDataSource
                 }else{
                     self.legsDataSource = nil
+                }
+                if let phases = self.flightLogFileInfo.flightLog?.phasesOfFLight {
+                    self.phasesOfFlightDataSource = FlightLegsDataSource(legs: phases, displayContext: self.displayContext)
+                }else{
+                    self.phasesOfFlightDataSource = nil
                 }
             }
             NotificationCenter.default.post(name: .flightLogViewModelChanged, object: self)

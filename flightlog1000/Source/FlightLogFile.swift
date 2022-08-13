@@ -89,6 +89,14 @@ public class FlightLogFile {
 //MARK: - interpretation
 extension FlightLogFile {
     
+    var phasesOfFLight : [FlightLeg] {
+        var rv : [FlightLeg] = []
+        if let flyingStart = self.flightSummary?.flying?.start, let data = self.data {
+            rv = FlightLeg.legs(from: data, start: flyingStart, byfield: .FltPhase)
+        }
+        return rv
+    }
+    
     func meta(key : MetaField) -> String? {
         self.parse()
         return self.data?.meta[key]
