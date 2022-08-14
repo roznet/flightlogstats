@@ -555,6 +555,15 @@ class FlightLogOrganizer {
 
 extension String {
     var isLogFile : Bool { return self.hasPrefix("log_") && self.hasSuffix(".csv") }
+    var logFileGuessedAirport : String? {
+        if self.isLogFile {
+            let d = (self as NSString).deletingPathExtension
+            if let guess = d.components(separatedBy: "_").last {
+                return guess
+            }
+        }
+        return nil
+    }
 }
 
 extension URL {

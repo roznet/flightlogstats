@@ -22,9 +22,35 @@ class LogListTableViewCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var fileName: UILabel!
     
-    func update(with info: FlightLogFileInfo){
+    func update(minimum info: FlightLogFileInfo){
+        let titleAttribute = ViewConfig.shared.titleAttributes
+        let cellAttribute = ViewConfig.shared.cellAttributes
+
         self.fileName.text = info.log_file_name
+        if let guess = info.log_file_name?.logFileGuessedAirport {
+            self.airports.attributedText = NSAttributedString(string: guess, attributes: titleAttribute)
+        }
+        
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        if let start_time = info.start_time {
+            self.date.attributedText = NSAttributedString(string: formatter.string(from: start_time), attributes: cellAttribute)
+        }else{
+            self.date.attributedText = NSAttributedString(string: "Missing", attributes: cellAttribute)
+        }
+
+        
+        self.flightIcon.isHidden = true
+        self.flightTime.isHidden = true
+
+    }
+    
+    func update(with info: FlightLogFileInfo){
         self.flightLogFileInfo = info
+
+        self.update(minimum: info)
         
         let titleAttribute = ViewConfig.shared.titleAttributes
         let cellAttribute = ViewConfig.shared.cellAttributes
@@ -33,11 +59,6 @@ class LogListTableViewCell: UITableViewCell {
             let formatter = DateFormatter()
             formatter.dateStyle = .medium
             formatter.timeStyle = .short
-            if let start_time = info.start_time {
-                self.date.attributedText = NSAttributedString(string: formatter.string(from: start_time), attributes: cellAttribute)
-            }else{
-                self.date.attributedText = NSAttributedString(string: "Missing", attributes: cellAttribute)
-            }
             if let hobbs = flightSummary.hobbs {
                 self.totalTime.attributedText = NSAttributedString(string: self.displayContext.formatDecimal(timeRange: hobbs), attributes: cellAttribute)
             }else{
@@ -83,14 +104,12 @@ class LogListTableViewCell: UITableViewCell {
             }
             self.airports.attributedText = NSAttributedString(string: airports.joined(separator: "-"), attributes: titleAttribute)
         }else{
-            self.date.attributedText = NSAttributedString(string: "Empty", attributes: cellAttribute)
             self.totalTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
             self.flightTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
             self.fuel.attributedText = nil
             self.route.attributedText = nil
             self.distance.attributedText = nil
             self.airports.attributedText = nil
-
         }
     }
     

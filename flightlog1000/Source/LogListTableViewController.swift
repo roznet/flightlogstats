@@ -190,7 +190,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
         if let cell = cell as? LogListTableViewCell,
            let info = self.flightInfo(at: indexPath) {
-            
+            cell.update(minimum: info)
             AppDelegate.worker.async {
                 let _ = info.flightSummary
                 DispatchQueue.main.async {
@@ -265,8 +265,9 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         // mac should select files, ios just import folder
 #if targetEnvironment(macCatalyst)
         let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [
-            .commaSeparatedText
+            .commaSeparatedText, .folder
         ])
+        documentPicker.allowsMultipleSelection = true
 #else
         let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [
             .folder
