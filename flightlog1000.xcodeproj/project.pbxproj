@@ -20,6 +20,7 @@
 		4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */; };
 		423929112864D58800CD33C0 /* TestAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423929102864D58800CD33C0 /* TestAnalysis.swift */; };
 		423EF3532872E78900EA7415 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423EF3522872E78900EA7415 /* SettingsViewController.swift */; };
+		4240B6BB28A94E7C004D4F40 /* CalendarStatsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4240B6BA28A94E7C004D4F40 /* CalendarStatsViewController.swift */; };
 		42478A5128153EF300212BF2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42478A5028153EF300212BF2 /* Log.swift */; };
 		425A8DE2287094BD002DCB0C /* FlightFuelRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425A8DE1287094BD002DCB0C /* FlightFuelRecord.swift */; };
 		425B3459289408D500548557 /* TableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425B3458289408D500548557 /* TableDataSource.swift */; };
@@ -125,6 +126,7 @@
 		4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysis.swift; path = Source/FuelAnalysis.swift; sourceTree = "<group>"; };
 		423929102864D58800CD33C0 /* TestAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAnalysis.swift; sourceTree = "<group>"; };
 		423EF3522872E78900EA7415 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsViewController.swift; path = Source/SettingsViewController.swift; sourceTree = "<group>"; };
+		4240B6BA28A94E7C004D4F40 /* CalendarStatsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalendarStatsViewController.swift; path = Source/CalendarStatsViewController.swift; sourceTree = "<group>"; };
 		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
 		425A8DE1287094BD002DCB0C /* FlightFuelRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightFuelRecord.swift; path = Source/FlightFuelRecord.swift; sourceTree = "<group>"; };
 		425B34572893E12900548557 /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 			children = (
 				425F4EDA2893288A00F691BD /* StatsTabBarController.swift */,
 				425F4EDC289328DC00F691BD /* TripsStatsViewController.swift */,
+				4240B6BA28A94E7C004D4F40 /* CalendarStatsViewController.swift */,
 			);
 			name = Stats;
 			sourceTree = "<group>";
@@ -675,6 +678,7 @@
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
 				425B345B2894140800548557 /* ViewConfig.swift in Sources */,
+				4240B6BB28A94E7C004D4F40 /* CalendarStatsViewController.swift in Sources */,
 				42A20B522896F0CF00439880 /* Trips.swift in Sources */,
 				425B3459289408D500548557 /* TableDataSource.swift in Sources */,
 				42606A22288DE2FC00AE858C /* FlightSummary+Field.swift in Sources */,

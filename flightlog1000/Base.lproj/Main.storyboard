@@ -228,18 +228,88 @@
         <!--Calendar Stats-->
         <scene sceneID="Gii-1t-ydh">
             <objects>
-                <viewController id="le0-J7-zW3" userLabel="Calendar Stats" sceneMemberID="viewController">
+                <viewController id="le0-J7-zW3" userLabel="Calendar Stats" customClass="CalendarStatsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="hiS-AS-56c">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XTx-KC-rCa">
+                                <rect key="frame" x="20" y="24" width="794" height="110.5"/>
+                            </stackView>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="C8C-Qy-cZt" userLabel="Log List View">
+                                <rect key="frame" x="5" y="134.5" width="824" height="994.5"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewLayout key="collectionViewLayout" id="2x8-SZ-QS5" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="Zsk-3W-XUT" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="pza-0J-2FS">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d5w-2v-FOm">
+                                                    <rect key="frame" x="4" y="14.5" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="d5w-2v-FOm" firstAttribute="centerY" secondItem="pza-0J-2FS" secondAttribute="centerY" id="Ego-ic-ROv"/>
+                                                <constraint firstItem="d5w-2v-FOm" firstAttribute="centerX" secondItem="pza-0J-2FS" secondAttribute="centerX" id="rj6-fl-cow"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="label" destination="d5w-2v-FOm" id="KjK-jX-F7i"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="cBI-9r-JG3" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="ZoQ-jg-XQO">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1aR-No-we7" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="1aR-No-we7" firstAttribute="leading" secondItem="ZoQ-jg-XQO" secondAttribute="leading" id="TGm-jV-PWr"/>
+                                                <constraint firstItem="1aR-No-we7" firstAttribute="top" secondItem="ZoQ-jg-XQO" secondAttribute="top" id="e95-qR-BhU"/>
+                                                <constraint firstAttribute="bottom" secondItem="1aR-No-we7" secondAttribute="bottom" id="edn-Sd-n1o"/>
+                                                <constraint firstAttribute="trailing" secondItem="1aR-No-we7" secondAttribute="trailing" id="nOT-yc-DUH"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="numberWithUnitView" destination="1aR-No-we7" id="zGa-vD-SpL"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="1jp-Ar-Cmm"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="XTx-KC-rCa" firstAttribute="leading" secondItem="1jp-Ar-Cmm" secondAttribute="leading" constant="20" id="8Su-Wz-aKc"/>
+                            <constraint firstItem="1jp-Ar-Cmm" firstAttribute="trailing" secondItem="C8C-Qy-cZt" secondAttribute="trailing" constant="5" id="K2q-Xr-pQY"/>
+                            <constraint firstItem="C8C-Qy-cZt" firstAttribute="leading" secondItem="1jp-Ar-Cmm" secondAttribute="leading" constant="5" id="Vgr-kA-A0S"/>
+                            <constraint firstItem="XTx-KC-rCa" firstAttribute="height" secondItem="1jp-Ar-Cmm" secondAttribute="height" multiplier="0.1" id="Zrt-9G-nlI"/>
+                            <constraint firstItem="C8C-Qy-cZt" firstAttribute="top" secondItem="XTx-KC-rCa" secondAttribute="bottom" id="grl-dJ-uuI"/>
+                            <constraint firstItem="1jp-Ar-Cmm" firstAttribute="trailing" secondItem="XTx-KC-rCa" secondAttribute="trailing" constant="20" id="wcJ-vm-6Wl"/>
+                            <constraint firstItem="C8C-Qy-cZt" firstAttribute="bottom" secondItem="1jp-Ar-Cmm" secondAttribute="bottom" id="xOZ-nn-Zo9"/>
+                            <constraint firstItem="XTx-KC-rCa" firstAttribute="top" secondItem="1jp-Ar-Cmm" secondAttribute="top" id="yya-EL-Sfa"/>
+                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Calendar" image="calendar" catalog="system" id="fQo-7t-sfx"/>
+                    <connections>
+                        <outlet property="logListCollectionView" destination="C8C-Qy-cZt" id="WFz-O3-Pf9"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fOc-RZ-0gg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2631" y="1174"/>
+            <point key="canvasLocation" x="2630.9352517985612" y="1173.8693467336684"/>
         </scene>
         <!--Trips Stats-->
         <scene sceneID="QSF-FC-Rbl">

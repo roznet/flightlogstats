@@ -68,7 +68,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     
     var frozenColor : UIColor = UIColor.systemCyan
     var selectedColor : UIColor = UIColor.systemTeal
-    var highlightedBackgroundColor : UIColor = UIColor.secondarySystemBackground
+    var highlightedBackgroundColor : UIColor =  UIColor.systemCyan //UIColor.secondarySystemBackground
     
     func setBackgroundColor(for tableCell: UICollectionViewCell, itemAt indexPath : IndexPath) {
         if self.highlightedBackgroundRows.contains(indexPath.section){

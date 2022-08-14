@@ -17,16 +17,45 @@ struct Trip {
     var count : Int { return self.flightLogFileInfos.count }
     var stats : [Field:ValueStats] = [:]
     
-    let base : Airport
+    var empty : Bool { return self.flightLogFileInfos.count == 0 }
     
-    init( base: Airport) {
-        self.base = base
+    enum Aggregation {
+        case awayFromBase(Airport)
+        case calendarUnit(GCStatsDateBuckets)
     }
     
-    /// Add the info to the trip
-    /// - Parameter info: info to add
-    /// - Returns: true if this info concludes the trip
-    mutating func add(info : FlightLogFileInfo) -> Bool {
+    var label : String
+    
+    private let aggregation : Aggregation
+    
+    init(base: Airport) {
+        self.aggregation = .awayFromBase(base)
+        self.label = "Trip"
+    }
+    
+    init(unit : NSCalendar.Unit, referenceDate : Date? = nil){
+        let bucket = GCStatsDateBuckets(for: unit, referenceDate: referenceDate, andCalendar: Calendar.current)
+        self.init(bucket: bucket)
+    }
+    
+    private init(bucket : GCStatsDateBuckets) {
+        self.aggregation = .calendarUnit(bucket)
+        self.label = bucket.description
+    }
+    
+    private mutating func add(summary : FlightSummary){
+        for field in FlightSummary.Field.allCases {
+            if let nu = summary.numberWithUnit(for: field) {
+                if stats[field] == nil {
+                    stats[field] = ValueStats(numberWithUnit: nu)
+                }else{
+                    stats[field]?.update(numberWithUnit: nu)
+                }
+            }
+        }
+    }
+    
+    private mutating func add(base : Airport, info : FlightLogFileInfo) -> Bool {
         var rv = false
         if let summary = info.flightSummary,
            let startAirport = summary.startAirport,
@@ -41,15 +70,7 @@ struct Trip {
                 }
             }
             
-            for field in FlightSummary.Field.allCases {
-                if let nu = summary.numberWithUnit(for: field) {
-                    if stats[field] == nil {
-                        stats[field] = ValueStats(numberWithUnit: nu)
-                    }else{
-                        stats[field]?.update(numberWithUnit: nu)
-                    }
-                }
-            }
+            self.add(summary: summary)
             
             flightLogFileInfos.append(info)
             flightLogFileInfos.sort {
@@ -57,6 +78,59 @@ struct Trip {
             }
         }
         return rv
+    }
+    
+    private mutating func add(bucket : GCStatsDateBuckets, info : FlightLogFileInfo) -> Bool {
+        var rv = false
+        if let summary = info.flightSummary,
+           let start = summary.hobbs?.start {
+            if self.self.flightLogFileInfos.count == 0 {
+                flightLogFileInfos.append(info)
+                bucket.bucket(start)
+            }else{
+                if bucket.contains(start) {
+                    self.add(summary: summary)
+                    flightLogFileInfos.append(info)
+                    flightLogFileInfos.sort {
+                        $0.isNewer(than: $1)
+                    }
+                    
+                }else{
+                    rv = true
+                }
+            }
+        }
+        
+        return rv
+    }
+    
+    /// Add the info to the trip
+    /// - Parameter info: info to add
+    /// - Returns: true if this info concludes the trip
+    mutating func add(info : FlightLogFileInfo) -> Bool {
+        switch aggregation {
+        case .awayFromBase(let base):
+            return self.add(base: base, info: info)
+        case .calendarUnit(let bucket):
+            return self.add(bucket: bucket, info: info)
+        }
+    }
+    
+    func next(info: FlightLogFileInfo) -> Trip? {
+        switch self.aggregation {
+        case .awayFromBase(let base):
+            return Trip(base: base)
+        case .calendarUnit(let bucket):
+            if let summary = info.flightSummary,
+               let start = summary.hobbs?.start {
+                bucket.bucket(start)
+                var rv = Trip(bucket: bucket)
+                rv.add(summary: summary)
+                rv.flightLogFileInfos = [info]
+                return rv
+            }
+            return nil
+        }
     }
     
     func numberWithUnit(field : Field) -> GCNumberWithUnit? {

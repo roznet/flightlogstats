@@ -26,12 +26,12 @@ class FlightListDataSource: TableDataSource  {
     //    End
     //    Remaining
     
-    init(displayContext : DisplayContext = DisplayContext()){
+    init(displayContext : DisplayContext = DisplayContext(), aggregation : Trips.Aggregation = .trips){
         self.fields = [.Hobbs, .Moving, .Flying, .FuelStart, .FuelEnd, .FuelUsed, .FuelTotalizer, .GpH, .NmpG, .Distance, .GroundSpeed]
         self.headers = [ "Date", "From", "To", "Start", "End"]
         self.logInfos = self.logFileOrganizer.actualFlightLogFileInfos
         self.displayContext = displayContext
-        self.trips = Trips(infos: self.logInfos)
+        self.trips = Trips(infos: self.logInfos, aggregation: aggregation)
         self.trips.compute()
         // rows is only a first guess, will really know once trips are computed
         super.init(rows: self.trips.infoCount + self.trips.tripCount + 1,
@@ -99,7 +99,7 @@ class FlightListDataSource: TableDataSource  {
             }
             // Summary
             tripIndex += 1
-            self.cellHolders.append(CellHolder(string:  "Trip \(tripIndex) Total", attributes: titleAttributes))
+            self.cellHolders.append(CellHolder(string:  "Trip Total", attributes: titleAttributes))
             self.cellHolders.append(CellHolder(string:  "", attributes: titleAttributes))
             self.cellHolders.append(CellHolder(string:  "", attributes: titleAttributes))
             self.cellHolders.append(CellHolder(string:  "", attributes: cellAttributes))

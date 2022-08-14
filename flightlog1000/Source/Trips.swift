@@ -8,30 +8,25 @@
 import Foundation
 import RZFlight
 import RZUtils
+import RZUtilsSwift
 
-extension Calendar {
-    func numberOfNights(from : Date, to: Date) -> Int {
-        let fromStart = self.startOfDay(for: from)
-        let toStart = self.startOfDay(for: to)
-        
-        let rv = dateComponents([.day], from: fromStart, to: toStart)
-        
-        return rv.day!
-    }
-}
 
-extension Airport : CustomStringConvertible {
-    public var description : String { return "\(icao)" }
-}
 class Trips {
+    
+    enum Aggregation {
+        case trips
+        case months
+    }
     private let flightFileInfos : [FlightLogFileInfo]
     
     private(set) var base : Airport? = nil
     private(set) var airportVisits : [Airport:[Int]] = [:]
     private(set) var trips : [Trip] = []
     
-    init(infos : [FlightLogFileInfo]){
+    var aggregation : Aggregation
+    init(infos : [FlightLogFileInfo], aggregation : Aggregation = .trips){
         self.flightFileInfos = infos
+        self.aggregation = aggregation
     }
     
     var infoCount : Int {
@@ -45,22 +40,36 @@ class Trips {
     
     func compute() {
         self.computeVisits()
-        self.computeTrips()
+        
+        switch self.aggregation {
+        case .months:
+            self.computeTrips(first: Trip(unit: .month))
+        case .trips:
+            if let base = self.base {
+                self.computeTrips(first: Trip(base: base))
+            }
+        }
     }
     
-    func computeTrips() {
+    func computeTrips(first : Trip) {
         var trips : [ Trip ] = []
+        var trip : Trip = first
         
-        if let base = self.base {
-            var trip : Trip = Trip(base: base)
-
-            for info in self.flightFileInfos {
-                if trip.add(info: info) {
-                    trips.append(trip)
-                    trip = Trip(base: base)
+        for info in self.flightFileInfos {
+            if trip.add(info: info) {
+                trips.append(trip)
+                if let next = trip.next(info: info) {
+                    trip = next
+                }else{
+                    // no more
+                    break
                 }
             }
         }
+        if !trip.empty {
+            trips.append(trip)
+        }
+        
         self.trips = trips
     }
     
