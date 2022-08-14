@@ -167,19 +167,35 @@ class FlightSummary {
 }
 
 extension FlightSummary : CustomStringConvertible {
+    
+    var routeSummary : String? {
+        var strs : [String] = []
+        if let startAirport = self.startAirport {
+            strs.append(startAirport.icao)
+        }
+        if let endAirport = self.endAirport {
+            strs.append(endAirport.icao)
+        }
+        return strs.count > 0 ? strs.joined(separator: "-") : nil
+    }
+    
     var description: String {
-        let displayContext = DisplayContext()
-        if let hobbs = self.hobbs {
-            let elapsedAsDecimalHours = displayContext.formatDecimal(timeRange: hobbs)
-            let fuel = displayContext.formatValue(gallon: self.fuelUsed.total)
-            if let flying = self.flying {
-                let flyingElapsedAsDecimalHours = displayContext.formatDecimal(timeRange: flying)
-                return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) flying:\(flyingElapsedAsDecimalHours) fuel:\(fuel)>"
-            }else{
-                return "<FlightSummary: hobbs:\(elapsedAsDecimalHours) fuel:\(fuel)>"
+        var strs : [String] = []
+        if let route = self.routeSummary {
+            strs.append(route)
+        }
+        
+        let fields : [Field] = [ .Hobbs, .Distance, .FuelTotalizer]
+        for field in fields {
+            if let nu = self.numberWithUnit(for: field) {
+                strs.append(nu.formatDouble())
             }
+        }
+        if strs.count > 0 {
+            let desc = strs.joined(separator: ", ")
+            return "FlightSummary(\(desc)"
         }else{
-            return "<FlightSummary: empty>"
+            return "FlightSummary(empty)"
         }
     }
 }

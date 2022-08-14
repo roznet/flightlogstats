@@ -8,6 +8,7 @@
 import Foundation
 import RZFlight
 import RZUtils
+import RZUtilsSwift
 
 struct Trip {
     typealias Field = FlightSummary.Field
@@ -73,7 +74,18 @@ struct Trip {
                 return stats.sumWithUnit
             case .GroundSpeed:
                 if let dist = self.stats[.Distance]?.sumWithUnit.convert(to: GCUnit.nm()),
-                   let elapsed = self.stats[.Flying]?.sumWithUnit.convert(to: GCUnit.second()) {
+                   let flying = self.stats[.Flying]?.sumWithUnit.convert(to: GCUnit.second()),
+                   let moving = self.stats[.Moving]?.sumWithUnit.convert(to: GCUnit.second()) {
+                    var elapsed = flying
+                    do {
+                        let nonflying = try moving - flying
+                        if nonflying > flying {
+                            elapsed = moving
+                        }
+                    }
+                    catch {
+                        return nil
+                    }
                     return GCNumberWithUnit(unit: GCUnit.knot(), andValue: dist.value/(elapsed.value/3600.0))
                 }else{
                     return nil
@@ -99,4 +111,21 @@ struct Trip {
     
 }
 
+
+extension Trip : CustomStringConvertible {
+    var description: String {
+        var strs : [String] = [ "\(self.count) legs" ]
+        if let date = self.flightLogFileInfos.last?.start_time {
+            strs.append(date.formatted(date: .abbreviated, time: .omitted))
+        }
+        if let time = self.numberWithUnit(field: .Hobbs) {
+            strs.append(time.description)
+        }
+        if let distance = self.numberWithUnit(field: .Distance) {
+            strs.append(distance.description)
+        }
+        let desc = strs.joined(separator: ", ")
+        return "Trip(\(desc))"
+    }
+}
 

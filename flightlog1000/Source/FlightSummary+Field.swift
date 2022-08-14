@@ -7,6 +7,7 @@
 
 import Foundation
 import RZUtils
+import RZUtilsSwift
 
 extension FlightSummary {
     enum Field : String, CaseIterable {
@@ -32,8 +33,14 @@ extension FlightSummary {
         case .Distance:
             return GCNumberWithUnit(unit: GCUnit.nm(), andValue: self.distance)
         case .GroundSpeed:
-            if let flying = self.flying?.elapsed {
-                return GCNumberWithUnit(unit: GCUnit.knot(), andValue: self.distance/(flying/3600.0))
+            if let flying = self.flying?.elapsed,
+               let moving = self.moving?.elapsed{
+                var elapsed = flying
+                let nonflying = moving - flying
+                if nonflying > flying {
+                    elapsed = moving
+                }
+                return GCNumberWithUnit(unit: GCUnit.knot(), andValue: self.distance/(elapsed/3600.0))
             }else{
                 return GCNumberWithUnit(unit: GCUnit.knot(), andValue: 0.0)
             }

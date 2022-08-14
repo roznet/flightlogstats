@@ -32,8 +32,10 @@ class FlightListDataSource: TableDataSource  {
         self.logInfos = self.logFileOrganizer.actualFlightLogFileInfos
         self.displayContext = displayContext
         self.trips = Trips(infos: self.logInfos)
-        
-        super.init(rows: self.logInfos.count, columns: self.fields.count + self.headers.count, frozenColumns: 1, frozenRows: 1)
+        self.trips.compute()
+        // rows is only a first guess, will really know once trips are computed
+        super.init(rows: self.trips.infoCount + self.trips.tripCount + 1,
+                   columns: self.fields.count + self.headers.count, frozenColumns: 1, frozenRows: 1)
     }
     
     //MARK: - delegate
@@ -42,9 +44,6 @@ class FlightListDataSource: TableDataSource  {
         
         self.cellHolders  = []
         self.geometries = []
-        
-        self.trips.compute()
-        self.rowsCount = self.trips.infoCount + self.trips.tripCount
         
         self.frozenColor = UIColor.secondarySystemBackground
         let titleAttributes : [NSAttributedString.Key:Any] = ViewConfig.shared.titleAttributes
@@ -74,6 +73,7 @@ class FlightListDataSource: TableDataSource  {
             self.cellHolders.append(CellHolder(string: field.rawValue, attributes: titleAttributes))
         }
         row += 1
+        var tripIndex : Int = 0
         for trip in trips.trips {
             for info in trip.flightLogFileInfos {
                 if let summary = info.flightSummary, let hobbs = summary.hobbs {
@@ -98,7 +98,8 @@ class FlightListDataSource: TableDataSource  {
                 }
             }
             // Summary
-            self.cellHolders.append(CellHolder(string:  "Trip Total", attributes: titleAttributes))
+            tripIndex += 1
+            self.cellHolders.append(CellHolder(string:  "Trip \(tripIndex) Total", attributes: titleAttributes))
             self.cellHolders.append(CellHolder(string:  "", attributes: titleAttributes))
             self.cellHolders.append(CellHolder(string:  "", attributes: titleAttributes))
             self.cellHolders.append(CellHolder(string:  "", attributes: cellAttributes))
@@ -115,6 +116,9 @@ class FlightListDataSource: TableDataSource  {
             }
             self.highlightedBackgroundRows.insert(row)
             row += 1
+        }
+        if self.rowsCount != row {
+            Logger.app.warning("Inconsistent row count \(self.rowsCount) \(row)")
         }
     }
 }

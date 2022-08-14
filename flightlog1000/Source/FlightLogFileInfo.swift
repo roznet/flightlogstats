@@ -195,7 +195,7 @@ class FlightLogFileInfo: NSManagedObject {
     }
     
     var isEmpty : Bool {
-        if let elapsed = self.flightSummary?.moving?.elapsed,
+        if let elapsed = self.flightSummary?.flying?.elapsed,
            let distance = self.flightSummary?.distance {
             return elapsed == 0.0 || distance < 0.2
         }
