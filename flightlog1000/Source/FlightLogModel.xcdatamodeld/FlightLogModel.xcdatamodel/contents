@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21223.12" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21277" systemVersion="21G72" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="FlightFuelRecord" representedClassName=".FlightFuelRecord" syncable="YES" codeGenerationType="category">
         <attribute name="added_fuel_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="added_fuel_right" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -19,6 +19,7 @@
         <attribute name="fuel_totalizer_total" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="info_status" optional="YES" attributeType="String"/>
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
+        <attribute name="max_altitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="route" optional="YES" attributeType="String"/>
         <attribute name="start_airport_icao" optional="YES" attributeType="String"/>
         <attribute name="start_fuel_quantity_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -31,8 +32,4 @@
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="fuel_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFuelRecord" inverseName="log_file_info" inverseEntity="FlightFuelRecord"/>
     </entity>
-    <elements>
-        <element name="FlightFuelRecord" positionX="-327.4898681640625" positionY="165.2957763671875" width="128" height="119"/>
-        <element name="FlightLogFileInfo" positionX="-533.6739501953125" positionY="160.4337158203125" width="128" height="344"/>
-    </elements>
 </model>

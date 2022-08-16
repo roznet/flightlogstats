@@ -22,7 +22,23 @@ class LogListTableViewCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var fileName: UILabel!
     
+    func shouldRefresh(for info : FlightLogFileInfo) -> Bool {
+        if let current = self.flightLogFileInfo {
+            return info.log_file_name == current.log_file_name
+        }else{
+            return false
+        }
+    }
+    
+    func refresh() {
+        if let info = self.flightLogFileInfo {
+            self.update(with: info)
+        }
+    }
+    
     func update(minimum info: FlightLogFileInfo){
+        self.flightLogFileInfo = info
+        
         let titleAttribute = ViewConfig.shared.titleAttributes
         let cellAttribute = ViewConfig.shared.cellAttributes
 
@@ -30,7 +46,6 @@ class LogListTableViewCell: UITableViewCell {
         if let guess = info.log_file_name?.logFileGuessedAirport {
             self.airports.attributedText = NSAttributedString(string: guess, attributes: titleAttribute)
         }
-        
 
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -41,15 +56,13 @@ class LogListTableViewCell: UITableViewCell {
             self.date.attributedText = NSAttributedString(string: "Missing", attributes: cellAttribute)
         }
 
-        
+        self.route.isHidden = true
         self.flightIcon.isHidden = true
         self.flightTime.isHidden = true
 
     }
     
     func update(with info: FlightLogFileInfo){
-        self.flightLogFileInfo = info
-
         self.update(minimum: info)
         
         let titleAttribute = ViewConfig.shared.titleAttributes

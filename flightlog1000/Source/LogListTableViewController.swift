@@ -66,6 +66,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 _ in
                 Logger.app.info("Delete")
             },
+            UIAction(title: "Rebuild Info", image: UIImage(systemName: "plus.circle")){
+                _ in
+                Logger.app.info("Rebuild info")
+                self.logFileOrganizer.updateInfo(count: 1000, force: true)
+            },
             UIAction(title: "Reset Database", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Reset All")
@@ -151,18 +156,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 }
             }
         }
-        NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
-            _ in
-            self.buildList()
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-                if let info = self.logInfoList.first {
-                    self.delegate?.logInfoSelected(info)
-                }else{
-                    self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
-                }
-            }
-        }
         /*
         NotificationCenter.default.addObserver(forName: .kProgressUpdate, object: nil, queue: nil){
             notification in
@@ -220,6 +213,28 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.updateButtons()
         }
     }
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let logCell = (cell as? LogListTableViewCell) {
+            NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
+                notification in
+                if let info = (notification.object as? FlightLogFileInfo) {
+                    if logCell.shouldRefresh(for: info) {
+                        DispatchQueue.main.async {
+                            logCell.refresh()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let logCell = (cell as? LogListTableViewCell) {
+            NotificationCenter.default.removeObserver(logCell)
+        }
+    }
+    
     
     //MARK: - build list functionality
     

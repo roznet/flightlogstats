@@ -93,6 +93,7 @@ class FlightLogOrganizer {
     private var managedFlightLogs : [String:FlightLogFileInfo] = [:]
     private var currentState : UpdateState = .complete
     private var missingCount : Int = 0
+    private var doneCount : Int = 0
     private let queue = OperationQueue()
 
     private var flightLogFileList : FlightLogFileList {
@@ -159,7 +160,7 @@ class FlightLogOrganizer {
         AppDelegate.worker.async {
             var missing : [FlightLogFileInfo] = []
             for (_,info) in self.managedFlightLogs {
-                if info.requiresParsing{
+                if force || info.requiresParsing{
                     if firstMissingCheck, let log_file_name = info.log_file_name {
                         Logger.app.info("Missing info for \(log_file_name)")
                     }
@@ -169,7 +170,12 @@ class FlightLogOrganizer {
             if !missing.isEmpty {
                 if firstMissingCheck {
                     self.missingCount = missing.count
+                    self.doneCount = 0
                     self.progress?.update(state: .progressing(0.0), message: .updatingInfo)
+                    
+                }
+                if missing.count > self.missingCount {
+                    self.missingCount = missing.count
                 }
                 var done : [String] = []
                 // do more recent first
@@ -186,6 +192,7 @@ class FlightLogOrganizer {
                     }
                     
                     if let flightLog = info.flightLog {
+                        // if not already parsed, we will clear it
                         let alreadyParsed = flightLog.requiresParsing
                         flightLog.parse(progress: self.progress)
                         do {
@@ -203,18 +210,25 @@ class FlightLogOrganizer {
                     }else{
                         info.infoStatus = .error
                     }
+                    self.doneCount += 1
                     Logger.app.info("after update \(log_file_name) \(info.infoStatus.rawValue) \(self.managedFlightLogs[log_file_name]!.infoStatus.rawValue)")
+                    let percent = 1.0 - (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
+                    self.progress?.update(state: .progressing(percent), message: .updatingInfo)
                 }
                 let firstName = done.last ?? ""
-                Logger.app.info("Updated \(self.missingCount-missing.count)/\(self.missingCount) info last=\(firstName)")
+                Logger.app.info("Updated \(self.doneCount)/\(self.missingCount) info last=\(firstName)")
                 self.saveContext()
                 // need to switch state before starting next
                 NotificationCenter.default.post(name: .flightLogInfoUpdated, object: nil)
-                let percent = 1.0 - (Double(missing.count)/Double(self.missingCount))
+                let percent = 1.0 - (Double(done.count)/Double(self.missingCount))
                 self.progress?.update(state: .progressing(percent), message: .updatingInfo)
                 self.currentState = .ready
-                // if did something, schedule another batch
-                self.updateInfo(count: count, force: force)
+                // if did something and not in force mode, schedule another batch
+                if force {
+                    self.progress?.update(state: .complete)
+                }else{
+                    self.updateInfo(count: count, force: false)
+                }
             }else{
                 if firstMissingCheck {
                     Logger.app.info("No logFile requires updating")

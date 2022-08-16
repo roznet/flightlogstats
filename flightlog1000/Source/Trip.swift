@@ -144,6 +144,8 @@ struct Trip {
                 return stats.sumWithUnit
             case .Distance:
                 return stats.sumWithUnit
+            case .Altitude:
+                return stats.maxWithUnit
             case .Hobbs,.Flying,.Moving:
                 return stats.sumWithUnit
             case .GroundSpeed:

@@ -195,7 +195,7 @@ public struct DatesValuesByField<T,F : Hashable> {
         let value = fieldValues[index]
         return value
     }
-
+    
     public func fieldValue(at index : Int) -> FieldsValues {
         var rv : FieldsValues = [:]
         for (field,values) in self.values {
@@ -236,10 +236,19 @@ extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
         }
         return rv
     }
+    
+    public func max(for field : F) -> T? {
+        guard let fieldValues = self.values[field] else { return nil }
+        let value = fieldValues.max()
+        return value
+    }
 
-}
+    public func min(for field : F) -> T? {
+        guard let fieldValues = self.values[field] else { return nil }
+        let value = fieldValues.min()
+        return value
+    }
 
-extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
     public func dataSeries(from : Date? = nil, to : Date? = nil) -> [F:GCStatsDataSerie] {
         var rv : [F:GCStatsDataSerie] = [:]
         var started : Bool = false

@@ -20,6 +20,7 @@ extension FlightSummary {
         case NmpG
         
         case Distance
+        case Altitude
         case GroundSpeed
         
         case Hobbs
@@ -31,7 +32,9 @@ extension FlightSummary {
     func numberWithUnit(for field : Field) -> GCNumberWithUnit? {
         switch field {
         case .Distance:
-            return GCNumberWithUnit(unit: GCUnit.nm(), andValue: self.distance)
+            return GCNumberWithUnit(unit: GCUnit.nm(), andValue: self.distanceInNm)
+        case .Altitude:
+            return GCNumberWithUnit(unit: GCUnit.foot(), andValue: self.altitudeInFeet)
         case .GroundSpeed:
             if let flying = self.flying?.elapsed,
                let moving = self.moving?.elapsed{
@@ -40,7 +43,7 @@ extension FlightSummary {
                 if nonflying > flying {
                     elapsed = moving
                 }
-                return GCNumberWithUnit(unit: GCUnit.knot(), andValue: self.distance/(elapsed/3600.0))
+                return GCNumberWithUnit(unit: GCUnit.knot(), andValue: self.distanceInNm/(elapsed/3600.0))
             }else{
                 return GCNumberWithUnit(unit: GCUnit.knot(), andValue: 0.0)
             }
@@ -63,9 +66,9 @@ extension FlightSummary {
                 return GCNumberWithUnit(unit: GCUnit.gph(), andValue: 0.0)
             }
         case .NmpG:
-            if self.distance > 0.0 {
+            if self.distanceInNm > 0.0 {
                 let fuelTotal = (self.fuelTotalizer.total > 0.0 ? self.fuelTotalizer.total : self.fuelUsed.total)
-                return GCNumberWithUnit(unit: GCUnit.nmpergallon(), andValue: (self.distance) / fuelTotal )
+                return GCNumberWithUnit(unit: GCUnit.nmpergallon(), andValue: (self.distanceInNm) / fuelTotal )
             }else{
                 return GCNumberWithUnit(unit: GCUnit.nmpergallon(), andValue: 0.0)
             }

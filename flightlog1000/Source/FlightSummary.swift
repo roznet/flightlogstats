@@ -31,7 +31,7 @@ class FlightSummary {
     var fuelUsed : FuelQuantity { return self.fuelStart - self.fuelEnd }
     var fuelTotalizer : FuelQuantity
     
-    private let engineOn : TimeRange?
+    let engineOn : TimeRange?
     let moving : TimeRange?
     let flying : TimeRange?
     let hobbs : TimeRange?
@@ -42,7 +42,8 @@ class FlightSummary {
     var endAirport : Airport? = nil
     
     /// in nm
-    let distance : Double
+    let distanceInNm : Double
+    let altitudeInFeet : Double
     
     init?( info : FlightLogFileInfo ) {
         guard let start = info.start_time_moving, let end = info.end_time else {
@@ -79,7 +80,9 @@ class FlightSummary {
         self.fuelStart = FuelQuantity(left: info.start_fuel_quantity_left, right: info.start_fuel_quantity_right)
         self.fuelEnd = FuelQuantity(left: info.end_fuel_quantity_left, right: info.end_fuel_quantity_right)
         self.fuelTotalizer = FuelQuantity(total: info.fuel_totalizer_total)
-        self.distance = info.total_distance
+        
+        self.distanceInNm = info.total_distance
+        self.altitudeInFeet = info.max_altitude
         
         if let start_airport_icao = info.start_airport_icao {
             self.startAirport = try? Airport(db: AppDelegate.db, ident: start_airport_icao)
@@ -90,7 +93,7 @@ class FlightSummary {
     }
     
     init( data : FlightData) throws {
-        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT] )
+        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT,.AltInd] )
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd, minimumMatchCount: 5) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
@@ -106,7 +109,8 @@ class FlightSummary {
             self.fuelEnd = FuelQuantity.zero
             self.fuelStart = FuelQuantity.zero
             self.fuelTotalizer = FuelQuantity.zero
-            self.distance = 0.0
+            self.distanceInNm = 0.0
+            self.altitudeInFeet = 0.0
             self.route = []
             return
         }
@@ -140,7 +144,8 @@ class FlightSummary {
         self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
         self.fuelTotalizer = FuelQuantity(total: fuel_totalizer)
         
-        self.distance = values.last(field: .Distance)?.value ?? 0.0
+        self.distanceInNm = values.last(field: .Distance)?.value ?? 0.0
+        self.altitudeInFeet = values.max(for: .AltInd) ?? 0.0
 
         let identifiers = data.datesStrings(for: [.AtvWpt])
 

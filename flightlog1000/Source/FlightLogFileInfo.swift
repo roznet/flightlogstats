@@ -153,7 +153,8 @@ class FlightLogFileInfo: NSManagedObject {
         self.start_airport_icao = flightSummary.startAirport?.icao
         self.end_airport_icao = flightSummary.endAirport?.icao
         
-        self.total_distance = flightSummary.distance
+        self.total_distance = flightSummary.distanceInNm
+        self.max_altitude = flightSummary.altitudeInFeet
         
         self.version = FlightLogFileInfo.currentVersion
         
@@ -196,7 +197,7 @@ class FlightLogFileInfo: NSManagedObject {
     
     var isEmpty : Bool {
         if let elapsed = self.flightSummary?.flying?.elapsed,
-           let distance = self.flightSummary?.distance {
+           let distance = self.flightSummary?.distanceInNm {
             return elapsed == 0.0 || distance < 0.2
         }
         return true
