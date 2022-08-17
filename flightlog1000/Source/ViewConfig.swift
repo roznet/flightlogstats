@@ -16,6 +16,7 @@ class ViewConfig {
 
     var dynamicFont : Bool = false
     
+    var defaultSubFont : UIFont = UIFont(name: "AvenirNext-Medium", size: 12.0)!
     var defaultBodyFont : UIFont = UIFont(name: "AvenirNext-Medium", size: 14.0)!
     var defaultHeadlineFont : UIFont = UIFont(name: "AvenirNext-Bold", size: 14.0)!
     var defaultTitleFont : UIFont = UIFont(name: "AvenirNext-Bold", size: 17.0)!

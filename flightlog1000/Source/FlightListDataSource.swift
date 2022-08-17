@@ -27,7 +27,7 @@ class FlightListDataSource: TableDataSource  {
     //    Remaining
     
     init(displayContext : DisplayContext = DisplayContext(), aggregation : Trips.Aggregation = .trips){
-        self.fields = [.Hobbs, .Moving, .Flying, .FuelStart, .FuelEnd, .FuelUsed, .FuelTotalizer, .GpH, .NmpG, .Distance, .GroundSpeed, .Altitude]
+        self.fields = [.Hobbs, .Flying,  .Distance, .GroundSpeed, .Altitude, .GpH, .NmpG,  .FuelTotalizer, .FuelUsed, .FuelStart, .FuelEnd ]
         self.headers = [ "Date", "From", "To", "Start", "End"]
         self.logInfos = self.logFileOrganizer.actualFlightLogFileInfos
         self.displayContext = displayContext

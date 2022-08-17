@@ -12,6 +12,8 @@ import RZUtils
 class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UITextFieldDelegate {
     
     @IBOutlet weak var fuelTargetField: UITextField!
+    @IBOutlet weak var fuelTotalizerStartField: UITextField!
+    
     @IBOutlet weak var fuelTargetSegment: UISegmentedControl!
     @IBOutlet weak var fuelTargetUnitSegment: UISegmentedControl!
     
@@ -22,6 +24,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     
     @IBOutlet private var fixedLabels : [UILabel]!
+    @IBOutlet private var subFixedLabels : [UILabel]!
     
     var fuelDataSource : FuelAnalysisDataSource? { return self.flightLogViewModel?.fuelAnalysisDataSource }
     
@@ -50,6 +53,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         self.fuelTargetField.addTarget(self, action: #selector(self.textViewDidChange(_:)), for: .editingChanged)
         self.fuelAddedRightField.addTarget(self, action: #selector(self.textViewDidChange(_:)), for: .editingChanged)
         self.fuelAddedLeftField.addTarget(self, action: #selector(self.textViewDidChange(_:)), for: .editingChanged)
+        self.fuelTotalizerStartField.addTarget(self, action: #selector(self.textViewDidChange(_:)), for: .editingChanged)
         
         self.fuelTargetSegment.addTarget(self, action: #selector(self.segmentDidChange(_:)), for: .valueChanged)
         self.fuelTargetUnitSegment.addTarget(self, action: #selector(self.segmentDidChange(_:)), for: .valueChanged)
@@ -58,9 +62,14 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         for label in self.fixedLabels {
             label.font = ViewConfig.shared.defaultBodyFont
         }
+        for label in self.subFixedLabels {
+            label.font = ViewConfig.shared.defaultSubFont
+        }
+
         self.fuelTargetField.font = ViewConfig.shared.defaultTextEntryFont
         self.fuelAddedLeftField.font = ViewConfig.shared.defaultTextEntryFont
         self.fuelAddedRightField.font = ViewConfig.shared.defaultTextEntryFont
+        self.fuelTotalizerStartField.font = ViewConfig.shared.defaultTextEntryFont
         // Do any additional setup after loading the view.
     }
     
@@ -78,6 +87,20 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     //MARK: - field to view object links
     var fuelTargetUnit : GCUnit { return self.flightLogViewModel?.fuelTargetUnit ?? Settings.fuelStoreUnit }
     var fuelAddedUnit : GCUnit { return self.flightLogViewModel?.fuelAddedUnit ?? Settings.fuelStoreUnit }
+    
+    var totalizerStart : FuelQuantity {
+        get {
+            if let totalizerStart =  self.fuelTotalizerStartField.text, let value = Double( totalizerStart )  {
+                return FuelQuantity(total: value, unit: self.fuelTargetUnit)
+            }
+            return Settings.shared.targetFuel
+        }
+        set {
+            let converted = newValue.convert(to: self.fuelTargetUnit)
+            self.fuelTotalizerStartField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.total))
+        }
+
+    }
     
     var enteredFuelTarget : FuelQuantity {
         get {
