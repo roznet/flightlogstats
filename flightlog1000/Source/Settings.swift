@@ -108,6 +108,7 @@ struct Settings {
         case target_fuel = "target_fuel"
         case added_fuel_left = "added_fuel_left"
         case added_fuel_right = "added_fuel_right"
+        case totalizer_start_fuel = "totalizer_start_fuel"
     }
     
     static func registerDefaults() {
@@ -136,6 +137,9 @@ struct Settings {
     @UserStorage(key: .target_fuel, defaultValue: 70.0)
     private var targetFuelTotal : Double
 
+    @UserStorage(key: .totalizer_start_fuel, defaultValue: 92.0)
+    private var totalizerStartFuelTotal : Double
+
     @UserStorage(key: .aircraft_max_fuel, defaultValue: 92.0)
     private var aircraftMaxFuelTotal : Double
     
@@ -149,6 +153,11 @@ struct Settings {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }
         set { self.targetFuelTotal = newValue.convert(to: Settings.fuelStoreUnit).total }
     }
+    var totalizerStartFuel : FuelQuantity {
+        get { return FuelQuantity(total: self.totalizerStartFuelTotal, unit: Settings.fuelStoreUnit ) }
+        set { self.totalizerStartFuelTotal = newValue.convert(to: Settings.fuelStoreUnit).total }
+    }
+
     var addedFuel : FuelQuantity {
         get { return FuelQuantity(left: self.addedFuelLeft, right: self.addedFuelRight, unit: Settings.fuelStoreUnit ) }
         set {

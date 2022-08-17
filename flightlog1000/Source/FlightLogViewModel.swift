@@ -72,7 +72,8 @@ class FlightLogViewModel {
             self.fuelAnalysisInputs = record.fuelAnalysisInputs
         }else{
             self.fuelAnalysisInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel,
-                                                          addedfuel: Settings.shared.addedFuel)
+                                                          addedfuel: Settings.shared.addedFuel,
+                                                          totalizerStartFuel: Settings.shared.totalizerStartFuel)
         }
         
         self.fuelTargetUnit = Settings.shared.unitTargetFuel

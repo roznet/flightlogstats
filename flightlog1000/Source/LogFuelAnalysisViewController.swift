@@ -159,7 +159,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     //MARK: - sync view and model
     private func pushViewToModel() {
-        let inputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded)        
+        let inputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded, totalizerStartFuel: self.totalizerStart)
         self.flightLogViewModel?.fuelAnalysisInputs = inputs
         self.flightLogViewModel?.fuelAddedUnit = self.unit(for: self.fuelAddedUnitSegment)
         self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetUnitSegment)
@@ -198,7 +198,8 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
             let targetUnit = Settings.shared.unitTargetFuel
             let addedUnit = Settings.shared.unitAddedFuel
             let newInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel.convert(to: targetUnit),
-                                                addedfuel: Settings.shared.addedFuel.convert(to: addedUnit))
+                                                addedfuel: Settings.shared.addedFuel.convert(to: addedUnit),
+                                                totalizerStartFuel: Settings.shared.totalizerStartFuel.convert(to: targetUnit))
             if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
                 viewModel.fuelAnalysisInputs = newInputs
             }

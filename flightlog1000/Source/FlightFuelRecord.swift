@@ -13,11 +13,22 @@ class FlightFuelRecord: NSManagedObject {
 
     var fuelAnalysisInputs : FuelAnalysis.Inputs {
         get {
-            return FuelAnalysis.Inputs(targetFuel: self.targetFuel, addedfuel: self.addedFuel)
+            return FuelAnalysis.Inputs(targetFuel: self.targetFuel, addedfuel: self.addedFuel, totalizerStartFuel: self.totalizerStartFuel)
         }
         set {
             self.targetFuel = newValue.targetFuel
             self.addedFuel = newValue.addedfuel
+        }
+    }
+    
+    var totalizerStartFuel : FuelQuantity {
+        get {
+            let start = (self.totalizer_fuel_start == 0 ? self.target_fuel : self.totalizer_fuel_start)
+            return FuelQuantity(total: start, unit: Settings.fuelStoreUnit)
+        }
+        set {
+            let ingallons = newValue.convert(to: Settings.fuelStoreUnit)
+            self.totalizer_fuel_start = ingallons.total
         }
     }
     
@@ -35,15 +46,11 @@ class FlightFuelRecord: NSManagedObject {
         set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.target_fuel = ingallons.total }
     }
 
-    var totalizerUsed : FuelQuantity {
-        get { return FuelQuantity(total: self.totalizer_fuel_used, unit: Settings.fuelStoreUnit) }
-        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.totalizer_fuel_used = ingallons.total }
-    }
-
     /// setup default from settings
     func setupFromSettings() {
         self.targetFuel = Settings.shared.targetFuel
         self.addedFuel = Settings.shared.addedFuel
+        
     }
     
     /// save latest to settings so next new one is same default

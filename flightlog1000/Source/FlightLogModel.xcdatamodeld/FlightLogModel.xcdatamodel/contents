@@ -5,7 +5,7 @@
         <attribute name="added_fuel_right" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
         <attribute name="target_fuel" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="totalizer_fuel_used" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="totalizer_fuel_start" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileInfo" inverseName="fuel_record" inverseEntity="FlightLogFileInfo"/>
     </entity>
     <entity name="FlightLogFileInfo" representedClassName=".FlightLogFileInfo" syncable="YES" codeGenerationType="category">

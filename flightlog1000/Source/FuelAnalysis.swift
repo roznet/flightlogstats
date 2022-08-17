@@ -13,9 +13,10 @@ class FuelAnalysis {
     struct Inputs : Equatable {
         let targetFuel : FuelQuantity
         let addedfuel : FuelQuantity
+        let totalizerStartFuel : FuelQuantity
         
         static func ==(lhs: Inputs, rhs: Inputs) -> Bool {
-            return lhs.targetFuel == rhs.targetFuel && lhs.addedfuel == rhs.addedfuel
+            return lhs.targetFuel == rhs.targetFuel && lhs.addedfuel == rhs.addedfuel && lhs.totalizerStartFuel == rhs.totalizerStartFuel
         }
     }
     
