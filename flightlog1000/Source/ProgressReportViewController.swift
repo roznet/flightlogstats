@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import OSLog
 class ProgressReportViewController: UIViewController {
 
     typealias Message = ProgressReport.Message
@@ -42,6 +42,7 @@ class ProgressReportViewController: UIViewController {
     func update(for report: ProgressReport) -> Bool {
         var rv = false
         let animate = self.shouldAnimate(for: report.message)
+
         self.statusLabel.attributedText = NSAttributedString(string: report.message.description, attributes: ViewConfig.shared.progressAttributes)
         switch report.state {
         case .start:

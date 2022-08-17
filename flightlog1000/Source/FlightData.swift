@@ -126,7 +126,7 @@ class FlightData {
             state.process(line: vals)
         }
         progress?.update(state: .complete)
-        Logger.app.info("parsed \(array.count) lines in \(Date().timeIntervalSince(start)) secs")
+        Logger.app.info("Parsed \(array.count) lines in \(Date().timeIntervalSince(start)) secs")
     }
 
 
@@ -648,7 +648,7 @@ extension FlightData {
     
     func parse(inputStream : InputStream, totalSize : Int = 0, progress : ProgressReport? = nil) throws {
         let start = Date()
-        progress?.update(state: .progressing(0.0))
+        progress?.update(state: .progressing(0.0), message: .parsingInfo)
 
         var parsingState = ParsingState(data: self)
         //var done_sofar = 0
@@ -771,7 +771,7 @@ extension FlightData {
         }
         progress?.update(state: .complete)
         if totalSize > 0 {
-            Logger.app.info("parsed \(totalSize) bytes in \(Date().timeIntervalSince(start)) secs")
+            Logger.app.info("Parsed \(totalSize) bytes in \(Date().timeIntervalSince(start)) secs")
         }
     }
     

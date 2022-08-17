@@ -98,7 +98,7 @@ class FlightLogViewModel {
     
     func build() {
         if self.shouldBuild {
-            self.progress?.update(state: .start)
+            self.progress?.update(state: .start, message: .parsingInfo)
             self.flightLogFileInfo.parseAndUpdate(progress: self.progress)
             
             if let summary = self.flightLogFileInfo.flightSummary {

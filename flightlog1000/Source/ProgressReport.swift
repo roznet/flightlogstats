@@ -65,6 +65,9 @@ extension Notification.Name {
         if state == .start {
             self.startDate = Date()
         }
+        if let message = message {
+            self.message = message
+        }
         switch state {
         case .progressing(let pct):
             // if not at 0 (start) or end (1.0) only report once every few 100ms
@@ -78,6 +81,12 @@ extension Notification.Name {
             self.callback(self)
             NotificationCenter.default.post(name: .progressUpdate, object: self)
         }
+    }
+}
+
+extension ProgressReport {
+    override var description: String {
+        return "ProgressReport(\(self.message), \(self.state))"
     }
 }
 

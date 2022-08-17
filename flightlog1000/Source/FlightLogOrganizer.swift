@@ -14,7 +14,7 @@ import OSLog
 
 extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
-    static let flightLogInfoUpdated : Notification.Name = Notification.Name("Notification.Name.FlightLogInfoUpdated")
+    static let flightLogOrganizerInfoUpdated : Notification.Name = Notification.Name("Notification.Name.FlightLogOrganizerInfoUpdated")
 }
 
 class FlightLogOrganizer {
@@ -162,7 +162,9 @@ class FlightLogOrganizer {
             for (_,info) in self.managedFlightLogs {
                 if force || info.requiresParsing{
                     if firstMissingCheck, let log_file_name = info.log_file_name {
-                        Logger.app.info("Missing info for \(log_file_name)")
+                        if !force {
+                            Logger.app.info("Will update missing info for \(log_file_name)")
+                        }
                     }
                     missing.append(info)
                 }
@@ -171,12 +173,14 @@ class FlightLogOrganizer {
                 if firstMissingCheck {
                     self.missingCount = missing.count
                     self.doneCount = 0
-                    self.progress?.update(state: .progressing(0.0), message: .updatingInfo)
+                    self.progress?.update(state: .start, message: .updatingInfo)
                     
                 }
                 if missing.count > self.missingCount {
                     self.missingCount = missing.count
                 }
+                
+                let reportParsingProgress : Bool = (force && count < 3 ) || self.missingCount < 3
                 var done : [String] = []
                 // do more recent first
                 missing.sort() { $1.log_file_name! < $0.log_file_name! }
@@ -193,8 +197,12 @@ class FlightLogOrganizer {
                     
                     if let flightLog = info.flightLog {
                         // if not already parsed, we will clear it
-                        let alreadyParsed = flightLog.requiresParsing
-                        flightLog.parse(progress: self.progress)
+                        let requiresParsing = flightLog.requiresParsing
+                        // only report parsing progress if few missing, if many, just report overall progress
+                        if requiresParsing {
+                            Logger.app.info("Parsing \(log_file_name)")
+                        }
+                        flightLog.parse(progress: reportParsingProgress ? self.progress : nil)
                         do {
                             try info.updateFromFlightLog(flightLog: flightLog)
                         }catch{
@@ -203,7 +211,7 @@ class FlightLogOrganizer {
                         }
                         
                         NotificationCenter.default.post(name: .logFileInfoUpdated, object: info)
-                        if !alreadyParsed {
+                        if requiresParsing {
                             flightLog.clear()
                         }
                         done.append(log_file_name)
@@ -211,23 +219,28 @@ class FlightLogOrganizer {
                         info.infoStatus = .error
                     }
                     self.doneCount += 1
-                    Logger.app.info("after update \(log_file_name) \(info.infoStatus.rawValue) \(self.managedFlightLogs[log_file_name]!.infoStatus.rawValue)")
-                    let percent = 1.0 - (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
-                    self.progress?.update(state: .progressing(percent), message: .updatingInfo)
+                    if !reportParsingProgress {
+                        let percent = (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
+                        self.progress?.update(state: .progressing(percent), message: .updatingInfo)
+                    }
                 }
                 let firstName = done.last ?? ""
                 Logger.app.info("Updated \(self.doneCount)/\(self.missingCount) info last=\(firstName)")
                 self.saveContext()
                 // need to switch state before starting next
-                NotificationCenter.default.post(name: .flightLogInfoUpdated, object: nil)
-                let percent = 1.0 - (Double(done.count)/Double(self.missingCount))
-                self.progress?.update(state: .progressing(percent), message: .updatingInfo)
+                NotificationCenter.default.post(name: .flightLogOrganizerInfoUpdated, object: nil)
+                if !reportParsingProgress {
+                    let percent = (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
+                    self.progress?.update(state: .progressing(percent), message: .updatingInfo)
+                }
                 self.currentState = .ready
                 // if did something and not in force mode, schedule another batch
                 if force {
                     self.progress?.update(state: .complete)
+                    self.currentState = .complete
                 }else{
                     self.updateInfo(count: count, force: false)
+                    self.currentState = .ready
                 }
             }else{
                 if firstMissingCheck {
@@ -235,7 +248,7 @@ class FlightLogOrganizer {
                 }
                 self.progress?.update(state: .complete)
                 // nothing done, ready for more
-                self.currentState = .ready
+                self.currentState = .complete
             }
         }
     }
@@ -517,7 +530,7 @@ class FlightLogOrganizer {
         
         for localUrl in localUrls {
             let lastComponent = localUrl.lastPathComponent
-            self.progress?.update(state: .progressing(done/totalCount))
+            self.progress?.update(state: .progressing(done/totalCount), message: .iCloudSync)
             done += 1.0
             if lastComponent.isLogFile {
                 if !existingInCloud.contains(lastComponent) {
