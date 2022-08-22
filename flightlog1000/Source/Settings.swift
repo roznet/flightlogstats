@@ -128,10 +128,10 @@ struct Settings {
     @UnitStorage(key: .unit_added_fuel, defaultValue: GCUnit.liter())
     var unitAddedFuel : GCUnit
        
-    @UserStorage(key: .added_fuel_left, defaultValue: 5.0)
+    @UserStorage(key: .added_fuel_left, defaultValue: 0.0)
     private var addedFuelLeft : Double
 
-    @UserStorage(key: .added_fuel_right, defaultValue: 5.0)
+    @UserStorage(key: .added_fuel_right, defaultValue: 0.0)
     private var addedFuelRight : Double
     
     @UserStorage(key: .target_fuel, defaultValue: 70.0)
