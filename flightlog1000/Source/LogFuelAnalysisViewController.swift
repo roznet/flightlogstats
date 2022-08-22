@@ -84,6 +84,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.pushViewToModel()
+        NotificationCenter.default.removeObserver(self)
     }
     
     //MARK: - field to view object links
@@ -160,6 +161,11 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }
     
     //MARK: - sync view and model
+    
+    private func updateFromSettings() {
+        
+    }
+    
     private func pushViewToModel() {
         let inputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded, totalizerStartFuel: self.enteredtotalizerStart)
         self.flightLogViewModel?.fuelAnalysisInputs = inputs
@@ -168,8 +174,6 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }
         
     private func pushModelToView() {
-        self.estimatePreviousTotalizerStart()
-        
         if let inputs = self.flightLogViewModel?.fuelAnalysisInputs {
             self.enteredFuelAdded = inputs.addedfuel
             self.enteredFuelTarget = inputs.targetFuel
@@ -205,7 +209,6 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         guard self.fuelTargetField != nil else { return }
         
         self.flightLogFileInfo?.ensureFuelRecord()
-        self.estimatePreviousTotalizerStart()
 
         if let record = self.flightLogFileInfo?.fuel_record {
             self.enteredFuelAdded = record.addedFuel
@@ -252,7 +255,11 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     // MARK: - Segment and units
     
     @IBAction func showConfig(_ sender: Any) {
-        
+        NotificationCenter.default.addObserver(forName: .settingsViewControllerUpdate, object: nil, queue: nil){
+            _ in
+            self.pushViewToModel()
+            self.updateUI()
+        }
     }
     @objc func segmentDidChange(_ segment : UISegmentedControl) {
         
@@ -280,6 +287,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
             self.updateUI()
         }
     }
+    
     
     // MARK: - Text Field Editing and fuel values
     

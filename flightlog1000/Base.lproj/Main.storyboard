@@ -713,7 +713,7 @@
                                 </cells>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r8v-c1-eqN">
-                                <rect key="frame" x="712.5" y="24" width="101.5" height="34.5"/>
+                                <rect key="frame" x="5" y="24" width="101.5" height="34.5"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" image="gearshape" catalog="system" title="Config"/>
                                 <connections>
@@ -727,6 +727,7 @@
                         <viewLayoutGuide key="safeArea" id="89l-r2-Bdg"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="r8v-c1-eqN" firstAttribute="leading" secondItem="89l-r2-Bdg" secondAttribute="leading" constant="5" id="Bpa-Uf-3Hu"/>
                             <constraint firstItem="r8v-c1-eqN" firstAttribute="top" secondItem="89l-r2-Bdg" secondAttribute="top" id="FhG-Kg-QeC"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="bottom" secondItem="hdQ-sd-7Aw" secondAttribute="bottom" constant="20" id="KvZ-81-RcK"/>
                             <constraint firstItem="25Q-Ay-JWf" firstAttribute="top" secondItem="9cQ-fA-Zou" secondAttribute="bottom" constant="10" id="NHR-WX-i6N"/>
@@ -736,7 +737,6 @@
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="25Q-Ay-JWf" secondAttribute="trailing" constant="5" id="aly-uJ-NJw"/>
                             <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="9cQ-fA-Zou" secondAttribute="trailing" constant="5" id="jel-IR-Pcg"/>
                             <constraint firstItem="hdQ-sd-7Aw" firstAttribute="top" secondItem="25Q-Ay-JWf" secondAttribute="bottom" constant="50" id="nRB-aa-ywX"/>
-                            <constraint firstItem="89l-r2-Bdg" firstAttribute="trailing" secondItem="r8v-c1-eqN" secondAttribute="trailing" constant="20" id="ncC-m8-gWk"/>
                             <constraint firstItem="9cQ-fA-Zou" firstAttribute="leading" secondItem="89l-r2-Bdg" secondAttribute="leading" constant="5" id="oV4-w0-h07"/>
                             <constraint firstItem="25Q-Ay-JWf" firstAttribute="leading" secondItem="89l-r2-Bdg" secondAttribute="leading" constant="5" id="ydh-gr-7Fy"/>
                         </constraints>
@@ -778,74 +778,131 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="GU4-th-mSz">
-                                <rect key="frame" x="5" y="8" width="195.5" height="102"/>
+                                <rect key="frame" x="46" y="33" width="228" height="205"/>
                                 <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Aircraft Information" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wpM-Sj-GdW" userLabel="Aircraft Information">
+                                        <rect key="frame" x="0.0" y="0.0" width="228" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I29-fW-aax">
-                                        <rect key="frame" x="0.0" y="0.0" width="195.5" height="34"/>
+                                        <rect key="frame" x="0.0" y="20.5" width="228" height="34"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Maximum Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J16-lI-GnY">
-                                                <rect key="frame" x="0.0" y="0.0" width="149.5" height="34"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Maximum Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J16-lI-GnY">
+                                                <rect key="frame" x="0.0" y="0.0" width="182" height="34"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="92" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="iGY-wM-bHq">
-                                                <rect key="frame" x="149.5" y="0.0" width="46" height="34"/>
+                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="92" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="iGY-wM-bHq">
+                                                <rect key="frame" x="182" y="0.0" width="46" height="34"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
                                             </textField>
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QgF-xl-L95">
-                                        <rect key="frame" x="0.0" y="34" width="195.5" height="34"/>
+                                        <rect key="frame" x="0.0" y="54.5" width="228" height="34"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tab Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qpd-JB-xKS">
-                                                <rect key="frame" x="0.0" y="0.0" width="149.5" height="34"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Tab Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qpd-JB-xKS">
+                                                <rect key="frame" x="0.0" y="0.0" width="182" height="34"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="60" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="q97-GF-00Q">
-                                                <rect key="frame" x="149.5" y="0.0" width="46" height="34"/>
+                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="60" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="q97-GF-00Q">
+                                                <rect key="frame" x="182" y="0.0" width="46" height="34"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
                                             </textField>
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BvO-CV-F3f">
-                                        <rect key="frame" x="0.0" y="68" width="195.5" height="34"/>
+                                        <rect key="frame" x="0.0" y="88.5" width="228" height="34"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="gal / hour" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pag-k2-e0X">
-                                                <rect key="frame" x="0.0" y="0.0" width="133.5" height="34"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="gal / hour" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pag-k2-e0X">
+                                                <rect key="frame" x="0.0" y="0.0" width="182" height="34"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="17" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wH9-FN-Lpe">
-                                                <rect key="frame" x="133.5" y="0.0" width="62" height="34"/>
+                                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" ambiguous="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="17" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wH9-FN-Lpe">
+                                                <rect key="frame" x="182" y="0.0" width="46" height="34"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
                                             </textField>
                                         </subviews>
                                     </stackView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Units" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2ul-fF-r7h">
+                                        <rect key="frame" x="0.0" y="122.5" width="228" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="YNt-48-o2G">
+                                        <rect key="frame" x="0.0" y="143" width="228" height="31"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Target" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qr9-X7-sRS">
+                                                <rect key="frame" x="0.0" y="0.0" width="50" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="aDq-YG-ijA">
+                                                <rect key="frame" x="55" y="0.0" width="173" height="32"/>
+                                                <segments>
+                                                    <segment title="US Gallons"/>
+                                                    <segment title="Liters"/>
+                                                </segments>
+                                            </segmentedControl>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="b1P-DP-lpq">
+                                        <rect key="frame" x="0.0" y="174" width="228" height="31"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Added" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6fA-KW-SUe">
+                                                <rect key="frame" x="0.0" y="0.0" width="50" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="WRo-Hp-j7p">
+                                                <rect key="frame" x="55" y="0.0" width="173" height="32"/>
+                                                <segments>
+                                                    <segment title="US Gallons"/>
+                                                    <segment title="Liters"/>
+                                                </segments>
+                                            </segmentedControl>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="iGY-wM-bHq" firstAttribute="width" secondItem="q97-GF-00Q" secondAttribute="width" id="0eV-bd-kfD"/>
-                                    <constraint firstItem="q97-GF-00Q" firstAttribute="width" secondItem="wH9-FN-Lpe" secondAttribute="width" multiplier="0.742972" id="wGW-eK-AlS"/>
+                                    <constraint firstItem="q97-GF-00Q" firstAttribute="width" secondItem="wH9-FN-Lpe" secondAttribute="width" id="wGW-eK-AlS"/>
                                 </constraints>
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="PAF-0K-2Ab"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="GU4-th-mSz" firstAttribute="leading" secondItem="PAF-0K-2Ab" secondAttribute="leading" constant="5" id="4Gf-x7-1dr"/>
-                            <constraint firstItem="PAF-0K-2Ab" firstAttribute="top" secondItem="GU4-th-mSz" secondAttribute="top" constant="5" id="NLO-Wh-Gyt"/>
+                            <constraint firstItem="PAF-0K-2Ab" firstAttribute="top" secondItem="GU4-th-mSz" secondAttribute="top" constant="-20" id="NLO-Wh-Gyt"/>
+                            <constraint firstItem="GU4-th-mSz" firstAttribute="centerX" secondItem="PAF-0K-2Ab" secondAttribute="centerX" id="X5J-8Q-OTm"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="addedUnitSegment" destination="WRo-Hp-j7p" id="d6Y-vs-p41"/>
                         <outlet property="gphField" destination="wH9-FN-Lpe" id="NMU-N6-jsf"/>
                         <outlet property="maxFuelField" destination="iGY-wM-bHq" id="aP4-Z6-e89"/>
                         <outlet property="tabFuelField" destination="q97-GF-00Q" id="ac7-lh-EGW"/>
+                        <outlet property="targetUnitSegment" destination="aDq-YG-ijA" id="tdW-s9-NVX"/>
+                        <outletCollection property="labels" destination="J16-lI-GnY" collectionClass="NSMutableArray" id="L4N-ua-owR"/>
+                        <outletCollection property="labels" destination="qpd-JB-xKS" collectionClass="NSMutableArray" id="2BP-bR-1e5"/>
+                        <outletCollection property="labels" destination="Pag-k2-e0X" collectionClass="NSMutableArray" id="QmI-pS-jlp"/>
+                        <outletCollection property="titleLabels" destination="wpM-Sj-GdW" collectionClass="NSMutableArray" id="DqQ-0m-dWI"/>
+                        <outletCollection property="titleLabels" destination="2ul-fF-r7h" collectionClass="NSMutableArray" id="7mF-WC-coa"/>
+                        <outletCollection property="labels" destination="Qr9-X7-sRS" collectionClass="NSMutableArray" id="xgw-K9-W4o"/>
+                        <outletCollection property="labels" destination="6fA-KW-SUe" collectionClass="NSMutableArray" id="3Zg-EB-9dk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mp6-Mv-eJF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
