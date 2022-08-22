@@ -22,13 +22,15 @@ class FuelAnalysisDataSource: TableDataSource {
     let flightSummary : FlightSummary
     private var displayContext : DisplayContext
     
+    private let columnsHeaders = [ "Fuel", "Total", "Left", "Right", "Totalizer" ]
+    
     init(flightSummary : FlightSummary,
          flightViewModel : FlightLogViewModel){
         self.flightSummary = flightSummary
         self.flightLogViewModel = flightViewModel
         self.displayContext = DisplayContext()
         
-        super.init(rows: 0, columns: 4, frozenColumns: 1, frozenRows: 1)
+        super.init(rows: 0, columns: self.columnsHeaders.count, frozenColumns: 1, frozenRows: 1)
     }
     
     //MARK: - delegate
@@ -37,32 +39,44 @@ class FuelAnalysisDataSource: TableDataSource {
     var cellAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.systemFont(ofSize: 14.0)]
     
     func addSeparator() {
-        for _ in 0..<4 {
+        for _ in 0..<self.columnsCount {
             self.cellHolders.append(CellHolder(string: "", attributes: self.titleAttributes))
         }
         self.rowsCount += 1
     }
     
-    func addLine(name : String, fuel : FuelQuantity, unit : GCUnit) {
+    func addLine(name : String, fuel : FuelQuantity, totalizer : FuelQuantity, unit : GCUnit) {
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
         var geoIndex = 1
         for nu in [fuel.totalWithUnit.convert(to: unit),
                    fuel.leftWithUnit.convert(to: unit),
-                   fuel.rightWithUnit.convert(to: unit)] {
-            self.geometries[geoIndex].adjust(for: nu)
-            self.cellHolders.append(CellHolder(numberWithUnit: nu))
+                   fuel.rightWithUnit.convert(to: unit),
+                   totalizer.totalWithUnit.convert(to: unit)] {
+            if nu.value == 0.0 {
+                self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+            }else{
+                self.geometries[geoIndex].adjust(for: nu)
+                self.cellHolders.append(CellHolder(numberWithUnit: nu))
+            }
             geoIndex += 1
         }
         self.rowsCount += 1
     }
     
-    func addLine(name : String, endurance  : Endurance) {
+    func addLine(name : String, endurance  : Endurance, totalizer : Endurance) {
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
-        let nu = endurance.numberWithUnit.convert(to: GCUnit.minute())
+        let nu = endurance.numberWithUnit.convert(to: GCUnit.hobbshour())
+        let nuT = totalizer.numberWithUnit.convert(to: GCUnit.hobbshour())
+        
         self.cellHolders.append(CellHolder(numberWithUnit: nu))
         self.geometries[1].adjust(for: nu)
+        
         self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
         self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+        
+        self.cellHolders.append(CellHolder(numberWithUnit: nuT))
+        self.geometries[4].adjust(for: nuT)
+        
         self.rowsCount += 1
     }
     
@@ -84,11 +98,10 @@ class FuelAnalysisDataSource: TableDataSource {
             
             let fuelAnalysis = FuelAnalysis(aircraft: aircraft,
                                             current: flightSummary.fuelEnd,
+                                            totalizer: flightSummary.fuelTotalizer,
                                             inputs: inputs)
             
-            
-            
-            for title in [ "Fuel", "Total", "Left", "Right" ] {
+            for title in self.columnsHeaders {
                 let geometry = RZNumberWithUnitGeometry()
                 geometry.defaultUnitAttribute = cellAttributes
                 geometry.defaultNumberAttribute = cellAttributes
@@ -101,38 +114,38 @@ class FuelAnalysisDataSource: TableDataSource {
             }
             self.rowsCount = 1
             
-            self.addLine(name: "Current", fuel: fuelAnalysis.currentFuel, unit: fuelTargetUnit)
-            self.addLine(name: "Current Endurance", endurance: fuelAnalysis.currentEndurance)
+            self.addLine(name: "Current", fuel: fuelAnalysis.currentFuel, totalizer: fuelAnalysis.currentFuelTotalizer, unit: fuelTargetUnit)
+            self.addLine(name: "Current Endurance", endurance: fuelAnalysis.currentEndurance, totalizer: fuelAnalysis.currentEnduranceTotalizer)
             self.addSeparator()
             
-            for (name,fuel,unit) in [
-                ("Target", fuelAnalysis.targetFuel, GCUnit.usgallon()),
-                ("Target Required", fuelAnalysis.targetAdd, fuelAddedUnit),
-                ("Target Save", fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
+            for (name,fuel,totalizer,unit) in [
+                ("Target", fuelAnalysis.targetFuel, fuelAnalysis.targetFuel, GCUnit.usgallon()),
+                ("Target Required", fuelAnalysis.targetAdd, fuelAnalysis.targetAddTotalizer, fuelAddedUnit),
+                ("Target Save", fuelAnalysis.targetSave, fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
             ] {
-                self.addLine(name: name, fuel: fuel, unit: unit)
+                self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
             
-            self.addLine(name: "Target Endurance", endurance: fuelAnalysis.targetEndurance)
-            self.addLine(name: "Target Lost Endurance", endurance: fuelAnalysis.targetLostEndurance)
+            self.addLine(name: "Target Endurance", endurance: fuelAnalysis.targetEndurance, totalizer: fuelAnalysis.targetEndurance)
+            self.addLine(name: "Target Lost Endurance", endurance: fuelAnalysis.targetLostEndurance, totalizer: fuelAnalysis.targetLostEndurance)
             self.addSeparator()
             
-            for (name,fuel,unit) in [
-                ("Added", fuelAnalysis.addedFuel, fuelTargetUnit),
-                ("", fuelAnalysis.addedFuel, fuelAddedUnit),
+            for (name,fuel,totalizer,unit) in [
+                ("Added", fuelAnalysis.addedFuel, fuelAnalysis.addedFuelTotalizer, fuelTargetUnit),
+                ("", fuelAnalysis.addedFuel, fuelAnalysis.addedFuelTotalizer, fuelAddedUnit),
             ] {
-                self.addLine(name: name, fuel: fuel, unit: unit)
+                self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
             
             self.addSeparator()
-            for (name,fuel,unit) in [
-                ("New Total", fuelAnalysis.addedTotal, GCUnit.usgallon()),
-                ("New Save", fuelAnalysis.addedSave, GCUnit.avgasKilogram()),
+            for (name,fuel,totalizer,unit) in [
+                ("New Total", fuelAnalysis.addedTotal, fuelAnalysis.addedTotalTotalizer, GCUnit.usgallon()),
+                ("New Save", fuelAnalysis.addedSave, fuelAnalysis.addedSaveTotalizer, GCUnit.avgasKilogram()),
             ] {
-                self.addLine(name: name, fuel: fuel, unit: unit)
+                self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
-            self.addLine(name: "New Endurance", endurance: fuelAnalysis.addedTotalEndurance)
-            self.addLine(name: "Lost Endurance", endurance: fuelAnalysis.addedLostEndurance)
+            self.addLine(name: "New Endurance", endurance: fuelAnalysis.addedTotalEndurance, totalizer: fuelAnalysis.addedTotalEnduranceTotalizer)
+            self.addLine(name: "Lost Endurance", endurance: fuelAnalysis.addedLostEndurance, totalizer: fuelAnalysis.addedLostEnduranceTotalizer)
         }
    }
 }

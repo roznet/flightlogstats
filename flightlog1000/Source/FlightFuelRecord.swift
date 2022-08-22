@@ -18,12 +18,13 @@ class FlightFuelRecord: NSManagedObject {
         set {
             self.targetFuel = newValue.targetFuel
             self.addedFuel = newValue.addedfuel
+            self.totalizerStartFuel = newValue.totalizerStartFuel
         }
     }
     
     var totalizerStartFuel : FuelQuantity {
         get {
-            let start = (self.totalizer_fuel_start == 0 ? self.target_fuel : self.totalizer_fuel_start)
+            let start = (self.totalizer_fuel_start == 0.0 ? self.target_fuel : self.totalizer_fuel_start)
             return FuelQuantity(total: start, unit: Settings.fuelStoreUnit)
         }
         set {
@@ -50,13 +51,14 @@ class FlightFuelRecord: NSManagedObject {
     func setupFromSettings() {
         self.targetFuel = Settings.shared.targetFuel
         self.addedFuel = Settings.shared.addedFuel
-        
+        self.totalizerStartFuel = Settings.shared.totalizerStartFuel
     }
     
     /// save latest to settings so next new one is same default
     func saveToSettings() {
         Settings.shared.addedFuel = self.addedFuel
         Settings.shared.targetFuel = self.targetFuel
+        Settings.shared.totalizerStartFuel = self.totalizerStartFuel
     }
     
 }

@@ -88,7 +88,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     var fuelTargetUnit : GCUnit { return self.flightLogViewModel?.fuelTargetUnit ?? Settings.fuelStoreUnit }
     var fuelAddedUnit : GCUnit { return self.flightLogViewModel?.fuelAddedUnit ?? Settings.fuelStoreUnit }
     
-    var totalizerStart : FuelQuantity {
+    var enteredtotalizerStart : FuelQuantity {
         get {
             if let totalizerStart =  self.fuelTotalizerStartField.text, let value = Double( totalizerStart )  {
                 return FuelQuantity(total: value, unit: self.fuelTargetUnit)
@@ -159,7 +159,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     //MARK: - sync view and model
     private func pushViewToModel() {
-        let inputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded, totalizerStartFuel: self.totalizerStart)
+        let inputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded, totalizerStartFuel: self.enteredtotalizerStart)
         self.flightLogViewModel?.fuelAnalysisInputs = inputs
         self.flightLogViewModel?.fuelAddedUnit = self.unit(for: self.fuelAddedUnitSegment)
         self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetUnitSegment)
@@ -169,6 +169,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         if let inputs = self.flightLogViewModel?.fuelAnalysisInputs {
             self.enteredFuelAdded = inputs.addedfuel
             self.enteredFuelTarget = inputs.targetFuel
+            self.enteredtotalizerStart = inputs.totalizerStartFuel
         }
         self.update(segment: self.fuelTargetUnitSegment, for: self.fuelTargetUnit)
         self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
@@ -194,6 +195,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         if let record = self.flightLogFileInfo?.fuel_record {
             self.enteredFuelAdded = record.addedFuel
             self.enteredFuelTarget = record.targetFuel
+            self.enteredtotalizerStart = record.totalizerStartFuel
         }else{
             let targetUnit = Settings.shared.unitTargetFuel
             let addedUnit = Settings.shared.unitAddedFuel
