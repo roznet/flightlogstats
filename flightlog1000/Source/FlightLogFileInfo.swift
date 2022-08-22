@@ -189,6 +189,21 @@ class FlightLogFileInfo: NSManagedObject {
         }
     }
     
+    var estimatedTotalizerStart : FuelQuantity? {
+        var rv : FuelQuantity? = nil
+        if let previous = self.container?.flight(preceding: self) {
+            rv = previous.nextTotalizerStart
+        }
+        return rv
+    }
+    
+    var nextTotalizerStart : FuelQuantity? {
+        self.ensureFuelRecord()
+        if let record = self.fuel_record {
+            return record.nextTotalizerStart(for: FuelQuantity(total: self.fuel_totalizer_total, unit: Settings.fuelStoreUnit))
+        }
+        return nil
+    }
     //MARK: - Analysis
     
     func isNewer(than other : FlightLogFileInfo) -> Bool {

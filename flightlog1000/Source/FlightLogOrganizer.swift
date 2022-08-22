@@ -46,6 +46,47 @@ class FlightLogOrganizer {
     subscript(log: FlightLogFile) -> FlightLogFileInfo? {
         return self.managedFlightLogs[log.name]
     }
+    
+    func flight(following info: FlightLogFileInfo) -> FlightLogFileInfo? {
+        var rv : FlightLogFileInfo? = nil
+        
+        var following : FlightLogFileInfo? = nil
+        for candidate in self.flightLogFileInfos.reversed() {
+            if  info == candidate {
+                if let following = following,
+                   let end = info.end_airport_icao,
+                   let start = following.start_airport_icao,
+                   start == end{
+                    rv = following
+                    break
+                }
+            }
+            following = candidate
+        }
+        
+        return rv
+    }
+    
+    func flight(preceding info: FlightLogFileInfo) -> FlightLogFileInfo? {
+        var rv : FlightLogFileInfo? = nil
+        
+        var following : FlightLogFileInfo? = nil
+        for candidate in self.actualFlightLogFileInfos {
+            if let following = following,
+               info == following {
+                if
+                   let end = candidate.end_airport_icao,
+                   let start = following.start_airport_icao,
+                   start == end {
+                    rv = candidate
+                }
+                break
+            }
+            following = candidate
+        }
+        
+        return rv
+    }
     func filter(filter : (FlightLogFileInfo) -> Bool) -> [FlightLogFileInfo] {
         var logs : [FlightLogFileInfo] = []
         for info in self.flightLogFileInfos {

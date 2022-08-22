@@ -9,6 +9,7 @@ import UIKit
 import CoreData
 import RZUtils
 
+/// Record for the end of a flight
 class FlightFuelRecord: NSManagedObject {
 
     var fuelAnalysisInputs : FuelAnalysis.Inputs {
@@ -20,6 +21,10 @@ class FlightFuelRecord: NSManagedObject {
             self.addedFuel = newValue.addedfuel
             self.totalizerStartFuel = newValue.totalizerStartFuel
         }
+    }
+    
+    var totalizerStartNotKnown : Bool {
+        return self.totalizer_fuel_start == 0.0
     }
     
     var totalizerStartFuel : FuelQuantity {
@@ -47,6 +52,10 @@ class FlightFuelRecord: NSManagedObject {
         set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.target_fuel = ingallons.total }
     }
 
+    func nextTotalizerStart(for used : FuelQuantity) -> FuelQuantity {
+        return self.totalizerStartFuel - used + self.addedFuel
+    }
+    
     /// setup default from settings
     func setupFromSettings() {
         self.targetFuel = Settings.shared.targetFuel

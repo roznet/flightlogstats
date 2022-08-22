@@ -31,6 +31,8 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     var flightLogViewModel : FlightLogViewModel? = nil
     var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
     
+    //MARK: - delegate functions
+    
     func viewModelDidFinishBuilding(viewModel: FlightLogViewModel) {
         self.updateUI()
     }
@@ -166,6 +168,8 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }
         
     private func pushModelToView() {
+        self.estimatePreviousTotalizerStart()
+        
         if let inputs = self.flightLogViewModel?.fuelAnalysisInputs {
             self.enteredFuelAdded = inputs.addedfuel
             self.enteredFuelTarget = inputs.targetFuel
@@ -187,11 +191,22 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         }
     }
     
+    private func estimatePreviousTotalizerStart() -> FuelQuantity? {
+        // do we have previous flight info?
+        var previousStart : FuelQuantity? = nil
+        if let info = self.flightLogFileInfo {
+            previousStart = info.estimatedTotalizerStart
+        }
+        return previousStart
+    }
+    
     private func setupViewFromModel() {
         // Make sure UI ready
         guard self.fuelTargetField != nil else { return }
         
         self.flightLogFileInfo?.ensureFuelRecord()
+        self.estimatePreviousTotalizerStart()
+
         if let record = self.flightLogFileInfo?.fuel_record {
             self.enteredFuelAdded = record.addedFuel
             self.enteredFuelTarget = record.targetFuel
@@ -211,6 +226,8 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         self.checkViewConsistency()
     }
 
+    
+    //MARK: - Update UI
     func updateUI(){
         AppDelegate.worker.async {
             self.flightLogViewModel?.build()
