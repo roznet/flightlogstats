@@ -23,8 +23,6 @@ class ViewConfig {
     var defaultTextEntryFont : UIFont = UIFont(name: "AvenirNext-Medium", size: 20.0)!
     
     func setDefaultAttributes() {
-        //print( UIFont.familyNames)
-        //UILabel.appearance().font = UIFont(name: "Avenir", size: 14.0)!
         if self.dynamicFont {
             let headlineFontDesc = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline)
                 .withFamily(ViewConfig.fontFamily)

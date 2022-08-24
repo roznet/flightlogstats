@@ -301,7 +301,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
     
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-        print( "cancelled")
         controller.dismiss(animated: true)
     }
 

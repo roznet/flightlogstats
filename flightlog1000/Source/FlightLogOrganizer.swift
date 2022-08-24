@@ -100,9 +100,6 @@ class FlightLogOrganizer {
     var nonEmptyLogFileInfos : [FlightLogFileInfo] {
         return self.filter() {
             info in
-            if info.log_file_name == "log_211004_081955_EGLL.csv" {
-                print( info )
-            }
             return !info.isEmpty
         }
     }
