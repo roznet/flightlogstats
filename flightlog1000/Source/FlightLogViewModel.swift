@@ -52,7 +52,7 @@ class FlightLogViewModel {
     var fuelAnalysisInputs : FuelAnalysis.Inputs { didSet { if oldValue != self.fuelAnalysisInputs { self.didWrite() } } }
     var fuelTargetUnit : GCUnit { didSet { if oldValue != self.fuelTargetUnit { self.didWrite() } } }
     var fuelAddedUnit : GCUnit { didSet { if oldValue != self.fuelAddedUnit { self.didWrite() } } }
-
+    
     // MARK: Outputs
     private(set) var legsDataSource : FlightLegsDataSource? = nil
     private(set) var fuelDataSource : FlightSummaryFuelDataSource? = nil
@@ -60,6 +60,12 @@ class FlightLogViewModel {
     private(set) var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
     private(set) var phasesOfFlightDataSource : FlightLegsDataSource? = nil
     
+    var estimatedTotalizerStart : FuelQuantity? {
+        if let rv = self.flightLogFileInfo.estimatedTotalizerStart {
+            return min(rv, self.aircraft.fuelMax)
+        }
+        return nil
+    }
     
     // MARK: - Setup
     init(fileInfo : FlightLogFileInfo, displayContext : DisplayContext, progress : ProgressReport? = nil){

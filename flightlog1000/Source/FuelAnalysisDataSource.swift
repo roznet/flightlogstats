@@ -114,8 +114,8 @@ class FuelAnalysisDataSource: TableDataSource {
             }
             self.rowsCount = 1
             
-            if let estimatedStart = self.flightLogViewModel?.flightLogFileInfo.estimatedTotalizerStart {
-                self.addLine(name: "Last Flight Estimated", fuel: FuelQuantity(total: 0.0), totalizer: estimatedStart, unit: fuelTargetUnit)
+            if let estimatedStart = self.flightLogViewModel?.estimatedTotalizerStart {
+                self.addLine(name: "Start (Estimated)", fuel: flightSummary.fuelStart, totalizer: estimatedStart, unit: fuelTargetUnit)
                 self.addSeparator()
             }
             
