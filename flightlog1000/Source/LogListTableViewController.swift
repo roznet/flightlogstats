@@ -175,42 +175,82 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         NotificationCenter.default.removeObserver(self)
     }
     
+    //MARK: - TableViewController
+    
+    enum TableSection : Int, CaseIterable {
+        case statistics = 0, flights
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return TableSection.allCases.count
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.logInfoList.count
+        switch TableSection(rawValue: section) {
+        case .flights:
+            return self.logInfoList.count
+        case .statistics:
+            return 1
+        case .none:
+            return 0
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
-        if let cell = cell as? LogListTableViewCell,
-           let info = self.flightInfo(at: indexPath) {
-            cell.update(minimum: info)
-            AppDelegate.worker.async {
-                let _ = info.flightSummary
-                DispatchQueue.main.async {
-                    cell.update(with: info)
+        switch TableSection(rawValue: indexPath.section) {
+        case .flights:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
+            if let cell = cell as? LogListTableViewCell,
+               let info = self.flightInfo(at: indexPath) {
+                cell.update(minimum: info)
+                AppDelegate.worker.async {
+                    let _ = info.flightSummary
+                    DispatchQueue.main.async {
+                        cell.update(with: info)
+                    }
                 }
             }
+            return cell
+        case .statistics:
+            let cell = UITableViewCell(style: .default, reuseIdentifier: "flightstatscell")
+            var content = cell.defaultContentConfiguration()
+            content.text = "Display Statistics"
+            content.textProperties.font = ViewConfig.shared.defaultTitleFont
+            content.image = UIImage(systemName: "sum")
             
-            /*
-            if let cell = GCCellGrid(tableView) {
-                cell.setup(forRows: 1, andCols: 1)
-                cell.label(forRow: 0, andCol: 0).text = log.name
-                return cell
-            }*/
+            cell.contentConfiguration = content
+            cell.backgroundColor = UIColor.systemGroupedBackground
+            return cell
+        case .none:
+            return UITableViewCell(frame: .zero)
         }
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100.0
+        switch TableSection(rawValue: indexPath.section) {
+        case .statistics:
+            return 50.0
+        case .flights:
+            return 100.0
+        case .none:
+            return 0.0
+        }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let info = self.flightInfo(at: indexPath){
-            self.ensureDelegate()
-            self.delegate?.logInfoSelected(info)
-            self.userInterfaceModeManager?.userInterfaceMode = .detail
+        switch TableSection(rawValue: indexPath.section) {
+        case .flights:
+            if let info = self.flightInfo(at: indexPath){
+                self.ensureDelegate()
+                self.delegate?.logInfoSelected(info)
+                self.userInterfaceModeManager?.userInterfaceMode = .detail
+                self.updateButtons()
+            }
+        case .statistics:
+            self.userInterfaceModeManager?.userInterfaceMode = .stats
             self.updateButtons()
+        case .none:
+            return
         }
     }
     

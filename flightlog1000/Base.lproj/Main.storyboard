@@ -1044,13 +1044,13 @@
         <scene sceneID="ifI-4a-r8r">
             <objects>
                 <tableViewController clearsSelectionOnViewWillAppear="NO" id="JdO-DO-Gh9" customClass="LogListTableViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="oIf-wu-Id9">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="oIf-wu-Id9">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" indentationWidth="10" reuseIdentifier="flightlogcell" rowHeight="99" id="fOk-Uh-ECS" customClass="LogListTableViewCell" customModule="FlightLog1000" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="50" width="420" height="99"/>
+                                <rect key="frame" x="0.0" y="55.5" width="420" height="99"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fOk-Uh-ECS" id="Fpc-Xo-3Um">
                                     <rect key="frame" x="100" y="0.0" width="320" height="99"/>
