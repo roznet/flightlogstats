@@ -20,7 +20,7 @@ class Trips {
     private let flightFileInfos : [FlightLogFileInfo]
     
     private(set) var base : Airport? = nil
-    private(set) var airportVisits : [Airport:[Int]] = [:]
+    private(set) var airportVisits : [Airport:[Visit]] = [:]
     private(set) var trips : [Trip] = []
     
     var aggregation : Aggregation
@@ -74,13 +74,57 @@ class Trips {
     }
     
     func computeVisits() {
+        var rv : [Airport:[Visit]] = [:]
+        
+        var currentVisit : Visit? = nil
+        for info in self.flightFileInfos.reversed() {
+            if let summary = info.flightSummary,
+               let startAirport = summary.startAirport,
+               let endAirport = summary.endAirport{
+                // ignore local flights
+                if startAirport == endAirport {
+                    continue
+                }
+                if var currentVisit = currentVisit {
+                    currentVisit.departed(with: info)
+                    if rv[startAirport] == nil {
+                        rv[startAirport] = [currentVisit]
+                    }else{
+                        rv[startAirport]?.append(currentVisit)
+                    }
+                }
+                currentVisit = Visit(airport: endAirport, arrivingFlight: info)
+            }
+        }
+        
+        var baseFound : Airport? = nil
+        var baseNights : Int = 0
+        
+        for (airport,visits) in rv {
+            let nights = visits.reduce(0) {
+                cnt,visit in
+                let days = visit.numberOfDays
+                return cnt + days
+            }
+            if nights > baseNights {
+                baseFound = airport
+                baseNights = nights
+            }
+        }
+        if let baseFound = baseFound {
+            self.base = baseFound
+        }
+
+        self.airportVisits = rv
+    }
+    func computeVisitsSimple() -> [Airport:[Int]]{
         // 7/23 egmd - egtf
         // 7/23 egtf - egmd
         // 7/21 lfaq - egtf
         // 7/15 egtf - lfaq
         // 7/10 egtf - egtf
         
-        self.airportVisits = [:]
+        var rv : [Airport:[Int]] = [:]
         var lastAirport : Airport? = nil
         var lastTime : Date? = nil
         
@@ -100,10 +144,10 @@ class Trips {
                     let lastAirportReported = lastAirport {
                     let days = calendar.numberOfNights(from: hobbs.end, to: lastTimeReported)
                     if endAirport == lastAirportReported {
-                        if airportVisits[endAirport] == nil {
-                            airportVisits[endAirport] = [days]
+                        if rv[endAirport] == nil {
+                            rv[endAirport] = [days]
                         }else{
-                            airportVisits[endAirport]?.append(days)
+                            rv[endAirport]?.append(days)
                         }
                     }else{
                         // hum, missing a leg?
@@ -117,7 +161,7 @@ class Trips {
         var baseFound : Airport? = nil
         var baseNights : Int = 0
         
-        for (airport,days) in airportVisits {
+        for (airport,days) in rv {
             let nights = days.reduce(0, +)
             if nights > baseNights {
                 baseFound = airport
@@ -127,5 +171,6 @@ class Trips {
         if let baseFound = baseFound {
             self.base = baseFound
         }
+        return rv
     }
 }

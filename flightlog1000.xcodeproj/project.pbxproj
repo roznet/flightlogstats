@@ -85,6 +85,7 @@
 		42CEA372281C2F7400AB7B5F /* log_220416_161856_LFQA.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36E281C2F7400AB7B5F /* log_220416_161856_LFQA.csv */; };
 		42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */; };
 		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
+		42DF535A28B6486700512C34 /* Visit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42DF535928B6486700512C34 /* Visit.swift */; };
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
 		42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */; };
 		42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */; };
@@ -193,6 +194,7 @@
 		42CEA36E281C2F7400AB7B5F /* log_220416_161856_LFQA.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220416_161856_LFQA.csv; sourceTree = "<group>"; };
 		42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_211204_102045_EGLL.csv; sourceTree = "<group>"; };
 		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
+		42DF535928B6486700512C34 /* Visit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Visit.swift; path = Source/Visit.swift; sourceTree = "<group>"; };
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 		42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestParsingLogFiles.swift; sourceTree = "<group>"; };
 		42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BufferedStreamReader.swift; path = Source/BufferedStreamReader.swift; sourceTree = "<group>"; };
@@ -466,6 +468,7 @@
 			children = (
 				42A20B512896F0CF00439880 /* Trips.swift */,
 				42A20B54289C577F00439880 /* Trip.swift */,
+				42DF535928B6486700512C34 /* Visit.swift */,
 			);
 			name = Trips;
 			sourceTree = "<group>";
@@ -693,6 +696,7 @@
 				429949D7282816A100CA1B89 /* DisplayContext.swift in Sources */,
 				4264C23828267F6600F40436 /* Waypoint.swift in Sources */,
 				429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */,
+				42DF535A28B6486700512C34 /* Visit.swift in Sources */,
 				423EF3532872E78900EA7415 /* SettingsViewController.swift in Sources */,
 				42A20B5A289D7D1500439880 /* FlightData+Map.swift in Sources */,
 				429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */,
