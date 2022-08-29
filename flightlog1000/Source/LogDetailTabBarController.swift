@@ -40,7 +40,13 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
         }
     }
     
-    func logInfoSelected(_ info: FlightLogFileInfo) {
+    //MARK: - LogSelection Delegate
+    
+    var logInfoIsSelected: Bool {
+        return self.logViewModel != nil
+    }
+    
+    func selectlogInfo(_ info: FlightLogFileInfo) {
         if self.progress == nil {
             self.progress = ProgressReport(message: .parsingInfo) {
                 progress in
@@ -59,7 +65,7 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
     
     func selectOneIfEmpty(organizer : FlightLogOrganizer) {
         if self.logViewModel == nil, let first = organizer.first {
-            self.logInfoSelected(first)
+            self.selectlogInfo(first)
         }
     }
 

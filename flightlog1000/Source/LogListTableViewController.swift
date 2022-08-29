@@ -13,8 +13,8 @@ import UniformTypeIdentifiers
 import OSLog
 
 protocol LogSelectionDelegate : AnyObject {
-    func logInfoSelected(_ info : FlightLogFileInfo)
-    func selectOneIfEmpty(organizer : FlightLogOrganizer)
+    func selectlogInfo(_ info : FlightLogFileInfo)
+    var logInfoIsSelected : Bool { get }
 }
 
 class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate, UISearchResultsUpdating {
@@ -55,6 +55,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     func moreFunctionMenu() -> UIMenu {
         let menuItems : [UIAction] = [
+            UIAction(title: "Force Refresh", image: UIImage(systemName: "minus.circle")){
+                _ in
+                self.buildList()
+                self.tableView.reloadData()
+            },
+
             UIAction(title: "Toggle Filter", image: UIImage(systemName: "minus.circle")){
                 _ in
                 self.filterEmpty = !self.filterEmpty
@@ -62,9 +68,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.tableView.reloadData()
             },
 
-            UIAction(title: "Delete", image: UIImage(systemName: "minus.circle")){
+            UIAction(title: "Delete last", image: UIImage(systemName: "minus.circle")){
                 _ in
-                Logger.app.info("Delete")
+                if let info = self.logFileOrganizer.firstNonEmpty, let log_file_name = info.log_file_name {
+                    Logger.ui.info("Deleting \(log_file_name)")
+                    self.logFileOrganizer.delete(info: info)
+                }
             },
             UIAction(title: "Rebuild Info", image: UIImage(systemName: "plus.circle")){
                 _ in
@@ -146,26 +155,9 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
         NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil){
             _ in
+            Logger.ui.info("local file list changed, updating log list")
             self.buildList()
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-                if let info = self.logInfoList.first  {
-                    self.delegate?.logInfoSelected(info)
-                }else{
-                    self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
-                }
-            }
         }
-        /*
-        NotificationCenter.default.addObserver(forName: .kProgressUpdate, object: nil, queue: nil){
-            notification in
-            if let progress = notification.object as? ProgressReport {
-                self.update(for: progress)
-            }else{
-                Logger.app.error("invalid notification \(notification)")
-            }
-        }
-         */
         self.buildList()
     }
     
@@ -179,6 +171,10 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     enum TableSection : Int, CaseIterable {
         case statistics = 0, flights
+        
+        init?(indexPath : IndexPath) {
+            self.init(rawValue: indexPath.section)
+        }
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -197,7 +193,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch TableSection(rawValue: indexPath.section) {
+        switch TableSection(indexPath: indexPath) {
         case .flights:
             let cell = tableView.dequeueReusableCell(withIdentifier: "flightlogcell", for: indexPath)
             if let cell = cell as? LogListTableViewCell,
@@ -227,7 +223,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        switch TableSection(rawValue: indexPath.section) {
+        switch TableSection(indexPath: indexPath) {
         case .statistics:
             return 50.0
         case .flights:
@@ -238,11 +234,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch TableSection(rawValue: indexPath.section) {
+        switch TableSection(indexPath: indexPath) {
         case .flights:
             if let info = self.flightInfo(at: indexPath){
                 self.ensureDelegate()
-                self.delegate?.logInfoSelected(info)
+                self.delegate?.selectlogInfo(info)
                 self.userInterfaceModeManager?.userInterfaceMode = .detail
                 self.updateButtons()
             }
@@ -261,6 +257,9 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 if let info = (notification.object as? FlightLogFileInfo) {
                     if logCell.shouldRefresh(for: info) {
                         DispatchQueue.main.async {
+                            if let file_name = info.log_file_name {
+                                Logger.ui.info("refresh cell for \(file_name)")
+                            }
                             logCell.refresh()
                         }
                     }
@@ -279,23 +278,33 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     //MARK: - build list functionality
     
     func buildList() {
-        
         if self.filterEmpty {
             AppDelegate.worker.async {
                 self.fullLogInfoList = self.logFileOrganizer.nonEmptyLogFileInfos
                 DispatchQueue.main.async {
                     self.updateSearchedList()
                     self.tableView.reloadData()
+                    self.ensureOneDetailDisplayed()
                 }
             }
         }else{
             self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos
             self.updateSearchedList()
             self.tableView.reloadData()
-            self.delegate?.selectOneIfEmpty(organizer: self.logFileOrganizer)
+            self.ensureOneDetailDisplayed()
         }
     }
 
+    private func ensureOneDetailDisplayed() {
+        if let delegate = self.delegate, !delegate.logInfoIsSelected {
+            if let info = self.logInfoList.first  {
+                delegate.selectlogInfo(info)
+            }else if let info = self.logFileOrganizer.first {
+                delegate.selectlogInfo(info)
+            }
+        }
+    }
+        
     func updateSearchedList() {
         if self.isSearchBarEmpty {
             self.logInfoList = self.fullLogInfoList

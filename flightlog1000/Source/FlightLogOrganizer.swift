@@ -14,7 +14,6 @@ import OSLog
 
 extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
-    static let flightLogOrganizerInfoUpdated : Notification.Name = Notification.Name("Notification.Name.FlightLogOrganizerInfoUpdated")
 }
 
 class FlightLogOrganizer {
@@ -181,11 +180,6 @@ class FlightLogOrganizer {
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
             Logger.app.info("Loaded \(fetchedInfo.count) existing \(existing) added \(added) ")
             self.updateInfo(count: 1)
-            /*AppDelegate.worker.async {
-                let trips = Trips(infos: self.flightLogFileInfos)
-                trips.computeVisits()
-                trips.computeTrips()
-            }*/
         }catch{
             Logger.app.error("Failed to query for files")
         }
@@ -266,7 +260,6 @@ class FlightLogOrganizer {
                 Logger.app.info("Updated \(self.doneCount)/\(self.missingCount) info last=\(firstName)")
                 self.saveContext()
                 // need to switch state before starting next
-                NotificationCenter.default.post(name: .flightLogOrganizerInfoUpdated, object: nil)
                 if !reportParsingProgress {
                     let percent = (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
                     self.progress?.update(state: .progressing(percent), message: .updatingInfo)
@@ -334,9 +327,13 @@ class FlightLogOrganizer {
     }
     
     func delete(info : FlightLogFileInfo){
-        info.delete()
-        self.persistentContainer.viewContext.delete(info)
-        self.saveContext()
+        if let name = info.log_file_name {
+            self.managedFlightLogs.removeValue(forKey: name)
+            info.delete()
+            self.persistentContainer.viewContext.delete(info)
+            self.saveContext()
+            NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+        }
     }
     
     func deleteAndResetDatabase() {
@@ -475,7 +472,7 @@ class FlightLogOrganizer {
     
     func syncCloud() {
         guard cloudFolder != nil else {
-            Logger.app.info("iCloud not setup, skipping sync")
+            Logger.sync.info("iCloud not setup, skipping sync")
             return
         }
         self.progress?.update(state: .progressing(0.0), message: .iCloudSync)
@@ -483,7 +480,7 @@ class FlightLogOrganizer {
             result in
             switch result {
             case .failure(let error):
-                Logger.app.error("Failed to find files \(error.localizedDescription)")
+                Logger.sync.error("Failed to find files \(error.localizedDescription)")
             case .success(let urls):
                 self.syncCloud(with: FlightLogFileList(urls: urls))
             }
@@ -498,7 +495,7 @@ class FlightLogOrganizer {
         self.cachedLocalFlightLogList = local
         
         if let already = self.cachedQuery?.isGathering, already {
-            Logger.app.info("Query already gathering")
+            Logger.sync.info("Query already gathering")
         }
         
         self.cachedQuery = NSMetadataQuery()
@@ -555,7 +552,7 @@ class FlightLogOrganizer {
             let lastComponent = cloudUrl.lastPathComponent
             if lastComponent.isLogFile {
                 if !existingInLocal.contains(lastComponent) {
-                    Logger.app.info( "copy to local \(cloudUrl.lastPathComponent)")
+                    Logger.sync.info( "copy to local \(cloudUrl.lastPathComponent)")
                     copyCloudToLocal.append(NSFileAccessIntent.readingIntent(with: cloudUrl))
                 }
             }
@@ -575,15 +572,15 @@ class FlightLogOrganizer {
                     copyLocalToCloud.append(localUrl)
                     if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
                         copiedToCloud += 1
-                        Logger.app.info( "copy to cloud \(localUrl.lastPathComponent)")
+                        Logger.sync.info( "copy to cloud \(localUrl.lastPathComponent)")
                         do {
                             if !FileManager.default.fileExists(atPath: cloud.path) {
                                 try FileManager.default.copyItem(at: localUrl, to: cloud)
                             }else{
-                                Logger.app.info("Already copied \(cloud.lastPathComponent), skipping")
+                                Logger.sync.info("Already copied \(cloud.lastPathComponent), skipping")
                             }
                         }catch{
-                            Logger.app.error("Failed to copy to cloud \(error.localizedDescription)")
+                            Logger.sync.error("Failed to copy to cloud \(error.localizedDescription)")
                         }
                     }
                 }
@@ -591,7 +588,7 @@ class FlightLogOrganizer {
         }
         
         if copiedToCloud == 0 {
-            Logger.app.info("Nothing new in local to copy to cloud")
+            Logger.sync.info("Nothing new in local to copy to cloud")
         }
         if copyCloudToLocal.count > 0 {
             let coordinator = NSFileCoordinator()
@@ -606,16 +603,16 @@ class FlightLogOrganizer {
                         }
                         self.addMissingFromLocal()
                     }catch{
-                        Logger.app.error("Failed to copy from cloud \(error.localizedDescription)")
+                        Logger.sync.error("Failed to copy from cloud \(error.localizedDescription)")
                     }
                 }else{
                     if let error = error {
-                        Logger.app.error("Failed to coordinate \(error.localizedDescription)")
+                        Logger.sync.error("Failed to coordinate \(error.localizedDescription)")
                     }
                 }
             }
         }else{
-            Logger.app.info("Nothing new in cloud to copy to local")
+            Logger.sync.info("Nothing new in cloud to copy to local")
         }
         self.progress?.update(state: .complete, message: .iCloudSync)
     }
