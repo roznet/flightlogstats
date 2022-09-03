@@ -15,15 +15,15 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4280C879280D43E400A0FB32"
-               BuildableName = "FlightLog1000.app"
-               BlueprintName = "FlightLog1000"
-               ReferencedContainer = "container:flightlog1000.xcodeproj">
+               BuildableName = "FlightLogStats.app"
+               BlueprintName = "FlightLogStats"
+               ReferencedContainer = "container:flightlogstats.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4280C88F280D43E500A0FB32"
-               BuildableName = "flightlog1000Tests.xctest"
-               BlueprintName = "flightlog1000Tests"
-               ReferencedContainer = "container:flightlog1000.xcodeproj">
+               BuildableName = "FlightLogStatsTests.xctest"
+               BlueprintName = "FlightLogStatsTests"
+               ReferencedContainer = "container:flightlogstats.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -43,15 +43,15 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4280C899280D43E500A0FB32"
-               BuildableName = "flightlog1000UITests.xctest"
-               BlueprintName = "flightlog1000UITests"
-               ReferencedContainer = "container:flightlog1000.xcodeproj">
+               BuildableName = "FlightLogStatsUITests.xctest"
+               BlueprintName = "FlightLogStatsUITests"
+               ReferencedContainer = "container:flightlogstats.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -65,9 +65,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4280C879280D43E400A0FB32"
-            BuildableName = "FlightLog1000.app"
-            BlueprintName = "FlightLog1000"
-            ReferencedContainer = "container:flightlog1000.xcodeproj">
+            BuildableName = "FlightLogStats.app"
+            BlueprintName = "FlightLogStats"
+            ReferencedContainer = "container:flightlogstats.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -82,9 +82,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4280C879280D43E400A0FB32"
-            BuildableName = "FlightLog1000.app"
-            BlueprintName = "FlightLog1000"
-            ReferencedContainer = "container:flightlog1000.xcodeproj">
+            BuildableName = "FlightLogStats.app"
+            BlueprintName = "FlightLogStats"
+            ReferencedContainer = "container:flightlogstats.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

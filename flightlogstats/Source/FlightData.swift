@@ -771,7 +771,8 @@ extension FlightData {
         }
         progress?.update(state: .complete)
         if totalSize > 0 {
-            Logger.app.info("Parsed \(totalSize) bytes in \(Date().timeIntervalSince(start)) secs")
+            let formatter = ByteCountFormatter()
+            Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize))) in \(Date().timeIntervalSince(start)) secs")
         }
     }
     
