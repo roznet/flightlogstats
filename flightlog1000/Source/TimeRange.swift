@@ -8,7 +8,7 @@
 import Foundation
 import RZUtils
 
-struct TimeRange {
+struct TimeRange : Codable {
     typealias Field = FlightLogFile.Field
     
     let start : Date

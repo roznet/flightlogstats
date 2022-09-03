@@ -9,7 +9,7 @@ import Foundation
 import RZUtils
 import OSLog
 
-struct FuelQuantity : Comparable {
+struct FuelQuantity : Comparable, Codable {
     static let gallon : Double = 3.785411784
     static let zero = FuelQuantity(left: 0.0, right: 0.0)
     static let kilogramPerLiter = 0.71
@@ -18,6 +18,33 @@ struct FuelQuantity : Comparable {
     let left : Double
     let right : Double
     var total : Double { return left + right }
+    
+    enum FuelQuantityError : Error {
+        case invalidUnit
+    }
+    
+    enum CodingKeys : String, CodingKey {
+        case unit, left, right
+    }
+    
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        left = try values.decode(Double.self, forKey: .left)
+        right = try values.decode(Double.self, forKey: .right)
+        let unitkey = try values.decode(String.self, forKey: .unit)
+        if let u = GCUnit(forKey: unitkey){
+            unit = u
+        }else{
+            throw FuelQuantityError.invalidUnit
+        }
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(left, forKey: .left)
+        try container.encode(right, forKey: .right)
+        try container.encode(unit.key, forKey: .unit)
+    }
     
     var totalWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: left+right) }
     var leftWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: left ) }

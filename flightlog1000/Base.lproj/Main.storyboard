@@ -756,6 +756,7 @@
                         <outlet property="fuelTargetSegment" destination="9Nb-pE-2dl" id="O8B-nB-u8e"/>
                         <outlet property="fuelTargetUnitSegment" destination="7Ag-KF-YBw" id="XWw-TE-AOm"/>
                         <outlet property="fuelTotalizerStartField" destination="0s2-Os-IFf" id="Wuk-I0-gHZ"/>
+                        <outlet property="maxFuelSubLabel" destination="EL0-VA-KsT" id="CzX-Uv-Ue7"/>
                         <outletCollection property="fixedLabels" destination="1o7-kq-3OE" collectionClass="NSMutableArray" id="0hA-bO-afa"/>
                         <outletCollection property="fixedLabels" destination="bbh-zw-XXR" collectionClass="NSMutableArray" id="jZF-n0-yKB"/>
                         <outletCollection property="fixedLabels" destination="E4E-FM-dRf" collectionClass="NSMutableArray" id="1uQ-zK-EAA"/>

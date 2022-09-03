@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Waypoint : Equatable {
+struct Waypoint : Equatable, Codable {
     let name : String
     
     init?(name : String?) {

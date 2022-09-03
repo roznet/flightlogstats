@@ -60,6 +60,17 @@ class FlightLogViewModel {
     private(set) var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
     private(set) var phasesOfFlightDataSource : FlightLegsDataSource? = nil
     
+    var fuelMaxTextLabel : String {
+        let max = aircraft.fuelMax.convert(to: fuelTargetUnit)
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 0
+        if let maxText = formatter.string(from: NSNumber(floatLiteral: max.totalWithUnit.value)) {
+            return "max \(maxText)"
+        }else{
+            return "max ??"
+        }
+    }
+    
     var estimatedTotalizerStart : FuelQuantity? {
         if let rv = self.flightLogFileInfo.estimatedTotalizerStart {
             return min(rv, self.aircraft.fuelMax)
@@ -86,6 +97,14 @@ class FlightLogViewModel {
         self.fuelAddedUnit = Settings.shared.unitAddedFuel
     }
 
+    func updateForSettings() {
+        self.aircraft = Settings.shared.aircraft
+        self.fuelTargetUnit = Settings.shared.unitTargetFuel
+        self.fuelAddedUnit = Settings.shared.unitAddedFuel
+
+        self.didWrite()
+    }
+    
     func isSameLog(as other : FlightLogFileInfo) -> Bool {
         return other.log_file_name == self.flightLogFileInfo.log_file_name
     }

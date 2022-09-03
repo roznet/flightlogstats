@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 protocol ViewModelDelegate : AnyObject {
     func viewModelDidFinishBuilding(viewModel : FlightLogViewModel)
@@ -28,6 +29,19 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now()+0.2){
             self.selectOneIfEmpty(organizer: FlightLogOrganizer.shared)
         }
+        
+        NotificationCenter.default.addObserver(forName: .settingsViewControllerUpdate, object: nil, queue: nil){
+            _ in
+            Logger.ui.info("Update flight view model for setting change")
+            
+            self.logViewModel?.updateForSettings()
+        }
+
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func viewModelHasChanged(viewModel: FlightLogViewModel){

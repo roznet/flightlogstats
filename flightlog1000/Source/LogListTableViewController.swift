@@ -54,7 +54,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     //MARK: - ui interactions (menu, search, button, etc)
     
     func moreFunctionMenu() -> UIMenu {
-        let menuItems : [UIAction] = [
+        var menuItems : [UIAction] = [
             UIAction(title: "Force Refresh", image: UIImage(systemName: "minus.circle")){
                 _ in
                 self.buildList()
@@ -67,7 +67,9 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.buildList()
                 self.tableView.reloadData()
             },
-
+            ]
+#if DEBUG
+        menuItems.append(contentsOf: [
             UIAction(title: "Delete last", image: UIImage(systemName: "minus.circle")){
                 _ in
                 if let info = self.logFileOrganizer.firstNonEmpty, let log_file_name = info.log_file_name {
@@ -95,8 +97,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 Logger.app.info("Reset All")
                 self.progressReportOverlay?.displayOverlay()
             }
-
-        ]
+            ])
+#endif
         
         return UIMenu( options: .displayInline, children: menuItems)
         

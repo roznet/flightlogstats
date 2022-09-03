@@ -23,6 +23,8 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     
+    @IBOutlet weak var maxFuelSubLabel: UILabel!
+    
     @IBOutlet private var fixedLabels : [UILabel]!
     @IBOutlet private var subFixedLabels : [UILabel]!
     
@@ -163,17 +165,26 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     //MARK: - sync view and model
     
     private func updateFromSettings() {
-        
+        // this should be sync'd with the view
+        if let maxTextLabel = self.flightLogViewModel?.fuelMaxTextLabel {
+            self.maxFuelSubLabel.text = maxTextLabel
+        }
     }
     
     private func pushViewToModel() {
+        self.updateFromSettings()
+        
         let inputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded, totalizerStartFuel: self.enteredtotalizerStart)
         self.flightLogViewModel?.fuelAnalysisInputs = inputs
         self.flightLogViewModel?.fuelAddedUnit = self.unit(for: self.fuelAddedUnitSegment)
         self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetUnitSegment)
+
+        
     }
         
     private func pushModelToView() {
+        self.updateFromSettings()
+        
         if let inputs = self.flightLogViewModel?.fuelAnalysisInputs {
             self.enteredFuelAdded = inputs.addedfuel
             self.enteredFuelTarget = inputs.targetFuel
@@ -209,7 +220,9 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         guard self.fuelTargetField != nil else { return }
         
         self.flightLogFileInfo?.ensureFuelRecord()
-
+        
+        self.updateFromSettings()
+        
         if let record = self.flightLogFileInfo?.fuel_record {
             self.enteredFuelAdded = record.addedFuel
             self.enteredFuelTarget = record.targetFuel
@@ -257,7 +270,8 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     @IBAction func showConfig(_ sender: Any) {
         NotificationCenter.default.addObserver(forName: .settingsViewControllerUpdate, object: nil, queue: nil){
             _ in
-            self.pushViewToModel()
+            Logger.ui.info("Update Fuel Analysis for settings change")
+            self.pushModelToView()
             self.updateUI()
         }
     }

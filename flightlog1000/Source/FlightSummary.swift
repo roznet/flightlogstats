@@ -11,13 +11,13 @@ import RZFlight
 import RZUtils
 import OSLog
 
-class FlightSummary {
+struct FlightSummary : Codable {
     enum FlightSummaryError : Error {
         case noData
         case missingFuel
     }
     
-    enum SummaryType : String {
+    enum SummaryType : String, Codable {
         case empty
         case preflight
         case ground
