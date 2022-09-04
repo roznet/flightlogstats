@@ -10,8 +10,8 @@ The usage is:
 
 ### Log Synchronisation
 
-- from an ipad with a simcard dongle, press the + icon and select the simcard from the file browser. All the logs should then bee imported, and will be made available and sync'd on your icloud drive.
-- The files will then be available (once your ipad had network available) on your mac and iphone. You can access the logs via the Files app or via the app on a different device.
+- from an ipad with a simcard dongle, press the + icon and select the simcard from the file browser. All the logs should then be imported, and will be made available and sync'd on your icloud drive.
+- The files will then be available (once your ipad had network available) on your mac and iphone. You can access the logs via the Files app to sync them to your favorite service or via the app on a different device for review.
 
 ### Basics review of the logs
 
@@ -23,6 +23,6 @@ From the app, you can:
 
 ## CAVEATS
 
-This has so far only been tested with the logs from one aircraft, an SR22 with Garmin Perspective+
-This should never be used as a primary planning tool, but just as a supplementary tool. Always check independently all the calculation made by the apps
+- This has so far only been tested with the logs from one aircraft, an SR22 with Garmin Perspective+
+- This should never be used as a primary planning tool, but just as a supplementary tool. Always check independently all the calculation made by the apps
 
