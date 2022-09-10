@@ -109,6 +109,7 @@ struct Settings {
         case added_fuel_left = "added_fuel_left"
         case added_fuel_right = "added_fuel_right"
         case totalizer_start_fuel = "totalizer_start_fuel"
+        case fuel_config_first_use_acknowledged = "fuel_config_first_use_acknowledged"
     }
     
     static func registerDefaults() {
@@ -149,6 +150,9 @@ struct Settings {
     @UserStorage(key: .aircraft_gph, defaultValue: 17.0)
     private var aircraftGph : Double
 
+    @UserStorage(key: .fuel_config_first_use_acknowledged, defaultValue: false)
+    var fuelConfigFirstUseAcknowledged : Bool
+    
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }
         set { self.targetFuelTotal = newValue.convert(to: Settings.fuelStoreUnit).total }

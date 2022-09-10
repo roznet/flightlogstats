@@ -89,6 +89,16 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         NotificationCenter.default.removeObserver(self)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if !Settings.shared.fuelConfigFirstUseAcknowledged {
+            let alert = UIAlertController(title: "First Use", message: "Please make sure you edit as necessary the configuration for your aircraft before use. This should not to be used as a primary flight planning and decision tool", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Acknowledged", style: .default, handler: { _ in Settings.shared.fuelConfigFirstUseAcknowledged = true } ) )
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     //MARK: - field to view object links
     var fuelTargetUnit : GCUnit { return self.flightLogViewModel?.fuelTargetUnit ?? Settings.fuelStoreUnit }
     var fuelAddedUnit : GCUnit { return self.flightLogViewModel?.fuelAddedUnit ?? Settings.fuelStoreUnit }
