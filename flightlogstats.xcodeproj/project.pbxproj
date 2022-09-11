@@ -890,6 +890,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlogstats/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "This app does not access Health record";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app does not share health record";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app does not update Health record";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -924,6 +927,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlogstats/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "This app does not access Health record";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app does not share health record";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app does not update Health record";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
