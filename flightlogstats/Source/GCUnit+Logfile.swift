@@ -10,7 +10,7 @@ import RZUtils
 
 extension GCUnit {
     static let mapping : [String:GCUnit] = [
-        "%" : GCUnit(forKey: "percent")!,
+        "%" : GCUnit(forKey: "percentdecimal")!,
         "G" : GCUnit(forKey: "dimensionless")!,
         "Hg" : GCUnit(forKey: "inHg")!, // manifold pressure
         "MHz" : GCUnit(forKey: "MHz")!, // radio frequency

@@ -191,7 +191,7 @@ class DisplayContext {
         return GCNumberWithUnit(unit: altitude.unit, andValue: altitude.max)
     }
     func numberWithUnit(percent : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: percent.unit, andValue: percent.average*100.0)
+        return GCNumberWithUnit(unit: percent.unit, andValue: percent.average)
     }
 
     func numberWithUnit(frequency : ValueStats) -> GCNumberWithUnit {
