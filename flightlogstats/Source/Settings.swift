@@ -110,6 +110,7 @@ struct Settings {
         case added_fuel_right = "added_fuel_right"
         case totalizer_start_fuel = "totalizer_start_fuel"
         case fuel_config_first_use_acknowledged = "fuel_config_first_use_acknowledged"
+        case flysto_credentials = "flysto.credentials"
     }
     
     static func registerDefaults() {
@@ -152,6 +153,9 @@ struct Settings {
 
     @UserStorage(key: .fuel_config_first_use_acknowledged, defaultValue: false)
     var fuelConfigFirstUseAcknowledged : Bool
+    
+    @UserStorage(key: .flysto_credentials, defaultValue: Data())
+    var flystoCredentials : Data
     
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }
