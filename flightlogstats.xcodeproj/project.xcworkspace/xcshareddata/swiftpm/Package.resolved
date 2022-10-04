@@ -1,59 +1,106 @@
 {
-  "pins" : [
-    {
-      "identity" : "fmdb",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ccgus/fmdb",
-      "state" : {
-        "revision" : "61e51fde7f7aab6554f30ab061cc588b28a97d04",
-        "version" : "2.7.7"
+  "object": {
+    "pins": [
+      {
+        "package": "BrightFutures",
+        "repositoryURL": "https://github.com/Thomvis/BrightFutures.git",
+        "state": {
+          "branch": null,
+          "revision": "fa66fa183dce7196d431244d0215748cd14c5758",
+          "version": "8.2.0"
+        }
+      },
+      {
+        "package": "Erik",
+        "repositoryURL": "https://github.com/phimage/Erik.git",
+        "state": {
+          "branch": null,
+          "revision": "109a130e9cdb00789a43a7a625293eeb12d22989",
+          "version": "5.1.0"
+        }
+      },
+      {
+        "package": "FileKit",
+        "repositoryURL": "https://github.com/nvzqz/FileKit.git",
+        "state": {
+          "branch": null,
+          "revision": "826d9161b184509f80d85c28cd612d630646de98",
+          "version": "6.0.0"
+        }
+      },
+      {
+        "package": "FMDB",
+        "repositoryURL": "https://github.com/ccgus/fmdb",
+        "state": {
+          "branch": null,
+          "revision": "61e51fde7f7aab6554f30ab061cc588b28a97d04",
+          "version": "2.7.7"
+        }
+      },
+      {
+        "package": "Geomagnetism",
+        "repositoryURL": "https://github.com/roznet/Geomagnetism",
+        "state": {
+          "branch": null,
+          "revision": "74049c87ab58b6e004342a64de2884c60b0c4734",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "Kanna",
+        "repositoryURL": "https://github.com/tid-kijyun/Kanna.git",
+        "state": {
+          "branch": null,
+          "revision": "f9e4922223dd0d3dfbf02ca70812cf5531fc0593",
+          "version": "5.2.7"
+        }
+      },
+      {
+        "package": "KDTree",
+        "repositoryURL": "https://github.com/Bersaelor/KDTree.git",
+        "state": {
+          "branch": null,
+          "revision": "490df2848e3f497bdc2edf61667f4ab669cff26e",
+          "version": "1.4.1"
+        }
+      },
+      {
+        "package": "OAuthSwift",
+        "repositoryURL": "https://github.com/OAuthSwift/OAuthSwift.git",
+        "state": {
+          "branch": null,
+          "revision": "d85964b96dbce94df961f28b996187c835089903",
+          "version": "2.2.0"
+        }
+      },
+      {
+        "package": "RZUtils",
+        "repositoryURL": "https://github.com/roznet/rzutils",
+        "state": {
+          "branch": null,
+          "revision": "527755dcdba4b6ea33fc48dd8325abe4a218de9e",
+          "version": "1.0.21"
+        }
+      },
+      {
+        "package": "RZUtilsTouch",
+        "repositoryURL": "https://github.com/roznet/rzutils-touch",
+        "state": {
+          "branch": null,
+          "revision": "5a396243777c14257c4e0b23c9f2229fd25252ae",
+          "version": "1.0.2"
+        }
+      },
+      {
+        "package": "Swifter",
+        "repositoryURL": "https://github.com/httpswift/swifter.git",
+        "state": {
+          "branch": null,
+          "revision": "9483a5d459b45c3ffd059f7b55f9638e268632fd",
+          "version": "1.5.0"
+        }
       }
-    },
-    {
-      "identity" : "geomagnetism",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/roznet/Geomagnetism",
-      "state" : {
-        "revision" : "74049c87ab58b6e004342a64de2884c60b0c4734",
-        "version" : "1.0.0"
-      }
-    },
-    {
-      "identity" : "kdtree",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Bersaelor/KDTree.git",
-      "state" : {
-        "revision" : "490df2848e3f497bdc2edf61667f4ab669cff26e",
-        "version" : "1.4.1"
-      }
-    },
-    {
-      "identity" : "rzflight",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/roznet/rzflight",
-      "state" : {
-        "revision" : "5eb6cd24871ef3c0beabb16abb1f1a3827823b52",
-        "version" : "1.0.2"
-      }
-    },
-    {
-      "identity" : "rzutils",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/roznet/rzutils",
-      "state" : {
-        "revision" : "527755dcdba4b6ea33fc48dd8325abe4a218de9e",
-        "version" : "1.0.21"
-      }
-    },
-    {
-      "identity" : "rzutils-touch",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/roznet/rzutils-touch",
-      "state" : {
-        "revision" : "5a396243777c14257c4e0b23c9f2229fd25252ae",
-        "version" : "1.0.2"
-      }
-    }
-  ],
-  "version" : 2
+    ]
+  },
+  "version": 1
 }
