@@ -16,6 +16,7 @@ extension Notification.Name {
     enum State : Comparable {
         case start
         case complete
+        // should be pct between 0 and 1
         case progressing(Double)
         case error(String)
     }

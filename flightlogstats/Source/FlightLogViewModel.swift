@@ -262,6 +262,9 @@ class FlightLogViewModel {
             self.request?.start() {
                 status in
                 switch status {
+                case .progressing(let pct):
+                    self.progress?.update(state: .progressing(pct), message: .uploadingFiles)
+                    return
                 case .success,.already:
                     self.flystoStatus = .uploaded
                 case .error:

@@ -20,6 +20,7 @@ class FlyStoRequests {
         case success
         case already
         case error
+        case progressing(Double)
     }
     
     let oauth : OAuth2Swift
@@ -100,6 +101,9 @@ class FlyStoRequests {
         
         if let data = self.buildUploadFile(),
            let upload = URL(string: Secrets.shared.value(for: "flysto.uploadLogUrl")) {
+            if let cb = self.completionHandler {
+                cb(FlyStoRequests.Status.progressing(0.5))
+            }
             self.oauth.client.post(upload, body: data) {
                 result in
                 switch result {
