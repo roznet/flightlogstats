@@ -16,6 +16,9 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var date: UILabel!
     
+    @IBOutlet weak var flystoButton: UIButton!
+    @IBOutlet weak var flystoStatus: UILabel!
+    
     @IBOutlet weak var timeCollectionView: UICollectionView!
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
@@ -52,6 +55,17 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
         NotificationCenter.default.removeObserver(self)
     }
 
+    // MARK: - Actions
+    private var request : FlyStoRequests? = nil
+    
+    @IBAction func exportButton(_ sender: Any) {
+        if let url = self.flightLogFileInfo?.flightLog?.url {
+            self.request = FlyStoRequests(viewController: self, url: url)
+            self.request?.start()
+        }
+    }
+    
+    
     /*
     // MARK: - Navigation
 
@@ -67,10 +81,17 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
                 self.date.attributedText = NSAttributedString(string: "Loading", attributes: ViewConfig.shared.cellAttributes)
                 self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
                 self.name.textColor = UIColor.systemGray
+                
+                self.flystoStatus.attributedText = NSAttributedString(string: "Ready",attributes: ViewConfig.shared.subTextAttributes)
+                self.flystoStatus.textColor = UIColor.systemGray
+                self.flystoButton.isEnabled = true
             }else{
                 self.date.attributedText = NSAttributedString(string: "Pending", attributes: ViewConfig.shared.cellAttributes)
                 self.name.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.cellAttributes)
+                self.flystoStatus.attributedText = NSAttributedString(string: "Pending",attributes: ViewConfig.shared.subTextAttributes)
                 self.name.textColor = UIColor.systemGray
+                self.flystoStatus.textColor = UIColor.systemGray
+                self.flystoButton.isEnabled = false
             }
             self.timeCollectionView.isHidden = true
             self.fuelCollectionView.isHidden = true
@@ -86,6 +107,10 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
                         self.timeCollectionView.isHidden = false
                         self.fuelCollectionView.isHidden = false
                         self.legsCollectionView.isHidden = false
+
+                        self.flystoStatus.attributedText = NSAttributedString(string: "Ready",attributes: ViewConfig.shared.subTextAttributes)
+                        self.flystoStatus.textColor = UIColor.systemGray
+                        self.flystoButton.isEnabled = true
 
                         if let logname = self.flightLogFileInfo?.log_file_name {
                             self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)

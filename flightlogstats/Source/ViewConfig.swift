@@ -28,6 +28,8 @@ class ViewConfig {
                 .withFamily(ViewConfig.fontFamily)
             let bodyFontDesc = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
                 .withFamily(ViewConfig.fontFamily)
+            let subFontDesc = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .footnote).withFamily(ViewConfig.fontFamily)
+            
             //.addingAttributes([.traits:[UIFontDescriptor.TraitKey.weight: UIFont.Weight.medium]])
             
             self.titleAttributes = [
@@ -35,6 +37,9 @@ class ViewConfig {
             ]
             self.cellAttributes = [
                 .font:UIFont(descriptor: bodyFontDesc, size: 0.0)
+            ]
+            self.subTextAttributes = [
+                .font: UIFont(descriptor: subFontDesc, size: 0.0)
             ]
         }else{
             
@@ -48,11 +53,16 @@ class ViewConfig {
                 .font:self.defaultBodyFont,
                 .foregroundColor: UIColor.label
             ]
+            self.subTextAttributes = [
+                .font:self.defaultSubFont,
+                .foregroundColor: UIColor.systemGray
+            ]
         }
     }
     
     var cellAttributes : [NSAttributedString.Key:Any] = [:]
     var titleAttributes : [NSAttributedString.Key:Any] = [:]
-
+    var subTextAttributes : [NSAttributedString.Key:Any] = [:]
+    
     var progressAttributes : [NSAttributedString.Key:Any] { return self.cellAttributes }
 }

@@ -72,6 +72,7 @@
 		429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */; };
 		42A11EA028E882E70031D209 /* OAuthSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 42A11E9F28E882E70031D209 /* OAuthSwift */; };
 		42A11EA328E883190031D209 /* FlyStoRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A11EA228E883190031D209 /* FlyStoRequests.swift */; };
+		42A11EA828FACD2C0031D209 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 42A11EA728FACD2C0031D209 /* ZIPFoundation */; };
 		42A20B522896F0CF00439880 /* Trips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B512896F0CF00439880 /* Trips.swift */; };
 		42A20B55289C577F00439880 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B54289C577F00439880 /* Trip.swift */; };
 		42A20B57289D78D700439880 /* LogMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B56289D78D700439880 /* LogMapViewController.swift */; };
@@ -181,6 +182,7 @@
 		429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewLayout.swift; path = Source/TableCollectionViewLayout.swift; sourceTree = "<group>"; };
 		42A11EA228E883190031D209 /* FlyStoRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoRequests.swift; path = Source/FlyStoRequests.swift; sourceTree = "<group>"; };
 		42A11EA428E8844A0031D209 /* rzflight */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzflight; path = ../rzflight; sourceTree = "<group>"; };
+		42A11EA528F7EF080031D209 /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		42A20B512896F0CF00439880 /* Trips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trips.swift; path = Source/Trips.swift; sourceTree = "<group>"; };
 		42A20B54289C577F00439880 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trip.swift; path = Source/Trip.swift; sourceTree = "<group>"; };
 		42A20B56289D78D700439880 /* LogMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogMapViewController.swift; path = Source/LogMapViewController.swift; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 				425D04F72832F47B0028FD67 /* RZFlight in Frameworks */,
 				4280C8CB280D4AD300A0FB32 /* RZUtils in Frameworks */,
 				4268A0C728357E6300A3CB05 /* KDTree in Frameworks */,
+				42A11EA828FACD2C0031D209 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,6 +321,7 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
+				42A11EA528F7EF080031D209 /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLogStats.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlogstats */,
 				4280C893280D43E500A0FB32 /* flightlogstatsTests */,
@@ -527,6 +531,7 @@
 				425D04F62832F47B0028FD67 /* RZFlight */,
 				4268A0C628357E6300A3CB05 /* KDTree */,
 				42A11E9F28E882E70031D209 /* OAuthSwift */,
+				42A11EA728FACD2C0031D209 /* ZIPFoundation */,
 			);
 			productName = flightlog1000;
 			productReference = 4280C87A280D43E400A0FB32 /* FlightLogStats.app */;
@@ -607,6 +612,7 @@
 				425D04F52832F47B0028FD67 /* XCRemoteSwiftPackageReference "rzflight" */,
 				4268A0C528357E6300A3CB05 /* XCRemoteSwiftPackageReference "KDTree" */,
 				42A11E9E28E882E70031D209 /* XCRemoteSwiftPackageReference "OAuthSwift" */,
+				42A11EA628FACD2C0031D209 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			productRefGroup = 4280C87B280D43E400A0FB32 /* Products */;
 			projectDirPath = "";
@@ -1126,6 +1132,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		42A11EA628FACD2C0031D209 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.9;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1163,6 +1177,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 42A11E9E28E882E70031D209 /* XCRemoteSwiftPackageReference "OAuthSwift" */;
 			productName = OAuthSwift;
+		};
+		42A11EA728FACD2C0031D209 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 42A11EA628FACD2C0031D209 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 

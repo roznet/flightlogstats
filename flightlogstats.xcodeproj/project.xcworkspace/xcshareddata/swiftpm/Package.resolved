@@ -74,15 +74,6 @@
         }
       },
       {
-        "package": "RZUtils",
-        "repositoryURL": "https://github.com/roznet/rzutils",
-        "state": {
-          "branch": null,
-          "revision": "527755dcdba4b6ea33fc48dd8325abe4a218de9e",
-          "version": "1.0.21"
-        }
-      },
-      {
         "package": "RZUtilsTouch",
         "repositoryURL": "https://github.com/roznet/rzutils-touch",
         "state": {
@@ -98,6 +89,15 @@
           "branch": null,
           "revision": "9483a5d459b45c3ffd059f7b55f9638e268632fd",
           "version": "1.5.0"
+        }
+      },
+      {
+        "package": "ZIPFoundation",
+        "repositoryURL": "https://github.com/weichsel/ZIPFoundation.git",
+        "state": {
+          "branch": null,
+          "revision": "f6a22e7da26314b38bf9befce34ae8e4b2543090",
+          "version": "0.9.15"
         }
       }
     ]

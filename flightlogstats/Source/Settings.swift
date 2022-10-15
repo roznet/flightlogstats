@@ -7,6 +7,7 @@
 
 import Foundation
 import RZUtils
+import OAuthSwift
 
 @propertyWrapper
 struct UserStorage<Type> {
@@ -27,6 +28,31 @@ struct UserStorage<Type> {
     }
 }
 
+@propertyWrapper
+struct CodableStorage<Type : Codable> {
+    private let key : String
+    
+    init(key : Settings.Key){
+        self.key = key.rawValue
+    }
+    
+    var wrappedValue : Type? {
+        get {
+            if let data = UserDefaults.standard.data(forKey: key),
+               let decoded = try? JSONDecoder().decode(Type.self, from: data) {
+                return decoded
+            }
+            return nil
+        }
+        set {
+            if let data = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(data, forKey: key)
+            }else{
+                UserDefaults.standard.set(nil, forKey: key)
+            }
+        }
+    }
+}
 @propertyWrapper
 struct UnitStorage {
     private let key : String
@@ -154,8 +180,8 @@ struct Settings {
     @UserStorage(key: .fuel_config_first_use_acknowledged, defaultValue: false)
     var fuelConfigFirstUseAcknowledged : Bool
     
-    @UserStorage(key: .flysto_credentials, defaultValue: Data())
-    var flystoCredentials : Data
+    @CodableStorage(key: .flysto_credentials)
+    var flystoCredentials : OAuthSwiftCredential?
     
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }

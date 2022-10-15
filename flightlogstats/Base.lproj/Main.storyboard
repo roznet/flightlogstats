@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21223" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21204"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -16,42 +16,66 @@
         <!--Summary-->
         <scene sceneID="aUE-ts-Q69">
             <objects>
-                <viewController storyboardIdentifier="LogDetailViewController" id="jUv-0p-pFh" customClass="LogDetailViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LogDetailViewController" id="jUv-0p-pFh" customClass="LogDetailViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="05n-vR-e7N">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="i78-1P-54X">
-                                <rect key="frame" x="5" y="24" width="824" height="20.5"/>
+                                <rect key="frame" x="5" y="24" width="824" height="55"/>
                                 <subviews>
-                                    <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
-                                        <rect key="frame" x="0.0" y="0.0" width="824" height="20.5"/>
+                                    <stackView opaque="NO" contentMode="left" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="udC-tB-FcV">
+                                        <rect key="frame" x="0.0" y="0.0" width="824" height="55"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
-                                                <rect key="frame" x="0.0" y="0.0" width="756.5" height="20.5"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <nil key="textColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
-                                                <rect key="frame" x="761.5" y="0.0" width="62.5" height="20.5"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                <nil key="textColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
+                                            <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
+                                                <rect key="frame" x="0.0" y="0.0" width="474" height="55"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
+                                                        <rect key="frame" x="0.0" y="0.0" width="406.5" height="55"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
+                                                        <rect key="frame" x="411.5" y="0.0" width="62.5" height="55"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                            </stackView>
+                                            <stackView opaque="NO" contentMode="center" horizontalHuggingPriority="750" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HR9-9W-drY">
+                                                <rect key="frame" x="474" y="0.0" width="350" height="55"/>
+                                                <subviews>
+                                                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="knZ-aj-EVf">
+                                                        <rect key="frame" x="0.0" y="0.0" width="350" height="34.5"/>
+                                                        <state key="normal" title="Button"/>
+                                                        <buttonConfiguration key="configuration" style="plain" image="square.and.arrow.up" catalog="system" title="FlySto"/>
+                                                        <connections>
+                                                            <action selector="exportButton:" destination="jUv-0p-pFh" eventType="touchUpInside" id="Aeq-Xa-LCb"/>
+                                                        </connections>
+                                                    </button>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pending" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qRM-2i-xo5" userLabel="Status">
+                                                        <rect key="frame" x="0.0" y="34.5" width="350" height="20.5"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                        <nil key="textColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                            </stackView>
                                         </subviews>
                                     </stackView>
                                 </subviews>
                             </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="s50-2U-Cvg" userLabel="TimeSummary Collection View">
-                                <rect key="frame" x="5" y="49.5" width="824" height="160"/>
+                                <rect key="frame" x="5" y="84" width="824" height="160"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="160" id="KDg-SL-kLK"/>
                                 </constraints>
-                                <collectionViewLayout key="collectionViewLayout" id="IIK-bc-UxE" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="IIK-bc-UxE" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="gwc-Wk-8DA" userLabel="TimeSummaryCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="gwc-Wk-8DA" userLabel="TimeSummaryCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="UzP-6M-UFt">
@@ -77,14 +101,14 @@
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mee-fG-3c6" userLabel="Fuel Collection View">
-                                <rect key="frame" x="5" y="214.5" width="824" height="100"/>
+                                <rect key="frame" x="5" y="249" width="824" height="100"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="100" id="uJR-ao-is8"/>
                                 </constraints>
-                                <collectionViewLayout key="collectionViewLayout" id="rhw-Mu-gap" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="rhw-Mu-gap" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="J22-fR-Qj1" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="J22-fR-Qj1" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="FDz-jQ-IZ8">
@@ -107,14 +131,14 @@
                                             <outlet property="label" destination="UPy-Qe-KvO" id="LJt-OJ-iG1"/>
                                         </connections>
                                     </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="paF-PK-qkC" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="paF-PK-qkC" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="HWf-3q-Qzz">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aeQ-Lh-78q" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aeQ-Lh-78q" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </view>
                                             </subviews>
@@ -132,11 +156,11 @@
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="aKL-fC-i7y" userLabel="Legs Collection View">
-                                <rect key="frame" x="5" y="319.5" width="824" height="800.5"/>
+                                <rect key="frame" x="5" y="354" width="824" height="766"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewLayout key="collectionViewLayout" id="oSQ-lx-eW3" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="oSQ-lx-eW3" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="Ybg-6H-Krt" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="Ybg-6H-Krt" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="wEg-kd-TkA">
@@ -159,14 +183,14 @@
                                             <outlet property="label" destination="poO-1U-1lH" id="2u1-LC-b6s"/>
                                         </connections>
                                     </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="ncd-3e-VYh" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="ncd-3e-VYh" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="zZd-lG-HaM">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zT3-ET-M7b" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zT3-ET-M7b" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </view>
                                             </subviews>
@@ -214,6 +238,8 @@
                     <tabBarItem key="tabBarItem" title="Summary" image="tablecells" catalog="system" id="77u-9R-Es2"/>
                     <connections>
                         <outlet property="date" destination="6bN-rh-gIs" id="sL8-AX-MI1"/>
+                        <outlet property="flystoButton" destination="knZ-aj-EVf" id="dIH-Kx-0jT"/>
+                        <outlet property="flystoStatus" destination="qRM-2i-xo5" id="5H8-s0-J8Q"/>
                         <outlet property="fuelCollectionView" destination="mee-fG-3c6" id="ASf-Nf-8NE"/>
                         <outlet property="legsCollectionView" destination="aKL-fC-i7y" id="B4G-8r-hwp"/>
                         <outlet property="name" destination="h5i-bu-Kfn" id="H0Q-jq-D8o"/>
@@ -228,7 +254,7 @@
         <!--Calendar Stats-->
         <scene sceneID="Gii-1t-ydh">
             <objects>
-                <viewController id="le0-J7-zW3" userLabel="Calendar Stats" customClass="CalendarStatsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="le0-J7-zW3" userLabel="Calendar Stats" customClass="CalendarStatsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="hiS-AS-56c">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -239,9 +265,9 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="C8C-Qy-cZt" userLabel="Log List View">
                                 <rect key="frame" x="5" y="134.5" width="824" height="994.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewLayout key="collectionViewLayout" id="2x8-SZ-QS5" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="2x8-SZ-QS5" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="Zsk-3W-XUT" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="Zsk-3W-XUT" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="pza-0J-2FS">
@@ -264,14 +290,14 @@
                                             <outlet property="label" destination="d5w-2v-FOm" id="KjK-jX-F7i"/>
                                         </connections>
                                     </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="cBI-9r-JG3" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="cBI-9r-JG3" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="ZoQ-jg-XQO">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1aR-No-we7" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1aR-No-we7" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </view>
                                             </subviews>
@@ -314,7 +340,7 @@
         <!--Trips Stats-->
         <scene sceneID="QSF-FC-Rbl">
             <objects>
-                <viewController id="EYb-e7-uL0" userLabel="Trips Stats" customClass="TripsStatsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="EYb-e7-uL0" userLabel="Trips Stats" customClass="TripsStatsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3G4-GW-ic3">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -322,9 +348,9 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="8Xl-gc-ZSL" userLabel="Log List View">
                                 <rect key="frame" x="5" y="29" width="824" height="1105"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewLayout key="collectionViewLayout" id="6w5-OM-45w" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="6w5-OM-45w" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="zwF-zT-Nri" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="zwF-zT-Nri" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="hdn-PS-YVS">
@@ -347,14 +373,14 @@
                                             <outlet property="label" destination="6Sr-H7-nn6" id="gmS-BM-CVJ"/>
                                         </connections>
                                     </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="XLr-Rs-Yso" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="XLr-Rs-Yso" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="05i-ve-m4u">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0fZ-ZT-4RI" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0fZ-ZT-4RI" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </view>
                                             </subviews>
@@ -393,7 +419,7 @@
         <!--Stats Tab Bar Controller-->
         <scene sceneID="TPK-Bo-bnt">
             <objects>
-                <tabBarController storyboardIdentifier="statsTabBarController" id="myV-fl-FL9" userLabel="Stats Tab Bar Controller" customClass="StatsTabBarController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="statsTabBarController" id="myV-fl-FL9" userLabel="Stats Tab Bar Controller" customClass="StatsTabBarController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="rYU-MD-ceZ">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -411,7 +437,7 @@
         <!--Map View Controller-->
         <scene sceneID="SDL-fH-bz2">
             <objects>
-                <viewController id="tIL-BH-og2" userLabel="Map View Controller" customClass="LogMapViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="tIL-BH-og2" userLabel="Map View Controller" customClass="LogMapViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="yF0-BN-oP4">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -423,9 +449,9 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="b18-pk-RPc" userLabel="Legs Collection View">
                                 <rect key="frame" x="0.0" y="576.5" width="834" height="552.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewLayout key="collectionViewLayout" id="lyT-6t-B01" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="lyT-6t-B01" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="BIA-GU-Ufd" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="BIA-GU-Ufd" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="kKH-3M-Srp">
@@ -448,14 +474,14 @@
                                             <outlet property="label" destination="GYx-tf-2kC" id="pFo-Fj-hrO"/>
                                         </connections>
                                     </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="oox-Kb-ZBZ" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="oox-Kb-ZBZ" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="60.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="YAh-xf-iLj">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v2d-IM-YZp" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v2d-IM-YZp" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </view>
                                             </subviews>
@@ -499,7 +525,7 @@
         <!--Calculations View Controller-->
         <scene sceneID="sKo-Gz-sxa">
             <objects>
-                <viewController id="Ixv-6V-WSf" userLabel="Calculations View Controller" customClass="LogFuelAnalysisViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Ixv-6V-WSf" userLabel="Calculations View Controller" customClass="LogFuelAnalysisViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="bVa-kJ-IET">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -508,7 +534,7 @@
                                 <rect key="frame" x="5" y="74" width="824" height="60"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" alignment="firstBaseline" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="5WP-aP-66h">
-                                        <rect key="frame" x="0.0" y="8" width="285.5" height="44"/>
+                                        <rect key="frame" x="0.0" y="8.5" width="285.5" height="43.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" text="Fuel Target" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1o7-kq-3OE">
                                                 <rect key="frame" x="0.0" y="0.0" width="85" height="20.5"/>
@@ -517,10 +543,10 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="kgD-0G-y04">
-                                                <rect key="frame" x="87" y="-15.5" width="65" height="59.5"/>
+                                                <rect key="frame" x="87" y="-15.5" width="65" height="59"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="60" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="PqG-gQ-uQm">
-                                                        <rect key="frame" x="0.0" y="0.0" width="65" height="43.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="65" height="43"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="9k4-OG-Jkm"/>
                                                         </constraints>
@@ -528,7 +554,7 @@
                                                         <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     </textField>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" text="max 92" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EL0-VA-KsT" userLabel="max 92">
-                                                        <rect key="frame" x="10" y="43.5" width="45" height="16"/>
+                                                        <rect key="frame" x="10" y="43" width="45" height="16"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -542,10 +568,10 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="bi4-x4-vW7">
-                                                <rect key="frame" x="220.5" y="-15.5" width="65" height="59.5"/>
+                                                <rect key="frame" x="220.5" y="-15.5" width="65" height="59"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="60" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="0s2-Os-IFf" userLabel="Totalizer Start Field">
-                                                        <rect key="frame" x="0.0" y="0.0" width="65" height="43.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="65" height="43"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="8xb-Se-CtX"/>
                                                         </constraints>
@@ -553,7 +579,7 @@
                                                         <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     </textField>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="251" text="Start" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aW4-D8-pXl" userLabel="Start">
-                                                        <rect key="frame" x="17.5" y="43.5" width="30" height="16"/>
+                                                        <rect key="frame" x="17.5" y="43" width="30" height="16"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -592,7 +618,7 @@
                                 <rect key="frame" x="5" y="144" width="824" height="60"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="left" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="uEY-rN-0a1">
-                                        <rect key="frame" x="0.0" y="0.5" width="259.5" height="59.5"/>
+                                        <rect key="frame" x="0.0" y="0.5" width="259.5" height="59"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Fuel Added" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bbh-zw-XXR">
                                                 <rect key="frame" x="0.0" y="19.5" width="86.5" height="20.5"/>
@@ -601,10 +627,10 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <stackView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="0LU-UP-8VD">
-                                                <rect key="frame" x="86.5" y="0.0" width="86.5" height="59.5"/>
+                                                <rect key="frame" x="86.5" y="0.0" width="86.5" height="59"/>
                                                 <subviews>
                                                     <textField toolTip="Left" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="29" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2Ke-QW-NFk" userLabel="AddedLeft">
-                                                        <rect key="frame" x="12.5" y="0.0" width="62" height="43.5"/>
+                                                        <rect key="frame" x="12.5" y="0.0" width="62" height="43"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="62" id="d2J-1I-hK9"/>
                                                         </constraints>
@@ -612,7 +638,7 @@
                                                         <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     </textField>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Left" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gAz-go-gko">
-                                                        <rect key="frame" x="31.5" y="43.5" width="24" height="16"/>
+                                                        <rect key="frame" x="31.5" y="43" width="24" height="16"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -620,10 +646,10 @@
                                                 </subviews>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="XlO-Ef-iMF">
-                                                <rect key="frame" x="173" y="0.0" width="86.5" height="59.5"/>
+                                                <rect key="frame" x="173" y="0.0" width="86.5" height="59"/>
                                                 <subviews>
                                                     <textField toolTip="Right" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="31" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fCd-gw-jOZ" userLabel="AddedRight">
-                                                        <rect key="frame" x="12.5" y="0.0" width="62" height="43.5"/>
+                                                        <rect key="frame" x="12.5" y="0.0" width="62" height="43"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="62" id="29o-7a-G9g"/>
                                                         </constraints>
@@ -631,7 +657,7 @@
                                                         <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     </textField>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Right" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="chS-wr-ErF">
-                                                        <rect key="frame" x="27.5" y="43.5" width="32" height="16"/>
+                                                        <rect key="frame" x="27.5" y="43" width="32" height="16"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -663,9 +689,9 @@
                                 <constraints>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="MTb-3z-2kN"/>
                                 </constraints>
-                                <collectionViewLayout key="collectionViewLayout" id="B8H-Hy-EMs" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="B8H-Hy-EMs" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="nay-Yb-5GQ" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="nay-Yb-5GQ" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="AaJ-B4-QN7">
@@ -688,14 +714,14 @@
                                             <outlet property="label" destination="fec-4C-dvz" id="f00-HL-VdU"/>
                                         </connections>
                                     </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="2wB-hT-H6C" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="2wB-hT-H6C" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="zpy-2L-hDf">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rsr-6B-SM9" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rsr-6B-SM9" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </view>
                                             </subviews>
@@ -773,7 +799,7 @@
         <!--Settings View Controller-->
         <scene sceneID="1Ya-r9-PFR">
             <objects>
-                <viewController id="rwj-Ou-8lY" customClass="SettingsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="rwj-Ou-8lY" customClass="SettingsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="2uz-q1-TX9">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="493"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -922,7 +948,7 @@
         <!--Graphs View Controller-->
         <scene sceneID="VeH-AF-dEi">
             <objects>
-                <viewController id="9Nf-CY-m6R" userLabel="Graphs View Controller" customClass="LogGraphsViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="9Nf-CY-m6R" userLabel="Graphs View Controller" customClass="LogGraphsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="N8L-EL-blt">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -963,9 +989,9 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="RIe-Tr-gEa" userLabel="Legs Collection View">
                                 <rect key="frame" x="0.0" y="636.5" width="834" height="492.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewLayout key="collectionViewLayout" id="Ouf-s9-dep" customClass="TableCollectionViewLayout" customModule="FlightLog1000" customModuleProvider="target"/>
+                                <collectionViewLayout key="collectionViewLayout" id="Ouf-s9-dep" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="rP3-SL-T57" customClass="TableCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="rP3-SL-T57" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="k2S-sJ-NGh">
@@ -988,14 +1014,14 @@
                                             <outlet property="label" destination="p0j-z5-OXB" id="GQx-aa-hhb"/>
                                         </connections>
                                     </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="Q7M-6s-AUu" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="Q7M-6s-AUu" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                         <rect key="frame" x="60.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="YTf-B9-Xvc">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vvZ-Fy-BzD" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLog1000" customModuleProvider="target">
+                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vvZ-Fy-BzD" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </view>
                                             </subviews>
@@ -1044,13 +1070,13 @@
         <!--Flight Logs-->
         <scene sceneID="ifI-4a-r8r">
             <objects>
-                <tableViewController clearsSelectionOnViewWillAppear="NO" id="JdO-DO-Gh9" customClass="LogListTableViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController clearsSelectionOnViewWillAppear="NO" id="JdO-DO-Gh9" customClass="LogListTableViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="oIf-wu-Id9">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" indentationWidth="10" reuseIdentifier="flightlogcell" rowHeight="99" id="fOk-Uh-ECS" customClass="LogListTableViewCell" customModule="FlightLog1000" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" indentationWidth="10" reuseIdentifier="flightlogcell" rowHeight="99" id="fOk-Uh-ECS" customClass="LogListTableViewCell" customModule="FlightLogStats" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="55.5" width="420" height="99"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="fOk-Uh-ECS" id="Fpc-Xo-3Um">
@@ -1186,7 +1212,7 @@
         <!--Progress Report View Controller-->
         <scene sceneID="uaX-bl-vRd">
             <objects>
-                <viewController storyboardIdentifier="ProgressReport" id="SnM-n5-3km" customClass="ProgressReportViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ProgressReport" id="SnM-n5-3km" customClass="ProgressReportViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="uY2-wv-zdb">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1246,7 +1272,7 @@
         <!--Main Split View Controller-->
         <scene sceneID="11Z-c9-KGr">
             <objects>
-                <splitViewController allowDoubleColumnStyle="YES" id="UzS-5f-0Gy" customClass="MainSplitViewController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController allowDoubleColumnStyle="YES" id="UzS-5f-0Gy" customClass="MainSplitViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <connections>
                         <segue destination="SpX-dd-qC9" kind="relationship" relationship="masterViewController" id="4XW-om-kZr"/>
                         <segue destination="VbP-r0-aJq" kind="relationship" relationship="detailViewController" id="egr-bJ-nog"/>
@@ -1259,7 +1285,7 @@
         <!--Log Detail Tab Bar Controller-->
         <scene sceneID="1mA-0R-1KR">
             <objects>
-                <tabBarController storyboardIdentifier="LogDetailTabBarController" automaticallyAdjustsScrollViewInsets="NO" id="VbP-r0-aJq" customClass="LogDetailTabBarController" customModule="FlightLog1000" customModuleProvider="target" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="LogDetailTabBarController" automaticallyAdjustsScrollViewInsets="NO" id="VbP-r0-aJq" customClass="LogDetailTabBarController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="L3u-cI-Bev">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
@@ -1285,6 +1311,7 @@
         <image name="fuelpump" catalog="system" width="128" height="122"/>
         <image name="gearshape" catalog="system" width="128" height="123"/>
         <image name="map" catalog="system" width="128" height="112"/>
+        <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
         <image name="tablecells" catalog="system" width="128" height="93"/>
         <image name="timer" catalog="system" width="128" height="123"/>
         <systemColor name="labelColor">
