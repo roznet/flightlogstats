@@ -175,6 +175,19 @@ class FlightLogFileInfo: NSManagedObject {
         }
     }
     
+    //MARK: - FLySto
+    
+    func ensureFlyStoStatus() {
+        if self.flysto_status == nil,
+           let container = self.container {
+            let context = container.persistentContainer.viewContext
+            let status = FlightFlyStoStatus(context: context)
+            status.status = .ready
+            self.flysto_status = status
+            self.saveContext()
+        }
+    }
+    
     //MARK: - Fuel Records
     
     func ensureFuelRecord() {

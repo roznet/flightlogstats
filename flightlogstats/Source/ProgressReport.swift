@@ -25,6 +25,7 @@ extension Notification.Name {
         case iCloudSync = "Sync iCloud"
         case parsingInfo = "Parsing Info"
         case addingFiles = "Adding Files"
+        case uploadingFiles = "Uploading Files"
         
         var description: String { return self.rawValue }
     }

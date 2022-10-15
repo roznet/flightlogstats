@@ -13,6 +13,7 @@ import OSLog
 
 extension Notification.Name {
     static let flightLogViewModelChanged : Notification.Name = Notification.Name("Notification.Name.logViewModelChanged")
+    static let flightLogViewModelUploadFinished : Notification.Name = Notification.Name("Notification.Name.logViewModelUploadFinished")
 }
 
 class FlightLogViewModel {
@@ -36,6 +37,7 @@ class FlightLogViewModel {
     private func save() {
         AppDelegate.worker.async {
             self.flightLogFileInfo.ensureFuelRecord()
+            self.flightLogFileInfo.ensureFlyStoStatus()
             if let record = self.flightLogFileInfo.fuel_record {
                 record.fuelAnalysisInputs = self.fuelAnalysisInputs
                 self.flightLogFileInfo.saveContext()
@@ -78,6 +80,21 @@ class FlightLogViewModel {
         return nil
     }
     
+    var flystoStatus : FlightFlyStoStatus.Status {
+        get {
+            return self.flightLogFileInfo.flysto_status?.status ?? .ready
+        }
+        set {
+            self.flightLogFileInfo.ensureFlyStoStatus()
+            self.flightLogFileInfo.flysto_status?.status = newValue
+            self.flightLogFileInfo.flysto_status?.status_date = Date()
+        }
+    }
+    
+    var flystoStatusText : String {
+        return self.flystoStatus.rawValue.capitalized
+    }
+    
     // MARK: - Setup
     init(fileInfo : FlightLogFileInfo, displayContext : DisplayContext, progress : ProgressReport? = nil){
         self.flightLogFileInfo = fileInfo
@@ -85,6 +102,7 @@ class FlightLogViewModel {
         self.displayContext = displayContext
         self.aircraft = Settings.shared.aircraft
         fileInfo.ensureFuelRecord()
+        fileInfo.ensureFlyStoStatus()
         if let record = fileInfo.fuel_record {
             self.fuelAnalysisInputs = record.fuelAnalysisInputs
         }else{
@@ -231,5 +249,29 @@ class FlightLogViewModel {
             return ds
         }
         return nil
+    }
+    
+    //MARK: - Servive Synchronization
+    
+    private var request : FlyStoRequests? = nil
+
+    func startServiceSynchronization(viewController : UIViewController) {
+        if let url = self.flightLogFileInfo.flightLog?.url {
+            self.progress?.update(state: .start, message: .uploadingFiles)
+            self.request = FlyStoRequests(viewController: viewController, url: url)
+            self.request?.start() {
+                status in
+                switch status {
+                case .success,.already:
+                    self.flystoStatus = .uploaded
+                case .error:
+                    self.flystoStatus = .failed
+                }
+                NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)
+                self.save()
+                self.progress?.update(state: .complete, message: .uploadingFiles)
+            }
+        }
+
     }
 }

@@ -13,11 +13,21 @@ import OSLog
 import ZIPFoundation
 
 class FlyStoRequests {
+    
+    typealias CompletionHandler = (Status) -> Void
+    
+    enum Status {
+        case success
+        case already
+        case error
+    }
+    
     let oauth : OAuth2Swift
     let viewController : UIViewController
     
     let url : URL
     var uploadFileUrl : URL { return self.url.appendingPathExtension("zip") }
+    var completionHandler : CompletionHandler? = nil
 
     init(viewController : UIViewController, url : URL) {
         self.url = url
@@ -50,7 +60,8 @@ class FlyStoRequests {
         Settings.shared.flystoCredentials = nil
     }
     
-    func start() {
+    func start(completion : @escaping CompletionHandler) {
+        self.completionHandler = completion
         Logger.net.info("start upload \(self.url.lastPathComponent)")
         if !self.retrieveCredential() {
             let callback = URL(string: Secrets.shared.value(for: "flysto.callbackUrl"))
@@ -65,11 +76,20 @@ class FlyStoRequests {
                     self.makeRequest()
                 case .failure(let error):
                     Logger.net.error("Failed \(error.localizedDescription)")
+                    self.end(status: .error)
                 }
             }
         }else{
             self.makeRequest()
         }
+    }
+    
+    func end(status : Status){
+        if let cb = self.completionHandler {
+            cb(status)
+        }
+        
+        self.completionHandler = nil
     }
     
     func makeRequest(tokenRefreshed : Bool = false){
@@ -85,6 +105,7 @@ class FlyStoRequests {
                 switch result {
                 case .success(let response):
                     Logger.net.info("upload of \(self.url.lastPathComponent) successfull \(response.description)")
+                    self.end(status: .success)
                 case .failure(let queryError):
                     switch queryError {
                     case .requestError(let underlyingError, _ /*request:*/ ):
@@ -95,26 +116,33 @@ class FlyStoRequests {
                             Logger.net.info("Application error, clearing credentials: \(code)")
                             self.refreshTokenAndTryAgain()
                         }else if code == 409 {
-                            Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code)")
+                            Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
+                            self.end(status: .success)
                         }else{
                             Logger.net.info("Underlying request error: \(code)")
+                            self.end(status: .error)
                         }
                     case .accessDenied(let underlyingError, _ /*request:*/):
                         let code = (underlyingError as NSError).code
                         Logger.net.info("Access Denied: \(code)")
                         // force login
                         Settings.shared.flystoCredentials = nil
+                        self.end(status: .error)
                     case .tokenExpired:
                         if !tokenRefreshed {
                             self.refreshTokenAndTryAgain()
                         }else{
                             self.clearCredential()
+                            self.end(status: .error)
                         }
                     default:
                         Logger.net.error("Other error \(queryError.localizedDescription)")
+                        self.end(status: .error)
                     }
                 }
             }
+        }else{
+            self.end(status: .error)
         }
     }
     
@@ -129,6 +157,7 @@ class FlyStoRequests {
                 self.makeRequest(tokenRefreshed: true)
             case .failure(let error):
                 Logger.net.error("Failed to refresh token \(error.localizedDescription)")
+                self.end(status: .error)
             }
         }
 

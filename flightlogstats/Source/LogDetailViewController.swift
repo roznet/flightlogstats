@@ -48,6 +48,12 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
                 self.updateUI()
             }
         }
+        NotificationCenter.default.addObserver(forName: .flightLogViewModelUploadFinished, object: nil, queue: nil){
+            notification in
+            DispatchQueue.main.async{
+                self.updateUI()
+            }
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,13 +62,9 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     }
 
     // MARK: - Actions
-    private var request : FlyStoRequests? = nil
     
     @IBAction func exportButton(_ sender: Any) {
-        if let url = self.flightLogFileInfo?.flightLog?.url {
-            self.request = FlyStoRequests(viewController: self, url: url)
-            self.request?.start()
-        }
+        self.flightLogViewModel?.startServiceSynchronization(viewController: self)
     }
     
     
@@ -108,7 +110,7 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
                         self.fuelCollectionView.isHidden = false
                         self.legsCollectionView.isHidden = false
 
-                        self.flystoStatus.attributedText = NSAttributedString(string: "Ready",attributes: ViewConfig.shared.subTextAttributes)
+                        self.flystoStatus.attributedText = NSAttributedString(string: self.flightLogViewModel?.flystoStatusText ?? "Ready", attributes: ViewConfig.shared.subTextAttributes)
                         self.flystoStatus.textColor = UIColor.systemGray
                         self.flystoButton.isEnabled = true
 
