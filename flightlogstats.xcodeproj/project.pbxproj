@@ -182,8 +182,6 @@
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
 		429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewLayout.swift; path = Source/TableCollectionViewLayout.swift; sourceTree = "<group>"; };
 		42A11EA228E883190031D209 /* FlyStoRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoRequests.swift; path = Source/FlyStoRequests.swift; sourceTree = "<group>"; };
-		42A11EA428E8844A0031D209 /* rzflight */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzflight; path = ../rzflight; sourceTree = "<group>"; };
-		42A11EA528F7EF080031D209 /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		42A11EA928FAFD7C0031D209 /* FlightFlyStoStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightFlyStoStatus.swift; path = Source/FlightFlyStoStatus.swift; sourceTree = "<group>"; };
 		42A20B512896F0CF00439880 /* Trips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trips.swift; path = Source/Trips.swift; sourceTree = "<group>"; };
 		42A20B54289C577F00439880 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trip.swift; path = Source/Trip.swift; sourceTree = "<group>"; };
@@ -323,13 +321,11 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
-				42A11EA528F7EF080031D209 /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLogStats.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlogstats */,
 				4280C893280D43E500A0FB32 /* flightlogstatsTests */,
 				4280C89D280D43E500A0FB32 /* flightlogstatsUITests */,
 				4280C87B280D43E400A0FB32 /* Products */,
-				42A11EA428E8844A0031D209 /* rzflight */,
 				4280C8D5280D70CB00A0FB32 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -1101,7 +1097,7 @@
 			repositoryURL = "https://github.com/roznet/rzflight";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.2;
+				minimumVersion = 1.0.3;
 			};
 		};
 		4268A0C528357E6300A3CB05 /* XCRemoteSwiftPackageReference "KDTree" */ = {
@@ -1117,7 +1113,7 @@
 			repositoryURL = "https://github.com/roznet/rzutils";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.21;
+				minimumVersion = 1.0.23;
 			};
 		};
 		4280C8D0280D4BE400A0FB32 /* XCRemoteSwiftPackageReference "rzutils-touch" */ = {
