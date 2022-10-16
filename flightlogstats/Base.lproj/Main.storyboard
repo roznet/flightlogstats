@@ -63,6 +63,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
+                                                <variation key="widthClass=compact" axis="horizontal"/>
                                             </stackView>
                                         </subviews>
                                         <variation key="widthClass=compact" axis="vertical"/>
