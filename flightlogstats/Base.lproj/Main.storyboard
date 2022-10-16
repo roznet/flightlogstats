@@ -43,6 +43,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
+                                                <variation key="widthClass=compact" axis="vertical"/>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="center" horizontalHuggingPriority="750" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HR9-9W-drY">
                                                 <rect key="frame" x="474" y="0.0" width="350" height="55"/>
@@ -64,6 +65,7 @@
                                                 </subviews>
                                             </stackView>
                                         </subviews>
+                                        <variation key="widthClass=compact" axis="vertical"/>
                                     </stackView>
                                 </subviews>
                             </stackView>

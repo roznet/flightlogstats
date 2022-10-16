@@ -39,7 +39,11 @@ class FlyStoRequests {
                                  accessTokenUrl: Secrets.shared.value(for: "flysto.accessTokenUrl"),
                             responseType: "code")
         self.oauth.allowMissingStateCheck = true
+        #if targetEnvironment(macCatalyst)
+        self.oauth.authorizeURLHandler = OAuthSwiftOpenURLExternally.sharedInstance
+        #else
         self.oauth.authorizeURLHandler = SafariURLHandler(viewController: self.viewController, oauthSwift: self.oauth)
+        #endif
         
     }
     
