@@ -4,7 +4,7 @@ This app is currently in development and a work in progress.
 
 ## Goal
 
-This app is about simplifying the workflow around management of Garmin 1000, Perspective and Perspective+ Flight logs.
+This app is about simplifying the workflow around management of Garmin G1000, Perspective and Perspective+ Flight logs.
 
 The usage is:
 
