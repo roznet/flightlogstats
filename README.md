@@ -1,4 +1,4 @@
-# Flight Log Stats
+# ![icon](https://raw.githubusercontent.com/roznet/flightlogstats/main/flightlogstats/Assets.xcassets/AppIcon.appiconset/icon-72.png) Flight Log Stats
 
 This app is currently in development and a work in progress.
 
