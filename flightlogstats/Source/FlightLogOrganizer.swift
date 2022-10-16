@@ -471,6 +471,7 @@ class FlightLogOrganizer {
     private var cachedLocalFlightLogList : FlightLogFileList? = nil
     
     func syncCloud() {
+        self.cloudFolder = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
         guard cloudFolder != nil else {
             Logger.sync.info("iCloud not setup, skipping sync")
             return
