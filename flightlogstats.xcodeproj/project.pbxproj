@@ -513,6 +513,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4280C8A4280D43E500A0FB32 /* Build configuration list for PBXNativeTarget "FlightLogStats" */;
 			buildPhases = (
+				4210A7BB2903218C00D09017 /* Run Script Validate Secrets.json */,
 				4280C876280D43E400A0FB32 /* Sources */,
 				4280C877280D43E400A0FB32 /* Frameworks */,
 				4280C878280D43E400A0FB32 /* Resources */,
@@ -663,6 +664,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4210A7BB2903218C00D09017 /* Run Script Validate Secrets.json */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script Validate Secrets.json";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\nSECRETS=$SRCROOT/flightlogstats/secrets.json\nSAMPLE_SECRETS=$SRCROOT/flightlogstats/secrets.sample.json\n\nif [ -f $SECRETS ]; then\n    echo \"Checked $SECRETS\"\nelse\n    if [ -f $SAMPLE_SECRETS ]; then\n        echo \"Creating $SECRETS\"\n        /bin/cp $SAMPLE_SECRETS $SECRETS\n    fi\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4280C876280D43E400A0FB32 /* Sources */ = {
