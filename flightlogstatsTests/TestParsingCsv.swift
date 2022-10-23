@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import FlightLog1000
+@testable import FlightLogStats
 import RZUtils
 import TabularData
 import OSLog

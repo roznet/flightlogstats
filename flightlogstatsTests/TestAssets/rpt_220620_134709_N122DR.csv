@@ -1,0 +1,1249 @@
+System Info,v2.00
+Aircraft Report Version,Date,Time,GDU Software Version,Airframe Name,System ID,System Part Number,System Version,Cockpit Ref Guide Part Number,Aircraft Identifier,Aircraft Serial Number,Flight Time (seconds)
+"3","06-20-2022","13:47:09","21.50.5","Cirrus SR22 Turbo","000000025B289D04","006-B2647-N8","2647.N8","GPN 190-02184-XX","N122DR ","","647953"
+
+Product Data,v2.00
+LRU,Status,Serial Number,SW Part Number,Version,Product String,Description,Model Number,Functions Present,Parent LRU,Power-on Count,Power-on Time
+"CO GUARDIAN","OK","PCOG452","","","Aero-452","CO GUARDIAN CO Detector","0","0",,,
+"COM 1","OK","","006-B2371-02","2.02","COM 64","COM SYS","0","0",,,
+"COM 1 Aircraft CONFIG","OK","","","","","","0","0","COM 1",,
+"COM 1 System","OK","","006-B2371-02","2.02","COM 64","COM SYS","0","0","COM 1",,
+"COM 1 Boot Block","N/A","","006-B2371-BA","2.00","","GIA 64 COM/NAV Bootblock SW","0","0","COM 1",,
+"COM 1 Region List","OK","","006-D6512-00","2.00","","GIA64 COM Region List","0","0","COM 1",,
+"COM 1 GARMIN Public Key","N/A","","006-D6512-K0","2.00","","GIA64 COM Key Region","0","0","COM 1",,
+"COM 2","OK","","006-B2371-02","2.02","COM 64","COM SYS","0","0",,,
+"COM 2 Aircraft CONFIG","OK","","","","","","0","0","COM 2",,
+"COM 2 System","OK","","006-B2371-02","2.02","COM 64","COM SYS","0","0","COM 2",,
+"COM 2 Boot Block","N/A","","006-B2371-BA","2.00","","GIA 64 COM/NAV Bootblock SW","0","0","COM 2",,
+"COM 2 Region List","OK","","006-D6512-00","2.00","","GIA64 COM Region List","0","0","COM 2",,
+"COM 2 GARMIN Public Key","N/A","","006-D6512-K0","2.00","","GIA64 COM Key Region","0","0","COM 2",,
+"FS510","OK","402006523","006-B2021-71","2.71","FS 510","FS 510 System Software","1","0",,,
+"FS510 System","N/A","402006523","006-B2021-71","2.71","FS 510","FS 510 System Software","1","0","FS510",,
+"FS510 FPGA","N/A","","006-C0166-21","2.1","","FS 510 XILINX","1","0","FS510",,
+"FS510 FPGA","N/A","","006-C0166-21","2.1","","FS 510 XILINX","0","0","FS510",,
+"GCU 1","OK","4RJ000810","006-B0742-12","3.10","GCU/GMC SYS","G1000 GCU/GMC SYS","50","0",,,
+"GDC 1","OK","3KY002526","006-B1838-58","2.08","GSU75 ADC","GSU75 ADC","0","0",,,
+"GDC 1 Aircraft CONFIG","OK","","006-D6037-13","2.00","","GDC 72/GSU 75 ADC Cirrus SR2","0","0","GDC 1",,
+"GDC 1 BB","N/A","","006-B1838-BD","2.02","","GSU75/GRS79/GDC72 BBL","0","0","GDC 1",,
+"GDC 1 RGN LIST","N/A","","006-D5080-50","2.00","","GSU75 ADC region list","0","0","GDC 1",,
+"GDC 2","OK","3KY002528","006-B1838-58","2.08","GSU75 ADC","GSU75 ADC","0","0",,,
+"GDC 2 Aircraft CONFIG","OK","","006-D6037-13","2.00","","GDC 72/GSU 75 ADC Cirrus SR2","0","0","GDC 2",,
+"GDC 2 BB","N/A","","006-B1838-BD","2.02","","GSU75/GRS79/GDC72 BBL","0","0","GDC 2",,
+"GDC 2 RGN LIST","N/A","","006-D5080-50","2.00","","GSU75 ADC region list","0","0","GDC 2",,
+"GEA 1","OK","497001565","006-B2139-09","2.60","GEA 71B","GEA71B System Software","0","0",,,
+"GEA 1 Aircraft CONFIG","OK","497001565","","","GEA 71B","GEA rgn 5, format v2","0","0","GEA 1",,
+"GEA 1 System","OK","497001565","006-B2139-09","2.60","GEA 71B","GEA71B System Software","0","0","GEA 1",,
+"GEA 1 Boot Block","N/A","497001565","006-B2139-BC","2.60","GEA 71B","GEA71B Boot Block Software","0","0","GEA 1",,
+"GEA 1 Aircraft CAL","N/A","497001565","","","GEA 71B","GEA rgn 17, format v3","0","0","GEA 1",,
+"GEA 1 Region List","OK","497001565","006-D6358-01","2.30","GEA 71B","GEA 71B Region List","0","0","GEA 1",,
+"GEA 1 Rigging Data","N/A","497001565","","","GEA 71B","GEA rgn 68, format v1","0","0","GEA 1",,
+"GEA 1 XHTML Templates","N/A","497001565","006-D6358-HG","2.40","GEA 71B","GEA 71B XHTML","0","0","GEA 1",,
+"GEA 1 GARMIN Public Key","N/A","497001565","006-D6358-K1","3.00","GEA 71B","GEA71B Key Region","0","0","GEA 1",,
+"GFC","N/A","","","","","","0","0",,,
+"GFC CERT GIA 1","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GIA 1",,
+"GFC CERT GIA 2","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GIA 2",,
+"GFC CERT P C","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GSA PTCH CTL",,
+"GFC CERT P C AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GFC CERT P C",,
+"GFC CERT P M","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GSA PTCH MON",,
+"GFC CERT P M AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GFC CERT P M",,
+"GFC CERT PT","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GTA PTCH TRM",,
+"GFC CERT PT AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GFC CERT PT",,
+"GFC CERT R C","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GSA ROLL CTL",,
+"GFC CERT R C AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GFC CERT R C",,
+"GFC CERT R M","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GSA ROLL MON",,
+"GFC CERT R M AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GFC CERT R M",,
+"GFC CERT Y C","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GSA YAW CTL",,
+"GFC CERT Y C AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GFC CERT Y C",,
+"GFC CERT Y M","N/A","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GSA YAW MON",,
+"GFC CERT Y M AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","1","19","GFC CERT Y M",,
+"GIA 1","OK","4SK005601","006-B2548-12","2.19","GIA64 SYS","GIA64 SYS commit: 461fd0f","5","15",,"991",
+"GIA 1 Aircraft CONFIG","OK","","","","","","5","15","GIA 1",,
+"GIA 1 A429 CONFIG","OK","","","1.27","","","5","15","GIA 1",,
+"GIA 1 GEA CONFIG","OK","","","","","","5","15","GIA 1",,
+"GIA 1 Region List","OK","","006-D6318-03","2.10","","GIA64 MAIN REGION LIST","5","15","GIA 1",,
+"GIA 1 FPGA","OK","","006-C0164-01","1.10","","GIA6300 Main Board FPGA","5","15","GIA 1",,
+"GIA 1 System","OK","4SK005601","006-B2548-12","2.19","GIA64 SYS","GIA64 SYS commit: 461fd0f","5","15","GIA 1",,
+"GIA 1 Boot Block","N/A","","006-B2548-BC","2.02","","GIA64 BB commit: 0ecfd73","5","15","GIA 1",,
+"GIA 1 XHTML Templates","N/A","","006-D6813-0C","2.16","","GIA64 XHTML","5","15","GIA 1",,
+"GIA 1 GARMIN Public Key","N/A","","006-D6704-K2","1.04","","GIA64 Main Key Region","5","15","GIA 1",,
+"GIA 1 AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","5","15","GIA 1",,
+"GIA 1 AUDIO","N/A","","006-D0425-29","4.09","","Alert Audio","0","0","GIA 1",,
+"GIA 1 AUDIO Audio CONFIG","OK","","","","","","0","0","GIA 1 AUDIO",,
+"GIA 1 AUDIO Audio Database","OK","","006-D0425-29","4.09","","Alert Audio","0","0","GIA 1 AUDIO",,
+"GIA 1 BB","N/A","","006-B2548-BC","2.02","","GIA64 BB commit: 0ecfd73","0","0","GIA 1",,
+"GIA 2","OK","4SK005580","006-B2548-12","2.19","GIA64 SYS","GIA64 SYS commit: 461fd0f","5","15",,"1021",
+"GIA 2 Aircraft CONFIG","OK","","","","","","5","15","GIA 2",,
+"GIA 2 A429 CONFIG","Unknown","","","","","","5","15","GIA 2",,
+"GIA 2 GEA CONFIG","OK","","","","","","5","15","GIA 2",,
+"GIA 2 Region List","OK","","006-D6318-03","2.10","","GIA64 MAIN REGION LIST","5","15","GIA 2",,
+"GIA 2 FPGA","OK","","006-C0164-01","1.10","","GIA6300 Main Board FPGA","5","15","GIA 2",,
+"GIA 2 System","OK","4SK005580","006-B2548-12","2.19","GIA64 SYS","GIA64 SYS commit: 461fd0f","5","15","GIA 2",,
+"GIA 2 Boot Block","N/A","","006-B2548-BC","2.02","","GIA64 BB commit: 0ecfd73","5","15","GIA 2",,
+"GIA 2 XHTML Templates","N/A","","006-D6813-0C","2.16","","GIA64 XHTML","5","15","GIA 2",,
+"GIA 2 GARMIN Public Key","N/A","","006-D6704-K2","1.04","","GIA64 Main Key Region","5","15","GIA 2",,
+"GIA 2 AFCS Gains","OK","-","006-D0938-35","2.35","GFC700","SR2X Cert Gains","5","15","GIA 2",,
+"GIA 2 AUDIO","N/A","","006-D0425-29","4.09","","Alert Audio","0","0","GIA 2",,
+"GIA 2 AUDIO Audio CONFIG","OK","","","","","","0","0","GIA 2 AUDIO",,
+"GIA 2 AUDIO Audio Database","OK","","006-D0425-29","4.09","","Alert Audio","0","0","GIA 2 AUDIO",,
+"GIA 2 BB","N/A","","006-B2548-BC","2.02","","GIA64 BB commit: 0ecfd73","0","0","GIA 2",,
+"GMA 1","OK","1UF202894","006-B2103-05","5.20C","GMA 35xc","GMA 35xc Audio Processor","0","1",,"825","1616105"
+"GMA 1 Region List","OK","","006-D3035-D8","5.20C","","GMA35xc Audio Region List","0","1","GMA 1",,
+"GMA 1 Boot Block","N/A","","006-B2103-BH","5.20C","","GMA35xc Audio Boot Software","0","1","GMA 1",,
+"GMA 1 System","OK","1UF202894","006-B2103-05","5.20C","GMA 35xc","GMA 35xc Audio Processor","0","1","GMA 1",,
+"GMA 1 Audio CONFIG","OK","","006-D3035-EP","5.21C","","ARC GMA350c G1XXX","0","1","GMA 1",,
+"GMA 1 GARMIN Public Key","N/A","","006-D3035-DA","5.01C","","GMA35xc Audio Key Region","0","1","GMA 1",,
+"GMA 1 ARC","N/A","","006-D3035-EP","5.21C","","ARC GMA350c G1XXX","0","0","GMA 1",,
+"GMA 1 AUX","OK","1UF202894","006-B2104-05","5.20C","GMA 35xc","GMA 35xc AUX Processor","0","0",,"795","1623302"
+"GMA 1 AUX Region List","OK","","006-D3034-B7","5.20C","","GMA35xc Aux Region List","0","0","GMA 1 AUX",,
+"GMA 1 AUX Boot Block","N/A","","006-B2104-BH","5.20C","","GMA35xc Aux Boot Software","0","0","GMA 1 AUX",,
+"GMA 1 AUX System","OK","1UF202894","006-B2104-05","5.20C","GMA 35xc","GMA 35xc AUX Processor","0","0","GMA 1 AUX",,
+"GMA 1 AUX Audio Database","OK","","006-D3034-36","4.20C","","GMA 35xc Audio Data","0","0","GMA 1 AUX",,
+"GMA 1 AUX ASR CONFIG 1","N/A","","006-D3034-C4","5.50","","GMA x3xx ASR Grammars","0","0","GMA 1 AUX",,
+"GMA 1 AUX ASR CONFIG 2","N/A","","006-D3034-08","2.00","","GMA x3xx ASR Language Model","0","0","GMA 1 AUX",,
+"GMA 1 AUX ASR CONFIG 3","N/A","","006-D3034-09","2.00","","GMA x3xx ASR DDG2P","0","0","GMA 1 AUX",,
+"GMA 1 AUX Unit Data","N/A","","006-D3034-31","4.20C","","GMA 35xc Config Region","0","0","GMA 1 AUX",,
+"GMA 1 AUX GARMIN Public Key","N/A","","006-D3034-B9","5.01C","","GMA35xc Aux Key Region","0","0","GMA 1 AUX",,
+"GMA 1 AUX Text-to-Speech Data","N/A","","006-D3034-24","4.10","","GMA x3xx TTS Voice Data","0","0","GMA 1 AUX",,
+"GMA 1 AUX Text-to-Speech Grammar","N/A","","006-D3034-C5","5.50","","GMA x3xx TTS Grammars","0","0","GMA 1 AUX",,
+"GMA 1 AUX AUD","N/A","","006-D3034-36","4.20C","","GMA 35xc Audio Data","0","0","GMA 1 AUX",,
+"GMA 1 AUX BB","N/A","","006-B2104-BH","5.20C","","GMA35xc Aux Boot Software","0","0","GMA 1 AUX",,
+"GMA 1 AUX RGN","N/A","","006-D3034-B7","5.20C","","GMA35xc Aux Region List","0","0","GMA 1 AUX",,
+"GMA 1 BB","N/A","","006-B2103-BH","5.20C","","GMA35xc Audio Boot Software","0","0","GMA 1",,
+"GMA 1 FPGA","N/A","","","","","","0","0","GMA 1",,
+"GMA 1 RGN","N/A","","006-D3035-D8","5.20C","","GMA35xc Audio Region List","0","0","GMA 1",,
+"GMC 1","OK","2ZN201065","006-B0742-13","3.11","GCU/GMC SYS","G1000 GCU/GMC SYS","34","0",,,
+"GMU 1","OK","1CM026092","006-B0224-01","2.05","GMU44 SYS","","0","0",,,
+"GMU 1 FPGA","N/A","","006-C0048-00","2.00","","GMU44 XILINX","0","0","GMU 1",,
+"GMU 2","OK","1CM026091","006-B0224-01","2.05","GMU44 SYS","","0","0",,,
+"GMU 2 FPGA","N/A","","006-C0048-00","2.00","","GMU44 XILINX","0","0","GMU 2",,
+"GPS 1","OK","14516442063","006-B1827-20","8.0","WAAS ENGINE","01/15/2019","0","0",,,
+"GPS 2","OK","14516442070","006-B1827-20","8.0","WAAS ENGINE","01/15/2019","0","0",,,
+"GRS 1","OK","3KY002526","006-B1838-09","2.09","GSU75 AHRS","GSU75 AHRS","0","0",,,
+"GRS 1 Aircraft CONFIG","OK","","006-D6038-22","2.00","","GSU 75 AHRS CONFIG CIRRUS SR","0","0","GRS 1",,
+"GRS 1 Boot Block","N/A","","006-B1838-BD","2.02","","GSU75/GRS79/GDC72 BBL","0","0","GRS 1",,
+"GRS 1 Region List","OK","","006-D5080-00","2.00","","GSU75 AHRS region list","0","0","GRS 1",,
+"GRS 1 MV DB","N/A","","006-D2658-02","2020.00","","IGRF MODEL PARAMETERS ","0","0","GRS 1",,
+"GRS 2","OK","3KY002528","006-B1838-09","2.09","GSU75 AHRS","GSU75 AHRS","0","0",,,
+"GRS 2 Aircraft CONFIG","OK","","006-D6038-22","2.00","","GSU 75 AHRS CONFIG CIRRUS SR","0","0","GRS 2",,
+"GRS 2 Boot Block","N/A","","006-B1838-BD","2.02","","GSU75/GRS79/GDC72 BBL","0","0","GRS 2",,
+"GRS 2 Region List","OK","","006-D5080-00","2.00","","GSU75 AHRS region list","0","0","GRS 2",,
+"GRS 2 MV DB","N/A","","006-D2658-02","2020.00","","IGRF MODEL PARAMETERS ","0","0","GRS 2",,
+"GSA PTCH CTL","OK","1A1021785","006-B0398-46","3.56","GSA8X SYS","","0","0",,,
+"GSA PTCH CTL System","OK","1A1021785","006-B0398-46","3.56","GSA8X SYS","","0","0","GSA PTCH CTL",,
+"GSA PTCH MON","OK","1A1021785","006-B0398-46","3.56","GSA8X SYS","","0","0",,,
+"GSA PTCH MON System","OK","1A1021785","006-B0398-46","3.56","GSA8X SYS","","0","0","GSA PTCH MON",,
+"GSA ROLL CTL","OK","1A1021965","006-B0398-46","3.56","GSA8X SYS","","0","0",,,
+"GSA ROLL CTL System","OK","1A1021965","006-B0398-46","3.56","GSA8X SYS","","0","0","GSA ROLL CTL",,
+"GSA ROLL MON","OK","1A1021965","006-B0398-46","3.56","GSA8X SYS","","0","0",,,
+"GSA ROLL MON System","OK","1A1021965","006-B0398-46","3.56","GSA8X SYS","","0","0","GSA ROLL MON",,
+"GSA YAW CTL","OK","19Z011947","006-B0398-46","3.56","GSA8X SYS","","0","0",,,
+"GSA YAW CTL System","OK","19Z011947","006-B0398-46","3.56","GSA8X SYS","","0","0","GSA YAW CTL",,
+"GSA YAW MON","OK","19Z011947","006-B0398-46","3.56","GSA8X SYS","","0","0",,,
+"GSA YAW MON System","OK","19Z011947","006-B0398-46","3.56","GSA8X SYS","","0","0","GSA YAW MON",,
+"GSR 1","OK","1NZ007892","","","GSR 56","300025060902970","0","0",,,
+"GTA PTCH TRM","OK","66905652","006-B0267-27","3.16","GTA82 SYS","","0","0",,,
+"GTA PTCH TRM Boot Block","N/A","66905652","006-B0267-BD","3.10","GTA82 BB","","0","0","GTA PTCH TRM",,
+"GTA PTCH TRM System","OK","66905652","006-B0267-27","3.16","GTA82 SYS","","0","0","GTA PTCH TRM",,
+"GTS","OK","15L011326","006-B0551-35","4.13","GTS800","GTS8XX TRAFFIC SYSTEM","0","0",,"825","1602424"
+"GTS AIRPORT DB","N/A","","","","","","0","0","GTS",,
+"GTS AUDIO","N/A","","006-D0726-00","2.00","","GTS8XX AUDIO REGION","0","0","GTS",,
+"GTS FPGA","N/A","","006-C0081-20","2.0","","GTS8XX FPGA","0","0","GTS",,
+"GTS MAGENTIC VAR","N/A","","006-D0159-03","2015.00","","IGRF MODEL PARAMETERS ","0","0","GTS",,
+"GTS RGN LIST","N/A","","006-D0725-02","4.00","","GTS8XX REGION LIST","0","0","GTS",,
+"GTX 1","OK","3EF020857","006-B1607-0K","2.60","GTX 335","XPDR Main Board System","2","0",,,
+"GTX 1 Unit Data","OK","","","104","","Unit Configuration","2","0","GTX 1",,
+"GTX 1 Wiring CONFIG","OK","","","102","","Wire Configuration","2","0","GTX 1",,
+"GTX 1 Synched CONFIG","OK","","","100","","Sync Configuration","2","0","GTX 1",,
+"GTX 1 System","OK","3EF020857","006-B1607-0K","2.60","GTX 335","XPDR Main Board System","2","0","GTX 1",,
+"GTX 1 Audio Database","N/A","","006-D4910-01","2.02","GTX 335","Audio Database","2","0","GTX 1",,
+"GTX 1 Boot Block","N/A","","006-B1607-BC","2.05","GTX 335","Main Board Boot Block","2","0","GTX 1",,
+"GTX 1 FPGA","OK","","006-C0153-22","2.20","GTX 335","Main Board FPGA","2","0","GTX 1",,
+"GTX 1 XHTML Templates","N/A","","006-D6674-15","2.61","GTX 335","GX000 Remote Config XHTML","2","0","GTX 1",,
+"GTX 1 BB","N/A","","006-B1607-BC","2.05","GTX 335","Main Board Boot Block","0","0","GTX 1",,
+"MFD 1","OK","495201430","006-B1177-C1","21.50.5","GDU1XXX 200","GDU1XXX System Software","4","134225921",,"1066","1526835"
+"MFD 1 GARMIN Public Key","N/A","","006-D6426-02","2.02","","Garmin Public Key Region","4","134225921","MFD 1",,
+"MFD 1 FPGA","N/A","","N/A","","","","0","0","MFD 1",,
+"NAV 1","OK","","006-B2253-00","2.00","GIA 64 VLG","NAV Receiver","0","0",,,
+"NAV 1 System","OK","","006-B2253-00","2.00","GIA 64 VLG","NAV Receiver","0","0","NAV 1",,
+"NAV 1 Boot Block","N/A","","006-B2371-BA","2.00","","GIA 64 COM/NAV Bootblock SW","0","0","NAV 1",,
+"NAV 1 Region List","OK","","006-D5761-00","2.00","","GIA 64 NAV Region List","0","0","NAV 1",,
+"NAV 1 GARMIN Public Key","N/A","","006-D5761-K0","1.00","","GIA64 NAV Key Region","0","0","NAV 1",,
+"NAV 1 BB","N/A","","006-B2371-BA","2.00","","GIA 64 COM/NAV Bootblock SW","0","0","NAV 1",,
+"NAV 2","OK","","006-B2253-00","2.00","GIA 64 VLG","NAV Receiver","0","0",,,
+"NAV 2 System","OK","","006-B2253-00","2.00","GIA 64 VLG","NAV Receiver","0","0","NAV 2",,
+"NAV 2 Boot Block","N/A","","006-B2371-BA","2.00","","GIA 64 COM/NAV Bootblock SW","0","0","NAV 2",,
+"NAV 2 Region List","OK","","006-D5761-00","2.00","","GIA 64 NAV Region List","0","0","NAV 2",,
+"NAV 2 GARMIN Public Key","N/A","","006-D5761-K0","1.00","","GIA64 NAV Key Region","0","0","NAV 2",,
+"NAV 2 BB","N/A","","006-B2371-BA","2.00","","GIA 64 COM/NAV Bootblock SW","0","0","NAV 2",,
+"PFD 1","OK","495301434","006-B1177-C1","21.50.5","GDU1XXX 200","GDU1XXX System Software","1","134225985",,"1097","1526590"
+"PFD 1 GARMIN Public Key","N/A","","006-D6426-02","2.02","","Garmin Public Key Region","1","134225985","PFD 1",,
+"PFD 1 FPGA","N/A","","N/A","","","","0","0","PFD 1",,
+"WX500","OK","","STORMSCOPE","1.04 ","","","0","0",,,
+
+Database Data,v2.00
+Database,Status,Description,Cycle,Part Number,Version,Effective Date,Expiration Date
+"APT Directory DB (MFD 1)","Success","International","22D3","006-D1430-22","1.01","05-19-2022","07-14-2022"
+"AVTN STDBY DB (MFD 1)","Success","INTL-ADB2","2205","006-D5159-02   ","","05-19-2022","06-16-2022"
+"Aeronautical Charts (MFD 1)","Success","Australia IFR/VFR Charts","2203","","2.0","03-24-2022","01-01-1990"
+"Airport TRN DB (MFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"Autoland Notice (MFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"Aviation DB (MFD 1)","Success","INTL-ADB2","2206","006-D5159-02   ","","06-16-2022","07-14-2022"
+"Base Map (MFD 1)","Success","Worldwide Basemap 20M2","20M2","","5.18","01-01-1990","01-01-1990"
+"Charts CRCs (MFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"Checklist (MFD 1)","Success","Checklist","","","","01-01-1990","01-01-1990"
+"FliteCharts DB (MFD 1)","Success","FliteCharts","2206","","","06-16-2022","07-14-2022"
+"FliteCharts DB (MFD 1)","Success","FliteCharts","2206","","","06-16-2022","07-14-2022"
+"Obstacle DB (MFD 1)","Success","Worldwide Fixed-Wing","22B3","006-D4731-15","1.50","05-19-2022","07-14-2022"
+"ROAAS Database (MFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"SafeTaxi Map (MFD 1)","Success","FullCoverage SafeTaxi 22S3","22S3","","3.09","05-19-2022","07-14-2022"
+"Terrain DB (MFD 1)","Success","Worldwide","20T1","006-D2659-01","3.00","04-08-2020","01-01-1990"
+"APT Directory DB (PFD 1)","Success","International","22D3","006-D1430-22","1.01","05-19-2022","07-14-2022"
+"AVTN STDBY DB (PFD 1)","Success","INTL-ADB2","2205","006-D5159-02   ","","05-19-2022","06-16-2022"
+"Aeronautical Charts (PFD 1)","Success","US IFR/VFR Charts","1811","","2.0","10-11-2018","01-01-1990"
+"Airport TRN DB (PFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"Autoland Notice (PFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"Aviation DB (PFD 1)","Success","INTL-ADB2","2206","006-D5159-02   ","","06-16-2022","07-14-2022"
+"Base Map (PFD 1)","Success","Worldwide Basemap 20M2","20M2","","5.18","01-01-1990","01-01-1990"
+"Charts CRCs (PFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"Checklist (PFD 1)","Success","Checklist","","","","01-01-1990","01-01-1990"
+"FliteCharts DB (PFD 1)","Success","FliteCharts","1811","","","10-11-2018","11-08-2018"
+"FliteCharts DB (PFD 1)","Success","FliteCharts","1811","","","10-11-2018","11-08-2018"
+"Obstacle DB (PFD 1)","Success","Worldwide Fixed-Wing","22B3","006-D4731-15","1.50","05-19-2022","07-14-2022"
+"ROAAS Database (PFD 1)","Missing","","","","","01-01-1990","01-01-1990"
+"SafeTaxi Map (PFD 1)","Success","FullCoverage SafeTaxi 22S3","22S3","","3.09","05-19-2022","07-14-2022"
+"Terrain DB (PFD 1)","Success","Worldwide","20T1","006-D2659-01","3.00","04-08-2020","01-01-1990"
+
+Configuration IDs,v2.00
+Type,Actual,Expected
+"Fleet","240ea290","240ea290"
+"Aircraft","c4c03728","c4c03728"
+
+Transaction Log,v2.00
+---
+Activity Date:,"October-21-2021 10:31:30"
+Loader Image:,"None"
+Loader Group:,"None"
+Loader Item:,"CNFRM CFG"
+Loader Status:,"AIRCRAFT ID UPDATED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0x240EA290"
+Product Name,Status,Transaction ID
+---
+Activity Date:,"October-21-2021 10:27:47"
+Loader Image:,"010-00330-KA"
+Loader Group:,"Enable_SurfaceWatch"
+Loader Item:,"SurfaceWatch Feature Enable"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0x240EA290"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xA625BF3F"
+---
+Activity Date:,"October-21-2021 10:26:49"
+Loader Image:,"Card-e5c0"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable SVS Single PFD"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0x5E25E466"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"October-21-2021 10:25:38"
+Loader Image:,"Card-7d77"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable TAWS"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0xDD808C47"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"October-21-2021 10:24:22"
+Loader Image:,"010-00330-5C"
+Loader Group:,"Enhanced AFCS"
+Loader Item:,"Enable Enhanced AFCS"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0xBF02AB3D"
+Product Name,Status,Transaction ID
+"GIA 2","Exp Transaction ID Not Provided","0x79AC8CE0"
+"GIA 1","Exp Transaction ID Not Provided","0xDDD20E25"
+---
+Activity Date:,"October-20-2021 13:12:32"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"90-Ice Protection Options"
+Loader Item:,"Enable Vref Airspeed Bug Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0xAA155D6F"
+Product Name,Status,Transaction ID
+"DATA TYPES","Exp Transaction ID Not Provided","0x824CF44E"
+"CALIBRATION","Exp Transaction ID Not Provided","0x58DD48DE"
+"AIRFRAME","Exp Transaction ID Not Provided","0xD00AF885"
+---
+Activity Date:,"October-20-2021 13:11:53"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"90-Ice Protection Options"
+Loader Item:,"Known IPS (FIKI) Digital Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0x817E1288"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"WEIGHT AND BALANCE (FIKI)","Exp Transaction ID Not Provided","0x5B1EFF1C"
+"DATA TYPES","Exp Transaction ID Not Provided","0x2F855E7E"
+"ALERTS","Exp Transaction ID Not Provided","0x801D3EAC"
+"TRIGGERS","Exp Transaction ID Not Provided","0x33FC1BF1"
+"AIRFRAME","Exp Transaction ID Not Provided","0x68C300C6"
+"GEA 71B","Exp Transaction ID Not Provided","0x0A4F4E2D"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xCEC6963C"
+---
+Activity Date:,"October-20-2021 13:09:09"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"80-Other Options"
+Loader Item:,"WX-500 Stormscope Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0xC20001C4"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x5D4FEA85"
+---
+Activity Date:,"October-20-2021 13:08:09"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"80-Other Options"
+Loader Item:,"Oxygen Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0x72F766DD"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0x48B326D9"
+"TRIGGERS","Exp Transaction ID Not Provided","0xD0263AA8"
+"AIRFRAME","Exp Transaction ID Not Provided","0x0F8CD12D"
+"GEA 71B","Exp Transaction ID Not Provided","0x71A37189"
+"GIA 64 #2 - GEA-CFG","Exp Transaction ID Not Provided","0x49A0E445"
+"GIA 64 #1 - GEA-CFG","Exp Transaction ID Not Provided","0x49A0E445"
+---
+Activity Date:,"October-20-2021 13:06:12"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"80-Other Options"
+Loader Item:,"KN63 DME Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0xCE43A1F1"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xBB2FAFF1"
+---
+Activity Date:,"October-20-2021 13:05:38"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"80-Other Options"
+Loader Item:,"EVS Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xC4C03728"
+Fleet ID:,"0xD62A5318"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0x9CA4026B"
+---
+Activity Date:,"October-20-2021 13:04:54"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"80-Other Options"
+Loader Item:,"Enable FliteCharts"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x303B7891"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0x59E42D21"
+---
+Activity Date:,"October-20-2021 13:04:01"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"70-Audio Panel Options"
+Loader Item:,"GMA 350/350c Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x303B7891"
+Product Name,Status,Transaction ID
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GMA TTS Grammar","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GMA ASR DB1 (Grammar)","Transaction Aborted","0xFFFFFFFF"
+"GMA Audio Data","Exp Transaction ID Not Provided","0x3AA6C30D"
+"GMA Auxiliary System","Transaction Aborted","0xFFFFFFFF"
+"GMA Auxiliary Key Region","Transaction Aborted","0xFFFFFFFF"
+"GMA Auxiliary Region List","Transaction Aborted","0xFFFFFFFF"
+"GMA Auxiliary Boot Block-no S/N Chk","Transaction Aborted","0xFFFFFFFF"
+"GMA 350/350c ARC Database","Exp Transaction ID Not Provided","0xB2367233"
+"GMA 350/350c ARC Database","Transaction Aborted","0xFFFFFFFF"
+"GMA Main System","Transaction Aborted","0xFFFFFFFF"
+"GMA Main Key Region","Transaction Aborted","0xFFFFFFFF"
+"GMA Main Key Region","Transaction Aborted","0xFFFFFFFF"
+"GMA Main Region List","Transaction Aborted","0xFFFFFFFF"
+"GMA Main Boot Block-no S/N Chk","Transaction Aborted","0xFFFFFFFF"
+"AUDIO","Exp Transaction ID Not Provided","0x6CEF28B3"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x529EA0AE"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xC8347F64"
+"MANIFEST","Exp Transaction ID Not Provided","0xF0460C54"
+"AIRFRAME","Exp Transaction ID Not Provided","0x4DFCA75E"
+---
+Activity Date:,"October-20-2021 12:43:38"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"60-Data Link Options"
+Loader Item:,"GSR 56 Option (Voice/SMS/CONNEXT)"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x4854D7FA"
+Product Name,Status,Transaction ID
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0xBE38F350"
+"TRIGGERS","Exp Transaction ID Not Provided","0x025DF89F"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x580ECE42"
+"AIRFRAME","Exp Transaction ID Not Provided","0x58E31F48"
+---
+Activity Date:,"October-20-2021 12:30:50"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"50-Traffic Options"
+Loader Item:,"GTS 8XX Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0xFA5BF1D9"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GTS - SYS","Exp Transaction ID Not Provided","0xA4D7A35C"
+"GTS - SYS","Transaction Aborted","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0xB383B7C9"
+"TRIGGERS","Exp Transaction ID Not Provided","0x36BFCC7A"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xB0A49C73"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xA11536CB"
+"MANIFEST","Exp Transaction ID Not Provided","0xBA05ABB7"
+"SYSTEM","Exp Transaction ID Not Provided","0xDB502CFF"
+"AIRFRAME","Exp Transaction ID Not Provided","0x709AB490"
+---
+Activity Date:,"October-20-2021 12:28:25"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"40-Transponder Options"
+Loader Item:,"GTX 335 Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x3DE11AFB"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GTX 335 CONFIG","Exp Transaction ID Not Provided","0x6E10EC1C"
+"GTX 335 XHTML","Transaction Aborted","0xFFFFFFFF"
+"GTX 335 FPGA","Transaction Aborted","0xFFFFFFFF"
+"GTX 335 SYSTEM","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x534C5D90"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x534C5D90"
+"MANIFEST","Exp Transaction ID Not Provided","0x1984B1B7"
+"SYSTEM","Exp Transaction ID Not Provided","0xD99E731E"
+"AIRFRAME","Exp Transaction ID Not Provided","0x5B4335BC"
+---
+Activity Date:,"October-20-2021 12:18:21"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"30-Autopilot Options"
+Loader Item:,"GFC 700 Add YD Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x20E5A6D9"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"YAW SERVO GAINS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"YAW SERVO GAINS","Transaction Aborted","0xFFFFFFFF"
+"YAW SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"YAW SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x951E6F23"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x951E6F23"
+"ALERTS","Exp Transaction ID Not Provided","0x84FE89B9"
+"TRIGGERS","Exp Transaction ID Not Provided","0x9D51E03B"
+---
+Activity Date:,"October-20-2021 12:11:09"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"30-Autopilot Options"
+Loader Item:,"GFC 700 Autopilot Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x9A7B8B3E"
+Product Name,Status,Transaction ID
+"PITCH TRIM ADAPTER SOFTWARE (-20)","Serial Number Out of Range","0xFFFFFFFF"
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GAINS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GAINS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"ROLL SERVO GAINS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"ROLL SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"ROLL SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"PITCH TRIM ADAPTER GAINS","Transaction Aborted","0xFFFFFFFF"
+"PITCH TRIM ADAPTER SOFTWARE (-00)","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO GAINS","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO GAINS","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"GMC 707","Exp Transaction ID Not Provided","0x4F4865D1"
+"GEA 71B","Exp Transaction ID Not Provided","0xEC575D3A"
+"GIA 64 #2 - GEA-CFG","Exp Transaction ID Not Provided","0xD61162A3"
+"GIA 64 #2 - GAINS","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x1E6FD349"
+"GIA 64 #1 - GEA-CFG","Exp Transaction ID Not Provided","0xD61162A3"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xCEE73105"
+"MFD","Exp Transaction ID Not Provided","0x194EF9D3"
+"PFD","Exp Transaction ID Not Provided","0xF99989DC"
+"MANIFEST","Exp Transaction ID Not Provided","0x22BE92AC"
+"ALERTS","Exp Transaction ID Not Provided","0x1C493FF1"
+"TRIGGERS","Exp Transaction ID Not Provided","0x0803FD6C"
+"AIRFRAME","Exp Transaction ID Not Provided","0xB1CFBB9D"
+---
+Activity Date:,"October-20-2021 11:49:29"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"10-AHRS ADC Options"
+Loader Item:,"Dual GSU 75 ADAHRS Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x33BC6A1B"
+Product Name,Status,Transaction ID
+"GMU 44B #2","Serial Number Out of Range","0xFFFFFFFF"
+"GMU 44B #1","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2 (GMU 44B)","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #1 (GMU 44B)","Serial Number Out of Range","0xFFFFFFFF"
+"MANIFEST (GMU 44B)","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"AHRS 2","Exp Transaction ID Not Provided","0x9F00A3C9"
+"AHRS 2","Transaction Aborted","0xFFFFFFFF"
+"AHRS 2","Transaction Aborted","0xFFFFFFFF"
+"AHRS 1","Exp Transaction ID Not Provided","0x9F00A3C9"
+"AHRS 1","Transaction Aborted","0xFFFFFFFF"
+"ADC 2","Exp Transaction ID Not Provided","0x198B529B"
+"ADC 2","Transaction Aborted","0xFFFFFFFF"
+"ADC 2","Transaction Aborted","0xFFFFFFFF"
+"ADC 1","Exp Transaction ID Not Provided","0x198B529B"
+"ADC 1","Transaction Aborted","0xFFFFFFFF"
+"ADC 1","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x8E239462"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x7D117565"
+"MANIFEST","Exp Transaction ID Not Provided","0xC63BDEF8"
+"PFD","Exp Transaction ID Not Provided","0x488EC7AF"
+"MFD","Exp Transaction ID Not Provided","0x2F7606B3"
+---
+Activity Date:,"October-20-2021 10:59:25"
+Loader Image:,"006-B2647-N8"
+Loader Group:,"03-Cirrus SR22 Turbo"
+Loader Item:,"Cirrus SR22 Turbo"
+Loader Status:,"PASSED"
+Aircraft ID:,"0x9AF3CC94"
+Fleet ID:,"0x9ED449D5"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - COM","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - NAV","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - Config 429","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GPS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - AUDIO DB","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - SYS","Serial Number Out of Range","0xFFFFFFFF"
+"AUDIO - GIA 63W","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - COM","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - Config 429","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - AUDIO DB","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - SYS","Serial Number Out of Range","0xFFFFFFFF"
+"WEIGHT AND BALANCE","Exp Transaction ID Not Provided","0x6B74CB8A"
+"DATA TYPES","Exp Transaction ID Not Provided","0xC551933F"
+"ALERTS","Exp Transaction ID Not Provided","0x37FD9064"
+"TRIGGERS","Exp Transaction ID Not Provided","0x7AE86BFF"
+"AUDIO - GIA 64","Exp Transaction ID Not Provided","0x41B9A729"
+"CALIBRATION","Exp Transaction ID Not Provided","0x8AC544C9"
+"GEA 71B - XHTML/Configuration","Exp Transaction ID Not Provided","0x32C0B1F9"
+"GEA 71B - XHTML/Configuration","Transaction Aborted","0xFFFFFFFF"
+"GEA 71B - Software","Transaction Aborted","0xFFFFFFFF"
+"GEA 71B - Software","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2 - AUDIO DB","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2, COM Config","Exp Transaction ID Not Provided","0x3DD21180"
+"GIA 64 #2 - GPS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GIA 64 #2 - GPS","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2 XHTML","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2 - Config 429","Exp Transaction ID Not Provided","0xEF653156"
+"GIA 64 #2 CONFIG","Exp Transaction ID Not Provided","0x20336FCB"
+"GIA 64 #2 - SYS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GIA 64 #2 - SYS","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2 Region List","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GIA 64 #1 - AUDIO DB","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GIA 64 #1, COM Config","Exp Transaction ID Not Provided","0xD0A109F5"
+"GIA 64 #1 - GPS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GIA 64 #1 - GPS","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #1 - Config 429","Exp Transaction ID Not Provided","0xEF653156"
+"GIA 64 #1 CONFIG","Exp Transaction ID Not Provided","0x46F659D9"
+"GIA 64 #1 - SYS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GIA 64 #1 - SYS","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #1 Region List","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"GCU 479","Exp Transaction ID Not Provided","0x7E433E32"
+"MFD","Exp Transaction ID Not Provided","0x9B5CAE76"
+"PFD","Exp Transaction ID Not Provided","0xBB3A5C37"
+"MANIFEST","Exp Transaction ID Not Provided","0x03339419"
+"SYSTEM","Exp Transaction ID Not Provided","0x15494715"
+"AIRFRAME","Exp Transaction ID Not Provided","0xB90D585C"
+"CLEAR CONFIG","Transaction Passed","0x00000000"
+"CONNECT DISPLAY LRUS","Exp Transaction ID Not Provided","0xD571C2D6"
+---
+Activity Date:,"July-20-2021 10:30:03"
+Loader Image:,"010-00330-KA"
+Loader Group:,"Enable_SurfaceWatch"
+Loader Item:,"SurfaceWatch Feature Enable"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x33956792"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xA625BF3F"
+---
+Activity Date:,"July-20-2021 10:27:26"
+Loader Image:,"Card-5ee7"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable ChartView"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x4D50EE09"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"July-20-2021 10:24:59"
+Loader Image:,"Card-e5c0"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable SVS Single PFD"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xE9668F34"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"July-20-2021 10:23:43"
+Loader Image:,"Card-7d77"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable TAWS"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xD3C223A5"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"July-20-2021 10:22:05"
+Loader Image:,"010-00330-5C"
+Loader Group:,"Enhanced AFCS"
+Loader Item:,"Enable Enhanced AFCS"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xDAC2FADE"
+Product Name,Status,Transaction ID
+"GIA 2","Exp Transaction ID Not Provided","0x79AC8CE0"
+"GIA 1","Exp Transaction ID Not Provided","0xDDD20E25"
+---
+Activity Date:,"July-20-2021 10:14:41"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"90-Ice Protection Options"
+Loader Item:,"Enable Vref Airspeed Bug Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xFF313DBF"
+Product Name,Status,Transaction ID
+"DATA TYPES","Exp Transaction ID Not Provided","0x824CF44E"
+"CALIBRATION","Exp Transaction ID Not Provided","0x58DD48DE"
+"AIRFRAME","Exp Transaction ID Not Provided","0xD00AF885"
+---
+Activity Date:,"July-20-2021 10:14:22"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"90-Ice Protection Options"
+Loader Item:,"Known IPS (FIKI) Digital Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x7CD2FB92"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"WEIGHT AND BALANCE (FIKI)","Exp Transaction ID Not Provided","0x5B1EFF1C"
+"DATA TYPES","Exp Transaction ID Not Provided","0x2F855E7E"
+"ALERTS","Exp Transaction ID Not Provided","0xEB3647A3"
+"TRIGGERS","Exp Transaction ID Not Provided","0xA729D493"
+"AIRFRAME","Exp Transaction ID Not Provided","0x68C300C6"
+"GEA 71B","Exp Transaction ID Not Provided","0x0A4F4E2D"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xCB22E4E7"
+---
+Activity Date:,"July-20-2021 10:11:19"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"WX-500 Stormscope Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xF5A9C541"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xACC4FBCF"
+---
+Activity Date:,"July-20-2021 10:10:40"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"Oxygen Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x99EC43B5"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0xEEB146EF"
+"TRIGGERS","Exp Transaction ID Not Provided","0xAFF7F149"
+"AIRFRAME","Exp Transaction ID Not Provided","0x755CBCC3"
+"GEA 71B","Exp Transaction ID Not Provided","0x71A37189"
+"GIA 64 #2 - GEA-CFG","Exp Transaction ID Not Provided","0x199DC4E7"
+"GIA 64 #1 - GEA-CFG","Exp Transaction ID Not Provided","0x199DC4E7"
+---
+Activity Date:,"July-20-2021 10:08:54"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"KN63 DME Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x63D5F1CB"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x0DE8CBFF"
+---
+Activity Date:,"July-20-2021 10:08:29"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"EVS Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x12FC23E4"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0x1BAFC128"
+---
+Activity Date:,"July-20-2021 10:07:37"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"70-Audio Panel Options"
+Loader Item:,"GMA 350/350c Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x85ACE236"
+Product Name,Status,Transaction ID
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350/350c ARC Database","Exp Transaction ID Not Provided","0x024428BE"
+"AUDIO","Exp Transaction ID Not Provided","0x6CEF28B3"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xCF855FFE"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xACC4FBCF"
+"SYSTEM","Exp Transaction ID Not Provided","0x239D18D2"
+"AIRFRAME","Exp Transaction ID Not Provided","0x4DFCA75E"
+---
+Activity Date:,"July-20-2021 10:05:50"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"60-Data Link Options"
+Loader Item:,"GSR 56 Option (Voice/SMS/CONNEXT)"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x6600799A"
+Product Name,Status,Transaction ID
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0x873E6847"
+"TRIGGERS","Exp Transaction ID Not Provided","0xBBF23A4C"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x3F95D78B"
+"AIRFRAME","Exp Transaction ID Not Provided","0x58E31F48"
+---
+Activity Date:,"July-20-2021 10:04:45"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"50-Traffic Options"
+Loader Item:,"GTS 8XX Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xA86FC95A"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GTS - SYS","Exp Transaction ID Not Provided","0xA4D7A35C"
+"ALERTS","Exp Transaction ID Not Provided","0x7D3D00B7"
+"TRIGGERS","Exp Transaction ID Not Provided","0xFE7F44C6"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x5695AF7A"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x34290ED3"
+"MANIFEST","Exp Transaction ID Not Provided","0x11494DFA"
+"SYSTEM","Exp Transaction ID Not Provided","0xDB502CFF"
+"AIRFRAME","Exp Transaction ID Not Provided","0x709AB490"
+---
+Activity Date:,"July-20-2021 10:03:33"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"40-Transponder Options"
+Loader Item:,"GTX 335 Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xAE1F9301"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GTX 335 CONFIG","Exp Transaction ID Not Provided","0x54C3A47C"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xACC4FBCF"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xACC4FBCF"
+"MANIFEST","Exp Transaction ID Not Provided","0x01EF0FDE"
+"SYSTEM","Exp Transaction ID Not Provided","0xD99E731E"
+"AIRFRAME","Exp Transaction ID Not Provided","0x5B4335BC"
+---
+Activity Date:,"July-20-2021 10:00:49"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"30-Autopilot Options"
+Loader Item:,"GFC 700 Add YD Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x80B31110"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x9E01F397"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x9E01F397"
+"ALERTS","Exp Transaction ID Not Provided","0x8AB18D17"
+"TRIGGERS","Exp Transaction ID Not Provided","0x6C5FFA49"
+---
+Activity Date:,"July-20-2021 10:00:03"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"30-Autopilot Options"
+Loader Item:,"GFC 700 Add YD Installation Option"
+Loader Status:,"FAILED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x86FCAB6B"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Transaction Aborted","0x9E01F397"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x9E01F397"
+"ALERTS","Exp Transaction ID Not Provided","0x8AB18D17"
+"TRIGGERS","Exp Transaction ID Not Provided","0x6C5FFA49"
+---
+Activity Date:,"July-20-2021 09:57:11"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"30-Autopilot Options"
+Loader Item:,"GFC 700 Autopilot Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x7282C0E8"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GAINS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GAINS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GMC 707","Exp Transaction ID Not Provided","0x4F4865D1"
+"GEA 71B","Exp Transaction ID Not Provided","0x4A88AE47"
+"GIA 64 #2 - GEA-CFG","Exp Transaction ID Not Provided","0xDD29F1EE"
+"GIA 64 #1 - GEA-CFG","Exp Transaction ID Not Provided","0xDD29F1EE"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x1F87495B"
+"MFD","Exp Transaction ID Not Provided","0x194EF9D3"
+"PFD","Exp Transaction ID Not Provided","0xF99989DC"
+"MANIFEST","Exp Transaction ID Not Provided","0xFA2A6344"
+"ALERTS","Exp Transaction ID Not Provided","0xC7E56459"
+"TRIGGERS","Exp Transaction ID Not Provided","0xB7340CE9"
+"AIRFRAME","Exp Transaction ID Not Provided","0xB1CFBB9D"
+---
+Activity Date:,"July-20-2021 09:53:33"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"10-AHRS ADC Options"
+Loader Item:,"Dual GSU 75 ADAHRS Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x0CBB9911"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"AHRS 2","Exp Transaction ID Not Provided","0x36362B89"
+"AHRS 1","Exp Transaction ID Not Provided","0x36362B89"
+"ADC 2","Exp Transaction ID Not Provided","0x1A8FD799"
+"ADC 1","Exp Transaction ID Not Provided","0x1A8FD799"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xA1ADE0C6"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xA1ADE0C6"
+"MANIFEST","Exp Transaction ID Not Provided","0x3F3AD6EC"
+"PFD","Exp Transaction ID Not Provided","0x488EC7AF"
+"MFD","Exp Transaction ID Not Provided","0x2F7606B3"
+---
+Activity Date:,"July-20-2021 09:44:23"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"03-Cirrus SR22 Turbo"
+Loader Item:,"Cirrus SR22 Turbo"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xE39356F7"
+Product Name,Status,Transaction ID
+"AUDIO - GIA 63W","Serial Number Out of Range","0xFFFFFFFF"
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - COM","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - NAV","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - Config 429","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GPS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - AUDIO DB","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - SYS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - COM","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - Config 429","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GPS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - AUDIO DB","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - SYS","Serial Number Out of Range","0xFFFFFFFF"
+"WEIGHT AND BALANCE","Exp Transaction ID Not Provided","0x3D8A122F"
+"DATA TYPES","Exp Transaction ID Not Provided","0x9C0DE8DA"
+"ALERTS","Exp Transaction ID Not Provided","0xBA877EF9"
+"TRIGGERS","Exp Transaction ID Not Provided","0xA65D3945"
+"AUDIO - GIA 64","Exp Transaction ID Not Provided","0xEB8297D7"
+"CALIBRATION","Exp Transaction ID Not Provided","0x8AC544C9"
+"GEA 71B - XHTML/Configuration","Exp Transaction ID Not Provided","0x32C0B1F9"
+"GIA 64 #2, COM Config","Exp Transaction ID Not Provided","0x3DD21180"
+"GIA 64 #2 CONFIG","Exp Transaction ID Not Provided","0xBC53E1C1"
+"GIA 64 #1, COM Config","Exp Transaction ID Not Provided","0xD0A109F5"
+"GIA 64 #1 - Config 429","Exp Transaction ID Not Provided","0xAA991939"
+"GIA 64 #1 CONFIG","Exp Transaction ID Not Provided","0xA32A493C"
+"GCU 479","Exp Transaction ID Not Provided","0x7E433E32"
+"MFD","Exp Transaction ID Not Provided","0x9B5CAE76"
+"PFD","Exp Transaction ID Not Provided","0xBB3A5C37"
+"MANIFEST","Exp Transaction ID Not Provided","0xBD90F30D"
+"SYSTEM","Exp Transaction ID Not Provided","0x4BD60536"
+"AIRFRAME","Exp Transaction ID Not Provided","0x8242416A"
+"CLEAR CONFIG","Transaction Passed","0x00000000"
+"CONNECT DISPLAY LRUS","Exp Transaction ID Not Provided","0xD571C2D6"
+---
+Activity Date:,"July-20-2021 09:34:48"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"10-AHRS ADC Options"
+Loader Item:,"Dual GSU 75 ADAHRS Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xCA001702"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"AHRS 2","Exp Transaction ID Not Provided","0x36362B89"
+"AHRS 1","Exp Transaction ID Not Provided","0x36362B89"
+"ADC 2","Exp Transaction ID Not Provided","0x1A8FD799"
+"ADC 1","Exp Transaction ID Not Provided","0x1A8FD799"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xA1ADE0C6"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xA1ADE0C6"
+"MANIFEST","Exp Transaction ID Not Provided","0x3F3AD6EC"
+"PFD","Exp Transaction ID Not Provided","0x488EC7AF"
+"MFD","Exp Transaction ID Not Provided","0x2F7606B3"
+---
+Activity Date:,"December-6-2019 14:50:48"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"Disable FliteCharts"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xCA001702"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0x6C8E6FEF"
+---
+Activity Date:,"December-5-2019 15:53:57"
+Loader Image:,"Card-5ee7"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable ChartView"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x33956792"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"December-5-2019 15:52:40"
+Loader Image:,"Card-e5c0"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable SVS Single PFD"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x97A306AF"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"December-5-2019 15:51:28"
+Loader Image:,"010-00330-KA"
+Loader Group:,"Enable_SurfaceWatch"
+Loader Item:,"SurfaceWatch Feature Enable"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xAD07AA3E"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xA625BF3F"
+---
+Activity Date:,"December-5-2019 15:50:13"
+Loader Image:,"Card-7d77"
+Loader Group:,"Configuration Files"
+Loader Item:,"Enable TAWS"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xD3C223A5"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0xFFFFFFFF"
+---
+Activity Date:,"December-5-2019 15:49:09"
+Loader Image:,"010-00330-5C"
+Loader Group:,"Enhanced AFCS"
+Loader Item:,"Enable Enhanced AFCS"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xDAC2FADE"
+Product Name,Status,Transaction ID
+"GIA 2","Exp Transaction ID Not Provided","0x79AC8CE0"
+"GIA 1","Exp Transaction ID Not Provided","0xDDD20E25"
+---
+Activity Date:,"December-5-2019 15:46:08"
+Loader Image:,"None"
+Loader Group:,"None"
+Loader Item:,"CNFRM CFG"
+Loader Status:,"AIRCRAFT ID UPDATED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xFF313DBF"
+Product Name,Status,Transaction ID
+---
+Activity Date:,"December-5-2019 15:32:49"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"90-Ice Protection Options"
+Loader Item:,"Enable Vref Airspeed Bug Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xFF313DBF"
+Product Name,Status,Transaction ID
+"DATA TYPES","Exp Transaction ID Not Provided","0x824CF44E"
+"CALIBRATION","Exp Transaction ID Not Provided","0x58DD48DE"
+"AIRFRAME","Exp Transaction ID Not Provided","0xD00AF885"
+---
+Activity Date:,"December-5-2019 15:32:10"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"90-Ice Protection Options"
+Loader Item:,"Known IPS (FIKI) Digital Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x7CD2FB92"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"WEIGHT AND BALANCE (FIKI)","Exp Transaction ID Not Provided","0x5B1EFF1C"
+"DATA TYPES","Exp Transaction ID Not Provided","0x2F855E7E"
+"ALERTS","Exp Transaction ID Not Provided","0xEB3647A3"
+"TRIGGERS","Exp Transaction ID Not Provided","0xA729D493"
+"AIRFRAME","Exp Transaction ID Not Provided","0x68C300C6"
+"GEA 71B","Exp Transaction ID Not Provided","0x0A4F4E2D"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xCB22E4E7"
+---
+Activity Date:,"December-5-2019 15:29:59"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"WX-500 Stormscope Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xF5A9C541"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xACC4FBCF"
+---
+Activity Date:,"December-5-2019 15:29:21"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"Oxygen Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xAC293CF6"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0xEEB146EF"
+"TRIGGERS","Exp Transaction ID Not Provided","0xAFF7F149"
+"AIRFRAME","Exp Transaction ID Not Provided","0x755CBCC3"
+"GEA 71B","Exp Transaction ID Not Provided","0x71A37189"
+"GIA 64 #2 - GEA-CFG","Exp Transaction ID Not Provided","0x199DC4E7"
+"GIA 64 #1 - GEA-CFG","Exp Transaction ID Not Provided","0x199DC4E7"
+---
+Activity Date:,"December-5-2019 15:27:18"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"KN63 DME Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x56108E88"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x0DE8CBFF"
+---
+Activity Date:,"December-5-2019 15:26:40"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"80-Other Options"
+Loader Item:,"EVS Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x27395CA7"
+Product Name,Status,Transaction ID
+"AIRFRAME","Exp Transaction ID Not Provided","0x1BAFC128"
+---
+Activity Date:,"December-5-2019 15:25:34"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"70-Audio Panel Options"
+Loader Item:,"GMA 350/350c Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xB0699D75"
+Product Name,Status,Transaction ID
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350 Unit Type Verification","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GMA 350/350c ARC Database","Exp Transaction ID Not Provided","0x024428BE"
+"AUDIO","Exp Transaction ID Not Provided","0x6CEF28B3"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xCF855FFE"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xACC4FBCF"
+"SYSTEM","Exp Transaction ID Not Provided","0x239D18D2"
+"AIRFRAME","Exp Transaction ID Not Provided","0x4DFCA75E"
+---
+Activity Date:,"December-5-2019 15:23:46"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"60-Data Link Options"
+Loader Item:,"GSR 56 Option (Voice/SMS/CONNEXT)"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xFB960F5C"
+Product Name,Status,Transaction ID
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0x873E6847"
+"TRIGGERS","Exp Transaction ID Not Provided","0xBBF23A4C"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x3F95D78B"
+"AIRFRAME","Exp Transaction ID Not Provided","0x58E31F48"
+---
+Activity Date:,"December-5-2019 15:23:00"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"50-Traffic Options"
+Loader Item:,"GTS 8XX Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x3EC28971"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GTS - SYS","Exp Transaction ID Not Provided","0xA4D7A35C"
+"GTS - SYS","Transaction Aborted","0xFFFFFFFF"
+"ALERTS","Exp Transaction ID Not Provided","0x7D3D00B7"
+"TRIGGERS","Exp Transaction ID Not Provided","0xFE7F44C6"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x5695AF7A"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x34290ED3"
+"MANIFEST","Exp Transaction ID Not Provided","0x11494DFA"
+"SYSTEM","Exp Transaction ID Not Provided","0xDB502CFF"
+"AIRFRAME","Exp Transaction ID Not Provided","0x709AB490"
+---
+Activity Date:,"December-5-2019 15:18:00"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"40-Transponder Options"
+Loader Item:,"GTX 335 Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x3EFD6951"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"GTX 335 CONFIG","Exp Transaction ID Not Provided","0x54C3A47C"
+"GTX 335 XHTML","Transaction Aborted","0xFFFFFFFF"
+"GTX 335 FPGA","Transaction Aborted","0xFFFFFFFF"
+"GTX 335 SYSTEM","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xACC4FBCF"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xACC4FBCF"
+"MANIFEST","Exp Transaction ID Not Provided","0x01EF0FDE"
+"SYSTEM","Exp Transaction ID Not Provided","0xD99E731E"
+"AIRFRAME","Exp Transaction ID Not Provided","0x5B4335BC"
+---
+Activity Date:,"December-5-2019 15:07:51"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"30-Autopilot Options"
+Loader Item:,"GFC 700 Add YD Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x37BD01C8"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"YAW SERVO GAINS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"YAW SERVO GAINS","Transaction Aborted","0xFFFFFFFF"
+"YAW SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"YAW SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0x9E01F397"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x9E01F397"
+"ALERTS","Exp Transaction ID Not Provided","0x8AB18D17"
+"TRIGGERS","Exp Transaction ID Not Provided","0x6C5FFA49"
+---
+Activity Date:,"December-5-2019 15:00:53"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"30-Autopilot Options"
+Loader Item:,"GFC 700 Autopilot Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0xC3C36A4B"
+Product Name,Status,Transaction ID
+"GEA 71","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2 - GAINS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GEA-CFG","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1 - GAINS","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"ROLL SERVO GAINS","Exp Transaction ID Not Provided","0xFFFFFFFF"
+"ROLL SERVO GAINS","Transaction Aborted","0xFFFFFFFF"
+"ROLL SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"PITCH TRIM ADAPTER GAINS","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO GAINS","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO GAINS","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"PITCH SERVO SOFTWARE","Transaction Aborted","0xFFFFFFFF"
+"GMC 707","Exp Transaction ID Not Provided","0x4F4865D1"
+"GEA 71B","Exp Transaction ID Not Provided","0x4A88AE47"
+"GIA 64 #2 - GEA-CFG","Exp Transaction ID Not Provided","0xDD29F1EE"
+"GIA 64 #2 - GAINS","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xDBC91022"
+"GIA 64 #1 - GEA-CFG","Exp Transaction ID Not Provided","0xDD29F1EE"
+"GIA 64 #1 - GAINS","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #1","Exp Transaction ID Not Provided","0x1F87495B"
+"MFD","Exp Transaction ID Not Provided","0x194EF9D3"
+"PFD","Exp Transaction ID Not Provided","0xF99989DC"
+"ALERTS","Exp Transaction ID Not Provided","0xC7E56459"
+"TRIGGERS","Exp Transaction ID Not Provided","0xB7340CE9"
+"AIRFRAME","Exp Transaction ID Not Provided","0xB1CFBB9D"
+---
+Activity Date:,"December-5-2019 14:43:04"
+Loader Image:,"006-B2647-N2"
+Loader Group:,"10-AHRS ADC Options"
+Loader Item:,"Dual GSU 75 ADAHRS Installation Option"
+Loader Status:,"PASSED"
+Aircraft ID:,"0xD2099979"
+Fleet ID:,"0x343A9B8C"
+Product Name,Status,Transaction ID
+"GIA 63W #2","Serial Number Out of Range","0xFFFFFFFF"
+"GIA 63W #1","Serial Number Out of Range","0xFFFFFFFF"
+"AHRS 2","Exp Transaction ID Not Provided","0x36362B89"
+"AHRS 2","Transaction Aborted","0xFFFFFFFF"
+"AHRS 2","Transaction Aborted","0xFFFFFFFF"
+"AHRS 1","Exp Transaction ID Not Provided","0x36362B89"
+"AHRS 1","Transaction Aborted","0xFFFFFFFF"
+"AHRS 1","Transaction Aborted","0xFFFFFFFF"
+"ADC 2","Exp Transaction ID Not Provided","0x1A8FD799"
+"ADC 2","Transaction Aborted","0xFFFFFFFF"
+"ADC 2","Transaction Aborted","0xFFFFFFFF"
+"ADC 1","Exp Transaction ID Not Provided","0x1A8FD799"
+"ADC 1","Transaction Aborted","0xFFFFFFFF"
+"GIA 64 #2","Exp Transaction ID Not Provided","0xA1ADE0C6"
+"GIA 64 #1","Exp Transaction ID Not Provided","0xA1ADE0C6"
+"MANIFEST","Exp Transaction ID Not Provided","0x3F3AD6EC"
+"PFD","Exp Transaction ID Not Provided","0x488EC7AF"
+"MFD","Exp Transaction ID Not Provided","0x2F7606B3"
+
+ENDRPT

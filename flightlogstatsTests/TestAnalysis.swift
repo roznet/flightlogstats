@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import FlightLog1000
+@testable import FlightLogStats
 import RZUtils
 
 final class TestAnalysis: XCTestCase {
@@ -23,9 +23,11 @@ final class TestAnalysis: XCTestCase {
         let aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0),
                                 fuelTab: FuelQuantity(total: 60.0),
                                 gph: 17.0)
-        let fuelInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: 70.0), addedfuel: FuelQuantity(left: 29.0, right: 31.0, unit: GCUnit.liter()))
+        let fuelInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: 70.0), addedfuel: FuelQuantity(left: 29.0, right: 31.0, unit: GCUnit.liter()), totalizerStartFuel: FuelQuantity(total: 92.0))
+        
         let fuelAnalysis = FuelAnalysis(aircraft: aircraft,
                                         current: FuelQuantity(left: 30.5, right: 32.2, unit: GCUnit.usgallon()),
+                                        totalizer: FuelQuantity(total: 92.0),
                                         inputs: fuelInputs)
         
         XCTAssertEqual( fuelAnalysis.addedTotal.totalWithUnit.description, "78.6 gal")
@@ -40,9 +42,11 @@ final class TestAnalysis: XCTestCase {
                                 fuelTab: FuelQuantity(total: 60.0),
                                 gph: 17.0)
         let fuelInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: 60.0),
-                                             addedfuel: FuelQuantity(left: 25.0, right: 25.0, unit: GCUnit.usgallon()))
+                                             addedfuel: FuelQuantity(left: 25.0, right: 25.0, unit: GCUnit.usgallon()),
+                                             totalizerStartFuel: FuelQuantity(total: 92.0))
         var fuelAnalysis = FuelAnalysis(aircraft: aircraft,
                                         current: FuelQuantity(left: 29.0, right: 31.0, unit: GCUnit.usgallon()),
+                                        totalizer: FuelQuantity(total: 92.0),
                                         inputs: fuelInputs)
         // first case: current.total equal target.total but current.left < target.left, don't add anything
         
@@ -52,6 +56,7 @@ final class TestAnalysis: XCTestCase {
         
         fuelAnalysis = FuelAnalysis(aircraft: aircraft,
                                    current: FuelQuantity(left: 28.0, right: 31.0, unit: GCUnit.usgallon()),
+                                    totalizer: FuelQuantity(total: 92.0),
                                    inputs: fuelInputs)
         XCTAssertEqual(fuelAnalysis.targetFuel, fuelInputs.targetFuel)
 

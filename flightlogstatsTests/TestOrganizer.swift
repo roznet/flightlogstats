@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import FlightLog1000
+@testable import FlightLogStats
 import CoreData
 import OSLog
 import RZFlight
@@ -185,7 +185,7 @@ class TestOrganizer: XCTestCase {
         log.parse()
         organizer.add(flightLogFileList: FlightLogFileList(logs: [log]))
         organizer.saveContext()
-        XCTAssertEqual(organizer.managedFlightLogs.count,1)
+        XCTAssertEqual(organizer.count,1)
         
         if let info = organizer.flightLogFileInfos.first {
             let record = FlightFuelRecord(context: container.viewContext)
@@ -195,11 +195,11 @@ class TestOrganizer: XCTestCase {
         }
         let reload = FlightLogOrganizer()
         reload.persistentContainer = container
-        XCTAssertEqual(reload.managedFlightLogs.count,0)
+        XCTAssertEqual(reload.count,0)
         reload.loadFromContainer()
-        XCTAssertEqual(reload.managedFlightLogs.count,1)
+        XCTAssertEqual(reload.count,1)
         organizer.loadFromContainer()
-        XCTAssertEqual(reload.managedFlightLogs.count,1)
+        XCTAssertEqual(reload.count,1)
         XCTAssertNotNil(reload.flightLogFileInfos.first?.fuel_record)
         if let info = reload.flightLogFileInfos.first,
            let record = info.fuel_record {
@@ -210,7 +210,7 @@ class TestOrganizer: XCTestCase {
         
         let reload2 = FlightLogOrganizer()
         reload2.persistentContainer = container
-        XCTAssertEqual(reload2.managedFlightLogs.count,0)
+        XCTAssertEqual(reload2.count,0)
         reload2.loadFromContainer()
         XCTAssertNotNil(reload2.flightLogFileInfos.first?.fuel_record)
         if let info = reload2.flightLogFileInfos.first,

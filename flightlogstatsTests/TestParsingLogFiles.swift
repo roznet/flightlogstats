@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import FlightLog1000
+@testable import FlightLogStats
 import CoreData
 import OSLog
 import RZFlight
@@ -153,7 +153,7 @@ class TestParsingLogFiles: XCTestCase {
                     phasesCount[str] = 1
                 }
             }
-            for name in [ "Ground", "Climb", "Flight", "Descent"] {
+            for name in [ "Ground", "Climb", "Cruise", "Descent"] {
                 if let count = phasesCount[name] {
                     XCTAssertGreaterThanOrEqual(count, 1)
                 }else{
@@ -255,8 +255,8 @@ class TestParsingLogFiles: XCTestCase {
             for item in 0..<dataSource.collectionView(dummy, numberOfItemsInSection: section) {
                 let indexPath = IndexPath(item: item, section: section)
                 let tableSize = layout.size(at: indexPath)
-                let cellText = dataSource.attributedString(at: indexPath)
-                let cellSize = cellText.size()
+
+                let cellSize = dataSource.size(at: indexPath)
                 XCTAssertLessThanOrEqual(cellSize.width, tableSize.width)
                 XCTAssertLessThanOrEqual(cellSize.height, tableSize.height)
             }

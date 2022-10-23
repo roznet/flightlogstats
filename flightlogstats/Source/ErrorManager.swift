@@ -21,6 +21,7 @@ class ErrorManager {
         return errors.popLast()
     }
     
+    
     func append(error : Error){
         errors.append(error)
         NotificationCenter.default.post(name: .ErrorOccured, object: self)
