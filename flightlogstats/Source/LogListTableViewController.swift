@@ -60,7 +60,10 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.buildList()
                 self.tableView.reloadData()
             },
-
+            UIAction(title: "Logout of FlySto", image: UIImage(systemName: "minus.circle")) {
+                _ in
+                Settings.shared.flystoCredentials = nil
+            },
             UIAction(title: "Toggle Filter", image: UIImage(systemName: "minus.circle")){
                 _ in
                 self.filterEmpty = !self.filterEmpty

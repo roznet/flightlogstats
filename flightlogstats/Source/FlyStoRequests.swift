@@ -21,6 +21,7 @@ class FlyStoRequests {
         case already
         case error
         case progressing(Double)
+        case tokenExpired
     }
     
     let oauth : OAuth2Swift
@@ -61,7 +62,7 @@ class FlyStoRequests {
         Settings.shared.flystoCredentials = self.oauth.client.credential
     }
     
-    func clearCredential() {
+    static func clearCredential() {
         Settings.shared.flystoCredentials = nil
     }
     
@@ -140,7 +141,7 @@ class FlyStoRequests {
                         if !tokenRefreshed {
                             self.refreshTokenAndTryAgain()
                         }else{
-                            self.clearCredential()
+                            Self.clearCredential()
                             self.end(status: .error)
                         }
                     default:
@@ -154,6 +155,37 @@ class FlyStoRequests {
         }
     }
     
+    @discardableResult func processSwiftOAuthError(error : OAuthSwiftError) -> Status {
+        switch error {
+        case .requestError(let underlyingError, _ /*request:*/ ):
+            let code = (underlyingError as NSError).code
+            
+            if code == 503 { // application error
+                // application error, login again
+                Logger.net.info("Token has expired, status: \(code)")
+                return .tokenExpired
+            }else if code == 409 {
+                Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
+                return .success
+            }else{
+                Logger.net.info("Underlying request error: \(code)")
+                return .error
+            }
+        case .accessDenied(let underlyingError, _ /*request:*/):
+            let code = (underlyingError as NSError).code
+            Logger.net.info("Access Denied: \(code)")
+            // force login
+            Settings.shared.flystoCredentials = nil
+            return .error
+        case .tokenExpired:
+            Logger.net.error("Token has expired")
+            return .tokenExpired
+        default:
+            Logger.net.error("Other error \(error.localizedDescription)")
+            return .error
+        }
+    }
+    
     func refreshTokenAndTryAgain() {
         Logger.net.info("Refreshing expired token")
         self.oauth.renewAccessToken(withRefreshToken: self.oauth.client.credential.oauthRefreshToken){
@@ -164,7 +196,7 @@ class FlyStoRequests {
                 self.saveCredential()
                 self.makeRequest(tokenRefreshed: true)
             case .failure(let error):
-                Logger.net.error("Failed to refresh token \(error.localizedDescription)")
+                self.processSwiftOAuthError(error: error)
                 self.end(status: .error)
             }
         }

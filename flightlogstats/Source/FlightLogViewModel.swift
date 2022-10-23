@@ -267,7 +267,7 @@ class FlightLogViewModel {
                     return
                 case .success,.already:
                     self.flystoStatus = .uploaded
-                case .error:
+                case .error,.tokenExpired:
                     self.flystoStatus = .failed
                 }
                 NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)
