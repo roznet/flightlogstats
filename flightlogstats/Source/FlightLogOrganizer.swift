@@ -402,7 +402,7 @@ class FlightLogOrganizer {
                         }
                         
                         for case let file as URL in fileList {
-                            if file.isLogFile {
+                            if file.logFileType != .none {
                                 found.append(file)
                             }
                             if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
@@ -431,7 +431,48 @@ class FlightLogOrganizer {
     
     //MARK: - Update local file list
     
-    func copyMissingToLocal(urls : [URL]) {
+    private func copyLogFile(file : URL, dest : URL) -> Bool {
+        var someNew : Bool = false
+        if !FileManager.default.fileExists(atPath: dest.path) {
+            do {
+                try FileManager.default.copyItem(at: file, to: dest)
+                Logger.app.info("copied \(file.lastPathComponent) to \(dest.path)")
+                someNew = true
+            } catch {
+                Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest.path)")
+            }
+        }else{
+            Logger.app.info("Already copied \(file.lastPathComponent)")
+        }
+        return someNew
+    }
+    private func copyRptFile(file : URL, destFolder : URL ) -> Bool{
+        var someNew : Bool = false
+        if let avionics = AvionicsSystem(url: file),
+           let json = try? JSONEncoder().encode(avionics) {
+            let dest = destFolder.appendingPathComponent(avionics.uniqueFileName)
+            if !FileManager.default.fileExists(atPath: dest.path) {
+                do {
+                    try json.write(to: dest)
+                    Logger.app.info("Created \(dest.lastPathComponent) from \(file.lastPathComponent)")
+                    someNew = true
+                }catch{
+                    Logger.app.error("Failed to create \(dest.lastPathComponent)")
+                }
+            }else{
+                Logger.app.info("Already created \(dest.lastPathComponent)")
+            }
+        }else{
+            Logger.app.error("Failed to parse \(file.lastPathComponent)")
+        }
+        return someNew
+    }
+    
+    /// Main logic to identify which files to import and copy, typically an SD Card
+    /// - Parameters:
+    ///   - urls: url to look for new file.
+    ///   - process: if true will also sync cloud and add to the database new files, use false for testing
+    func copyMissingToLocal(urls : [URL], process : Bool = true) {
         let destFolder = self.localFolder
         
         Self.search(in: urls ){
@@ -440,25 +481,23 @@ class FlightLogOrganizer {
             case .success(let logurls):
                 var someNew : Bool = false
                 for url in logurls {
-                    let file = url
-                    let dest = destFolder.appendingPathComponent(file.lastPathComponent)
-                    if !FileManager.default.fileExists(atPath: dest.path) {
-                        do {
-                            try FileManager.default.copyItem(at: file, to: dest)
-                            Logger.app.info("copied \(file.lastPathComponent) to \(dest)")
+                    if url.logFileType == .rpt {
+                        if self.copyRptFile(file: url,destFolder: destFolder) {
                             someNew = true
-                        } catch {
-                            Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest)")
                         }
                     }else{
-                        Logger.app.info("Already copied \(file.lastPathComponent)")
+                        let dest = destFolder.appendingPathComponent(url.lastPathComponent)
+                        if self.copyLogFile(file: url, dest: dest) {
+                            someNew = true
+                        }
                     }
                 }
                 if someNew {
-                    Logger.app.info("Local File list has update")
-                    self.addMissingFromLocal()
-                    self.syncCloud()
-                    NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+                    if process {
+                        Logger.app.info("Local File list has update")
+                        self.addMissingFromLocal()
+                        self.syncCloud()
+                    }
                 }
             case .failure(let error):
                 Logger.app.error("Failed to find url \(error.localizedDescription)")
@@ -534,14 +573,14 @@ class FlightLogOrganizer {
         // Gather what is in what to check what is missing
         for cloudUrl in cloudUrls {
             let lastComponent = cloudUrl.lastPathComponent
-            if lastComponent.isLogFile {
+            if lastComponent.logFileType != .none {
                 existingInCloud.insert(lastComponent)
             }
         }
         
         for localUrl in localUrls {
             let lastComponent = localUrl.lastPathComponent
-            if lastComponent.isLogFile {
+            if lastComponent.logFileType != .none {
                 existingInLocal.insert(lastComponent)
             }
         }
@@ -551,7 +590,7 @@ class FlightLogOrganizer {
         
         for cloudUrl in cloudUrls {
             let lastComponent = cloudUrl.lastPathComponent
-            if lastComponent.isLogFile {
+            if lastComponent.logFileType != .none {
                 if !existingInLocal.contains(lastComponent) {
                     Logger.sync.info( "copy to local \(cloudUrl.lastPathComponent)")
                     copyCloudToLocal.append(NSFileAccessIntent.readingIntent(with: cloudUrl))
@@ -568,7 +607,7 @@ class FlightLogOrganizer {
             let lastComponent = localUrl.lastPathComponent
             self.progress?.update(state: .progressing(done/totalCount), message: .iCloudSync)
             done += 1.0
-            if lastComponent.isLogFile {
+            if lastComponent.logFileType != .none {
                 if !existingInCloud.contains(lastComponent) {
                     copyLocalToCloud.append(localUrl)
                     if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
@@ -620,7 +659,31 @@ class FlightLogOrganizer {
 }
 
 extension String {
-    var isLogFile : Bool { return self.hasPrefix("log_") && self.hasSuffix(".csv") }
+    enum LogFileType {
+        case log
+        case aircraft
+        case rpt
+        case none
+    }
+    
+    var isAircraftSystemFile : Bool { return self.logFileType == .aircraft }
+    var isRptFile : Bool { return self.logFileType == .rpt }
+    var isLogFile : Bool { self.logFileType == .log }
+    
+    var logFileType : LogFileType {
+        if self.hasSuffix(".csv") {
+            if self.hasPrefix("log_") {
+                return .log
+            } else if self.hasPrefix("rpt_") {
+                return .rpt
+            }
+        }else if self.hasSuffix(".json") {
+            if self.hasPrefix("sys_") {
+                return .aircraft
+            }
+        }
+        return .none
+    }
     var logFileGuessedAirport : String? {
         if self.isLogFile {
             let d = (self as NSString).deletingPathExtension
@@ -633,6 +696,8 @@ extension String {
 }
 
 extension URL {
+    typealias LogFileType = String.LogFileType
+    var logFileType : LogFileType { return self.lastPathComponent.logFileType }
     var isLogFile : Bool { return self.lastPathComponent.isLogFile }
 }
 

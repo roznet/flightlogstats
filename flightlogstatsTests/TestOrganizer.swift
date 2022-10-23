@@ -16,29 +16,61 @@ import RZUtils
 
 class TestOrganizer: XCTestCase {
     
+    func prepareAndClearFolder(url : URL) -> Bool {
+        var isDirectory : ObjCBool = false
+        if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
+            guard isDirectory.boolValue else{
+                Logger.test.error("\(url.path) is not a directory")
+                return false
+            }
+            
+            let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
+            
+            guard let fileList = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys) else {
+                return false
+            }
+            
+            for case let file as URL in fileList {
+                do {
+                    if FileManager.default.fileExists(atPath: file.path) {
+                        try FileManager.default.removeItem(at: file)
+                    }
+                }catch{
+                    Logger.test.error("Failed to remove file for testing \(error.localizedDescription)")
+                    return false
+                }
+            }
+            
+        }else{ // does not exist, create
+            do {
+                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: false)
+            }catch{
+                Logger.test.error("Failed to create directory \(url.path)")
+                return false
+            }
+        }
+        return true
+    }
+    
     /// quick helper to find log file
     /// - Parameter dirurl: url to search
     /// - Returns: list of found files
-    func findLocalLogFiles(dirurl : URL) -> [URL] {
+    func findLocalLogFiles(url : URL, types : [String.LogFileType] ) -> [URL] {
         var found : [URL] = []
         
         var isDirectory : ObjCBool = false
-        if FileManager.default.fileExists(atPath: dirurl.path, isDirectory: &isDirectory) {
+        if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
             if isDirectory.boolValue {
                 let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
                 
-                guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
+                guard let fileList = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys) else {
                     return []
                 }
                 
                 for case let file as URL in fileList {
-                    if file.isLogFile {
+                    if  types.contains(file.logFileType) {
                         found.append(file)
                     }
-                }
-            }else{
-                if dirurl.isLogFile {
-                    found.append(dirurl)
                 }
             }
         }
@@ -94,7 +126,7 @@ class TestOrganizer: XCTestCase {
         self.wait(for: [expectation], timeout: TimeInterval(10.0))
     }
     
-    func DISABLEtestOrganizerSyncCloud() throws {
+    func testOrganizerSyncCloud() throws {
         // This will test that
         //   1. logic of copying missing from from cloud works: cloud proxied by bundle path, and local by a testLocal folder initially empty
         //   2. after copying form cloud (bundle path) the coredata container updated
@@ -106,15 +138,14 @@ class TestOrganizer: XCTestCase {
         }
         
         let organizer = FlightLogOrganizer()
-        let writeableUrl = organizer.localFolder.appendingPathComponent("testLocal")
+        let writeableLocalUrl = organizer.localFolder.appendingPathComponent("testLocal")
+        let writeableCloudUrl = organizer.localFolder.appendingPathComponent("testCloud")
         
-        do {
-            if FileManager.default.fileExists(atPath: writeableUrl.path) {
-                try FileManager.default.removeItem(at: writeableUrl)
+        for writeableUrl in [writeableCloudUrl, writeableLocalUrl] {
+            guard self.prepareAndClearFolder(url: writeableUrl) else {
+                XCTAssertTrue(false)
+                return
             }
-        }catch{
-            Logger.test.error("Failed to remove directory for testing \(error.localizedDescription)")
-            XCTAssertNil(error)
         }
         
         let container = NSPersistentContainer(name: "FlightLogModel")
@@ -130,26 +161,44 @@ class TestOrganizer: XCTestCase {
         organizer.persistentContainer = container
         
         // set up cloud folder to be bundle, should copy eveyrthing locally
-        organizer.localFolder = writeableUrl
-        organizer.cloudFolder = bundleUrl
+        organizer.localFolder = writeableLocalUrl
+        organizer.cloudFolder = writeableCloudUrl
         
-        let cloudUrls = self.findLocalLogFiles(dirurl: bundleUrl)
-        var localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
+        // first try to copy to local what is missing
+        organizer.copyMissingToLocal(urls: [bundleUrl], process: false)
         
+        let startUrls = self.findLocalLogFiles(url: bundleUrl, types: [.log])
+        var localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
+        
+        // +1 because should have one aircraft file
+        XCTAssertEqual(startUrls.count+1, localUrls.count)
+
+        var cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
+        XCTAssertEqual(cloudUrls.count, 0)// start with nothing
         organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
-        localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
-        // check we copied all
+        cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
+            
         XCTAssertEqual(localUrls.count, cloudUrls.count)
-        
+            
         // now remove one from localUrls, and assuming local is cloud, make sure syncCloud will copy missing over
+        
         if let last = localUrls.last {
             do {
+                Logger.test.info("Removing \(last.path)")
                 try FileManager.default.removeItem(at: last)
-                localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
+                localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
+                cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
                 XCTAssertEqual(localUrls.count, cloudUrls.count - 1)
-                organizer.syncCloudLogic(localUrls: cloudUrls, cloudUrls: localUrls)
-                localUrls = self.findLocalLogFiles(dirurl: writeableUrl)
-                XCTAssertEqual(localUrls.count, cloudUrls.count)
+                let expectation = XCTestExpectation(description: "Added the files")
+                NotificationCenter.default.addObserver(forName: .localFileListChanged, object: nil, queue: nil) {
+                    _ in
+                    localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
+                    XCTAssertEqual(localUrls.count, cloudUrls.count)
+                    XCTAssertEqual(cloudUrls.count, organizer.count+1) // +1 because one file is not a log but avionics system file
+                    expectation.fulfill()
+                }
+                organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
+                self.wait(for: [expectation], timeout: 60.0)
             }catch{
                 XCTAssertTrue(false)
             }

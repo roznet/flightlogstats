@@ -27,6 +27,10 @@ final class TestAvionics: XCTestCase {
             return
         }
         XCTAssertEqual(avionics.aircraftIdentifier, "N122DR")
+        let json = try JSONEncoder().encode(avionics)
+        if let str = String(data: json, encoding: .utf8) {
+            print( str )
+        }
     }
     
 
