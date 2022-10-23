@@ -15,6 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let keepOrganizer = FlightLogOrganizer.shared
     public static var db : FMDatabase = FMDatabase()
     public static var knownAirports : KnownAirports? = nil
+    public static let errorManager : ErrorManager = ErrorManager()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

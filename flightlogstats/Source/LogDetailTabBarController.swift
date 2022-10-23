@@ -36,7 +36,15 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
             
             self.logViewModel?.updateForSettings()
         }
-
+        
+        NotificationCenter.default.addObserver(forName: .ErrorOccured, object: AppDelegate.errorManager, queue: nil) {
+            _ in
+            if let error = AppDelegate.errorManager.popLast() {
+                Logger.ui.info("Reporting error \(error.localizedDescription)")
+            }else{
+                Logger.ui.info("No error to report")
+            }
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {

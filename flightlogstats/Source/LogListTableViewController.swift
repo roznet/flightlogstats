@@ -163,6 +163,16 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             Logger.ui.info("local file list changed, updating log list")
             self.buildList()
         }
+        
+        NotificationCenter.default.addObserver(forName: .ErrorOccured, object: AppDelegate.errorManager, queue: nil) {
+            _ in
+            if let error = AppDelegate.errorManager.popLast() {
+                Logger.ui.info("Reporting error \(error.localizedDescription)")
+            }else{
+                Logger.ui.info("No error to report")
+            }
+        }
+
         self.buildList()
     }
     
