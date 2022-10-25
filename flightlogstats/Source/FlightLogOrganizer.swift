@@ -255,6 +255,9 @@ class FlightLogOrganizer {
                         let percent = (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
                         self.progress?.update(state: .progressing(percent), message: .updatingInfo)
                     }
+                    if self.doneCount % 5 == 0 {
+                        NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+                    }
                 }
                 let firstName = done.last ?? ""
                 Logger.app.info("Updated \(self.doneCount)/\(self.missingCount) info last=\(firstName)")
@@ -278,6 +281,9 @@ class FlightLogOrganizer {
                     Logger.app.info("No logFile requires updating")
                 }
                 self.progress?.update(state: .complete)
+                if self.doneCount > 0 {
+                    NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+                }
                 // nothing done, ready for more
                 self.currentState = .complete
             }
