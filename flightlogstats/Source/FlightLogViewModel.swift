@@ -259,7 +259,7 @@ class FlightLogViewModel {
         if let url = self.flightLogFileInfo.flightLog?.url {
             self.progress?.update(state: .start, message: .uploadingFiles)
             self.request = FlyStoRequests(viewController: viewController, url: url)
-            self.request?.start() {
+            self.request?.execute() {
                 status in
                 switch status {
                 case .progressing(let pct):
@@ -267,7 +267,7 @@ class FlightLogViewModel {
                     return
                 case .success,.already:
                     self.flystoStatus = .uploaded
-                case .error,.tokenExpired:
+                case .error,.tokenExpired,.denied:
                     self.flystoStatus = .failed
                 }
                 NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)

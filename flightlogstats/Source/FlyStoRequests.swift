@@ -16,12 +16,13 @@ class FlyStoRequests {
     
     typealias CompletionHandler = (Status) -> Void
     
-    enum Status {
+    enum Status : Equatable {
         case success
         case already
         case error
         case progressing(Double)
         case tokenExpired
+        case denied
     }
     
     let oauth : OAuth2Swift
@@ -66,12 +67,21 @@ class FlyStoRequests {
         Settings.shared.flystoCredentials = nil
     }
     
-    func start(completion : @escaping CompletionHandler) {
+    func execute(completion : @escaping CompletionHandler) {
         self.completionHandler = completion
-        Logger.net.info("start upload \(self.url.lastPathComponent)")
+        self.start(attempt: 0)
+    }
+    
+    func start(attempt : Int = 0){
+        guard attempt < 2 else {
+            Logger.net.error("More than 2 attempts failed, aborting")
+            self.end(status: .error)
+            return
+        }
+        Logger.net.info("start upload[\(attempt)] \(self.url.lastPathComponent)")
         if !self.retrieveCredential() {
             let callback = URL(string: Secrets.shared.value(for: "flysto.callbackUrl"))
-            
+            Logger.net.info("starting full authorize process")
             self.oauth.authorize(withCallbackURL: callback, scope: "", state: ""){
                 result in
                 Logger.net.info("Callback from oauth")
@@ -79,14 +89,14 @@ class FlyStoRequests {
                 case .success:
                     Logger.net.info("authorized")
                     self.saveCredential()
-                    self.makeRequest()
+                    self.makeRequest(attempt: attempt)
                 case .failure(let error):
                     Logger.net.error("Failed \(error.localizedDescription)")
                     self.end(status: .error)
                 }
             }
         }else{
-            self.makeRequest()
+            self.refreshToken(attempt: attempt)
         }
     }
     
@@ -98,9 +108,32 @@ class FlyStoRequests {
         self.completionHandler = nil
     }
     
-    func makeRequest(tokenRefreshed : Bool = false){
+    func refreshToken(attempt : Int = 0) {
+        Logger.net.info("Refreshing token")
+        self.oauth.renewAccessToken(withRefreshToken: self.oauth.client.credential.oauthRefreshToken){
+            result in
+            switch result{
+            case .success:
+                Logger.net.info("Successfully Refreshed token")
+                self.saveCredential()
+                self.makeRequest(attempt: attempt)
+            case .failure(let error):
+                let status = self.processSwiftOAuthError(error: error)
+                if status == .denied {
+                    Logger.net.info("Failed to refresh token, attempting full authorize")
+                    Self.clearCredential()
+                    self.start(attempt: attempt + 1)
+                }else{
+                    self.end(status: .error)
+                }
+            }
+        }
+    }
+
+    func makeRequest(attempt : Int = 0){
         guard !self.oauth.client.credential.isTokenExpired() else {
-            self.refreshTokenAndTryAgain()
+            Logger.net.error("Token should have been renewed but has expired")
+            self.end(status: .error)
             return
         }
         
@@ -116,37 +149,15 @@ class FlyStoRequests {
                     Logger.net.info("upload of \(self.url.lastPathComponent) successfull \(response.description)")
                     self.end(status: .success)
                 case .failure(let queryError):
-                    switch queryError {
-                    case .requestError(let underlyingError, _ /*request:*/ ):
-                        let code = (underlyingError as NSError).code
-                        
-                        if code == 503 { // applicaiton error
-                            // application error, login again
-                            Logger.net.info("Application error, clearing credentials: \(code)")
-                            self.refreshTokenAndTryAgain()
-                        }else if code == 409 {
-                            Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
-                            self.end(status: .success)
-                        }else{
-                            Logger.net.info("Underlying request error: \(code)")
-                            self.end(status: .error)
-                        }
-                    case .accessDenied(let underlyingError, _ /*request:*/):
-                        let code = (underlyingError as NSError).code
-                        Logger.net.info("Access Denied: \(code)")
-                        // force login
-                        Settings.shared.flystoCredentials = nil
+                    let status = self.processSwiftOAuthError(error: queryError)
+                    switch status {
+                    case .tokenExpired,.denied:
+                        Self.clearCredential()
+                        self.start(attempt: attempt + 1)
+                    case .error:
                         self.end(status: .error)
-                    case .tokenExpired:
-                        if !tokenRefreshed {
-                            self.refreshTokenAndTryAgain()
-                        }else{
-                            Self.clearCredential()
-                            self.end(status: .error)
-                        }
-                    default:
-                        Logger.net.error("Other error \(queryError.localizedDescription)")
-                        self.end(status: .error)
+                    case .success,.progressing(_),.already:
+                        self.end(status: .success)
                     }
                 }
             }
@@ -167,6 +178,9 @@ class FlyStoRequests {
             }else if code == 409 {
                 Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
                 return .success
+            }else if code == 400 {
+                Logger.net.info("File \(self.url.lastPathComponent) application error (code \(code))")
+                return .denied
             }else{
                 Logger.net.info("Underlying request error: \(code)")
                 return .error
@@ -176,7 +190,7 @@ class FlyStoRequests {
             Logger.net.info("Access Denied: \(code)")
             // force login
             Settings.shared.flystoCredentials = nil
-            return .error
+            return .denied
         case .tokenExpired:
             Logger.net.error("Token has expired")
             return .tokenExpired
@@ -186,23 +200,7 @@ class FlyStoRequests {
         }
     }
     
-    func refreshTokenAndTryAgain() {
-        Logger.net.info("Refreshing expired token")
-        self.oauth.renewAccessToken(withRefreshToken: self.oauth.client.credential.oauthRefreshToken){
-            result in
-            switch result{
-            case .success:
-                Logger.net.info("Successfully Refreshed token")
-                self.saveCredential()
-                self.makeRequest(tokenRefreshed: true)
-            case .failure(let error):
-                self.processSwiftOAuthError(error: error)
-                self.end(status: .error)
-            }
-        }
-
-    }
-    
+    //MARK: - Upload file
     func clearUploadFile() {
         if FileManager.default.fileExists(atPath: self.uploadFileUrl.path) {
             do {
