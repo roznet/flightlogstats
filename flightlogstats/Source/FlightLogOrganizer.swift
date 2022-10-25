@@ -551,16 +551,23 @@ class FlightLogOrganizer {
     @objc func didFinishGathering() {
         if let query = self.cachedQuery {
             
-            if let localUrls = self.cachedLocalFlightLogList?.urls {
-                var cloudUrls : [URL] = []
-                
-                for item in query.results {
-                    if let url = (item as? NSMetadataItem)?.value(forAttribute: NSMetadataItemURLKey) as? URL {
-                        cloudUrls.append(url)
-                    }
+            var cloudUrls : [URL] = []
+            
+            for item in query.results {
+                if let url = (item as? NSMetadataItem)?.value(forAttribute: NSMetadataItemURLKey) as? URL {
+                    cloudUrls.append(url)
                 }
-                AppDelegate.worker.async {
-                    self.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
+            }
+            Self.search(in: [self.localFolder]){
+                result in
+                switch result{
+                case .failure(let error):
+                    Logger.app.error("Failed to load local \(error.localizedDescription)")
+                case .success(let urls):
+                    AppDelegate.worker.async {
+                        self.syncCloudLogic(localUrls: urls, cloudUrls: cloudUrls)
+                    }
+
                 }
             }
         }
