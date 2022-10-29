@@ -59,6 +59,10 @@ class FlyStoRequests {
         return false
     }
     
+    static var hasCredential : Bool {
+        return Settings.shared.flystoCredentials != nil
+    }
+    
     func saveCredential() {
         Settings.shared.flystoCredentials = self.oauth.client.credential
     }

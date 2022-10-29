@@ -1,35 +1,48 @@
 //
 //  Aircraft.swift
-//  FlightLog1000
+//  FlightLogStats
 //
-//  Created by Brice Rosenzweig on 23/06/2022.
+//  Created by Brice Rosenzweig on 28/10/2022.
 //
 
-import Foundation
-import RZUtils
+import UIKit
+import CoreData
 
-struct Aircraft : Equatable {
-    typealias Endurance = TimeInterval
-    
-    let fuelMax : FuelQuantity
-    let fuelTab : FuelQuantity
-    
-    let gph : Double
-    
-    //static let default = Aircraft()
-    
-    init(fuelMax: FuelQuantity, fuelTab: FuelQuantity, gph: Double) {
-        self.fuelMax = fuelMax
-        self.fuelTab = fuelTab
-        self.gph = gph
+class Aircraft: NSManagedObject {
+
+    weak var container : FlightLogOrganizer? = nil
+    func saveContext() {
+        self.container?.saveContext()
+    }
+
+    var avionicsSystem : AvionicsSystem? {
+        get {
+            guard let i = self.aircraft_identifier, let n = self.airframe_name, let s = self.system_id else { return nil }
+            return AvionicsSystem(aircraftIdentifier: i, airframeName: n, systemId: s)
+        }
+        set {
+            if let newValue = newValue {
+                self.aircraft_identifier = newValue.aircraftIdentifier
+                self.airframe_name = newValue.airframeName
+                self.system_id = newValue.systemId
+            }else{
+                self.aircraft_identifier = nil
+                self.airframe_name = nil
+                self.system_id = nil
+            }
+        }
     }
     
-    func endurance(fuel : FuelQuantity) -> Endurance {
-        let inGallon = fuel.convert(to: GCUnit.usgallon())
-        return (inGallon.total / gph) * 3600.0
-    }
-    
-    static func ==(lhs: Aircraft, rhs: Aircraft) -> Bool {
-        return lhs.fuelMax == rhs.fuelMax && lhs.fuelTab == rhs.fuelTab && lhs.gph == rhs.gph
+    var aircraftPerformance : AircraftPerformance {
+        get {
+            return AircraftPerformance(fuelMax: FuelQuantity(total: self.fuel_max, unit: Settings.fuelStoreUnit),
+                                       fuelTab: FuelQuantity(total: self.fuel_tab, unit: Settings.fuelStoreUnit),
+                                       gph: self.gph )
+        }
+        set {
+            self.fuel_max = newValue.fuelMax.totalWithUnit.convert(to: Settings.fuelStoreUnit).value
+            self.fuel_tab = newValue.fuelTab.totalWithUnit.convert(to: Settings.fuelStoreUnit).value
+            self.gph = newValue.gph
+        }
     }
 }

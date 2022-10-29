@@ -31,7 +31,7 @@ class SettingsViewController: UIViewController {
             if let maxFuel =  self.maxFuelField.text, let value = Double( maxFuel )  {
                 return FuelQuantity(total: value, unit: self.aircraftFuelUnit)
             }
-            return Settings.shared.aircraft.fuelMax
+            return Settings.shared.aircraftPerformance.fuelMax
         }
         set {
             let converted = newValue.convert(to: self.aircraftFuelUnit)
@@ -44,7 +44,7 @@ class SettingsViewController: UIViewController {
             if let tabFuel =  self.tabFuelField.text, let value = Double( tabFuel )  {
                 return FuelQuantity(total: value, unit: self.aircraftFuelUnit)
             }
-            return Settings.shared.aircraft.fuelTab
+            return Settings.shared.aircraftPerformance.fuelTab
         }
         set {
             let converted = newValue.convert(to: self.aircraftFuelUnit)
@@ -57,7 +57,7 @@ class SettingsViewController: UIViewController {
             if let gph =  self.gphField.text, let value = Double( gph )  {
                 return value
             }
-            return Settings.shared.aircraft.gph
+            return Settings.shared.aircraftPerformance.gph
         }
         set {
             self.tabFuelField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: newValue))
@@ -101,14 +101,14 @@ class SettingsViewController: UIViewController {
         Settings.shared.unitAddedFuel = self.unit(for: self.addedUnitSegment)
         Settings.shared.unitTargetFuel = self.unit(for: self.targetUnitSegment)
         
-        let aircraft = Aircraft(fuelMax: self.enteredMaxFuel, fuelTab: self.enteredTabFuel, gph: self.enteredGph)
-        Settings.shared.aircraft = aircraft
+        let aircraft = AircraftPerformance(fuelMax: self.enteredMaxFuel, fuelTab: self.enteredTabFuel, gph: self.enteredGph)
+        Settings.shared.aircraftPerformance = aircraft
         
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     func pushModelToView() {
-        let aircraft = Settings.shared.aircraft
+        let aircraft = Settings.shared.aircraftPerformance
         self.enteredGph = aircraft.gph
         self.enteredTabFuel = aircraft.fuelTab
         self.enteredMaxFuel = aircraft.fuelMax

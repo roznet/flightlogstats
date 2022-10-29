@@ -16,7 +16,7 @@ extension TimeInterval {
 
 class FuelAnalysisDataSource: TableDataSource {
     
-    typealias Endurance = Aircraft.Endurance
+    typealias Endurance = AircraftPerformance.Endurance
     
     weak var flightLogViewModel : FlightLogViewModel?
     let flightSummary : FlightSummary

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="21G115" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="22A380" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Aircraft" representedClassName=".Aircraft" syncable="YES" codeGenerationType="category">
+        <attribute name="aircraft_identifier" optional="YES" attributeType="String"/>
+        <attribute name="airframe_name" optional="YES" attributeType="String"/>
+        <attribute name="fuel_max" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="fuel_tab" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="gph" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="system_id" optional="YES" attributeType="String"/>
+    </entity>
     <entity name="FlightFlyStoStatus" representedClassName=".FlightFlyStoStatus" syncable="YES" codeGenerationType="category">
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
         <attribute name="status_date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>

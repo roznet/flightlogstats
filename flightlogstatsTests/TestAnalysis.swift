@@ -20,7 +20,7 @@ final class TestAnalysis: XCTestCase {
     }
 
     func testFuelAnalysis() throws {
-        let aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0),
+        let aircraft = AircraftPerformance(fuelMax: FuelQuantity(total: 92.0),
                                 fuelTab: FuelQuantity(total: 60.0),
                                 gph: 17.0)
         let fuelInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: 70.0), addedfuel: FuelQuantity(left: 29.0, right: 31.0, unit: GCUnit.liter()), totalizerStartFuel: FuelQuantity(total: 92.0))
@@ -38,7 +38,7 @@ final class TestAnalysis: XCTestCase {
     }
 
     func testEdgeCases() {
-        let aircraft = Aircraft(fuelMax: FuelQuantity(total: 92.0),
+        let aircraft = AircraftPerformance(fuelMax: FuelQuantity(total: 92.0),
                                 fuelTab: FuelQuantity(total: 60.0),
                                 gph: 17.0)
         let fuelInputs = FuelAnalysis.Inputs(targetFuel: FuelQuantity(total: 60.0),

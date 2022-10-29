@@ -20,11 +20,11 @@ class FuelAnalysis {
         }
     }
     
-    typealias Endurance = Aircraft.Endurance
+    typealias Endurance = AircraftPerformance.Endurance
     
     
     
-    let aircraft : Aircraft
+    let aircraft : AircraftPerformance
     let currentFuel : FuelQuantity
     let totalizerUsedFuel : FuelQuantity
     let inputs : Inputs
@@ -63,7 +63,7 @@ class FuelAnalysis {
     var addedLostEnduranceTotalizer : Endurance { return self.aircraft.endurance(fuel: self.addedSaveTotalizer) }
     var targetLostEndurance : Endurance { return self.aircraft.endurance(fuel: self.targetSave) }
 
-    init(aircraft : Aircraft, current : FuelQuantity, totalizer: FuelQuantity, inputs : Inputs){
+    init(aircraft : AircraftPerformance, current : FuelQuantity, totalizer: FuelQuantity, inputs : Inputs){
         self.aircraft = aircraft
         self.currentFuel = current
         self.inputs = inputs

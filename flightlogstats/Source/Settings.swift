@@ -201,8 +201,8 @@ struct Settings {
         }
     }
     
-    var aircraft : Aircraft {
-        get { return Aircraft(fuelMax: FuelQuantity(total: self.aircraftMaxFuelTotal, unit: Self.fuelStoreUnit),
+    var aircraftPerformance : AircraftPerformance {
+        get { return AircraftPerformance(fuelMax: FuelQuantity(total: self.aircraftMaxFuelTotal, unit: Self.fuelStoreUnit),
                               fuelTab: FuelQuantity(total: self.aircraftTabFuelTotal, unit: Self.fuelStoreUnit),
                               gph: self.aircraftGph)}
         set {

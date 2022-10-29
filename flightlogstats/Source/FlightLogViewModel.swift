@@ -50,7 +50,7 @@ class FlightLogViewModel {
     
     // MARK: - Configurations and user inputs
     var displayContext : DisplayContext { didSet { self.didWrite() } }
-    var aircraft : Aircraft { didSet { if oldValue != self.aircraft { self.didWrite() } } }
+    var aircraft : AircraftPerformance { didSet { if oldValue != self.aircraft { self.didWrite() } } }
     var fuelAnalysisInputs : FuelAnalysis.Inputs { didSet { if oldValue != self.fuelAnalysisInputs { self.didWrite() } } }
     var fuelTargetUnit : GCUnit { didSet { if oldValue != self.fuelTargetUnit { self.didWrite() } } }
     var fuelAddedUnit : GCUnit { didSet { if oldValue != self.fuelAddedUnit { self.didWrite() } } }
@@ -100,7 +100,7 @@ class FlightLogViewModel {
         self.flightLogFileInfo = fileInfo
         self.progress = progress
         self.displayContext = displayContext
-        self.aircraft = Settings.shared.aircraft
+        self.aircraft = Settings.shared.aircraftPerformance
         fileInfo.ensureFuelRecord()
         fileInfo.ensureFlyStoStatus()
         if let record = fileInfo.fuel_record {
@@ -116,7 +116,7 @@ class FlightLogViewModel {
     }
 
     func updateForSettings() {
-        self.aircraft = Settings.shared.aircraft
+        self.aircraft = Settings.shared.aircraftPerformance
         self.fuelTargetUnit = Settings.shared.unitTargetFuel
         self.fuelAddedUnit = Settings.shared.unitAddedFuel
 

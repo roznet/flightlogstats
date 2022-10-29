@@ -60,17 +60,21 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.buildList()
                 self.tableView.reloadData()
             },
-            UIAction(title: "Logout of FlySto", image: UIImage(systemName: "minus.circle")) {
-                _ in
-                Settings.shared.flystoCredentials = nil
-            },
-            UIAction(title: "Toggle Filter", image: UIImage(systemName: "minus.circle")){
+            UIAction(title: self.filterEmpty ? "Show non-flights" : "Show flights only", image: UIImage(systemName: "minus.circle")){
                 _ in
                 self.filterEmpty = !self.filterEmpty
                 self.buildList()
                 self.tableView.reloadData()
+                self.updateButtons()
             },
             ]
+        if FlyStoRequests.hasCredential {
+            menuItems.append(UIAction(title: "Logout of FlySto", image: UIImage(systemName: "minus.circle")) {
+                _ in
+                FlyStoRequests.clearCredential()
+                self.updateButtons()
+            })
+        }
 #if DEBUG
         menuItems.append(contentsOf: [
             UIAction(title: "Delete last", image: UIImage(systemName: "minus.circle")){

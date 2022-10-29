@@ -14,6 +14,7 @@ import OSLog
 
 extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
+    static let aircraftListChanged  : Notification.Name = Notification.Name("Notification.Name.AircraftListChanged")
 }
 
 class FlightLogOrganizer {
@@ -126,13 +127,17 @@ class FlightLogOrganizer {
         case complete
         case updatingInfoFromData
     }
-
+    
+    /// managed logs keyed of log_file_name
     private var managedFlightLogs : [String:FlightLogFileInfo] = [:]
     private var currentState : UpdateState = .complete
     private var missingCount : Int = 0
     private var doneCount : Int = 0
     private let queue = OperationQueue()
 
+    /// managed aircrafts keyed of system_id
+    private var managedAircrafts : [String:Aircraft] = [:]
+    
     private var flightLogFileList : FlightLogFileList {
         let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
         return list
@@ -162,6 +167,11 @@ class FlightLogOrganizer {
     }
     
     func loadFromContainer() {
+        self.loadLogsFromContainer()
+        self.loadAircraftFromContainer()
+    }
+    
+    private func loadLogsFromContainer() {
         let fetchRequest = FlightLogFileInfo.fetchRequest()
         
         do {
@@ -178,13 +188,34 @@ class FlightLogOrganizer {
                 }
             }
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
-            Logger.app.info("Loaded \(fetchedInfo.count) existing \(existing) added \(added) ")
+            Logger.app.info("Loaded \(fetchedInfo.count) Logs: existing \(existing) added \(added) ")
             self.updateInfo(count: 1)
         }catch{
             Logger.app.error("Failed to query for files")
         }
     }
 
+    private func loadAircraftFromContainer() {
+        let fetchRequest = Aircraft.fetchRequest()
+        
+        do {
+            let fetchAircrafts : [Aircraft] = try self.persistentContainer.viewContext.fetch(fetchRequest)
+            var added = 0
+            let existing = self.managedAircrafts.count
+            for aircraft in fetchAircrafts {
+                if let systemId = aircraft.system_id {
+                    added += 1
+                    aircraft.container = self
+                    self.managedAircrafts[systemId] = aircraft
+                }
+            }
+            NotificationCenter.default.post(name: .aircraftListChanged, object: self)
+            Logger.app.info("Loaded \(fetchAircrafts.count) Aircrafts: existing \(existing) added \(added)")
+        }catch{
+            Logger.app.error("Failed to query for aircrafts")
+        }
+    }
+    
     func updateInfo(count : Int = 1, force : Bool = false) {
         guard currentState != .updatingInfoFromData else { return }
         let firstMissingCheck : Bool = (currentState == .complete)
@@ -299,8 +330,36 @@ class FlightLogOrganizer {
             case .success(let urls):
                 let logs = FlightLogFileList(urls: urls)
                 self.add(flightLogFileList: logs)
+                self.add(aircrafts: urls)
                 self.updateInfo(count: 1)
             }
+        }
+    }
+    
+    func add(aircrafts: [URL]){
+        var someNew : Int = 0
+        var checked : Int = 0
+        for url in aircrafts {
+            if url.logFileType == .aircraft {
+                checked += 1
+                if let avionics = AvionicsSystem.from(jsonUrl: url) {
+                    if self.managedAircrafts[ avionics.systemId ] == nil {
+                        Logger.app.info("Registering \(avionics)")
+                        let aircraft = Aircraft(context: self.persistentContainer.viewContext)
+                        aircraft.avionicsSystem = avionics
+                        aircraft.aircraftPerformance = Settings.shared.aircraftPerformance
+                        self.managedAircrafts[avionics.systemId] = aircraft
+                        someNew += 1
+                    }
+                }
+            }
+        }
+        if someNew > 0 {
+            Logger.app.info("Found \(someNew) aircrafts to add")
+            self.saveContext()
+            NotificationCenter.default.post(name: .aircraftListChanged, object: self)
+        }else{
+            Logger.app.info("No missing aircraft in \(checked) checked")
         }
     }
     
