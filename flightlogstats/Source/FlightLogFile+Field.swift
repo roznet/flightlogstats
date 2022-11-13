@@ -103,6 +103,9 @@ extension FlightLogFile {
         case WndDirect = "WndDirect"
         case WndCross  = "WndCross"
         case FTotalizerT = "FTotalizerT"
+        case E1_EGT_Max = "E1 EGTMax"
+        case E1_EGT_MaxIdx = "E1 EGTMaxIdx"
+        case E1_EGT_Min = "E1 EGTMin"
         
         // calculated strings
         case FltPhase = "FltPhase"
@@ -357,6 +360,12 @@ extension FlightLogFile {
                 
             case .FltPhase:
                 return nil
+            case .E1_EGT_Max:
+                return context.numberWithUnit(engineTemp: valueStats)
+            case .E1_EGT_MaxIdx:
+                return context.numberWithUnit(valueStats)
+            case .E1_EGT_Min:
+                return context.numberWithUnit(engineTemp: valueStats)
             }
         
         }

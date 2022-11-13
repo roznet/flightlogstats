@@ -308,6 +308,27 @@
     "unit_description": ""
   },
   {
+    "field": "E1 EGTMax",
+    "order": 110,
+    "unit": "deg F",
+    "description": "E1 EGTMax",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGTMaxIdx",
+    "order": 110,
+    "unit": "deg F",
+    "description": "E1 EGTMaxIdx",
+    "unit_description": ""
+  },
+  {
+    "field": "E1 EGTMin",
+    "order": 110,
+    "unit": "deg F",
+    "description": "E1 EGTMin",
+    "unit_description": ""
+  },
+  {
     "field": "E1 CHT4",
     "order": 111,
     "unit": "deg F",

@@ -7,23 +7,57 @@
 
 import Foundation
 
+/*
+ * Stats
+ *   per minute:
+ *      time
+ *      distance
+ *      long/lat start
+ 
+ *      engine on/off
+ *      phase climb/descent/cruise/ground
+ *      AltMSL min/max/start/end
+ *      AltGPS min/max/start/end
+ 
+ *      fuel used  total
+ *      fuel       imbalance
+ 
+ *      TAS/IAS/GS  min/max/avg
+ *      fuel flow  min/max/avg
+ *      OilT/OilP avg
+ *      MAP max/min/avg
+ *      RPM max/min/avg
+ *      %pwd max/min/avg
+ *      OAT min/max/avg
+ *      volt1/2  start/end/avg
+ *      amp      start/end/avg
+ 
+ *      CHTn max/min/maxI,minI
+ *      EGTn max/min/maxI,minI
+ *      TITn max/min/maxI,minI
+ 
+ */
+
+
 struct FieldCalculation {
     typealias Field = FlightLogFile.Field
     typealias FuncTextMulti = ([[Double]], String?) -> String
     
-    let output : Field
+    let outputs : [Field]
     let inputs : [Field]
     let calcType : CalcType
     let requiredObservationCount : Int
+    var output : Field { return self.outputs.first ?? .Lcl_Date }
     private let initial : Double
     private let calcFunc : ([Double]) -> Double
+    private let calcFuncArray : ([Double]) -> [Double]
     private let calcFuncTextMulti : FuncTextMulti
     
     var inputType : InputType {
         switch self.calcType {
         case .doublesArrayToString:
             return .doublesArray
-        case .doublesToDouble:
+        case .doublesToDouble,.doublesToDoublesArray:
             return .doubles
         }
     }
@@ -34,6 +68,8 @@ struct FieldCalculation {
             return .double
         case .doublesArrayToString:
             return .string
+        case .doublesToDoublesArray:
+            return .doubleArray
         }
     }
     
@@ -44,29 +80,45 @@ struct FieldCalculation {
     
     enum OutputType {
         case double
+        case doubleArray
         case string
     }
     
     enum CalcType {
         case doublesToDouble
         case doublesArrayToString
+        case doublesToDoublesArray
     }
     
     init(output : Field, inputs: [Field], initial : Double = 0.0, calcFunc : @escaping ([Double])->Double){
-        self.output = output
+        self.outputs = [output]
         self.inputs = inputs
         self.calcFunc = calcFunc
         self.calcFuncTextMulti = { _,_ in return "" }
+        self.calcFuncArray = { _ in return [] }
         self.calcType = .doublesToDouble
         self.initial = initial
         self.requiredObservationCount = 1
     }
+
+    init(outputs : [Field], inputs: [Field], initial : Double = 0.0, calcFunc : @escaping ([Double])->[Double]){
+        self.outputs = outputs
+        self.inputs = inputs
+        self.calcFunc = { _ in return .nan}
+        self.calcFuncArray = calcFunc
+        self.calcFuncTextMulti = { _,_ in return "" }
+        self.calcType = .doublesToDoublesArray
+        self.initial = initial
+        self.requiredObservationCount = 1
+    }
+
     
     init(stringOutput: Field, multiInputs: [Field], obsCount : Int, calcFunc : @escaping FuncTextMulti ){
-        self.output = stringOutput
+        self.outputs = [stringOutput]
         self.inputs = multiInputs
         self.calcFuncTextMulti = calcFunc
-        self.calcFunc = { _ in return 0.0 }
+        self.calcFuncArray = { _ in return [] }
+        self.calcFunc = { _ in return .nan }
         self.calcType = .doublesArrayToString
         self.initial = 0.0
         self.requiredObservationCount = obsCount
@@ -84,19 +136,17 @@ struct FieldCalculation {
         return self.calcFuncTextMulti(doublesArray,previous)
     }
     
-    func evaluate(line : [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> Double{
-        guard self.calcType == .doublesToDouble else { return .nan }
-        
+    private func doublesInput(line: [Double], fieldsMap: [Field:Int], previousLine : [Double]?) -> [Double] {
         var doubles : [Double] = []
         for field in self.inputs {
-            if field == self.output {
+            if self.outputs.contains(field) {
                 if let previousLine = previousLine {
                     if let idx = fieldsMap[field],
                        let val = previousLine[safe: idx],
                        val.isFinite {
                         doubles.append(val)
                     }else{
-                        return .nan
+                        doubles.append(.nan)
                     }
                 }else{
                     doubles.append(self.initial)
@@ -107,17 +157,43 @@ struct FieldCalculation {
                    val.isFinite {
                     doubles.append(val)
                 }else{
-                    return .nan
+                    doubles.append(.nan)
                 }
             }
         }
-        return self.calcFunc(doubles)
+        return doubles
+    }
+    
+    func evaluateToArray(line: [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> [Double] {
+        guard self.calcType == .doublesToDoublesArray else { return self.outputs.map { _ in return .nan } }
+        
+        return self.calcFuncArray(self.doublesInput(line: line, fieldsMap: fieldsMap, previousLine: previousLine))
+    }
+    
+    func evaluate(line : [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> Double{
+        guard self.calcType == .doublesToDouble else { return .nan }
+        
+        return self.calcFunc(self.doublesInput(line: line, fieldsMap: fieldsMap, previousLine: previousLine))
     }
     static var calculatedFields : [FieldCalculation] = [
         FieldCalculation(output: .FQtyT, inputs: [.FQtyL,.FQtyR]) {
             x in
             return x.reduce(0, +)
         },
+        FieldCalculation(outputs: [.E1_EGT_Max,.E1_EGT_Min,.E1_EGT_MaxIdx], inputs: [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6]) {
+            x in
+            let max : Double = x.max() ?? .nan
+            let min : Double = x.min() ?? .nan
+            let idx : Int = x.firstIndex(of: max) ?? 0
+            
+            return [max,min,Double(idx)]
+            
+        },
+        FieldCalculation(output: .E1_EGT_Max, inputs: [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6]) {
+            x in
+            return x.max() ?? 0.0
+        },
+
         FieldCalculation(output: .WndCross, inputs: [.WndDr,.WndSpd,.CRS]){
             x in
             let dir = x[0] < 0 ? 360.0 + x[0] : x[0]

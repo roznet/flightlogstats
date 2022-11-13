@@ -464,9 +464,11 @@ extension FlightData {
                 data.doubleFields.append(.Distance)
                 for field in FieldCalculation.calculatedFields {
                     switch field.outputType {
-                    case .double:
-                        fieldsMap[field.output] = data.doubleFields.count
-                        data.doubleFields.append(field.output)
+                    case .doubleArray,.double:
+                        for f in field.outputs {
+                            fieldsMap[f] = data.doubleFields.count
+                        }
+                        data.doubleFields.append(contentsOf: field.outputs)
                     case .string:
                         data.stringFields.append(field.output)
                     }
@@ -560,12 +562,22 @@ extension FlightData {
                 // match order with what was added for fields
                 doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
                 
+                // first add all output of calculated double fields so they can
+                // also be used in doubleInputs
                 for calcField in FieldCalculation.calculatedFields {
-                    if calcField.calcType == .doublesToDouble {
-                        doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                    if calcField.inputType == .doubles {
+                        switch calcField.outputType {
+                        case .double:
+                            doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                        case .doubleArray:
+                            doubleLine.append(contentsOf:  calcField.evaluateToArray(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                        case .string:
+                            break
+                        }
                     }
                 }
 
+                // Now build doubleArray inputs
                 for field in self.doubleInputs.keys {
                     if let idx = fieldsMap[field] {
                         let val = doubleLine[idx]
@@ -577,31 +589,36 @@ extension FlightData {
                 }
                 
                 for calcField in FieldCalculation.calculatedFields {
-                    if calcField.calcType == .doublesArrayToString {
-                        let previous = data.strings.last?[stringLine.count]
-                        let newVal = calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap, previous: previous)
-                        // reset when value changes
-                        var amountToFill : Int = 0
-                        if let prevVal = previous, prevVal != newVal {
-                            for field in self.doubleInputs.keys {
-                                if let idx = fieldsMap[field] {
-                                    let val = doubleLine[idx]
-                                    if let cnt = self.doubleInputs[field]?.count, cnt > amountToFill {
-                                        amountToFill = cnt
+                    if calcField.inputType == .doublesArray {
+                        switch calcField.outputType {
+                        case .string:
+                            let previous = data.strings.last?[stringLine.count]
+                            let newVal = calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap, previous: previous)
+                            // reset when value changes
+                            var amountToFill : Int = 0
+                            if let prevVal = previous, prevVal != newVal {
+                                for field in self.doubleInputs.keys {
+                                    if let idx = fieldsMap[field] {
+                                        let val = doubleLine[idx]
+                                        if let cnt = self.doubleInputs[field]?.count, cnt > amountToFill {
+                                            amountToFill = cnt
+                                        }
+                                        self.doubleInputs[field] = [val]
                                     }
-                                    self.doubleInputs[field] = [val]
                                 }
                             }
-                        }
-                        if amountToFill != 0 {
-                            let cnt = data.strings.count
-                            let downto = max(0,cnt - amountToFill)
-                            for idx in downto..<cnt {
-                                data.strings[idx][stringLine.count] = newVal
+                            if amountToFill != 0 {
+                                let cnt = data.strings.count
+                                let downto = max(0,cnt - amountToFill)
+                                for idx in downto..<cnt {
+                                    data.strings[idx][stringLine.count] = newVal
+                                }
+                                
                             }
-                            
+                            stringLine.append(newVal)
+                        case .double,.doubleArray:
+                            break
                         }
-                        stringLine.append(newVal)
                             
                     }
                 }
