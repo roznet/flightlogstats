@@ -34,6 +34,7 @@ public class FlightLogFile {
     var isParsed : Bool { return self.logType != .notParsed }
     
     var flightSummary : FlightSummary? = nil
+    // legs populated in parse
     var legs : [ FlightLeg ] = []
 
     private var data : FlightData? = nil

@@ -65,6 +65,8 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertTrue(false)
         }
         
+        let engine = data.datesDoubles(for: [.E1_EGT_Max,.E1_EGT_MaxIdx])
+        print( engine.count)
         let wind = data.datesDoubles(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
         for idx in 0..<wind.count {
             let x = wind.fieldValue(at: idx)
@@ -81,7 +83,6 @@ class TestParsingLogFiles: XCTestCase {
                 XCTAssertTrue(false)
             }
         }
-        
     }
     
     func testTaxiOnly() {

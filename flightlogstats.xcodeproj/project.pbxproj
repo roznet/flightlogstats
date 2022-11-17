@@ -372,8 +372,8 @@
 			children = (
 				4280C8C6280D48E700A0FB32 /* TestAssets */,
 				42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */,
-				42F1E84F284A4D2800DB732A /* TestOrganizer.swift */,
 				42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */,
+				42F1E84F284A4D2800DB732A /* TestOrganizer.swift */,
 				423929102864D58800CD33C0 /* TestAnalysis.swift */,
 				4203FBD22905B0FE005B0530 /* TestAvionics.swift */,
 			);
