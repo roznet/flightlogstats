@@ -95,6 +95,8 @@ class TestParsingLogFiles: XCTestCase {
                 XCTAssertTrue(false)
             }
         }
+        
+        data.groupBy(interval: 60.0)
     }
     
     func testTaxiOnly() {

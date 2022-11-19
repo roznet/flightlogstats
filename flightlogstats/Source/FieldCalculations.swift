@@ -7,36 +7,6 @@
 
 import Foundation
 
-/*
- * Stats
- *   per minute:
- *      time
- *      distance
- *      long/lat start
- 
- *      engine on/off
- *      phase climb/descent/cruise/ground
- *      AltMSL min/max/start/end
- *      AltGPS min/max/start/end
- 
- *      fuel used  total
- *      fuel       imbalance
- 
- *      TAS/IAS/GS  min/max/avg
- *      fuel flow  min/max/avg
- *      OilT/OilP avg
- *      MAP max/min/avg
- *      RPM max/min/avg
- *      %pwd max/min/avg
- *      OAT min/max/avg
- *      volt1/2  start/end/avg
- *      amp      start/end/avg
- 
- *      CHTn max/min/maxI,minI
- *      EGTn max/min/maxI,minI
- *      TITn max/min/maxI,minI
- 
- */
 
 
 struct FieldCalculation {

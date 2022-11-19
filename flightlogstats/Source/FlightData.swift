@@ -24,8 +24,8 @@ class FlightData {
     /**
         * values columns are fields,
      */
-    private var values : [[Double]] = []
-    private var strings : [[String]] = []
+    private(set) var values : [[Double]] = []
+    private(set) var strings : [[String]] = []
 
     private(set) var meta : [MetaField:String] = [:]
     private(set) var dates : [Date] = []
