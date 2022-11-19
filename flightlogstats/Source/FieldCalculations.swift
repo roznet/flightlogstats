@@ -186,12 +186,9 @@ struct FieldCalculation {
             let min : Double = x.min() ?? .nan
             let idx : Int = x.firstIndex(of: max) ?? 0
             
-            return [max,min,Double(idx)]
+            // idx + 1 to represent egt number
+            return [max,min,Double(idx)+1]
             
-        },
-        FieldCalculation(output: .E1_EGT_Max, inputs: [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6]) {
-            x in
-            return x.max() ?? 0.0
         },
 
         FieldCalculation(output: .WndCross, inputs: [.WndDr,.WndSpd,.CRS]){

@@ -70,8 +70,12 @@ class TestParsingLogFiles: XCTestCase {
         XCTAssertGreaterThan(engine.count, 0)
         for idx in 0..<engine.count {
             let x = engine.fieldValue(at: idx)
-            let max = [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6].map { x[$0] }
+            let cyls = [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6].map({ x[$0] ?? 0.0 })
+            let max = cyls.max() ?? 0.0
+            let maxidx = cyls.firstIndex(of: max) ?? cyls.count
             
+            XCTAssertEqual(max,x[.E1_EGT_Max])
+            XCTAssertEqual(Double(maxidx)+1.0, x[.E1_EGT_MaxIdx])
         }
         
         let wind = data.datesDoubles(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
