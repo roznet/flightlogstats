@@ -113,6 +113,28 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertNil(error)
         }
         
+        let identifiers = data.datesStrings(for: [.AtvWpt,.AfcsOn]).indexesForValueChange(fields: [.AtvWpt])
+        print(identifiers.count)
+        
+        do {
+            let start = Date()
+            let old = try data.extract(dates: identifiers.indexes)
+            let mid = Date()
+            let new = try data.datesDoubles(for: []).extract(indexes: identifiers.indexes,
+                                                             createCollector: createCollector,
+                                                             updateCollector: updateCollector)
+            let end = Date()
+            XCTAssertEqual(old.count, new.count)
+            Logger.test.info("old \(mid.timeIntervalSince(start)) new \(end.timeIntervalSince(mid))")
+        }catch{
+            XCTAssertNil(error)
+        }
+        
+        let freq = data.datesStrings(for: [.COM1,.COM2]).indexesForValueChange(fields: [.COM1,.COM2])
+        print(freq.count)
+        
+        let ap = data.datesStrings(for: [.AfcsOn,.RollM,.PitchM]).indexesForValueChange(fields: [.AfcsOn,.RollM,.PitchM])
+        print( ap.count)
     }
     
     func testTaxiOnly() {

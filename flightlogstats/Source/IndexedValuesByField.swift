@@ -38,6 +38,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
     var count : Int { return indexes.count }
     
     public init(fields : [F]){
+        
         indexes = []
         values = [:]
         for field in fields {
@@ -45,6 +46,25 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         }
     }
     
+    public init() {
+        indexes = []
+        values = [:]
+    }
+    
+    mutating public func reserveCapacity(_ capacity : Int){
+        indexes.reserveCapacity(capacity)
+        for k in values.keys {
+            values[k]?.reserveCapacity(capacity)
+        }
+    }
+    
+    mutating public func clear(fields : [F] = []) {
+        indexes = []
+        values = [:]
+        for field in fields {
+            values[field] = []
+        }
+    }
     
     //MARK: - modify, append
     private mutating func indexCheckAndUpdate(index : I) throws {
@@ -86,6 +106,18 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         }
     }
 
+    public mutating func unsafeFastAppend(fields : [F], elements : [T], for index : I) {
+        self.indexes.append(index)
+        if self.values.count == 0 {
+            for f in fields {
+                self.values[f] = []
+            }
+        }
+        for (field,element) in zip(fields,elements) {
+            self.values[field]?.append(element)
+        }
+    }
+    
     
     public mutating func append(fields : [F], elements: [T], for index : I) throws {
         try self.indexCheckAndUpdate(index: index)
@@ -93,6 +125,17 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         for (field,element) in zip(fields,elements) {
             try self.updateField(field: field, element: element)
         }
+    }
+    
+    public func dropFirst(index : I) -> IndexedValuesByField? {
+        guard let found = self.indexes.firstIndex(of: index) else { return nil }
+        
+        var rv = IndexedValuesByField(fields: [F](self.values.keys))
+        rv.indexes = [I](self.indexes.dropFirst(found))
+        for (field,values) in self.values {
+            rv.values[field] = [T](values.dropFirst(found))
+        }
+        return rv
     }
     
     public func dropFirst(field : F, minimumMatchCount : Int = 1, matching : ((T) -> Bool)) -> IndexedValuesByField? {
@@ -194,7 +237,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         }
     }
     
-    public func dateValue(for field : F, at index : Int) -> IndexedValue? {
+    public func indexedValue(for field : F, at index : Int) -> IndexedValue? {
         guard let fieldValues = self.values[field], index < self.indexes.count else { return nil }
         let value = fieldValues[index]
         let date = self.indexes[index]
@@ -217,11 +260,62 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         return rv
     }
     
-    public subscript(_ field : F) -> IndexedValues? {
+    public func indexedValues(for field : F) -> IndexedValues? {
         guard let values = self.values[field] else { return nil }
         return IndexedValues(indexes: self.indexes, values: values)
     }
+    public subscript(_ field : F) -> IndexedValues? {
+        return self.indexedValues(for: field)
+    }
     
+}
+
+extension IndexedValuesByField where T : FloatingPoint {
+    public func dropna(fields : [F]) -> IndexedValuesByField {
+        var rv = IndexedValuesByField(fields: self.fields)
+        rv.reserveCapacity(self.count)
+        
+        for (idx,index) in self.indexes.enumerated() {
+            var valid : Bool = true
+            for field in fields {
+                let val = self.values[field]![idx]
+                if !val.isFinite {
+                    valid = false
+                    break
+                }
+            }
+            if valid {
+                rv.unsafeFastAppend(fields: self.fields, elements: self.fields.map { self.values[$0]![idx] }, for: index)
+            }
+        }
+        return rv
+    }
+    
+
+}
+
+extension IndexedValuesByField where T : Equatable {
+    public func indexesForValueChange(fields : [F]) -> IndexedValuesByField {
+        var rv = IndexedValuesByField(fields: self.fields)
+        
+        guard !fields.map({ self.values[$0] != nil }).contains(false) else { return rv }
+        
+        var last : [T] = []
+        
+        for (idx,index) in self.indexes.enumerated() {
+            var add : Bool = (last.count != fields.count)
+            let vals = fields.map { self.values[$0]![idx] }
+            if !add {
+                add = vals != last
+            }
+            last = vals
+            if add {
+                let row = self.fields.map { self.values[$0]![idx] }
+                rv.unsafeFastAppend(fields: self.fields, elements: row, for: index)
+            }
+        }
+        return rv
+    }
 }
 
 extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field {

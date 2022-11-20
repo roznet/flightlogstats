@@ -57,7 +57,7 @@ struct FlightLeg {
                      end : Date? = nil,
                      byfield : Field = .AtvWpt) -> [FlightLeg] {
         var rv : [FlightLeg] = []
-        let identifiers : IndexedValuesByField<Date,String,Field> = data.datesStrings(for: [byfield], start: start)
+        let identifiers : IndexedValuesByField<Date,String,Field> = data.datesStrings(for: [byfield], start: start).indexesForValueChange(fields: [byfield])
         
         do {
             let stats : IndexedValuesByField<Date,ValueStats,Field> = try data.extract(dates: identifiers.indexes, start: start, end : end)

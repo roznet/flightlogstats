@@ -119,17 +119,22 @@ extension FlightLogFile {
         //E1TITMax
         //FQtyT
         
+        enum ValueType : String {
+            case value, discrete
+        }
+        
         struct FieldDef : Codable {
             let field : String
             let order : Int
             let unit_key : String
             let description : String
             let unit_description : String
+            let type : String
 
             lazy var unit : GCUnit = { return GCUnit.from(logFileUnit: self.unit_key) }()
             
             private enum CodingKeys : String, CodingKey {
-                case field, order, unit_key = "unit", description, unit_description
+                case field, order, unit_key = "unit", description, unit_description, type
             }
         }
         static var fieldDefinitions : [FlightLogFile.Field:FieldDef] = {
@@ -158,6 +163,13 @@ extension FlightLogFile {
             }
             return GCUnit.dimensionless()
 
+        }
+        
+        var valueType : ValueType {
+            if let def = Self.fieldDefinitions[self] {
+                return ValueType(rawValue:def.type) ?? .value
+            }
+            return .value
         }
         
         var localizedDescription : String {

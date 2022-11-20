@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension IndexedValuesByField{
+extension IndexedValuesByField  {
     
     /// Will extract and compute parameters
     /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the

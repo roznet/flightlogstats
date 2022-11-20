@@ -21,14 +21,10 @@ class FlightData {
     typealias MetaField = FlightLogFile.MetaField
     
     private var fieldsUnits : [Field:GCUnit] = [:]
-    /**
-        * values columns are fields,
-    private var discreteValues : IndexedValuesByField<Date,Double,Field>?
-    private var discreteStrings : IndexedValuesByField<Date,String,Field>?
-    private var doubleValues : IndexedValuesByField<Date,Double,Field>?
-    private var coord : IndexedValuesByField<Date,CLLocationCoordinate2D,Field>?
-     */
     
+    private var discreteValues : IndexedValuesByField<Date,String,Field> = IndexedValuesByField<Date,String,Field>()
+    private var doubleValues : IndexedValuesByField<Date,Double,Field> = IndexedValuesByField<Date,Double,Field>()
+    private var coord : IndexedValuesByField<Date,CLLocationCoordinate2D,Field> = IndexedValuesByField<Date,CLLocationCoordinate2D,Field>()
     
     private(set) var values : [[Double]] = []
     private(set) var strings : [[String]] = []
@@ -187,43 +183,17 @@ class FlightData {
         return rv
     }
     
-    func datesDoubles(for doubleFields : [Field]) -> IndexedValuesByField<Date,Double,Field> {
-        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
-        var rv = IndexedValuesByField<Date,Double,Field>(fields: doubleFields)
-        
-        var lastDate : Date? = nil
-        
-        for (date,row) in zip(dates,values) {
-            var valid : Bool = true
-            
-            // skip if twice the same date
-            if let lastDate = lastDate, date == lastDate {
-                continue
-            }
-            lastDate = date
-            for field in doubleFields {
-                if let idx = fieldToIndex[field] {
-                    if row[idx].isNaN {
-                        valid = false
-                        break
-                    }
-                }
-            }
-            if valid {
-                for field in doubleFields {
-                    if let idx = fieldToIndex[field] {
-                        let val = row[idx]
-                        do {
-                            try rv.append(field: field, element: val, for: date)
-                        }catch{
-                            Logger.app.error("Failed to create serie for \(field) at \(date)")
-                            continue
-                        }
-                    }
-                }
-            }
+    /// doubles values with nan removed
+    /// - Parameter doubleFields: fields to check for NA
+    /// - Returns: indexed for value  that are valid
+    func datesDoubles(for fields : [Field]) -> IndexedValuesByField<Date,Double,Field> {
+        if self.doubleValues.count == 0 {
+            let cstart = Date()
+            self.convertIndexedValues()
+            Logger.app.info("Converted \(self.doubleValues.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
-        return rv
+        
+        return self.doubleValues.dropna(fields: fields)
     }
 
     /**
@@ -236,46 +206,12 @@ class FlightData {
      - Returns: DatesValuesByField where date is the first appearance of the string
      */
     func datesStrings(for stringFields : [Field], start : Date? = nil) -> IndexedValuesByField<Date,String,Field> {
-        let fieldToIndex : [Field:Int] = self.stringFieldToIndex
-        
-        var rv = IndexedValuesByField<Date,String,Field>(fields: stringFields)
-        
-        var first = true
-        
-        for (date,row) in zip(dates,strings) {
-            if let start = start, date < start {
-                continue
-            }
-            var changed = first
-            if !first {
-                for field in stringFields {
-                    if let idx = fieldToIndex[field] {
-                        let val = row[idx]
-                        if rv.last(field: field)?.value != val {
-                            changed = true
-                        }
-                    }
-                }
-            }
-            
-            if changed {
-                for field in stringFields {
-                    if let idx = fieldToIndex[field] {
-                        let val = row[idx]
-                        do {
-                            try rv.append(field: field, element: val, for: date)
-                        }catch{
-                            Logger.app.error("Failed to create serie for \(field) at \(date)")
-                            continue
-                        }
-                    }
-                }
-                first = false
-            }
-            
-            
+        if self.discreteValues.count == 0 {
+            let cstart = Date()
+            self.convertIndexedValues()
+            Logger.app.info("Converted \(self.discreteValues.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
-        return rv
+        return self.discreteValues
     }
         
     /// Will extract and compute parameters
@@ -438,11 +374,16 @@ extension FlightData {
                             longitudeIndex = idx
                         }
                         fields.append(field)
+                        
+                        if field.valueType == .discrete {
+                            if columnIsDouble[idx] {
+                                columnIsDouble[idx] = false
+                            }
+                        }
                     }else{
                         fields.append(.Unknown)
                         Logger.app.warning("Unknown field \(fieldDescription)")
                     }
-                    
                 }
                 fields = line.map { Field(rawValue: $0) ?? .Unknown }
                 for (idx,(isDouble,unit)) in zip(columnIsDouble,units).enumerated() {
@@ -799,4 +740,39 @@ extension FlightData {
         }
     }
     
+    private func convertIndexedValues() {
+        self.doubleValues.clear(fields: self.doubleFields)
+        self.discreteValues.clear(fields: self.stringFields)
+        self.doubleValues.reserveCapacity(self.dates.capacity)
+        self.discreteValues.reserveCapacity(self.dates.capacity)
+        
+        guard dates.first != nil else { return }
+        
+        
+        var lastdate = dates.first!
+        for (date,row) in zip(dates,values) {
+            if date < lastdate {
+                Logger.app.info("Resetting inconsistent date after \(self.doubleValues.count) out of \(self.dates.count)")
+                self.doubleValues.clear(fields: self.doubleFields)
+                self.doubleValues.reserveCapacity(self.dates.capacity)
+            }
+            // edge case date is repeated
+            if self.doubleValues.count == 0 || date != lastdate {
+                self.doubleValues.unsafeFastAppend(fields: self.doubleFields, elements: row, for: date)
+                lastdate = date
+            }
+        }
+        
+        lastdate = dates.first!
+        for (date,row) in zip(dates,strings) {
+            if date < lastdate {
+                self.discreteValues.clear(fields: self.stringFields)
+                self.discreteValues.reserveCapacity(self.dates.capacity)
+            }
+            if self.discreteValues.count == 0 || date != lastdate {
+                self.discreteValues.unsafeFastAppend(fields: self.stringFields, elements: row, for: date)
+                lastdate = date
+            }
+        }
+    }
 }
