@@ -55,6 +55,9 @@ class TestParsingLogFiles: XCTestCase {
             return
         }
         
+        let createCollector : (FlightLogFile.Field,Double) -> ValueStats = {_,f in return ValueStats(value: f) }
+        let updateCollector : (inout ValueStats?,Double) -> Void = {v,d in v?.update(double: d) }
+        
         let speedPower = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.AltMSL])
         
         if let engineOn = speedPower.dropFirst(field: .E1_PctPwr, matching: { $0 > 0 }),
@@ -97,7 +100,18 @@ class TestParsingLogFiles: XCTestCase {
         }
         
         let group  = FlightGroupedData()
-        group.groupBy(data: data, interval: 60.0)
+        do {
+            let rv = try group.groupBy(data: data, interval: 60.0)
+            
+            let raw = data.datesDoubles(for: rv.fields.map { $0.field } )
+            let rv_e = try raw.extract(indexes: rv.indexes,
+                        createCollector: createCollector,
+                        updateCollector: updateCollector
+            )
+            XCTAssertEqual(rv.count, rv_e.count)
+        }catch{
+            XCTAssertNil(error)
+        }
         
     }
     

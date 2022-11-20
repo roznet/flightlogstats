@@ -9,6 +9,12 @@ import Foundation
 import RZUtils
 
 public struct ValueStats {
+    enum Metric : Hashable{
+        case start,end
+        case min,max,average
+        case total
+    }
+
     private(set) var unit : GCUnit
     
     private(set) var start : Double
@@ -22,6 +28,11 @@ public struct ValueStats {
     private(set) var count : Int
     private(set) var weight : Double
 
+    var isValid : Bool { return self.count != 0 }
+    
+    static let invalid = ValueStats(value: .nan)
+
+    //MARK: - Access
     var startWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: start) }
     var endWithUnit  : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: end) }
     
@@ -32,14 +43,13 @@ public struct ValueStats {
 
     var averageWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: average) }
     var weighterdAverageWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: weightedAverage) }
+    var totalWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: unit, andValue: total) }
 
     var average : Double { return self.sum / Double(self.count) }
     var weightedAverage : Double { return self.weightedSum / self.weight }
-
-    var isValid : Bool { return self.count != 0 }
+    var total : Double { return self.end - self.start}
     
-    static let invalid = ValueStats(value: .nan)
-    
+    //MARK: - Create
     init(value : Double, weight : Double = 1.0, unit : GCUnit = GCUnit.dimensionless()) {
         self.start = value
         self.end = value
@@ -55,7 +65,8 @@ public struct ValueStats {
     init(numberWithUnit : GCNumberWithUnit, weight : Double = 1.0) {
         self.init(value: numberWithUnit.value,weight: weight, unit: numberWithUnit.unit)
     }
-    
+
+    //MARK: - update
     mutating func update(numberWithUnit : GCNumberWithUnit, weight : Double = 1){
         let nu = numberWithUnit.convert(to: self.unit)
         self.update(double: nu.value, weight: weight)
@@ -83,4 +94,27 @@ public struct ValueStats {
             self.weightedSum = value * weight
         }
     }
+    
+    //MARK: Metrics
+    func value(for metric: Metric) -> Double{
+        switch metric {
+        case .max:
+            return self.max
+        case .average:
+            return self.average
+        case .min:
+            return self.min
+        case .end:
+            return self.end
+        case .start:
+            return self.start
+        case .total:
+            return self.total
+        }
+    }
+    
+    func numberWithUnit(for metric : Metric) -> GCNumberWithUnit {
+        return GCNumberWithUnit(unit: self.unit, andValue: self.value(for: metric))
+    }
+
 }

@@ -47,7 +47,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
     
     
     //MARK: - modify, append
-    public mutating func append(field : F, element : T, for index : I) throws {
+    private mutating func indexCheckAndUpdate(index : I) throws {
         if let last = indexes.last {
             if index > last {
                 indexes.append(index)
@@ -58,51 +58,40 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
             // nothing yet, insert date
             indexes.append(index)
         }
+    }
+    
+    private mutating func updateField(field : F, element : T) throws {
+        // if start and field missing, add dynamically
+        if self.indexes.count == 1 && values[field] == nil {
+            values[field] = []
+        }
+        
         guard let dataForField = values[field] else { throw IndexedValuesByFieldError.inconsistentDataSize }
         if dataForField.count != (indexes.count - 1) {
             throw IndexedValuesByFieldError.inconsistentDataSize
         }
         values[field]!.append(element)
     }
+    public mutating func append(field : F, element : T, for index : I) throws {
+        try self.indexCheckAndUpdate(index: index)
+        
+        try self.updateField(field: field, element: element)
+    }
     
     public mutating func append(fieldsValues : [F:T], for index : I) throws {
-        if let last = indexes.last {
-            if index > last {
-                indexes.append(index)
-            }else if index < last {
-                throw IndexedValuesByFieldError.inconsistentIndexOrder
-            }
-        }else{
-            // nothing yet, insert date
-            indexes.append(index)
-        }
+        try self.indexCheckAndUpdate(index: index)
+
         for (field,value) in fieldsValues {
-            guard let dataForField = values[field] else { throw IndexedValuesByFieldError.inconsistentDataSize }
-            if dataForField.count != (indexes.count - 1) {
-                throw IndexedValuesByFieldError.inconsistentDataSize
-            }
-            values[field]!.append(value)
+            try self.updateField(field: field, element: value)
         }
     }
 
     
     public mutating func append(fields : [F], elements: [T], for index : I) throws {
-        if let last = indexes.last {
-            if index > last {
-                indexes.append(index)
-            }else if index < last {
-                throw IndexedValuesByFieldError.inconsistentIndexOrder
-            }
-        }else{
-            // nothing yet, insert date
-            indexes.append(index)
-        }
+        try self.indexCheckAndUpdate(index: index)
+        
         for (field,element) in zip(fields,elements) {
-            guard let dataForField = values[field] else { throw IndexedValuesByFieldError.inconsistentDataSize }
-            if dataForField.count != (indexes.count - 1) {
-                throw IndexedValuesByFieldError.inconsistentDataSize
-            }
-            values[field]!.append(element)
+            try self.updateField(field: field, element: element)
         }
     }
     

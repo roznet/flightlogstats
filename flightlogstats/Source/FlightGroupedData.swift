@@ -57,67 +57,15 @@ extension Date {
 
 class FlightGroupedData  {
     typealias Field = FlightData.Field
+    typealias GroupedValueCollected = ValueStats
+    typealias GroupByType = ValueStats.Metric
     
-    enum GroupByType {
-        case start,end
-        case min,max,avg
-        case total
-        // Discrete
-        //case maxfreq,minIdx,maxIdx
-    }
-    
-    struct GroupByField {
+    struct GroupByField : Hashable {
         let field : Field
         let groupedBy : GroupByType
     }
-    
-    struct GroupedValueCollected {
-        let start : Double
-        var end : Double
-        var min : Double
-        var max : Double
-        var sum : Double
-        var cnt : Double
-        var avg : Double { return sum/cnt }
-        var total : Double { return end - start }
         
-        init(_ val : Double) {
-            start = val
-            end = val
-            min = val
-            max = val
-            sum = val
-            cnt = 1.0
-        }
-        
-        mutating func add(_ val : Double){
-            end = val
-            min = Swift.min(val,min)
-            max = Swift.max(val,max)
-            sum += val
-            cnt += 1.0
-        }
-        
-        func value(type: GroupByType) -> Double{
-            switch type {
-            case .max:
-                return self.max
-            case .avg:
-                return self.avg
-            case .min:
-                return self.min
-            case .end:
-                return self.end
-            case .start:
-                return self.start
-            case .total:
-                return self.total
-            }
-
-        }
-    }
-    
-    func groupBy(data : FlightData, interval : TimeInterval) {
+    func groupBy(data : FlightData, interval : TimeInterval) throws -> IndexedValuesByField<Date,Double,GroupByField> {
         let defs : [Field:[GroupByType]] = [.Distance:[.total],
                                             .E1_EGT_Max:[.max,.min],
                                             .FTotalizerT:[.total]]
@@ -125,37 +73,34 @@ class FlightGroupedData  {
         // categories by most frequency
         //  .E1_EGT_MaxIdx (int)
         //  .FltPhase (str)
-        
         // need at least one date
-        guard var currentGroupDate = data.dates.first?.roundedToNearest(interval: interval) else { return }
+        guard var currentGroupDate = data.dates.first?.roundedToNearest(interval: interval) else { return IndexedValuesByField<Date,Double,GroupByField>(fields: []) }
+                
+        // no fields initially build dynamically later
+        var rv : IndexedValuesByField<Date,Double,GroupByField> = IndexedValuesByField<Date,Double,GroupByField>(fields: [])
         
-        var datesGrouped : [Date] = []
-        var doublesGroupedValues : [[Double]] = []
-        var doublesGroupedFields : [GroupByField] = []
-        
-        var doublesCollected : [Field:GroupedValueCollected] = [:]
+        var doublesCollected : [Field:ValueStats] = [:]
         var started : Bool = false
         for (dateIdx,date) in data.dates.enumerated() {
-            
             let groupDateAtIdx = date.roundedToNearest(interval: interval)
             
             if started && !groupDateAtIdx.withinOneSecond(of: currentGroupDate) {
                 // collect
-                var groupedIdx = 0
-                var line : [Double] = []
                 for field in data.doubleFields {
+                    var add : [GroupByField:Double] = [:]
                     if let def = defs[field] {
                         for type in def {
-                            if groupedIdx == doublesGroupedFields.count  {
-                                doublesGroupedFields.append(GroupByField(field: field, groupedBy: type))
-                            }
-                            line.append(doublesCollected[field]?.value(type: type) ?? .nan)
-                            groupedIdx += 1
+                            let groupField = GroupByField(field: field, groupedBy: type)
+                            let element = doublesCollected[field]?.value(for: type) ?? .nan
+                            add[groupField] = element
                         }
                     }
+                    do {
+                        try rv.append(fieldsValues: add, for: currentGroupDate)
+                    }catch{
+                        throw error
+                    }
                 }
-                doublesGroupedValues.append(line)
-                datesGrouped.append(currentGroupDate)
                 
                 // Reset for next group
                 currentGroupDate = groupDateAtIdx
@@ -169,14 +114,15 @@ class FlightGroupedData  {
                 let value = valuesAtIdx[colIdx]
                 if defs[field] != nil {
                     if doublesCollected[field] == nil {
-                        let collected = GroupedValueCollected(value)
+                        let collected = GroupedValueCollected(value:value)
                         doublesCollected[field] = collected
                     }else{
-                        doublesCollected[field]?.add(value)
+                        doublesCollected[field]?.update(double: value)
                     }
                 }
             }
         }
-        print( doublesGroupedValues.count)
+        
+        return rv
     }
 }
