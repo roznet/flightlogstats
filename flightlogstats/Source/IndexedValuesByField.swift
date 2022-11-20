@@ -8,36 +8,37 @@
 import Foundation
 import RZUtils
 
-public struct DatesValuesByField<T,F : Hashable> {
-    public enum TimeDataByFieldError : Error {
-        case inconsistentDateOrder
+public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
+    public enum IndexedValuesByFieldError : Error {
+        case inconsistentIndexOrder
         case inconsistentDataSize
         case unknownField
     }
     
     public typealias FieldsValues = [F:T]
     
-    public struct DateValue {
-        public let date : Date
+    public struct IndexedValue {
+        public let index : I
         public let value : T
     }
     
-    public struct DatesValues {
-        public let dates : [Date]
+    public struct IndexedValues {
+        public let indexes : [I]
         public let values : [T]
         
-        public func dropFirst(_ k : Int) -> DatesValues {
-            return DatesValues(dates: [Date]( self.dates.dropFirst(k) ), values: [T]( self.values.dropFirst(k)) )
+        public func dropFirst(_ k : Int) -> IndexedValues {
+            return IndexedValues(indexes: [I]( self.indexes.dropFirst(k) ), values: [T]( self.values.dropFirst(k)) )
         }
     }
     
-    private(set) var dates : [Date]
-    private var values : [F:[T]]
+    private(set) var indexes : [I]
+    private(set) var values : [F:[T]]
     
-    var count : Int { return dates.count }
+    var fields : [F] { return Array(values.keys) }
+    var count : Int { return indexes.count }
     
     public init(fields : [F]){
-        dates = []
+        indexes = []
         values = [:]
         for field in fields {
             values[field] = []
@@ -46,52 +47,73 @@ public struct DatesValuesByField<T,F : Hashable> {
     
     
     //MARK: - modify, append
-    public mutating func append(field : F, element : T, for date : Date) throws {
-        if let last = dates.last {
-            if date > last {
-                dates.append(date)
-            }else if date < last {
-                throw TimeDataByFieldError.inconsistentDateOrder
+    public mutating func append(field : F, element : T, for index : I) throws {
+        if let last = indexes.last {
+            if index > last {
+                indexes.append(index)
+            }else if index < last {
+                throw IndexedValuesByFieldError.inconsistentIndexOrder
             }
         }else{
             // nothing yet, insert date
-            dates.append(date)
+            indexes.append(index)
         }
-        guard let dataForField = values[field] else { throw TimeDataByFieldError.inconsistentDataSize }
-        if dataForField.count != (dates.count - 1) {
-            throw TimeDataByFieldError.inconsistentDataSize
+        guard let dataForField = values[field] else { throw IndexedValuesByFieldError.inconsistentDataSize }
+        if dataForField.count != (indexes.count - 1) {
+            throw IndexedValuesByFieldError.inconsistentDataSize
         }
         values[field]!.append(element)
     }
     
-    public mutating func append(fields : [F], elements: [T], for date : Date) throws {
-        if let last = dates.last {
-            if date > last {
-                dates.append(date)
-            }else if date < last {
-                throw TimeDataByFieldError.inconsistentDateOrder
+    public mutating func append(fieldsValues : [F:T], for index : I) throws {
+        if let last = indexes.last {
+            if index > last {
+                indexes.append(index)
+            }else if index < last {
+                throw IndexedValuesByFieldError.inconsistentIndexOrder
             }
         }else{
             // nothing yet, insert date
-            dates.append(date)
+            indexes.append(index)
+        }
+        for (field,value) in fieldsValues {
+            guard let dataForField = values[field] else { throw IndexedValuesByFieldError.inconsistentDataSize }
+            if dataForField.count != (indexes.count - 1) {
+                throw IndexedValuesByFieldError.inconsistentDataSize
+            }
+            values[field]!.append(value)
+        }
+    }
+
+    
+    public mutating func append(fields : [F], elements: [T], for index : I) throws {
+        if let last = indexes.last {
+            if index > last {
+                indexes.append(index)
+            }else if index < last {
+                throw IndexedValuesByFieldError.inconsistentIndexOrder
+            }
+        }else{
+            // nothing yet, insert date
+            indexes.append(index)
         }
         for (field,element) in zip(fields,elements) {
-            guard let dataForField = values[field] else { throw TimeDataByFieldError.inconsistentDataSize }
-            if dataForField.count != (dates.count - 1) {
-                throw TimeDataByFieldError.inconsistentDataSize
+            guard let dataForField = values[field] else { throw IndexedValuesByFieldError.inconsistentDataSize }
+            if dataForField.count != (indexes.count - 1) {
+                throw IndexedValuesByFieldError.inconsistentDataSize
             }
             values[field]!.append(element)
         }
     }
     
-    public func dropFirst(field : F, minimumMatchCount : Int = 1, matching : ((T) -> Bool)) -> DatesValuesByField? {
+    public func dropFirst(field : F, minimumMatchCount : Int = 1, matching : ((T) -> Bool)) -> IndexedValuesByField? {
         
         guard let fieldValues = self.values[field]
         else {
             return nil
         }
         
-        var rv = DatesValuesByField(fields: [F](self.values.keys))
+        var rv = IndexedValuesByField(fields: [F](self.values.keys))
 
         var found : Int = -1
         var matchCount : Int = 0
@@ -110,7 +132,7 @@ public struct DatesValuesByField<T,F : Hashable> {
         }
 
         if found != -1 {
-            rv.dates = [Date](self.dates.dropFirst(found))
+            rv.indexes = [I](self.indexes.dropFirst(found))
             for (oneField,oneFieldValues) in self.values {
                 rv.values[oneField] = [T](oneFieldValues.dropFirst(found))
             }
@@ -118,14 +140,14 @@ public struct DatesValuesByField<T,F : Hashable> {
         return rv
     }
     
-    public func dropLast(field : F, matching : ((T) -> Bool)) -> DatesValuesByField? {
+    public func dropLast(field : F, matching : ((T) -> Bool)) -> IndexedValuesByField? {
         
         guard let fieldValues = self.values[field]
         else {
             return nil
         }
         
-        var rv = DatesValuesByField(fields: Array(self.values.keys))
+        var rv = IndexedValuesByField(fields: Array(self.values.keys))
 
         var found : Int = 0
         for (idx,value) in fieldValues.reversed().enumerated() {
@@ -135,7 +157,7 @@ public struct DatesValuesByField<T,F : Hashable> {
             }
         }
 
-        rv.dates = [Date](self.dates.dropLast(found))
+        rv.indexes = [I](self.indexes.dropLast(found))
         for (oneField,oneFieldValues) in self.values {
             rv.values[oneField] = [T](oneFieldValues.dropLast(found))
         }
@@ -143,55 +165,55 @@ public struct DatesValuesByField<T,F : Hashable> {
     }
     
     //MARK: - access
-    public func last(field : F, matching : ((T) -> Bool)? = nil) -> DateValue?{
+    public func last(field : F, matching : ((T) -> Bool)? = nil) -> IndexedValue?{
         guard let fieldValues = self.values[field],
-              let lastDate = self.dates.last,
+              let lastDate = self.indexes.last,
               let lastValue = fieldValues.last
         else {
             return nil
         }
         
         if let matching = matching {
-            for (date,value) in zip(dates.reversed(),fieldValues.reversed()) {
+            for (date,value) in zip(indexes.reversed(),fieldValues.reversed()) {
                 if matching(value) {
-                    return DateValue(date: date, value: value)
+                    return IndexedValue(index: date, value: value)
                 }
             }
             return nil
         }else{
-            return DateValue(date: lastDate, value: lastValue)
+            return IndexedValue(index: lastDate, value: lastValue)
         }
     }
 
-    public func first(field : F, matching : ((T) -> Bool)? = nil) -> DateValue?{
+    public func first(field : F, matching : ((T) -> Bool)? = nil) -> IndexedValue?{
         guard let fieldValues = self.values[field],
-              let firstDate = self.dates.first,
+              let firstDate = self.indexes.first,
               let firstValue = fieldValues.first
         else {
             return nil
         }
         
         if let matching = matching {
-            for (date,value) in zip(dates,fieldValues) {
+            for (date,value) in zip(indexes,fieldValues) {
                 if matching(value) {
-                    return DateValue(date: date, value: value)
+                    return IndexedValue(index: date, value: value)
                 }
             }
             return nil
         }else{
-            return DateValue(date: firstDate, value: firstValue)
+            return IndexedValue(index: firstDate, value: firstValue)
         }
     }
     
-    public func dateValue(for field : F, at index : Int) -> DateValue? {
-        guard let fieldValues = self.values[field], index < self.dates.count else { return nil }
+    public func dateValue(for field : F, at index : Int) -> IndexedValue? {
+        guard let fieldValues = self.values[field], index < self.indexes.count else { return nil }
         let value = fieldValues[index]
-        let date = self.dates[index]
-        return DateValue(date: date, value: value)
+        let date = self.indexes[index]
+        return IndexedValue(index: date, value: value)
     }
 
     public func value(for field : F, at index : Int) -> T? {
-        guard let fieldValues = self.values[field], index < self.dates.count else { return nil }
+        guard let fieldValues = self.values[field], index < self.indexes.count else { return nil }
         let value = fieldValues[index]
         return value
     }
@@ -206,18 +228,18 @@ public struct DatesValuesByField<T,F : Hashable> {
         return rv
     }
     
-    public subscript(_ field : F) -> DatesValues? {
+    public subscript(_ field : F) -> IndexedValues? {
         guard let values = self.values[field] else { return nil }
-        return DatesValues(dates: self.dates, values: values)
+        return IndexedValues(indexes: self.indexes, values: values)
     }
     
 }
 
-extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
-    public func valueStats(from : Date, to : Date) -> [F:ValueStats] {
+extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field {
+    public func valueStats(from : I, to : I) -> [F:ValueStats] {
         var rv : [F:ValueStats] = [:]
         var started : Bool = false
-        for (idx,runningdate) in self.dates.enumerated(){
+        for (idx,runningdate) in self.indexes.enumerated(){
             if runningdate > to {
                 break
             }
@@ -242,17 +264,20 @@ extension DatesValuesByField  where T == Double, F == FlightLogFile.Field {
         let value = fieldValues.max()
         return value
     }
-
+    
     public func min(for field : F) -> T? {
         guard let fieldValues = self.values[field] else { return nil }
         let value = fieldValues.min()
         return value
     }
+}
 
-    public func dataSeries(from : Date? = nil, to : Date? = nil) -> [F:GCStatsDataSerie] {
+extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field, I == Date {
+
+    public func dataSeries(from : I? = nil, to : I? = nil) -> [F:GCStatsDataSerie] {
         var rv : [F:GCStatsDataSerie] = [:]
         var started : Bool = false
-        for (idx,runningdate) in self.dates.enumerated(){
+        for (idx,runningdate) in self.indexes.enumerated(){
             if let to = to, runningdate > to {
                 break
             }

@@ -17,9 +17,9 @@ struct TimeRange : Codable {
     
     var numberWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: GCUnit.second(), andValue: self.elapsed)}
     
-    init?(valuesByField : DatesValuesByField<Double,Field>?, field : FlightLogFile.Field) {
-        guard let start = valuesByField?.first(field: field)?.date,
-           let end = valuesByField?.last(field: field)?.date else {
+    init?(valuesByField : IndexedValuesByField<Date,Double,Field>?, field : FlightLogFile.Field) {
+        guard let start = valuesByField?.first(field: field)?.index,
+           let end = valuesByField?.last(field: field)?.index else {
             return nil
         }
         self.start = start

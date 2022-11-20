@@ -23,7 +23,13 @@ class FlightData {
     private var fieldsUnits : [Field:GCUnit] = [:]
     /**
         * values columns are fields,
+    private var discreteValues : IndexedValuesByField<Date,Double,Field>?
+    private var discreteStrings : IndexedValuesByField<Date,String,Field>?
+    private var doubleValues : IndexedValuesByField<Date,Double,Field>?
+    private var coord : IndexedValuesByField<Date,CLLocationCoordinate2D,Field>?
      */
+    
+    
     private(set) var values : [[Double]] = []
     private(set) var strings : [[String]] = []
 
@@ -181,9 +187,9 @@ class FlightData {
         return rv
     }
     
-    func datesDoubles(for doubleFields : [Field]) -> DatesValuesByField<Double,Field> {
+    func datesDoubles(for doubleFields : [Field]) -> IndexedValuesByField<Date,Double,Field> {
         let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
-        var rv = DatesValuesByField<Double,Field>(fields: doubleFields)
+        var rv = IndexedValuesByField<Date,Double,Field>(fields: doubleFields)
         
         var lastDate : Date? = nil
         
@@ -229,10 +235,10 @@ class FlightData {
      - start: nil or the date when the collection should start
      - Returns: DatesValuesByField where date is the first appearance of the string
      */
-    func datesStrings(for stringFields : [Field], start : Date? = nil) -> DatesValuesByField<String,Field> {
+    func datesStrings(for stringFields : [Field], start : Date? = nil) -> IndexedValuesByField<Date,String,Field> {
         let fieldToIndex : [Field:Int] = self.stringFieldToIndex
         
-        var rv = DatesValuesByField<String,Field>(fields: stringFields)
+        var rv = IndexedValuesByField<Date,String,Field>(fields: stringFields)
         
         var first = true
         
@@ -280,8 +286,8 @@ class FlightData {
     /// - Parameter start:first date to start statistics or nil for first date in data
     /// - Parameter end: last date (included) to collect statistics or nil for last date in data
     /// - Returns: statisitics computed between dates
-    func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> DatesValuesByField<ValueStats,Field> {
-        var rv = DatesValuesByField<ValueStats,Field>(fields: self.doubleFields)
+    func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> IndexedValuesByField<Date,ValueStats,Field> {
+        var rv = IndexedValuesByField<Date,ValueStats,Field>(fields: self.doubleFields)
         
         // we need at least one date to extract and one date of data, else we'll return empty
         // last date should be past the last date (+10 seconds) so it's included

@@ -96,7 +96,9 @@ class TestParsingLogFiles: XCTestCase {
             }
         }
         
-        data.groupBy(interval: 60.0)
+        let group  = FlightGroupedData()
+        group.groupBy(data: data, interval: 60.0)
+        
     }
     
     func testTaxiOnly() {
