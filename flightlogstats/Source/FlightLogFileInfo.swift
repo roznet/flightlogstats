@@ -103,10 +103,6 @@ class FlightLogFileInfo: NSManagedObject {
 
         self.log_file_name = flightLog.name
         
-        guard let flightSummary = flightLog.flightSummary else {
-            self.infoStatus = .error
-            throw FlightLogFileInfoError.invalidFlightLog
-        }
         // start empty
         self.infoStatus = .empty
         
@@ -118,43 +114,48 @@ class FlightLogFileInfo: NSManagedObject {
             self.airframe_name = airframe_name
         }
 
-        if let hobbs = flightSummary.hobbs {
-            self.start_time = hobbs.start
-            self.end_time = hobbs.end
-            // if we have some times, then consider it parsed
-            self.infoStatus = .parsed
-        }
-        
-        if let moving = flightSummary.moving {
-            self.start_time_moving = moving.start
-            self.end_time_moving = moving.end
+        if let flightSummary = flightLog.flightSummary {
+            
+            if let hobbs = flightSummary.hobbs {
+                self.start_time = hobbs.start
+                self.end_time = hobbs.end
+                // if we have some times, then consider it parsed
+                self.infoStatus = .parsed
+            }
+            
+            if let moving = flightSummary.moving {
+                self.start_time_moving = moving.start
+                self.end_time_moving = moving.end
+            }else{
+                self.start_time_moving = nil
+                self.end_time_moving = nil
+                
+            }
+            
+            if let flying = flightSummary.flying {
+                self.start_time_flying = flying.start
+                self.end_time_flying = flying.end
+            }else{
+                self.start_time_flying = nil
+                self.end_time_flying = nil
+            }
+            
+            self.start_fuel_quantity_left = flightSummary.fuelStart.left
+            self.start_fuel_quantity_right = flightSummary.fuelStart.right
+            self.end_fuel_quantity_left = flightSummary.fuelEnd.left
+            self.end_fuel_quantity_right = flightSummary.fuelEnd.right
+            self.fuel_totalizer_total = flightSummary.fuelTotalizer.total
+            
+            self.route = flightSummary.route.map { $0.name }.joined(separator: ",")
+            
+            self.start_airport_icao = flightSummary.startAirport?.icao
+            self.end_airport_icao = flightSummary.endAirport?.icao
+            
+            self.total_distance = flightSummary.distanceInNm
+            self.max_altitude = flightSummary.altitudeInFeet
         }else{
-            self.start_time_moving = nil
-            self.end_time_moving = nil
-
+            self.infoStatus = .notParsed
         }
-        
-        if let flying = flightSummary.flying {
-            self.start_time_flying = flying.start
-            self.end_time_flying = flying.end
-        }else{
-            self.start_time_flying = nil
-            self.end_time_flying = nil
-        }
-
-        self.start_fuel_quantity_left = flightSummary.fuelStart.left
-        self.start_fuel_quantity_right = flightSummary.fuelStart.right
-        self.end_fuel_quantity_left = flightSummary.fuelEnd.left
-        self.end_fuel_quantity_right = flightSummary.fuelEnd.right
-        self.fuel_totalizer_total = flightSummary.fuelTotalizer.total
-        
-        self.route = flightSummary.route.map { $0.name }.joined(separator: ",")
-        
-        self.start_airport_icao = flightSummary.startAirport?.icao
-        self.end_airport_icao = flightSummary.endAirport?.icao
-        
-        self.total_distance = flightSummary.distanceInNm
-        self.max_altitude = flightSummary.altitudeInFeet
         
         self.version = FlightLogFileInfo.currentVersion
         

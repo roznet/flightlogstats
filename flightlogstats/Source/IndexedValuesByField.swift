@@ -81,16 +81,11 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
     }
     
     private mutating func updateField(field : F, element : T) throws {
-        // if start and field missing, add dynamically
-        if self.indexes.count == 1 && values[field] == nil {
-            values[field] = []
-        }
-        
-        guard let dataForField = values[field] else { throw IndexedValuesByFieldError.inconsistentDataSize }
-        if dataForField.count != (indexes.count - 1) {
+        values[field, default: []].append(element)
+
+        if values[field, default: []].count != indexes.count {
             throw IndexedValuesByFieldError.inconsistentDataSize
         }
-        values[field]!.append(element)
     }
     public mutating func append(field : F, element : T, for index : I) throws {
         try self.indexCheckAndUpdate(index: index)
@@ -108,13 +103,8 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
 
     public mutating func unsafeFastAppend(fields : [F], elements : [T], for index : I) {
         self.indexes.append(index)
-        if self.values.count == 0 {
-            for f in fields {
-                self.values[f] = []
-            }
-        }
         for (field,element) in zip(fields,elements) {
-            self.values[field]?.append(element)
+            self.values[field, default: []].append(element)
         }
     }
     

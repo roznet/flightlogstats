@@ -98,34 +98,47 @@ class TestParsingLogFiles: XCTestCase {
                 XCTAssertTrue(false)
             }
         }
-        
         let group  = FlightGroupedData()
         do {
+            
             let rv = try group.groupBy(data: data, interval: 60.0)
             
             let raw = data.datesDoubles(for: rv.fields.map { $0.field } )
+            
             let rv_e = try raw.extract(indexes: rv.indexes,
                         createCollector: createCollector,
                         updateCollector: updateCollector
             )
+            
+            
             XCTAssertEqual(rv.count, rv_e.count)
         }catch{
             XCTAssertNil(error)
         }
         
         let identifiers = data.datesStrings(for: [.AtvWpt,.AfcsOn]).indexesForValueChange(fields: [.AtvWpt])
-        print(identifiers.count)
-        
+
         do {
-            let start = Date()
+            var timings : [Date] = [Date()]
+            
             let old = try data.extract(dates: identifiers.indexes)
-            let mid = Date()
+            timings.append(Date())
             let new = try data.datesDoubles(for: []).extract(indexes: identifiers.indexes)
                                                              //createCollector: createCollector,
                                                              //updateCollector: updateCollector)
-            let end = Date()
+            timings.append(Date())
+            let generic = try data.datesDoubles(for: []).extract(indexes: identifiers.indexes,
+                                                                 createCollector: createCollector,
+                                                                 updateCollector: updateCollector)
+            timings.append(Date())
             XCTAssertEqual(old.count, new.count)
-            Logger.test.info("old \(mid.timeIntervalSince(start)) new \(end.timeIntervalSince(mid))")
+            XCTAssertEqual(old.count, generic.count)
+            for i in 0..<timings.count-1 {
+                let start = timings[i]
+                let end = timings[i+1]
+                
+                Logger.test.info("Timing[\(i)] = \(end.timeIntervalSince(start))")
+            }
         }catch{
             XCTAssertNil(error)
         }
