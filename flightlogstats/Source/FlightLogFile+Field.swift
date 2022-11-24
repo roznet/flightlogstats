@@ -10,6 +10,8 @@ import OSLog
 import RZUtils
 
 extension FlightLogFile {
+    typealias CategoricalValue = String
+    
     public enum Field : String {
         // the rawValue needs to be the same as in the original csv log file
         case Unknown = "Unknown"
@@ -120,7 +122,7 @@ extension FlightLogFile {
         //FQtyT
         
         enum ValueType : String {
-            case value, discrete
+            case value, categorical
         }
         
         struct FieldDef : Codable {

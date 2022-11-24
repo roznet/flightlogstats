@@ -11,6 +11,7 @@ import OSLog
 
 struct FlightLeg {
     typealias Field = FlightLogFile.Field
+    typealias CategoricalValue = FlightLogFile.CategoricalValue
     
     enum LegInfo : String {
         case start_time = "Start"
@@ -19,24 +20,29 @@ struct FlightLeg {
         case route = "Route"
     }
     
-    let waypoint : Waypoint
+    var waypoint : Waypoint { return Waypoint(name: self.categoricalValues[.AtvWpt] ?? "" )!  }
     
     let timeRange : TimeRange
     var start : Date { return timeRange.start }
     var end : Date { return timeRange.end }
     
     private var data : [Field:ValueStats]
+    private(set) var categoricalValues : [Field:CategoricalValue]
     
     var fields : [Field] { return Array(data.keys).sorted { $0.order < $1.order } }
     
-    init(waypoint: Waypoint, timeRange: TimeRange, data: [Field : ValueStats]) {
-        self.waypoint = waypoint
+    init(categoricalValues : [Field : CategoricalValue], timeRange: TimeRange, data: [Field : ValueStats]) {
+        self.categoricalValues = categoricalValues
         self.timeRange = timeRange
         self.data = data
     }
     
     func valueStats(field : Field) -> ValueStats? {
         return self.data[field]
+    }
+    
+    func categoricalValue(field: Field) -> CategoricalValue? {
+        return self.categoricalValues[field]
     }
     
     func format(which : LegInfo, displayContext : DisplayContext = DisplayContext(), reference : Date? = nil) -> String {
@@ -55,29 +61,30 @@ struct FlightLeg {
     static func legs(from data : FlightData,
                      start : Date? = nil,
                      end : Date? = nil,
-                     byfield : Field = .AtvWpt) -> [FlightLeg] {
+                     byfields : [Field] = [.AtvWpt]) -> [FlightLeg] {
         var rv : [FlightLeg] = []
-        let identifiers : IndexedValuesByField<Date,String,Field> = data.datesStrings(for: [byfield], start: start).indexesForValueChange(fields: [byfield])
+        let identifiers : IndexedValuesByField<Date,String,Field> = data.datesStrings(for: byfields, start: start).indexesForValueChange(fields: byfields)
         
         do {
             let stats : IndexedValuesByField<Date,ValueStats,Field> = try data.extract(dates: identifiers.indexes, start: start, end : end)
             
             for idx in 0..<identifiers.count {
-                if let identifier = identifiers.value(for: byfield, at: idx),
-                   let waypoint = Waypoint(name: identifier),
-                   var endTime = end ?? identifiers.indexes.last {
+                if var endTime = end ?? identifiers.indexes.last {
                    let startTime = identifiers.indexes[idx]
                     
                     if idx + 1 < identifiers.count {
                         endTime = identifiers.indexes[idx+1]
                     }
+                    
+                    let categoricalValues = identifiers.fieldsValues(at: idx)
                     var validData : [Field:ValueStats] = [:]
-                    for (field,val) in stats.fieldValue(at: idx) {
+                    
+                    for (field,val) in stats.fieldsValues(at: idx) {
                         if val.isValid {
                             validData[field] = val
                         }
                     }
-                    let leg = FlightLeg(waypoint: waypoint,
+                    let leg = FlightLeg(categoricalValues: categoricalValues,
                                         timeRange: TimeRange(start: startTime, end: endTime),
                                         data: validData)
                     rv.append(leg)

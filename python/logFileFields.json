@@ -5,7 +5,7 @@
     "unit": "ident",
     "description": "Active Waypoint Identifier",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "Distance",
@@ -213,7 +213,7 @@
     "unit": "enum",
     "description": "HSI source",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "NAV1",
@@ -221,7 +221,7 @@
     "unit": "MHz",
     "description": "Nav1 frequency",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "NAV2",
@@ -229,7 +229,7 @@
     "unit": "MHz",
     "description": "Nav2 frequency",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "COM1",
@@ -237,7 +237,7 @@
     "unit": "MHz",
     "description": "Com1 frequency",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "COM2",
@@ -245,7 +245,7 @@
     "unit": "MHz",
     "description": "Com2 frequency",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "AfcsOn",
@@ -253,7 +253,7 @@
     "unit": "bool",
     "description": "Autopilot On/Off",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "GPSfix",
@@ -261,7 +261,7 @@
     "unit": "enum",
     "description": "GPSfix",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "E1 FFlow",
@@ -365,7 +365,7 @@
     "unit": "deg F",
     "description": "E1 EGTMaxIdx",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "E1 EGTMin",
@@ -605,7 +605,7 @@
     "unit": "enum",
     "description": "RollM",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "PitchM",
@@ -613,7 +613,7 @@
     "unit": "enum",
     "description": "PitchM",
     "unit_description": "",
-    "type": "discrete"
+    "type": "categorical"
   },
   {
     "field": "RollC",

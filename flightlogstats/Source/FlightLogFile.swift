@@ -93,7 +93,7 @@ extension FlightLogFile {
     var phasesOfFLight : [FlightLeg] {
         var rv : [FlightLeg] = []
         if let flyingStart = self.flightSummary?.flying?.start, let data = self.data {
-            rv = FlightLeg.legs(from: data, start: flyingStart, byfield: .FltPhase)
+            rv = FlightLeg.legs(from: data, start: flyingStart, byfields: [.FltPhase])
         }
         return rv
     }
@@ -112,7 +112,7 @@ extension FlightLogFile {
         
         // first identify list of way points
         if let data = self.data {
-            rv = FlightLeg.legs(from: data, start: start, byfield: .AtvWpt)
+            rv = FlightLeg.legs(from: data, start: start, byfields: [.AtvWpt])
         }
         
         return rv

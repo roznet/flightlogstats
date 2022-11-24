@@ -458,7 +458,8 @@ class FlightLogOrganizer {
                 
                 var isDirectory : ObjCBool = false
                 if FileManager.default.fileExists(atPath: dirurl.path, isDirectory: &isDirectory) {
-                    if isDirectory.boolValue {
+                    if isDirectory.boolValue{
+                        
                         let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
                         
                         guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {

@@ -50,7 +50,7 @@ public struct ValueStats {
     var total : Double { return self.end - self.start}
     
     //MARK: - Create
-    init(value : Double, weight : Double = 1.0, unit : GCUnit = GCUnit.dimensionless()) {
+    init(value : Double, weight : Double = 1.0, unit : GCUnit? = nil) {
         self.start = value
         self.end = value
         self.sum = value
@@ -59,7 +59,7 @@ public struct ValueStats {
         self.count = value.isFinite ? 1 : 0
         self.weight = weight
         self.weightedSum = value * weight
-        self.unit = unit
+        self.unit = unit ?? GCUnit.dimensionless()
     }
     
     init(numberWithUnit : GCNumberWithUnit, weight : Double = 1.0) {

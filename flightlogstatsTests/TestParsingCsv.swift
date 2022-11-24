@@ -51,7 +51,7 @@ class TestParsingCsv: XCTestCase {
             for field in data.doubleFields {
                 csvtypes[field.rawValue] = .double
             }
-            for field in data.stringFields {
+            for field in data.categoricalFields {
                 csvtypes[field.rawValue] = .string
             }
             let csvoption = CSVReadingOptions()

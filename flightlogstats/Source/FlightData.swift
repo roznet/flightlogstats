@@ -18,21 +18,22 @@ class FlightData {
     
     
     typealias Field = FlightLogFile.Field
+    typealias CategoricalValue = FlightLogFile.CategoricalValue
     typealias MetaField = FlightLogFile.MetaField
     
     private var fieldsUnits : [Field:GCUnit] = [:]
     
-    private var discreteValues : IndexedValuesByField<Date,String,Field> = IndexedValuesByField<Date,String,Field>()
+    private var categoricalValues : IndexedValuesByField<Date,CategoricalValue,Field> = IndexedValuesByField<Date,String,Field>()
     private var doubleValues : IndexedValuesByField<Date,Double,Field> = IndexedValuesByField<Date,Double,Field>()
     private var coord : IndexedValuesByField<Date,CLLocationCoordinate2D,Field> = IndexedValuesByField<Date,CLLocationCoordinate2D,Field>()
     
     private(set) var values : [[Double]] = []
-    private(set) var strings : [[String]] = []
+    private(set) var strings : [[CategoricalValue]] = []
 
     private(set) var meta : [MetaField:String] = [:]
     private(set) var dates : [Date] = []
     private(set) var doubleFields : [Field] = []
-    private(set) var stringFields : [Field] = []
+    private(set) var categoricalFields : [Field] = []
     
     private(set) var coordinates : [CLLocationCoordinate2D] = []
 
@@ -52,9 +53,9 @@ class FlightData {
         return rv
     }
 
-    private var stringFieldToIndex : [Field:Int] {
+    private var categoricalFieldToIndex : [Field:Int] {
         var rv : [Field:Int] = [:]
-        for (idx,field) in stringFields.enumerated() {
+        for (idx,field) in categoricalFields.enumerated() {
             rv[field] = idx
         }
         return rv
@@ -205,13 +206,13 @@ class FlightData {
      - start: nil or the date when the collection should start
      - Returns: DatesValuesByField where date is the first appearance of the string
      */
-    func datesStrings(for stringFields : [Field], start : Date? = nil) -> IndexedValuesByField<Date,String,Field> {
-        if self.discreteValues.count == 0 {
+    func datesStrings(for stringFields : [Field], start : Date? = nil) -> IndexedValuesByField<Date,CategoricalValue,Field> {
+        if self.categoricalValues.count == 0 {
             let cstart = Date()
             self.convertIndexedValues()
-            Logger.app.info("Converted \(self.discreteValues.count) rows in \(Date().timeIntervalSince(cstart)) secs")
+            Logger.app.info("Converted \(self.categoricalValues.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
-        return self.discreteValues
+        return self.categoricalValues.sliced(start: start)
     }
         
     /// Will extract and compute parameters
@@ -294,11 +295,17 @@ extension FlightData {
 
     //
     private struct ParsingState {
+        enum ColumnType {
+            case double
+            case category
+            case ignore
+        }
+        
         var lastReportTime = Date()
         var totalSize = 0
         
         var fields : [Field] = []
-        var columnIsDouble : [Bool] = []
+        var columnIsDouble : [ColumnType] = []
         var fieldsMap : [Field:Int] = [:]
         
         let dateIndex : Int = 0
@@ -357,10 +364,12 @@ extension FlightData {
             }else if first.hasPrefix("#"){
                 units = line
                 for unit in units {
-                    if unit.hasPrefix("yyy-") || unit.hasPrefix("hh:") || unit == "ident" || unit == "enum" {
-                        columnIsDouble.append(false)
+                    if unit.hasPrefix("yyy-") || unit.hasPrefix("hh:") {
+                        columnIsDouble.append(.ignore)
+                    }else if unit == "ident" || unit == "enum" {
+                        columnIsDouble.append(.category)
                     }else{
-                        columnIsDouble.append(true)
+                        columnIsDouble.append(.double)
                     }
                 }
             }else if fields.count == 0 {
@@ -375,9 +384,9 @@ extension FlightData {
                         }
                         fields.append(field)
                         
-                        if field.valueType == .discrete {
-                            if columnIsDouble[idx] {
-                                columnIsDouble[idx] = false
+                        if field.valueType == .categorical {
+                            if idx < columnIsDouble.count {
+                                columnIsDouble[idx] = .category
                             }
                         }
                     }else{
@@ -387,23 +396,29 @@ extension FlightData {
                 }
                 fields = line.map { Field(rawValue: $0) ?? .Unknown }
                 for (idx,(isDouble,unit)) in zip(columnIsDouble,units).enumerated() {
-                    if isDouble {
+                    switch isDouble {
+                    case .double:
                         let field = fields[idx]
                         let gcunit = GCUnit.from(logFileUnit: unit)
                         data.fieldsUnits[field] = gcunit
+                    case .category,.ignore:
+                        break
                     }
                 }
                 data.doubleFields = []
-                data.stringFields = []
+                data.categoricalFields = []
                 fieldsMap = [:]
                 var idx = 0
                 for (field,isDouble) in zip(fields, columnIsDouble) {
-                    if isDouble {
+                    switch isDouble {
+                    case .double:
                         data.doubleFields.append(field)
                         fieldsMap[field] = idx
                         idx += 1
-                    }else{
-                        data.stringFields.append(field)
+                    case .category:
+                        data.categoricalFields.append(field)
+                    case .ignore:
+                        break
                     }
                 }
                 
@@ -417,7 +432,7 @@ extension FlightData {
                         }
                         data.doubleFields.append(contentsOf: field.outputs)
                     case .string:
-                        data.stringFields.append(field.output)
+                        data.categoricalFields.append(field.output)
                     }
                 }
             }else if line.count == columnIsDouble.count {
@@ -478,7 +493,8 @@ extension FlightData {
                 var coord = CLLocationCoordinate2D(latitude: .nan, longitude: .nan)
                 
                 for (idx,(val, isDouble)) in zip(line,columnIsDouble).enumerated() {
-                    if isDouble {
+                    switch isDouble {
+                    case .double:
                         if let dbl = Double(val) {
                             if idx == longitudeIndex {
                                 coord.longitude = dbl
@@ -490,8 +506,10 @@ extension FlightData {
                         }else{
                             doubleLine.append(.nan)
                         }
-                    }else{
+                    case .category:
                         stringLine.append(val)
+                    case .ignore:
+                        break
                     }
                 }
                 if coord.latitude.isFinite && coord.longitude.isFinite {
@@ -742,9 +760,9 @@ extension FlightData {
     
     private func convertIndexedValues() {
         self.doubleValues.clear(fields: self.doubleFields)
-        self.discreteValues.clear(fields: self.stringFields)
+        self.categoricalValues.clear(fields: self.categoricalFields)
         self.doubleValues.reserveCapacity(self.dates.capacity)
-        self.discreteValues.reserveCapacity(self.dates.capacity)
+        self.categoricalValues.reserveCapacity(self.dates.capacity)
         
         guard dates.first != nil else { return }
         
@@ -766,11 +784,11 @@ extension FlightData {
         lastdate = dates.first!
         for (date,row) in zip(dates,strings) {
             if date < lastdate {
-                self.discreteValues.clear(fields: self.stringFields)
-                self.discreteValues.reserveCapacity(self.dates.capacity)
+                self.categoricalValues.clear(fields: self.categoricalFields)
+                self.categoricalValues.reserveCapacity(self.dates.capacity)
             }
-            if self.discreteValues.count == 0 || date != lastdate {
-                self.discreteValues.unsafeFastAppend(fields: self.stringFields, elements: row, for: date)
+            if self.categoricalValues.count == 0 || date != lastdate {
+                self.categoricalValues.unsafeFastAppend(fields: self.categoricalFields, elements: row, for: date)
                 lastdate = date
             }
         }

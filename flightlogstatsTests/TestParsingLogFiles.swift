@@ -72,7 +72,7 @@ class TestParsingLogFiles: XCTestCase {
         
         XCTAssertGreaterThan(engine.count, 0)
         for idx in 0..<engine.count {
-            let x = engine.fieldValue(at: idx)
+            let x = engine.fieldsValues(at: idx)
             let cyls = [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6].map({ x[$0] ?? 0.0 })
             let max = cyls.max() ?? 0.0
             let maxidx = cyls.firstIndex(of: max) ?? cyls.count
@@ -84,7 +84,7 @@ class TestParsingLogFiles: XCTestCase {
         let wind = data.datesDoubles(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
         
         for idx in 0..<wind.count {
-            let x = wind.fieldValue(at: idx)
+            let x = wind.fieldsValues(at: idx)
             if let wndspddirect = x[.WndDirect], let wndspdcross = x[.WndCross], let wndspd = x[.WndSpd], let wnddr = x[.WndDr], let crs = x[.CRS] {
                 let heading = Heading(heading: crs)
                 let windDir = Heading(heading: wnddr > 0 ? wnddr : 360+wnddr)
@@ -120,9 +120,9 @@ class TestParsingLogFiles: XCTestCase {
             let start = Date()
             let old = try data.extract(dates: identifiers.indexes)
             let mid = Date()
-            let new = try data.datesDoubles(for: []).extract(indexes: identifiers.indexes,
-                                                             createCollector: createCollector,
-                                                             updateCollector: updateCollector)
+            let new = try data.datesDoubles(for: []).extract(indexes: identifiers.indexes)
+                                                             //createCollector: createCollector,
+                                                             //updateCollector: updateCollector)
             let end = Date()
             XCTAssertEqual(old.count, new.count)
             Logger.test.info("old \(mid.timeIntervalSince(start)) new \(end.timeIntervalSince(mid))")
@@ -196,14 +196,17 @@ class TestParsingLogFiles: XCTestCase {
             let routeFull = FlightLeg.legs(from: data, start: nil)
             let routeFlying = FlightLeg.legs(from: data, start: summary.flying?.start, end: summary.flying?.end)
             
-            let phases = FlightLeg.legs(from: data, byfield: .FltPhase)
-            var phasesCount : [String:Int] = [:]
+            let phases = FlightLeg.legs(from: data, byfields: [.FltPhase])
+            var phasesCount : [FlightLeg.CategoricalValue:Int] = [:]
             for phase in phases {
-                let str = phase.waypoint.name
-                if let oldCount = phasesCount[str] {
-                    phasesCount[str] = oldCount + 1
+                if let str = phase.categoricalValue(field: .FltPhase) {
+                    if let oldCount = phasesCount[str] {
+                        phasesCount[str] = oldCount + 1
+                    }else{
+                        phasesCount[str] = 1
+                    }
                 }else{
-                    phasesCount[str] = 1
+                    XCTAssertTrue(false)
                 }
             }
             for name in [ "Ground", "Climb", "Cruise", "Descent"] {

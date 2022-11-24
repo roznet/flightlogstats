@@ -196,6 +196,36 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         return rv
     }
     
+    //MARK: - Transform
+    
+    /// Returned array sliced from start to end.
+    /// - Parameters:
+    ///   - start: any index that are greater than or equal to start are included. if nil starts at the begining
+    ///   - end: any index that are strictly less than end are included, if nil ends at the end
+    /// - Returns: new indexvaluesbyfield
+    public func sliced(start : I? = nil, end : I? = nil) -> IndexedValuesByField {
+        guard self.indexes.count > 0 && ( start != nil || end != nil ) else { return self }
+        
+        var indexStart : Int = 0
+        var indexEnd : Int = self.indexes.count
+        
+        
+        if let start = start {
+            indexStart = self.indexes.firstIndex { $0 >= start } ?? 0
+        }
+        if let end = end {
+            if let found = self.indexes.lastIndex(where: { $0 < end }) {
+                indexEnd = self.indexes.index(after: found)
+            }
+        }
+        var rv = IndexedValuesByField(fields: self.fields)
+        rv.indexes = [I](self.indexes[indexStart..<indexEnd])
+        for (field,value) in self.values {
+            rv.values[field] = [T](value[indexStart..<indexEnd])
+        }
+        return rv
+    }
+    
     //MARK: - access
     public func last(field : F, matching : ((T) -> Bool)? = nil) -> IndexedValue?{
         guard let fieldValues = self.values[field],
@@ -250,7 +280,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         return value
     }
     
-    public func fieldValue(at index : Int) -> FieldsValues {
+    public func fieldsValues(at index : Int) -> FieldsValues {
         var rv : FieldsValues = [:]
         for (field,values) in self.values {
             if let value = values[safe: index] {
@@ -272,6 +302,8 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
 
 extension IndexedValuesByField where T : FloatingPoint {
     public func dropna(fields : [F]) -> IndexedValuesByField {
+        guard fields.count > 0 else { return self }
+        
         var rv = IndexedValuesByField(fields: self.fields)
         rv.reserveCapacity(self.count)
         
@@ -310,8 +342,8 @@ extension IndexedValuesByField where T : Equatable {
             }
             last = vals
             if add {
-                let row = self.fields.map { self.values[$0]![idx] }
-                rv.unsafeFastAppend(fields: self.fields, elements: row, for: index)
+                let row = fields.map { self.values[$0]![idx] }
+                rv.unsafeFastAppend(fields: fields, elements: row, for: index)
             }
         }
         return rv
