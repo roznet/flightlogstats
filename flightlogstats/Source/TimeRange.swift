@@ -46,4 +46,25 @@ struct TimeRange : Codable {
     func endTo(end other : TimeRange) -> TimeRange {
         return TimeRange(start: self.end, end: other.end)
     }
+    
+    func schedule(interval : TimeInterval) -> [Date] {
+        let first = Date(timeIntervalSinceReferenceDate: floor(self.start.timeIntervalSinceReferenceDate/interval) * interval )
+        let last =  first.addingTimeInterval(ceil(self.end.timeIntervalSince(first)/interval) * interval )
+        var rv : [Date] = []
+        var date = first
+        while date < last {
+            rv.append(date)
+            date = date.addingTimeInterval(interval)
+        }
+        rv.append(last)
+        return rv
+    }
+}
+
+extension Array<Date> {
+    func regularShedule(interval : TimeInterval) -> [Date] {
+        guard let start = self.first, let end = self.last else { return [] }
+        
+        return TimeRange(start: start, end: end).schedule(interval: interval)
+    }
 }

@@ -148,6 +148,17 @@ class TestParsingLogFiles: XCTestCase {
         
         let ap = data.datesStrings(for: [.AfcsOn,.RollM,.PitchM]).indexesForValueChange(fields: [.AfcsOn,.RollM,.PitchM])
         print( ap.count)
+        
+        if let first = ap.indexes.first, let last = ap.indexes.last {
+            let interval : TimeInterval = 5.0*60.0
+            let range = TimeRange(start: first, end: last)
+            let schedule1 = range.schedule(interval: interval)
+            XCTAssertLessThanOrEqual(schedule1.first!, first)
+            XCTAssertGreaterThanOrEqual(schedule1.last!, last)
+            
+        }else{
+            XCTAssertTrue(false)
+        }
     }
     
     func testTaxiOnly() {
