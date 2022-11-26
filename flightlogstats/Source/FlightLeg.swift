@@ -12,49 +12,54 @@ import OSLog
 struct FlightLeg {
     typealias Field = FlightLogFile.Field
     typealias CategoricalValue = FlightLogFile.CategoricalValue
+    typealias CategoricalValueStats = CategoricalStats<CategoricalValue>
     
     enum LegInfo : String {
         case start_time = "Start"
         case end_time = "End"
-        case waypoint = "Waypoint"
-        case route = "Route"
     }
     
+    @available(*, deprecated, message: "Should not use waypoint but generic CategoricalValues")
     var waypoint : Waypoint { return Waypoint(name: self.categoricalValues[.AtvWpt] ?? "" )!  }
     
     let timeRange : TimeRange
     var start : Date { return timeRange.start }
     var end : Date { return timeRange.end }
     
-    private var data : [Field:ValueStats]
+    private var valueStats : [Field:ValueStats]
+    private var categoricalStats : [Field:CategoricalValueStats]
     private(set) var categoricalValues : [Field:CategoricalValue]
     
-    var fields : [Field] { return Array(data.keys).sorted { $0.order < $1.order } }
+    var groupedFields : [Field] { return Array(self.categoricalValues.keys).sorted { $0.order < $1.order } }
     
-    init(timeRange: TimeRange, values: [Field : ValueStats], categoricalValues : [Field : CategoricalValue] ) {
+    var fields : [Field] {
+        return (Array(valueStats.keys) + Array(categoricalStats.keys)).sorted { $0.order < $1.order }
+    }
+    
+    init(timeRange: TimeRange, categoricalValues : [Field : CategoricalValue], valueStats: [Field : ValueStats], categoricalStats: [Field : CategoricalValueStats] ) {
         self.categoricalValues = categoricalValues
         self.timeRange = timeRange
-        self.data = values
+        self.valueStats = valueStats
+        self.categoricalStats = categoricalStats
     }
     
     func valueStats(field : Field) -> ValueStats? {
-        return self.data[field]
+        return self.valueStats[field]
     }
     
     func categoricalValue(field: Field) -> CategoricalValue? {
         return self.categoricalValues[field]
     }
-    
+    func categoricalValueStats(field: Field) -> CategoricalValueStats? {
+        return self.categoricalStats[field]
+    }
+
     func format(which : LegInfo, displayContext : DisplayContext = DisplayContext(), reference : Date? = nil) -> String {
         switch which {
         case .start_time:
             return displayContext.format(time: self.timeRange.start, since: self.timeRange.start, reference: reference)
         case .end_time:
             return displayContext.format(time: self.timeRange.end, since: self.timeRange.start, reference: reference)
-        case .route:
-            return displayContext.format(waypoint: self.waypoint)
-        case .waypoint:
-            return displayContext.format(waypoint: waypoint)
         }
     }
     
@@ -63,11 +68,14 @@ struct FlightLeg {
                      end : Date? = nil,
                      byfields : [Field] = [.AtvWpt]) -> [FlightLeg] {
         var rv : [FlightLeg] = []
-        let identifiers : DataFrame<Date,String,Field> = data.categoricalDataFrame(for: byfields, start: start).indexesForValueChange(fields: byfields)
+        let identifiers : DataFrame<Date,String,Field> = data.categoricalDataFrame(for: byfields).sliced(start: start).indexesForValueChange(fields: byfields)
         
         do {
             let values = data.doubleDataFrame()
-            let stats : DataFrame<Date,ValueStats,Field> = try values.extractValueStats(indexes: identifiers.indexes, start: start, end: end)
+            let categorical = data.categoricalDataFrame()
+            
+            let valuesStats : DataFrame<Date,ValueStats,Field> = try values.extractValueStats(indexes: identifiers.indexes, start: start, end: end)
+            let categoricalStats : DataFrame<Date,CategoricalValueStats,Field> = try categorical.extractCategoricalStats(indexes: identifiers.indexes, start: start, end: end)
             
             for idx in 0..<identifiers.count {
                 if var endTime = end ?? identifiers.indexes.last {
@@ -77,16 +85,18 @@ struct FlightLeg {
                         endTime = identifiers.indexes[idx+1]
                     }
                     
-                    let categoricalValues = identifiers.fieldsValues(at: idx)
-                    var validData : [Field:ValueStats] = [:]
+                    let categoricalValues = identifiers.row(at: idx)
+                    var validStats : [Field:ValueStats] = [:]
                     
-                    for (field,val) in stats.fieldsValues(at: idx) {
+                    for (field,val) in valuesStats.row(at: idx) {
                         if val.isValid {
-                            validData[field] = val
+                            validStats[field] = val
                         }
                     }
                     let leg = FlightLeg(timeRange: TimeRange(start: startTime, end: endTime),
-                                        values: validData, categoricalValues: categoricalValues)
+                                        categoricalValues: categoricalValues,
+                                        valueStats: validStats,
+                                        categoricalStats: categoricalStats.row(at: idx))
                     rv.append(leg)
                 }
 
@@ -96,14 +106,13 @@ struct FlightLeg {
         }
         return rv
     }
-
 }
 
 extension FlightLeg : CustomStringConvertible {
     var description: String {
         let displayContext = DisplayContext()
         let time = displayContext.formatHHMM(timeRange: self.timeRange)
-        return String(format: "<FlightLeg %@ %@>", waypoint.name, time )
+        return String(format: "<FlightLeg %@>", time )
     }
 }
 

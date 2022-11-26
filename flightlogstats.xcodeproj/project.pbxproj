@@ -301,10 +301,10 @@
 		421EE5C22929538600996EC6 /* DataUtils */ = {
 			isa = PBXGroup;
 			children = (
-				425D0501283452320028FD67 /* ValueStats.swift */,
-				421EE5C5292FE76E00996EC6 /* CategoricalStats.swift */,
 				42A7A0C028155B0E00DF4495 /* DataFrame.swift */,
 				421EE5C32929574300996EC6 /* GroupBy.swift */,
+				425D0501283452320028FD67 /* ValueStats.swift */,
+				421EE5C5292FE76E00996EC6 /* CategoricalStats.swift */,
 			);
 			name = DataUtils;
 			sourceTree = "<group>";

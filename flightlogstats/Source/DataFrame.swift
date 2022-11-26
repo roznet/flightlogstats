@@ -10,10 +10,11 @@ import RZUtils
 
 //DataFrame
 public struct DataFrame<I : Comparable,T,F : Hashable> {
+    //MARK: - Type definitions
     public enum DataFrameError : Error {
         case inconsistentIndexOrder
         case inconsistentDataSize
-        case unknownField
+        case unknownField(F)
     }
     
     //Row
@@ -35,12 +36,15 @@ public struct DataFrame<I : Comparable,T,F : Hashable> {
         
     }
     
+    //MARK: - stored property
     private(set) var indexes : [I]
     private(set) var values : [F:[T]]
     
+    //MARK: - calc property
     var fields : [F] { return Array(values.keys) }
     var count : Int { return indexes.count }
     
+    //MARK: - init and setup
     public init(fields : [F]){
         indexes = []
         values = [:]
@@ -57,6 +61,19 @@ public struct DataFrame<I : Comparable,T,F : Hashable> {
     public init() {
         indexes = []
         values = [:]
+    }
+    
+    private init(indexes : [I], values: [F:[T]], fields: [F]) throws{
+        var v : [F:[T]] = [:]
+        for field in fields {
+            if let c = values[field] {
+                v[field] = c
+            }else{
+                throw DataFrameError.unknownField(field)
+            }
+        }
+        self.indexes = indexes
+        self.values = v
     }
     
     mutating public func reserveCapacity(_ capacity : Int){
@@ -224,6 +241,11 @@ public struct DataFrame<I : Comparable,T,F : Hashable> {
         return rv
     }
     
+    
+    public func dataFrame(for fields : [F]) throws -> DataFrame {
+        return try DataFrame(indexes: self.indexes, values: self.values, fields:    fields)
+    }
+    
     //MARK: - access
     public func last(field : F, matching : ((T) -> Bool)? = nil) -> Point?{
         guard let fieldValues = self.values[field],
@@ -278,7 +300,7 @@ public struct DataFrame<I : Comparable,T,F : Hashable> {
         return value
     }
     
-    public func fieldsValues(at index : Int) -> Row {
+    public func row(at index : Int) -> Row {
         var rv : Row = [:]
         for (field,values) in self.values {
             if let value = values[safe: index] {
@@ -288,16 +310,17 @@ public struct DataFrame<I : Comparable,T,F : Hashable> {
         return rv
     }
     
-    public func indexedValues(for field : F) -> Column? {
+    public func column(for field : F) -> Column? {
         guard let values = self.values[field] else { return nil }
         return Column(indexes: self.indexes, values: values)
     }
     public subscript(_ field : F) -> Column? {
-        return self.indexedValues(for: field)
+        return self.column(for: field)
     }
     
 }
 
+//MARK: - Floating point specialisation
 extension DataFrame where T : FloatingPoint {
     public func dropna(fields : [F], includeAllFields : Bool = false) -> DataFrame {
         let outputFields = includeAllFields ? self.fields : fields.compactMap( { self.values[$0] != nil ? $0 : nil } )
@@ -325,30 +348,6 @@ extension DataFrame where T : FloatingPoint {
     }
     
 
-}
-
-extension DataFrame where T : Equatable {
-    public func indexesForValueChange(fields : [F]) -> DataFrame {
-        var rv = DataFrame(fields: self.fields)
-        
-        guard !fields.map({ self.values[$0] != nil }).contains(false) else { return rv }
-        
-        var last : [T] = []
-        
-        for (idx,index) in self.indexes.enumerated() {
-            var add : Bool = (last.count != fields.count)
-            let vals = fields.map { self.values[$0]![idx] }
-            if !add {
-                add = vals != last
-            }
-            last = vals
-            if add {
-                let row = fields.map { self.values[$0]![idx] }
-                rv.unsafeFastAppend(fields: fields, elements: row, for: index)
-            }
-        }
-        return rv
-    }
 }
 
 extension DataFrame  where T == Double, F == FlightLogFile.Field {
@@ -415,26 +414,56 @@ extension DataFrame  where T == Double, F == FlightLogFile.Field, I == Date {
     }
 }
 
+//MARK: - Equatable specialisation
+extension DataFrame where T : Equatable {
+    public func indexesForValueChange(fields : [F]) -> DataFrame {
+        let selectFields = fields.compactMap { self.values[$0] != nil ? $0 : nil }
+        
+        var rv = DataFrame(fields: selectFields)
+        
+        guard selectFields.count > 0 else { return rv }
+        
+        var last : [T] = []
+        
+        for (index,row) in self {
+            var add : Bool = (last.count != selectFields.count)
+
+            let vals = selectFields.map { row[$0]! }
+            if !add {
+                add = (vals != last)
+            }
+            last = vals
+            if add {
+                rv.unsafeFastAppend(fields: selectFields, elements: vals, for: index)
+            }
+        }
+        
+        return rv
+    }
+}
+
+
+//MARK: - Sequence/iterators
 extension DataFrame : Sequence {
     ///MARK: Iterator
     public struct DataFrameIterator : IteratorProtocol {
-        let values : DataFrame
+        let dataFrame : DataFrame
         var idx : Int
-        var element : [F:T] = [:]
+        var row : Row = [:]
         
         public init(_ indexedValues : DataFrame) {
-            self.values = indexedValues
+            self.dataFrame = indexedValues
             self.idx = 0
         }
-        public mutating func next() -> (I,[F:T])? {
-            guard idx < values.indexes.count else { return nil }
+        public mutating func next() -> (I,Row)? {
+            guard idx < dataFrame.indexes.count else { return nil }
                 
-            let index = values.indexes[idx]
-            for (field,serie) in values.values {
-                element[field] = serie[idx]
+            let index = dataFrame.indexes[idx]
+            for (field,serie) in dataFrame.values {
+                row[field] = serie[idx]
             }
             idx += 1
-            return (index,element)
+            return (index,row)
         }
     }
     public func makeIterator() -> DataFrameIterator {
@@ -463,6 +492,7 @@ extension DataFrame.Column : Sequence {
     }
 }
 
+//MARK: - Coordinate specialisation
 extension DataFrame where T == CLLocationCoordinate2D {
     public func boundingPoints(field : F) -> (northEast : CLLocationCoordinate2D, southWest : CLLocationCoordinate2D)? {
         guard let column = self.values[field] else { return nil }

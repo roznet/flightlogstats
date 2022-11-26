@@ -1,5 +1,5 @@
 ﻿field,order,unit,description,unit_description,type
-AtvWpt,1,ident,Active Waypoint Identifier,,discrete
+AtvWpt,1,ident,Active Waypoint Identifier,,categorical
 Distance,2,nm,Distance from start,,value
 WptDst,3,nm,Distance to next waypoint ,nm,value
 AltInd,4,ft,Baro-Corrected altitude ,feet,value
@@ -25,13 +25,13 @@ FQtyT,23,gals,Fuel Qty Total,gals,value
 FQtyL,24,gals,Fuel Qty Left ,gals,value
 FQtyR,25,gals,Fuel Qty Right ,gals,value
 FTotalizerT,26,gals,Fuel Totalizer Total,gals,value
-HSIS,27,enum,HSI source,,discrete
-NAV1,28,MHz,Nav1 frequency,,discrete
-NAV2,29,MHz,Nav2 frequency,,discrete
-COM1,30,MHz,Com1 frequency,,discrete
-COM2,31,MHz,Com2 frequency,,discrete
-AfcsOn,32,bool,Autopilot On/Off,,discrete
-GPSfix,33,enum,GPSfix,,discrete
+HSIS,27,enum,HSI source,,categorical
+NAV1,28,MHz,Nav1 frequency,,categorical
+NAV2,29,MHz,Nav2 frequency,,categorical
+COM1,30,MHz,Com1 frequency,,categorical
+COM2,31,MHz,Com2 frequency,,categorical
+AfcsOn,32,bool,Autopilot On/Off,,categorical
+GPSfix,33,enum,GPSfix,,categorical
 E1 FFlow,100,gph,Fuel Flow ,gph,value
 E1 MAP,101,Hg,E1 MAP,,value
 E1 RPM,102,rpm,E1 RPM,,value
@@ -44,7 +44,7 @@ E1 CHT1,108,deg F,E1 CHT1,,value
 E1 CHT2,109,deg F,E1 CHT2,,value
 E1 CHT3,110,deg F,E1 CHT3,,value
 E1 EGTMax,110,deg F,E1 EGTMax,,value
-E1 EGTMaxIdx,110,deg F,E1 EGTMaxIdx,,discrete
+E1 EGTMaxIdx,110,deg F,E1 EGTMaxIdx,,categorical
 E1 EGTMin,110,deg F,E1 EGTMin,,value
 E1 CHT4,111,deg F,E1 CHT4,,value
 E1 CHT5,112,deg F,E1 CHT5,,value
@@ -74,8 +74,8 @@ E2 RPM,202,rpm,E2 RPM,,value
 E2 Torq,203,ft lbs,E2 Torq,,value
 E2 NG,204,%,E2 NG,,value
 E2 ITT,205,deg C,E2 ITT,,value
-RollM,800,enum,RollM,,discrete
-PitchM,801,enum,PitchM,,discrete
+RollM,800,enum,RollM,,categorical
+PitchM,801,enum,PitchM,,categorical
 RollC,802,deg,RollC,,value
 PichC,803,deg,PichC,,value
 HAL,804,mt,GPS horizontal alert limit,,value

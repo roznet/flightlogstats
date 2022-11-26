@@ -18,27 +18,31 @@ class FlightLegsDataSource : TableDataSource {
     
     let legs : [FlightLeg]
     let fields : [Field]
+    let groupedFields : [Field]
     let fixedColumnsInfo : [LegInfo]
     let displayContext : DisplayContext
     
     init(legs : [FlightLeg], displayContext : DisplayContext = DisplayContext()){
         self.legs = legs
         
+        var groupedFields : Set<Field> = []
         var fields : Set<Field> = []
+        
         for leg in legs {
             fields.formUnion(leg.fields)
+            groupedFields.formUnion(leg.groupedFields)
         }
-        self.fields = Array(fields).sorted {
-            $0.order < $1.order
-        }
+        
+        self.fields = Array(fields).sorted { $0.order < $1.order }
+        self.groupedFields = Array(groupedFields).sorted { $0.order < $1.order }
 
         // should be sorted
         self.displayContext = displayContext
-        self.fixedColumnsInfo = [.end_time,.waypoint]
+        self.fixedColumnsInfo = [.end_time]
         
         super.init(rows: self.legs.count+1,
-                   columns: self.fixedColumnsInfo.count + self.fields.count,
-                   frozenColumns: self.fixedColumnsInfo.count,
+                   columns: self.fixedColumnsInfo.count + self.groupedFields.count + self.fields.count,
+                   frozenColumns: self.fixedColumnsInfo.count + self.groupedFields.count,
                    frozenRows: 1)
         
     }
@@ -57,6 +61,19 @@ class FlightLegsDataSource : TableDataSource {
         }
         
         return field.numberWithUnit(valueStats: value, context: self.displayContext)
+    }
+    
+    func formattedCategorical(field : Field, row : Int) -> String{
+        guard let leg = self.legs[safe: row] else { return "" }
+
+        if let value = leg.categoricalValue(field: field) {
+            return value
+        }else if let stats = leg.categoricalValueStats(field: field) {
+            return stats.mostFrequent
+        }
+
+        return ""
+
     }
     
     // helpers:
@@ -97,6 +114,12 @@ class FlightLegsDataSource : TableDataSource {
                 self.cellHolders.append(titleAttributed)
                 self.geometries.append(RZNumberWithUnitGeometry())
             }
+            
+            for field in groupedFields {
+                let titleAttributed = CellHolder(string: field.description, attributes: self.titleAttributes)
+                self.cellHolders.append(titleAttributed)
+                self.geometries.append(RZNumberWithUnitGeometry())
+            }
 
             for field in fields {
                 let fieldAttributed = CellHolder(string: field.description, attributes: self.titleAttributes)
@@ -117,12 +140,24 @@ class FlightLegsDataSource : TableDataSource {
                     self.cellHolders.append(fixedAttributed)
                 }
                 var geoIndex = self.fixedColumnsInfo.count
+                
+                for field in groupedFields {
+                    let fixedAttributed = CellHolder(string: self.formattedCategorical(field: field, row: row), attributes: self.cellAttributes)
+                    self.cellHolders.append(fixedAttributed)
+
+                }
                 for field in fields {
-                    if let nu = self.formattedValueFor(field: field, row: row) {
-                        self.geometries[geoIndex].adjust(for: nu)
-                        self.cellHolders.append(CellHolder(numberWithUnit: nu))
-                    }else{
-                        self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+                    switch field.valueType {
+                    case .value:
+                        if let nu = self.formattedValueFor(field: field, row: row) {
+                            self.geometries[geoIndex].adjust(for: nu)
+                            self.cellHolders.append(CellHolder(numberWithUnit: nu))
+                        }else{
+                            self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
+                        }
+                    case .categorical:
+                        let fixedAttributed = CellHolder(string: self.formattedCategorical(field: field, row: row), attributes: self.cellAttributes)
+                        self.cellHolders.append(fixedAttributed)
                     }
                     geoIndex += 1
                 }

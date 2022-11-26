@@ -16,7 +16,7 @@ public struct CategoricalStats<CategoricalValue : Hashable>{
     private var valuesCount : [CategoricalValue:Int]
     private(set) var start : CategoricalValue
     private(set) var end : CategoricalValue
-    var mostFrequent : CategoricalValue
+    private(set) var mostFrequent : CategoricalValue
     
     init(value: CategoricalValue){
         self.start = value

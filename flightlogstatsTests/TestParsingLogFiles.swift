@@ -72,7 +72,7 @@ class TestParsingLogFiles: XCTestCase {
         
         XCTAssertGreaterThan(engine.count, 0)
         for idx in 0..<engine.count {
-            let x = engine.fieldsValues(at: idx)
+            let x = engine.row(at: idx)
             let cyls = [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6].map({ x[$0] ?? 0.0 })
             let max = cyls.max() ?? 0.0
             let maxidx = cyls.firstIndex(of: max) ?? cyls.count
@@ -84,7 +84,7 @@ class TestParsingLogFiles: XCTestCase {
         let wind = data.doubleDataFrame(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
         
         for idx in 0..<wind.count {
-            let x = wind.fieldsValues(at: idx)
+            let x = wind.row(at: idx)
             if let wndspddirect = x[.WndDirect], let wndspdcross = x[.WndCross], let wndspd = x[.WndSpd], let wnddr = x[.WndDr], let crs = x[.CRS] {
                 let heading = Heading(heading: crs)
                 let windDir = Heading(heading: wnddr > 0 ? wnddr : 360+wnddr)

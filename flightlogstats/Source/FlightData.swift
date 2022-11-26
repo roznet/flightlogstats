@@ -193,13 +193,18 @@ class FlightData {
      - start: nil or the date when the collection should start
      - Returns: DatesValuesByField where date is the first appearance of the string
      */
-    func categoricalDataFrame(for stringFields : [Field], start : Date? = nil) -> DataFrame<Date,CategoricalValue,Field> {
+    func categoricalDataFrame(for stringFields : [Field] = [], includeAllFields : Bool = true) -> DataFrame<Date,CategoricalValue,Field> {
         if self.categoricalDataFrame.count == 0 {
             let cstart = Date()
             self.convertDataFrame()
             Logger.app.info("Converted \(self.categoricalDataFrame.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
-        return self.categoricalDataFrame.sliced(start: start)
+        if includeAllFields {
+            return self.categoricalDataFrame
+        }else{
+            let rv = try? self.categoricalDataFrame.dataFrame(for: stringFields)
+            return rv ?? self.categoricalDataFrame
+        }
     }
         
     func coordinateDataFrame(for coordField : [Field]) -> DataFrame<Date,CLLocationCoordinate2D,Field> {
