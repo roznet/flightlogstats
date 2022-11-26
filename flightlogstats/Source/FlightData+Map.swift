@@ -10,10 +10,14 @@ import MapKit
 
 extension FlightData {
     var boundingPoints : (northEast : CLLocationCoordinate2D, southWest : CLLocationCoordinate2D)? {
+        
         var northEastPoint : CLLocationCoordinate2D? = nil
         var southWestPoint : CLLocationCoordinate2D? = nil
         
-        for coord in self.coordinatesArray {
+        guard let column = self.coordinateDataFrame(for: [.Coordinate])[.Coordinate] else { return nil }
+        
+        for point in column {
+            let coord = point.value
             if coord.longitude <= -180.0 {
                 continue
             }
@@ -64,13 +68,13 @@ class FlightDataMapOverlay : NSObject, MKOverlay {
     var coordinate: CLLocationCoordinate2D
     var boundingMapRect: MKMapRect
 
-    var flightData : FlightData
+    var coordinates : DataFrame<Date,CLLocationCoordinate2D,FlightLogFile.Field>.Column
     
     var highlightTimeRange : TimeRange? = nil
     var colorChange : [Date] = []
     
     init(data : FlightData) {
-        self.flightData = data
+        self.coordinates = data.coordinateColumn
         if let boundingPoints = data.boundingPoints {
             self.boundingMapRect = MKMapRect(southWest: boundingPoints.southWest, northEast: boundingPoints.northEast)
             self.coordinate = boundingPoints.southWest.halfWay(to: boundingPoints.northEast)
@@ -97,14 +101,16 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
             context.beginPath()
             context.setLineWidth( 2.0 / zoomScale )
             var pathState : PathState = .primary
-            for (date,coord) in zip(mapOverlay.flightData.dates, mapOverlay.flightData.coordinatesArray) {
+            
+            for point in mapOverlay.coordinates {
+                let coord = point.value
                 if coord.longitude <= -180.0 {
                     continue
                 }
                 let mapPoint = MKMapPoint(coord)
                 let current = self.point(for: mapPoint)
                 if let range = mapOverlay.highlightTimeRange {
-                    if range.start <= date && pathState == .primary {
+                    if range.start <= point.index && pathState == .primary {
                         // start new path with new color
                         context.setStrokeColor(UIColor.systemRed.cgColor)
                         context.strokePath()
@@ -112,7 +118,7 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
                         context.setLineWidth( 5.0 / zoomScale )
                         pathState = .highlight
                     }
-                    if range.end <= date && pathState == .highlight{
+                    if range.end <= point.index && pathState == .highlight{
                         context.setStrokeColor(UIColor.systemBlue.cgColor)
                         context.strokePath()
                         context.beginPath()

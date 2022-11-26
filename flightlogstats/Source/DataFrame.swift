@@ -9,29 +9,30 @@ import Foundation
 import RZUtils
 
 //DataFrame
-public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
-    public enum IndexedValuesByFieldError : Error {
+public struct DataFrame<I : Comparable,T,F : Hashable> {
+    public enum DataFrameError : Error {
         case inconsistentIndexOrder
         case inconsistentDataSize
         case unknownField
     }
     
     //Row
-    public typealias FieldsValues = [F:T]
+    public typealias Row = [F:T]
     
-    public struct IndexedValue {
+    public struct Point {
         public let index : I
         public let value : T
     }
     
     //Column
-    public struct IndexedValues {
+    public struct Column {
         public let indexes : [I]
         public let values : [T]
         
-        public func dropFirst(_ k : Int) -> IndexedValues {
-            return IndexedValues(indexes: [I]( self.indexes.dropFirst(k) ), values: [T]( self.values.dropFirst(k)) )
+        public func dropFirst(_ k : Int) -> Column {
+            return Column(indexes: [I]( self.indexes.dropFirst(k) ), values: [T]( self.values.dropFirst(k)) )
         }
+        
     }
     
     private(set) var indexes : [I]
@@ -41,12 +42,16 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
     var count : Int { return indexes.count }
     
     public init(fields : [F]){
-        
         indexes = []
         values = [:]
         for field in fields {
             values[field] = []
         }
+    }
+    
+    public init(indexes : [I], values: [F:[T]]){
+        self.indexes = indexes
+        self.values = values
     }
     
     public init() {
@@ -75,7 +80,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
             if index > last {
                 indexes.append(index)
             }else if index < last {
-                throw IndexedValuesByFieldError.inconsistentIndexOrder
+                throw DataFrameError.inconsistentIndexOrder
             }
         }else{
             // nothing yet, insert date
@@ -87,7 +92,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         values[field, default: []].append(element)
 
         if values[field, default: []].count != indexes.count {
-            throw IndexedValuesByFieldError.inconsistentDataSize
+            throw DataFrameError.inconsistentDataSize
         }
     }
     public mutating func append(field : F, element : T, for index : I) throws {
@@ -120,10 +125,10 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         }
     }
     
-    public func dropFirst(index : I) -> IndexedValuesByField? {
+    public func dropFirst(index : I) -> DataFrame? {
         guard let found = self.indexes.firstIndex(of: index) else { return nil }
         
-        var rv = IndexedValuesByField(fields: [F](self.values.keys))
+        var rv = DataFrame(fields: [F](self.values.keys))
         rv.indexes = [I](self.indexes.dropFirst(found))
         for (field,values) in self.values {
             rv.values[field] = [T](values.dropFirst(found))
@@ -131,14 +136,14 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         return rv
     }
     
-    public func dropFirst(field : F, minimumMatchCount : Int = 1, matching : ((T) -> Bool)) -> IndexedValuesByField? {
+    public func dropFirst(field : F, minimumMatchCount : Int = 1, matching : ((T) -> Bool)) -> DataFrame? {
         
         guard let fieldValues = self.values[field]
         else {
             return nil
         }
         
-        var rv = IndexedValuesByField(fields: [F](self.values.keys))
+        var rv = DataFrame(fields: [F](self.values.keys))
 
         var found : Int = -1
         var matchCount : Int = 0
@@ -165,14 +170,14 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         return rv
     }
     
-    public func dropLast(field : F, matching : ((T) -> Bool)) -> IndexedValuesByField? {
+    public func dropLast(field : F, matching : ((T) -> Bool)) -> DataFrame? {
         
         guard let fieldValues = self.values[field]
         else {
             return nil
         }
         
-        var rv = IndexedValuesByField(fields: Array(self.values.keys))
+        var rv = DataFrame(fields: Array(self.values.keys))
 
         var found : Int = 0
         for (idx,value) in fieldValues.reversed().enumerated() {
@@ -196,7 +201,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
     ///   - start: any index that are greater than or equal to start are included. if nil starts at the begining
     ///   - end: any index that are strictly less than end are included, if nil ends at the end
     /// - Returns: new indexvaluesbyfield
-    public func sliced(start : I? = nil, end : I? = nil) -> IndexedValuesByField {
+    public func sliced(start : I? = nil, end : I? = nil) -> DataFrame {
         guard self.indexes.count > 0 && ( start != nil || end != nil ) else { return self }
         
         var indexStart : Int = 0
@@ -211,7 +216,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
                 indexEnd = self.indexes.index(after: found)
             }
         }
-        var rv = IndexedValuesByField(fields: self.fields)
+        var rv = DataFrame(fields: self.fields)
         rv.indexes = [I](self.indexes[indexStart..<indexEnd])
         for (field,value) in self.values {
             rv.values[field] = [T](value[indexStart..<indexEnd])
@@ -220,7 +225,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
     }
     
     //MARK: - access
-    public func last(field : F, matching : ((T) -> Bool)? = nil) -> IndexedValue?{
+    public func last(field : F, matching : ((T) -> Bool)? = nil) -> Point?{
         guard let fieldValues = self.values[field],
               let lastDate = self.indexes.last,
               let lastValue = fieldValues.last
@@ -231,16 +236,16 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         if let matching = matching {
             for (date,value) in zip(indexes.reversed(),fieldValues.reversed()) {
                 if matching(value) {
-                    return IndexedValue(index: date, value: value)
+                    return Point(index: date, value: value)
                 }
             }
             return nil
         }else{
-            return IndexedValue(index: lastDate, value: lastValue)
+            return Point(index: lastDate, value: lastValue)
         }
     }
 
-    public func first(field : F, matching : ((T) -> Bool)? = nil) -> IndexedValue?{
+    public func first(field : F, matching : ((T) -> Bool)? = nil) -> Point?{
         guard let fieldValues = self.values[field],
               let firstDate = self.indexes.first,
               let firstValue = fieldValues.first
@@ -251,20 +256,20 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         if let matching = matching {
             for (date,value) in zip(indexes,fieldValues) {
                 if matching(value) {
-                    return IndexedValue(index: date, value: value)
+                    return Point(index: date, value: value)
                 }
             }
             return nil
         }else{
-            return IndexedValue(index: firstDate, value: firstValue)
+            return Point(index: firstDate, value: firstValue)
         }
     }
     
-    public func indexedValue(for field : F, at index : Int) -> IndexedValue? {
+    public func indexedValue(for field : F, at index : Int) -> Point? {
         guard let fieldValues = self.values[field], index < self.indexes.count else { return nil }
         let value = fieldValues[index]
         let date = self.indexes[index]
-        return IndexedValue(index: date, value: value)
+        return Point(index: date, value: value)
     }
 
     public func value(for field : F, at index : Int) -> T? {
@@ -273,8 +278,8 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         return value
     }
     
-    public func fieldsValues(at index : Int) -> FieldsValues {
-        var rv : FieldsValues = [:]
+    public func fieldsValues(at index : Int) -> Row {
+        var rv : Row = [:]
         for (field,values) in self.values {
             if let value = values[safe: index] {
                 rv[field] = value
@@ -283,24 +288,24 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         return rv
     }
     
-    public func indexedValues(for field : F) -> IndexedValues? {
+    public func indexedValues(for field : F) -> Column? {
         guard let values = self.values[field] else { return nil }
-        return IndexedValues(indexes: self.indexes, values: values)
+        return Column(indexes: self.indexes, values: values)
     }
-    public subscript(_ field : F) -> IndexedValues? {
+    public subscript(_ field : F) -> Column? {
         return self.indexedValues(for: field)
     }
     
 }
 
-extension IndexedValuesByField where T : FloatingPoint {
-    public func dropna(fields : [F], includeAllFields : Bool = false) -> IndexedValuesByField {
+extension DataFrame where T : FloatingPoint {
+    public func dropna(fields : [F], includeAllFields : Bool = false) -> DataFrame {
         let outputFields = includeAllFields ? self.fields : fields.compactMap( { self.values[$0] != nil ? $0 : nil } )
         let checkFields = fields.compactMap { self.values[$0] != nil ? $0 : nil }
         
         guard outputFields.count > 0 else { return self }
         
-        var rv = IndexedValuesByField(fields: outputFields)
+        var rv = DataFrame(fields: outputFields)
         rv.reserveCapacity(self.count)
         
         for (idx,index) in self.indexes.enumerated() {
@@ -322,9 +327,9 @@ extension IndexedValuesByField where T : FloatingPoint {
 
 }
 
-extension IndexedValuesByField where T : Equatable {
-    public func indexesForValueChange(fields : [F]) -> IndexedValuesByField {
-        var rv = IndexedValuesByField(fields: self.fields)
+extension DataFrame where T : Equatable {
+    public func indexesForValueChange(fields : [F]) -> DataFrame {
+        var rv = DataFrame(fields: self.fields)
         
         guard !fields.map({ self.values[$0] != nil }).contains(false) else { return rv }
         
@@ -346,7 +351,7 @@ extension IndexedValuesByField where T : Equatable {
     }
 }
 
-extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field {
+extension DataFrame  where T == Double, F == FlightLogFile.Field {
     public func valueStats(from : I, to : I) -> [F:ValueStats] {
         var rv : [F:ValueStats] = [:]
         var started : Bool = false
@@ -383,7 +388,7 @@ extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field {
     }
 }
 
-extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field, I == Date {
+extension DataFrame  where T == Double, F == FlightLogFile.Field, I == Date {
     
     public func dataSeries(from : I? = nil, to : I? = nil) -> [F:GCStatsDataSerie] {
         var rv : [F:GCStatsDataSerie] = [:]
@@ -410,14 +415,14 @@ extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field, I =
     }
 }
 
-extension IndexedValuesByField : Sequence {
+extension DataFrame : Sequence {
     ///MARK: Iterator
-    public struct IndexedValuesByFieldIterator : IteratorProtocol {
-        let values : IndexedValuesByField
+    public struct DataFrameIterator : IteratorProtocol {
+        let values : DataFrame
         var idx : Int
         var element : [F:T] = [:]
         
-        public init(_ indexedValues : IndexedValuesByField) {
+        public init(_ indexedValues : DataFrame) {
             self.values = indexedValues
             self.idx = 0
         }
@@ -432,7 +437,67 @@ extension IndexedValuesByField : Sequence {
             return (index,element)
         }
     }
-    public func makeIterator() -> IndexedValuesByFieldIterator {
-        return IndexedValuesByFieldIterator(self)
+    public func makeIterator() -> DataFrameIterator {
+        return DataFrameIterator(self)
     }
 }
+
+extension DataFrame.Column : Sequence {
+    public struct ColumnIterator : IteratorProtocol {
+        let column : DataFrame.Column
+        var idx : Int
+        
+        public init(_ column : DataFrame.Column) {
+            self.column = column
+            idx = 0
+        }
+        public mutating func next() -> DataFrame.Point? {
+            guard idx < column.indexes.count else { return nil }
+            let rv = DataFrame.Point(index: column.indexes[idx], value: column.values[idx])
+            idx += 1
+            return rv
+        }
+    }
+    public func makeIterator() -> ColumnIterator {
+        return ColumnIterator(self)
+    }
+}
+
+extension DataFrame where T == CLLocationCoordinate2D {
+    public func boundingPoints(field : F) -> (northEast : CLLocationCoordinate2D, southWest : CLLocationCoordinate2D)? {
+        guard let column = self.values[field] else { return nil }
+        
+        var northEastPoint : CLLocationCoordinate2D? = nil
+        var southWestPoint : CLLocationCoordinate2D? = nil
+        
+        for coord in column {
+            if coord.longitude <= -180.0 {
+                continue
+            }
+
+            if let east = northEastPoint, let west = southWestPoint {
+                if coord.latitude > east.latitude {
+                    northEastPoint?.latitude = coord.latitude
+                }
+                if coord.longitude > east.longitude {
+                    northEastPoint?.longitude = coord.longitude
+                }
+                if coord.latitude < west.latitude {
+                    southWestPoint?.latitude = coord.latitude
+                }
+                if coord.longitude < west.longitude{
+                    southWestPoint?.longitude = coord.longitude
+                }
+            }else{
+                northEastPoint = coord
+                southWestPoint = coord
+            }
+        }
+        if let ne = northEastPoint, let sw = southWestPoint {
+            return (northEast: ne, southWest: sw)
+        }else{
+            return nil
+        }
+    }
+}
+

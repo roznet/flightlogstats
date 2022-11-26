@@ -63,11 +63,11 @@ struct FlightLeg {
                      end : Date? = nil,
                      byfields : [Field] = [.AtvWpt]) -> [FlightLeg] {
         var rv : [FlightLeg] = []
-        let identifiers : IndexedValuesByField<Date,String,Field> = data.categoricalValues(for: byfields, start: start).indexesForValueChange(fields: byfields)
+        let identifiers : DataFrame<Date,String,Field> = data.categoricalDataFrame(for: byfields, start: start).indexesForValueChange(fields: byfields)
         
         do {
-            let values = data.doubleValues()
-            let stats : IndexedValuesByField<Date,ValueStats,Field> = try values.extractValueStats(indexes: identifiers.indexes, start: start, end: end)
+            let values = data.doubleDataFrame()
+            let stats : DataFrame<Date,ValueStats,Field> = try values.extractValueStats(indexes: identifiers.indexes, start: start, end: end)
             
             for idx in 0..<identifiers.count {
                 if var endTime = end ?? identifiers.indexes.last {

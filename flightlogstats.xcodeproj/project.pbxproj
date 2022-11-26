@@ -89,7 +89,7 @@
 		42A20B5A289D7D1500439880 /* FlightData+Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B59289D7D1500439880 /* FlightData+Map.swift */; };
 		42A20B5C28A09F1100439880 /* ProgressReportOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B5B28A09F1100439880 /* ProgressReportOverlay.swift */; };
 		42A7A0BF28154A2400DF4495 /* FlightLogFileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */; };
-		42A7A0C128155B0E00DF4495 /* IndexedValuesByField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* IndexedValuesByField.swift */; };
+		42A7A0C128155B0E00DF4495 /* DataFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C028155B0E00DF4495 /* DataFrame.swift */; };
 		42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */; };
 		42B3843028609A3C009458CC /* FieldCalculations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B3842F28609A3C009458CC /* FieldCalculations.swift */; };
 		42B90997284D1F8100186FCD /* ProgressReportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B90996284D1F8100186FCD /* ProgressReportViewController.swift */; };
@@ -207,7 +207,7 @@
 		42A20B59289D7D1500439880 /* FlightData+Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightData+Map.swift"; path = "Source/FlightData+Map.swift"; sourceTree = "<group>"; };
 		42A20B5B28A09F1100439880 /* ProgressReportOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReportOverlay.swift; path = Source/ProgressReportOverlay.swift; sourceTree = "<group>"; };
 		42A7A0BE28154A2400DF4495 /* FlightLogFileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileInfo.swift; path = Source/FlightLogFileInfo.swift; sourceTree = "<group>"; };
-		42A7A0C028155B0E00DF4495 /* IndexedValuesByField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = IndexedValuesByField.swift; path = Source/IndexedValuesByField.swift; sourceTree = "<group>"; };
+		42A7A0C028155B0E00DF4495 /* DataFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DataFrame.swift; path = Source/DataFrame.swift; sourceTree = "<group>"; };
 		42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightLogFile+Field.swift"; path = "Source/FlightLogFile+Field.swift"; sourceTree = "<group>"; };
 		42B3842F28609A3C009458CC /* FieldCalculations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FieldCalculations.swift; path = Source/FieldCalculations.swift; sourceTree = "<group>"; };
 		42B90996284D1F8100186FCD /* ProgressReportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReportViewController.swift; path = Source/ProgressReportViewController.swift; sourceTree = "<group>"; };
@@ -303,7 +303,7 @@
 			children = (
 				425D0501283452320028FD67 /* ValueStats.swift */,
 				421EE5C5292FE76E00996EC6 /* CategoricalStats.swift */,
-				42A7A0C028155B0E00DF4495 /* IndexedValuesByField.swift */,
+				42A7A0C028155B0E00DF4495 /* DataFrame.swift */,
 				421EE5C32929574300996EC6 /* GroupBy.swift */,
 			);
 			name = DataUtils;
@@ -730,7 +730,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4280C8BC280D460600A0FB32 /* LogListTableViewController.swift in Sources */,
-				42A7A0C128155B0E00DF4495 /* IndexedValuesByField.swift in Sources */,
+				42A7A0C128155B0E00DF4495 /* DataFrame.swift in Sources */,
 				421EE5C6292FE76E00996EC6 /* CategoricalStats.swift in Sources */,
 				42B3843028609A3C009458CC /* FieldCalculations.swift in Sources */,
 				42606A1C288DC57600AE858C /* RZNumberWithUnitCollectionViewCell.swift in Sources */,

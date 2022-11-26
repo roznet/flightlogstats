@@ -23,19 +23,25 @@ class FlightData {
     
     private var fieldsUnits : [Field:GCUnit] = [:]
     
-    private var categoricalValues : IndexedValuesByField<Date,CategoricalValue,Field> = IndexedValuesByField<Date,String,Field>()
-    private var doubleValues : IndexedValuesByField<Date,Double,Field> = IndexedValuesByField<Date,Double,Field>()
-    private var coordinateValues : IndexedValuesByField<Date,CLLocationCoordinate2D,Field> = IndexedValuesByField<Date,CLLocationCoordinate2D,Field>()
+    private var categoricalDataFrame : DataFrame<Date,CategoricalValue,Field> = DataFrame<Date,String,Field>()
+    private var doubleDataFrame : DataFrame<Date,Double,Field> = DataFrame<Date,Double,Field>()
+    private var coordinateDataFrame : DataFrame<Date,CLLocationCoordinate2D,Field> = DataFrame<Date,CLLocationCoordinate2D,Field>()
     
-    private(set) var values : [[Double]] = []
-    private(set) var strings : [[CategoricalValue]] = []
 
     private(set) var meta : [MetaField:String] = [:]
-    private(set) var dates : [Date] = []
     private(set) var doubleFields : [Field] = []
     private(set) var categoricalFields : [Field] = []
     
-    private(set) var coordinatesArray : [CLLocationCoordinate2D] = []
+    private var values : [[Double]] = []
+    private var strings : [[CategoricalValue]] = []
+    private var dates : [Date] = []
+    private var coordinatesArray : [CLLocationCoordinate2D] = []
+    
+    var coordinateColumn : DataFrame<Date,CLLocationCoordinate2D,Field>.Column {
+        let df = self.coordinateDataFrame(for: [.Coordinate])
+        guard let rv = df[.Coordinate] else { return DataFrame<Date,CLLocationCoordinate2D,Field>.Column(indexes: [], values: []) }
+        return rv
+    }
 
     var count : Int { return dates.count }
     var firstCoordinate : CLLocationCoordinate2D {
@@ -165,16 +171,16 @@ class FlightData {
     /// - Parameter doubleFields: fields to check for not a value
     /// - Parameter includeAllFields: true return all field, false only return felds checked for na
     /// - Returns: indexed for value  that are valid (will call dropna)
-    func doubleValues(for fields : [Field] = [], includeAllFields : Bool = true) -> IndexedValuesByField<Date,Double,Field> {
-        if self.doubleValues.count == 0 {
+    func doubleDataFrame(for fields : [Field] = [], includeAllFields : Bool = true) -> DataFrame<Date,Double,Field> {
+        if self.doubleDataFrame.count == 0 {
             let cstart = Date()
-            self.convertIndexedValues()
-            Logger.app.info("Converted \(self.doubleValues.count) rows in \(Date().timeIntervalSince(cstart)) secs")
+            self.convertDataFrame()
+            Logger.app.info("Converted \(self.doubleDataFrame.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
         if fields.count == 0 {
-            return self.doubleValues
+            return self.doubleDataFrame
         }else{
-            return self.doubleValues.dropna(fields: fields, includeAllFields: includeAllFields)
+            return self.doubleDataFrame.dropna(fields: fields, includeAllFields: includeAllFields)
         }
     }
 
@@ -187,15 +193,24 @@ class FlightData {
      - start: nil or the date when the collection should start
      - Returns: DatesValuesByField where date is the first appearance of the string
      */
-    func categoricalValues(for stringFields : [Field], start : Date? = nil) -> IndexedValuesByField<Date,CategoricalValue,Field> {
-        if self.categoricalValues.count == 0 {
+    func categoricalDataFrame(for stringFields : [Field], start : Date? = nil) -> DataFrame<Date,CategoricalValue,Field> {
+        if self.categoricalDataFrame.count == 0 {
             let cstart = Date()
-            self.convertIndexedValues()
-            Logger.app.info("Converted \(self.categoricalValues.count) rows in \(Date().timeIntervalSince(cstart)) secs")
+            self.convertDataFrame()
+            Logger.app.info("Converted \(self.categoricalDataFrame.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
-        return self.categoricalValues.sliced(start: start)
+        return self.categoricalDataFrame.sliced(start: start)
     }
         
+    func coordinateDataFrame(for coordField : [Field]) -> DataFrame<Date,CLLocationCoordinate2D,Field> {
+        if self.categoricalDataFrame.count == 0 {
+            let cstart = Date()
+            self.convertDataFrame()
+            Logger.app.info("Converted \(self.categoricalDataFrame.count) rows in \(Date().timeIntervalSince(cstart)) secs")
+        }
+        return self.coordinateDataFrame
+    }
+    
     /// Will extract and compute parameters
     /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the
     /// first date in the input value, if the last date is before the end of the data, the end is skipped
@@ -205,8 +220,8 @@ class FlightData {
     /// - Parameter end: last date (included) to collect statistics or nil for last date in data
     /// - Returns: statisitics computed between dates
     @available(*, deprecated, message: "don't use anymore, prefer doubleValues and extract from there" )
-    func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> IndexedValuesByField<Date,ValueStats,Field> {
-        var rv = IndexedValuesByField<Date,ValueStats,Field>(fields: self.doubleFields)
+    func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> DataFrame<Date,ValueStats,Field> {
+        var rv = DataFrame<Date,ValueStats,Field>(fields: self.doubleFields)
         
         // we need at least one date to extract and one date of data, else we'll return empty
         // last date should be past the last date (+10 seconds) so it's included
@@ -740,25 +755,25 @@ extension FlightData {
         }
     }
     
-    private func convertIndexedValues() {
-        self.doubleValues.clear(fields: self.doubleFields)
-        self.categoricalValues.clear(fields: self.categoricalFields)
-        self.doubleValues.reserveCapacity(self.dates.capacity)
-        self.categoricalValues.reserveCapacity(self.dates.capacity)
+    private func convertDataFrame() {
+        self.doubleDataFrame.clear(fields: self.doubleFields)
+        self.categoricalDataFrame.clear(fields: self.categoricalFields)
+        self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
+        self.doubleDataFrame.reserveCapacity(self.dates.capacity)
+        self.categoricalDataFrame.reserveCapacity(self.dates.capacity)
         
         guard dates.first != nil else { return }
-        
         
         var lastdate = dates.first!
         for (date,row) in zip(dates,values) {
             if date < lastdate {
-                Logger.app.info("Resetting inconsistent date after \(self.doubleValues.count) out of \(self.dates.count)")
-                self.doubleValues.clear(fields: self.doubleFields)
-                self.doubleValues.reserveCapacity(self.dates.capacity)
+                Logger.app.info("Resetting inconsistent date after \(self.doubleDataFrame.count) out of \(self.dates.count)")
+                self.doubleDataFrame.clear(fields: self.doubleFields)
+                self.doubleDataFrame.reserveCapacity(self.dates.capacity)
             }
             // edge case date is repeated
-            if self.doubleValues.count == 0 || date != lastdate {
-                self.doubleValues.unsafeFastAppend(fields: self.doubleFields, elements: row, for: date)
+            if self.doubleDataFrame.count == 0 || date != lastdate {
+                self.doubleDataFrame.unsafeFastAppend(fields: self.doubleFields, elements: row, for: date)
                 lastdate = date
             }
         }
@@ -766,11 +781,11 @@ extension FlightData {
         lastdate = dates.first!
         for (date,row) in zip(dates,strings) {
             if date < lastdate {
-                self.categoricalValues.clear(fields: self.categoricalFields)
-                self.categoricalValues.reserveCapacity(self.dates.capacity)
+                self.categoricalDataFrame.clear(fields: self.categoricalFields)
+                self.categoricalDataFrame.reserveCapacity(self.dates.capacity)
             }
-            if self.categoricalValues.count == 0 || date != lastdate {
-                self.categoricalValues.unsafeFastAppend(fields: self.categoricalFields, elements: row, for: date)
+            if self.categoricalDataFrame.count == 0 || date != lastdate {
+                self.categoricalDataFrame.unsafeFastAppend(fields: self.categoricalFields, elements: row, for: date)
                 lastdate = date
             }
         }

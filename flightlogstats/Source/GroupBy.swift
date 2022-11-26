@@ -8,7 +8,7 @@
 import Foundation
 import RZUtils
 
-extension IndexedValuesByField  {
+extension DataFrame  {
     private struct ExtractIndexes {
         private var remainingIndexes : [I]
         
@@ -69,8 +69,8 @@ extension IndexedValuesByField  {
                     createCollector : (F,T) -> C,
                     updateCollector : (inout C?,T) -> Void,
                     start : I? = nil,
-                    end : I? = nil) throws -> IndexedValuesByField<I,C,F> {
-        var rv = IndexedValuesByField<I,C,F>(fields: self.fields)
+                    end : I? = nil) throws -> DataFrame<I,C,F> {
+        var rv = DataFrame<I,C,F>(fields: self.fields)
         
         // we need at least one date to extract and one date of data, else we'll return empty
         // last date should be past the last date (+10 seconds) so it's included
@@ -124,7 +124,7 @@ extension IndexedValuesByField  {
     }
 }
 
-extension IndexedValuesByField where T == Double {
+extension DataFrame where T == Double {
     
     /// Will extract and compute parameters
     /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the
@@ -137,8 +137,8 @@ extension IndexedValuesByField where T == Double {
     func extractValueStats(indexes extractIndexes : [I],
                  start : I? = nil,
                  end : I? = nil,
-                 units : [F:GCUnit] = [:]) throws -> IndexedValuesByField<I,ValueStats,F> {
-        var rv = IndexedValuesByField<I,ValueStats,F>(fields: self.fields)
+                 units : [F:GCUnit] = [:]) throws -> DataFrame<I,ValueStats,F> {
+        var rv = DataFrame<I,ValueStats,F>(fields: self.fields)
         
         // we need at least one date to extract and one date of data, else we'll return empty
         // last date should be past the last date (+10 seconds) so it's included
@@ -193,7 +193,7 @@ extension IndexedValuesByField where T == Double {
     }
 }
 
-extension IndexedValuesByField where T : Hashable {
+extension DataFrame where T : Hashable {
     
     /// Will extract and compute parameters
     /// will compute statistics between date in the  array returning one stats per dates, the stats will start form the first value up to the
@@ -205,8 +205,8 @@ extension IndexedValuesByField where T : Hashable {
     /// - Returns: statisitics computed between dates
     func extractCategoricalStats(indexes extractIndexes : [I],
                  start : I? = nil,
-                 end : I? = nil) throws -> IndexedValuesByField<I,CategoricalStats<T>,F> {
-        var rv = IndexedValuesByField<I,CategoricalStats<T>,F>(fields: self.fields)
+                 end : I? = nil) throws -> DataFrame<I,CategoricalStats<T>,F> {
+        var rv = DataFrame<I,CategoricalStats<T>,F>(fields: self.fields)
         
         // we need at least one date to extract and one date of data, else we'll return empty
         // last date should be past the last date (+10 seconds) so it's included

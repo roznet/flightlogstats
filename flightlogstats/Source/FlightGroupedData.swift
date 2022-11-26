@@ -65,7 +65,7 @@ class FlightGroupedData  {
         let groupedBy : GroupByType
     }
         
-    func groupBy(data : FlightData, interval : TimeInterval) throws -> IndexedValuesByField<Date,Double,GroupByField> {
+    func groupBy(data : FlightData, interval : TimeInterval) throws -> DataFrame<Date,Double,GroupByField> {
         let valuesDefs : [Field:[GroupByType]] = [.Distance:[.total],
                                             .E1_EGT_Max:[.max,.min],
                                             .FTotalizerT:[.total]]
@@ -75,12 +75,12 @@ class FlightGroupedData  {
         //  .FltPhase (str)
         //let categoricalDefs : [Field:[]
         
-        let values = data.doubleValues(for: Array(valuesDefs.keys))
+        let values = data.doubleDataFrame(for: Array(valuesDefs.keys))
         let schedule = values.indexes.regularShedule(interval: interval)
         let stats = try values.extractValueStats(indexes: schedule)
                 
         // no fields initially build dynamically later
-        var rv : IndexedValuesByField<Date,Double,GroupByField> = IndexedValuesByField<Date,Double,GroupByField>(fields: [])
+        var rv : DataFrame<Date,Double,GroupByField> = DataFrame<Date,Double,GroupByField>(fields: [])
         
         for (date,row) in stats {
             for (field,valueStat) in row {

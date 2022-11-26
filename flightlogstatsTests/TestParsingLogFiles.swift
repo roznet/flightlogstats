@@ -58,7 +58,7 @@ class TestParsingLogFiles: XCTestCase {
         let createCollector : (FlightLogFile.Field,Double) -> ValueStats = {_,f in return ValueStats(value: f) }
         let updateCollector : (inout ValueStats?,Double) -> Void = {v,d in v?.update(double: d) }
         
-        let speedPower = data.doubleValues(for: [.GndSpd,.IAS,.E1_PctPwr,.AltMSL])
+        let speedPower = data.doubleDataFrame(for: [.GndSpd,.IAS,.E1_PctPwr,.AltMSL])
         
         if let engineOn = speedPower.dropFirst(field: .E1_PctPwr, matching: { $0 > 0 }),
            let moving = engineOn.dropFirst(field: .GndSpd,matching: { $0 > 0 }) {
@@ -68,7 +68,7 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertTrue(false)
         }
         
-        let engine = data.doubleValues(for: [.E1_EGT_Max,.E1_EGT_MaxIdx,.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6])
+        let engine = data.doubleDataFrame(for: [.E1_EGT_Max,.E1_EGT_MaxIdx,.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6])
         
         XCTAssertGreaterThan(engine.count, 0)
         for idx in 0..<engine.count {
@@ -81,7 +81,7 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertEqual(Double(maxidx)+1.0, x[.E1_EGT_MaxIdx])
         }
         
-        let wind = data.doubleValues(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
+        let wind = data.doubleDataFrame(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
         
         for idx in 0..<wind.count {
             let x = wind.fieldsValues(at: idx)
@@ -103,7 +103,7 @@ class TestParsingLogFiles: XCTestCase {
             
             let rv = try group.groupBy(data: data, interval: 60.0)
             
-            let raw = data.doubleValues(for: rv.fields.map { $0.field } )
+            let raw = data.doubleDataFrame(for: rv.fields.map { $0.field } )
             
             let rv_e = try raw.extract(indexes: rv.indexes,
                         createCollector: createCollector,
@@ -116,16 +116,16 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertNil(error)
         }
         
-        let identifiers = data.categoricalValues(for: [.AtvWpt,.AfcsOn]).indexesForValueChange(fields: [.AtvWpt])
+        let identifiers = data.categoricalDataFrame(for: [.AtvWpt,.AfcsOn]).indexesForValueChange(fields: [.AtvWpt])
 
         do {
             var timings : [Date] = [Date()]
             
             let old = try data.extract(dates: identifiers.indexes)
             timings.append(Date())
-            let new = try data.doubleValues(for: []).extractValueStats(indexes: identifiers.indexes)
+            let new = try data.doubleDataFrame(for: []).extractValueStats(indexes: identifiers.indexes)
             timings.append(Date())
-            let generic = try data.doubleValues(for: []).extract(indexes: identifiers.indexes,
+            let generic = try data.doubleDataFrame(for: []).extract(indexes: identifiers.indexes,
                                                                  createCollector: createCollector,
                                                                  updateCollector: updateCollector)
             timings.append(Date())
@@ -141,10 +141,10 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertNil(error)
         }
         
-        let freq = data.categoricalValues(for: [.COM1,.COM2]).indexesForValueChange(fields: [.COM1,.COM2])
+        let freq = data.categoricalDataFrame(for: [.COM1,.COM2]).indexesForValueChange(fields: [.COM1,.COM2])
         print(freq.count)
         
-        let ap = data.categoricalValues(for: [.AfcsOn,.RollM,.PitchM]).indexesForValueChange(fields: [.AfcsOn,.RollM,.PitchM])
+        let ap = data.categoricalDataFrame(for: [.AfcsOn,.RollM,.PitchM]).indexesForValueChange(fields: [.AfcsOn,.RollM,.PitchM])
         let apFixedSchedule = ap.indexes.regularShedule(interval: 60.0)
         //let values = 
         

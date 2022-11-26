@@ -120,7 +120,7 @@ extension FlightLogFile {
     
     func dataSerie(fields : [Field]) -> [Field:GCStatsDataSerie] {
         if let data = self.data {
-            let values = data.doubleValues(for: fields)
+            let values = data.doubleDataFrame(for: fields)
             return values.dataSeries()
         }
         return [:]
