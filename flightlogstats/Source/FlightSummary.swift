@@ -93,13 +93,13 @@ struct FlightSummary : Codable {
     }
     
     init( data : FlightData) throws {
-        let values = data.datesDoubles(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT,.AltInd] )
+        let values = data.doubleValues(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT,.AltInd] )
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd, minimumMatchCount: 5) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
         let flyingValues = engineOnValues?.dropFirst(field: .IAS) { $0 > 35.0 }?.dropLast(field: .IAS) { $0 > 35.0 }
 
-        guard let start = data.dates.first, let end = data.dates.last else {
+        guard let start = values.indexes.first, let end = values.indexes.last else {
             self.summaryType = .empty
             self.engineOn = nil
             self.moving = nil
@@ -147,7 +147,7 @@ struct FlightSummary : Codable {
         self.distanceInNm = values.last(field: .Distance)?.value ?? 0.0
         self.altitudeInFeet = values.max(for: .AltInd) ?? 0.0
 
-        let identifiers = data.datesStrings(for: [.AtvWpt])
+        let identifiers = data.categoricalValues(for: [.AtvWpt])
 
         if let names = identifiers[.AtvWpt]?.values {
             self.route = names.compactMap {

@@ -31,10 +31,10 @@ struct FlightLeg {
     
     var fields : [Field] { return Array(data.keys).sorted { $0.order < $1.order } }
     
-    init(categoricalValues : [Field : CategoricalValue], timeRange: TimeRange, data: [Field : ValueStats]) {
+    init(timeRange: TimeRange, values: [Field : ValueStats], categoricalValues : [Field : CategoricalValue] ) {
         self.categoricalValues = categoricalValues
         self.timeRange = timeRange
-        self.data = data
+        self.data = values
     }
     
     func valueStats(field : Field) -> ValueStats? {
@@ -63,10 +63,11 @@ struct FlightLeg {
                      end : Date? = nil,
                      byfields : [Field] = [.AtvWpt]) -> [FlightLeg] {
         var rv : [FlightLeg] = []
-        let identifiers : IndexedValuesByField<Date,String,Field> = data.datesStrings(for: byfields, start: start).indexesForValueChange(fields: byfields)
+        let identifiers : IndexedValuesByField<Date,String,Field> = data.categoricalValues(for: byfields, start: start).indexesForValueChange(fields: byfields)
         
         do {
-            let stats : IndexedValuesByField<Date,ValueStats,Field> = try data.extract(dates: identifiers.indexes, start: start, end : end)
+            let values = data.doubleValues()
+            let stats : IndexedValuesByField<Date,ValueStats,Field> = try values.extractValueStats(indexes: identifiers.indexes, start: start, end: end)
             
             for idx in 0..<identifiers.count {
                 if var endTime = end ?? identifiers.indexes.last {
@@ -84,9 +85,8 @@ struct FlightLeg {
                             validData[field] = val
                         }
                     }
-                    let leg = FlightLeg(categoricalValues: categoricalValues,
-                                        timeRange: TimeRange(start: startTime, end: endTime),
-                                        data: validData)
+                    let leg = FlightLeg(timeRange: TimeRange(start: startTime, end: endTime),
+                                        values: validData, categoricalValues: categoricalValues)
                     rv.append(leg)
                 }
 

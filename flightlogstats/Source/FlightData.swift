@@ -25,7 +25,7 @@ class FlightData {
     
     private var categoricalValues : IndexedValuesByField<Date,CategoricalValue,Field> = IndexedValuesByField<Date,String,Field>()
     private var doubleValues : IndexedValuesByField<Date,Double,Field> = IndexedValuesByField<Date,Double,Field>()
-    private var coord : IndexedValuesByField<Date,CLLocationCoordinate2D,Field> = IndexedValuesByField<Date,CLLocationCoordinate2D,Field>()
+    private var coordinateValues : IndexedValuesByField<Date,CLLocationCoordinate2D,Field> = IndexedValuesByField<Date,CLLocationCoordinate2D,Field>()
     
     private(set) var values : [[Double]] = []
     private(set) var strings : [[CategoricalValue]] = []
@@ -35,14 +35,14 @@ class FlightData {
     private(set) var doubleFields : [Field] = []
     private(set) var categoricalFields : [Field] = []
     
-    private(set) var coordinates : [CLLocationCoordinate2D] = []
+    private(set) var coordinatesArray : [CLLocationCoordinate2D] = []
 
     var count : Int { return dates.count }
     var firstCoordinate : CLLocationCoordinate2D {
-        return self.coordinates.first { CLLocationCoordinate2DIsValid($0) } ?? kCLLocationCoordinate2DInvalid
+        return self.coordinatesArray.first { CLLocationCoordinate2DIsValid($0) } ?? kCLLocationCoordinate2DInvalid
     }
     var lastCoordinate : CLLocationCoordinate2D {
-        return self.coordinates.last { CLLocationCoordinate2DIsValid($0) } ?? kCLLocationCoordinate2DInvalid
+        return self.coordinatesArray.last { CLLocationCoordinate2DIsValid($0) } ?? kCLLocationCoordinate2DInvalid
     }
 
     private var doubleFieldToIndex : [Field:Int] {
@@ -160,41 +160,22 @@ class FlightData {
 
     
     //MARK: - raw extracts
-    
-    /**
-     * return array of values which are dict of field -> value
-     */
-    func values(for doubleFields : [Field]) -> [ [Field:Double] ] {
-        let fieldToIndex : [Field:Int] = self.doubleFieldToIndex
         
-        var rv : [[Field:Double]] = []
-        
-        for row in values {
-            var newRow : [Field:Double] = [:]
-            for field in doubleFields {
-                if let idx = fieldToIndex[field] {
-                    let val = row[idx]
-                    if !val.isNaN {
-                        newRow[field] = val
-                    }
-                }
-            }
-            rv.append(newRow)
-        }
-        return rv
-    }
-    
     /// doubles values with nan removed
-    /// - Parameter doubleFields: fields to check for NA
-    /// - Returns: indexed for value  that are valid
-    func datesDoubles(for fields : [Field]) -> IndexedValuesByField<Date,Double,Field> {
+    /// - Parameter doubleFields: fields to check for not a value
+    /// - Parameter includeAllFields: true return all field, false only return felds checked for na
+    /// - Returns: indexed for value  that are valid (will call dropna)
+    func doubleValues(for fields : [Field] = [], includeAllFields : Bool = true) -> IndexedValuesByField<Date,Double,Field> {
         if self.doubleValues.count == 0 {
             let cstart = Date()
             self.convertIndexedValues()
             Logger.app.info("Converted \(self.doubleValues.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
-        
-        return self.doubleValues.dropna(fields: fields)
+        if fields.count == 0 {
+            return self.doubleValues
+        }else{
+            return self.doubleValues.dropna(fields: fields, includeAllFields: includeAllFields)
+        }
     }
 
     /**
@@ -206,7 +187,7 @@ class FlightData {
      - start: nil or the date when the collection should start
      - Returns: DatesValuesByField where date is the first appearance of the string
      */
-    func datesStrings(for stringFields : [Field], start : Date? = nil) -> IndexedValuesByField<Date,CategoricalValue,Field> {
+    func categoricalValues(for stringFields : [Field], start : Date? = nil) -> IndexedValuesByField<Date,CategoricalValue,Field> {
         if self.categoricalValues.count == 0 {
             let cstart = Date()
             self.convertIndexedValues()
@@ -223,6 +204,7 @@ class FlightData {
     /// - Parameter start:first date to start statistics or nil for first date in data
     /// - Parameter end: last date (included) to collect statistics or nil for last date in data
     /// - Returns: statisitics computed between dates
+    @available(*, deprecated, message: "don't use anymore, prefer doubleValues and extract from there" )
     func extract(dates extractDates : [Date], start : Date? = nil, end : Date? = nil) throws -> IndexedValuesByField<Date,ValueStats,Field> {
         var rv = IndexedValuesByField<Date,ValueStats,Field>(fields: self.doubleFields)
         
@@ -513,9 +495,9 @@ extension FlightData {
                     }
                 }
                 if coord.latitude.isFinite && coord.longitude.isFinite {
-                    data.coordinates.append(coord)
+                    data.coordinatesArray.append(coord)
                 }else{
-                    data.coordinates.append(kCLLocationCoordinate2DInvalid)
+                    data.coordinatesArray.append(kCLLocationCoordinate2DInvalid)
                 }
                 if coord.latitude.isFinite && coord.longitude.isFinite {
                     let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)

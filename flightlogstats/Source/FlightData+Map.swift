@@ -13,7 +13,7 @@ extension FlightData {
         var northEastPoint : CLLocationCoordinate2D? = nil
         var southWestPoint : CLLocationCoordinate2D? = nil
         
-        for coord in self.coordinates {
+        for coord in self.coordinatesArray {
             if coord.longitude <= -180.0 {
                 continue
             }
@@ -97,7 +97,7 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
             context.beginPath()
             context.setLineWidth( 2.0 / zoomScale )
             var pathState : PathState = .primary
-            for (date,coord) in zip(mapOverlay.flightData.dates, mapOverlay.flightData.coordinates) {
+            for (date,coord) in zip(mapOverlay.flightData.dates, mapOverlay.flightData.coordinatesArray) {
                 if coord.longitude <= -180.0 {
                     continue
                 }

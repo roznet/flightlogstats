@@ -134,7 +134,7 @@ extension IndexedValuesByField where T == Double {
     /// - Parameter start:first date to start statistics or nil for first date in data
     /// - Parameter end: last date (included) to collect statistics or nil for last date in data
     /// - Returns: statisitics computed between dates
-    func extract(indexes extractIndexes : [I],
+    func extractValueStats(indexes extractIndexes : [I],
                  start : I? = nil,
                  end : I? = nil,
                  units : [F:GCUnit] = [:]) throws -> IndexedValuesByField<I,ValueStats,F> {
@@ -203,7 +203,7 @@ extension IndexedValuesByField where T : Hashable {
     /// - Parameter start:first date to start statistics or nil for first date in data
     /// - Parameter end: last date (included) to collect statistics or nil for last date in data
     /// - Returns: statisitics computed between dates
-    func extract(indexes extractIndexes : [I],
+    func extractCategoricalStats(indexes extractIndexes : [I],
                  start : I? = nil,
                  end : I? = nil) throws -> IndexedValuesByField<I,CategoricalStats<T>,F> {
         var rv = IndexedValuesByField<I,CategoricalStats<T>,F>(fields: self.fields)

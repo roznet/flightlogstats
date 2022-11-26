@@ -108,6 +108,7 @@ extension FlightLogFile {
         case E1_EGT_Max = "E1 EGTMax"
         case E1_EGT_MaxIdx = "E1 EGTMaxIdx"
         case E1_EGT_Min = "E1 EGTMin"
+        case Coordinate = "Coordinate"
         
         // calculated strings
         case FltPhase = "FltPhase"
@@ -353,10 +354,6 @@ extension FlightLogFile {
                 return context.numberWithUnit(valueStats)
             case .Longitude:
                 return context.numberWithUnit(valueStats)
-            case .Lcl_Date:
-                return nil
-            case .Lcl_Time:
-                return nil
             
             // Calculated
             case .FQtyT:
@@ -369,19 +366,16 @@ extension FlightLogFile {
                 return context.numberWithUnit(speed: valueStats)
             case .FTotalizerT:
                 return context.numberWithUnit(gallon: valueStats, used: false)
-            case .UTCOfst:
-                return nil
-                
-            case .FltPhase:
-                return nil
             case .E1_EGT_Max:
                 return context.numberWithUnit(engineTemp: valueStats)
             case .E1_EGT_MaxIdx:
                 return context.numberWithUnit(valueStats)
             case .E1_EGT_Min:
                 return context.numberWithUnit(engineTemp: valueStats)
+            // Not numbers:
+            case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time:
+                return nil
             }
-        
         }
     }
     

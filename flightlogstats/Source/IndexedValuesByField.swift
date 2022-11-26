@@ -8,6 +8,7 @@
 import Foundation
 import RZUtils
 
+//DataFrame
 public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
     public enum IndexedValuesByFieldError : Error {
         case inconsistentIndexOrder
@@ -15,6 +16,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         case unknownField
     }
     
+    //Row
     public typealias FieldsValues = [F:T]
     
     public struct IndexedValue {
@@ -22,6 +24,7 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
         public let value : T
     }
     
+    //Column
     public struct IndexedValues {
         public let indexes : [I]
         public let values : [T]
@@ -291,15 +294,18 @@ public struct IndexedValuesByField<I : Comparable,T,F : Hashable> {
 }
 
 extension IndexedValuesByField where T : FloatingPoint {
-    public func dropna(fields : [F]) -> IndexedValuesByField {
-        guard fields.count > 0 else { return self }
+    public func dropna(fields : [F], includeAllFields : Bool = false) -> IndexedValuesByField {
+        let outputFields = includeAllFields ? self.fields : fields.compactMap( { self.values[$0] != nil ? $0 : nil } )
+        let checkFields = fields.compactMap { self.values[$0] != nil ? $0 : nil }
         
-        var rv = IndexedValuesByField(fields: self.fields)
+        guard outputFields.count > 0 else { return self }
+        
+        var rv = IndexedValuesByField(fields: outputFields)
         rv.reserveCapacity(self.count)
         
         for (idx,index) in self.indexes.enumerated() {
             var valid : Bool = true
-            for field in fields {
+            for field in checkFields {
                 let val = self.values[field]![idx]
                 if !val.isFinite {
                     valid = false
@@ -307,7 +313,7 @@ extension IndexedValuesByField where T : FloatingPoint {
                 }
             }
             if valid {
-                rv.unsafeFastAppend(fields: self.fields, elements: self.fields.map { self.values[$0]![idx] }, for: index)
+                rv.unsafeFastAppend(fields: outputFields, elements: outputFields.map { self.values[$0]![idx] }, for: index)
             }
         }
         return rv
@@ -378,7 +384,7 @@ extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field {
 }
 
 extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field, I == Date {
-
+    
     public func dataSeries(from : I? = nil, to : I? = nil) -> [F:GCStatsDataSerie] {
         var rv : [F:GCStatsDataSerie] = [:]
         var started : Bool = false
@@ -402,5 +408,31 @@ extension IndexedValuesByField  where T == Double, F == FlightLogFile.Field, I =
         }
         return rv
     }
+}
 
+extension IndexedValuesByField : Sequence {
+    ///MARK: Iterator
+    public struct IndexedValuesByFieldIterator : IteratorProtocol {
+        let values : IndexedValuesByField
+        var idx : Int
+        var element : [F:T] = [:]
+        
+        public init(_ indexedValues : IndexedValuesByField) {
+            self.values = indexedValues
+            self.idx = 0
+        }
+        public mutating func next() -> (I,[F:T])? {
+            guard idx < values.indexes.count else { return nil }
+                
+            let index = values.indexes[idx]
+            for (field,serie) in values.values {
+                element[field] = serie[idx]
+            }
+            idx += 1
+            return (index,element)
+        }
+    }
+    public func makeIterator() -> IndexedValuesByFieldIterator {
+        return IndexedValuesByFieldIterator(self)
+    }
 }
