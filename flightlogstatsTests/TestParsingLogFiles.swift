@@ -116,7 +116,7 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertNil(error)
         }
         
-        let identifiers = data.categoricalDataFrame(for: [.AtvWpt,.AfcsOn]).indexesForValueChange(fields: [.AtvWpt])
+        let identifiers = data.categoricalDataFrame(for: [.AtvWpt,.AfcsOn]).dataFrameForValueChange(fields: [.AtvWpt])
 
         do {
             var timings : [Date] = [Date()]
@@ -141,10 +141,10 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertNil(error)
         }
         
-        let freq = data.categoricalDataFrame(for: [.COM1,.COM2]).indexesForValueChange(fields: [.COM1,.COM2])
+        let freq = data.categoricalDataFrame(for: [.COM1,.COM2]).dataFrameForValueChange(fields: [.COM1,.COM2])
         print(freq.count)
         
-        let ap = data.categoricalDataFrame(for: [.AfcsOn,.RollM,.PitchM]).indexesForValueChange(fields: [.AfcsOn,.RollM,.PitchM])
+        let ap = data.categoricalDataFrame(for: [.AfcsOn,.RollM,.PitchM]).dataFrameForValueChange(fields: [.AfcsOn,.RollM,.PitchM])
         let apFixedSchedule = ap.indexes.regularShedule(interval: 60.0)
         //let values = 
         

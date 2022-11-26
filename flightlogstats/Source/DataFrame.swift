@@ -287,7 +287,7 @@ public struct DataFrame<I : Comparable,T,F : Hashable> {
         }
     }
     
-    public func indexedValue(for field : F, at index : Int) -> Point? {
+    public func point(for field : F, at index : Int) -> Point? {
         guard let fieldValues = self.values[field], index < self.indexes.count else { return nil }
         let value = fieldValues[index]
         let date = self.indexes[index]
@@ -416,7 +416,7 @@ extension DataFrame  where T == Double, F == FlightLogFile.Field, I == Date {
 
 //MARK: - Equatable specialisation
 extension DataFrame where T : Equatable {
-    public func indexesForValueChange(fields : [F]) -> DataFrame {
+    public func dataFrameForValueChange(fields : [F]) -> DataFrame {
         let selectFields = fields.compactMap { self.values[$0] != nil ? $0 : nil }
         
         var rv = DataFrame(fields: selectFields)

@@ -68,7 +68,7 @@ struct FlightLeg {
                      end : Date? = nil,
                      byfields : [Field] = [.AtvWpt]) -> [FlightLeg] {
         var rv : [FlightLeg] = []
-        let identifiers : DataFrame<Date,String,Field> = data.categoricalDataFrame(for: byfields).sliced(start: start).indexesForValueChange(fields: byfields)
+        let identifiers : DataFrame<Date,String,Field> = data.categoricalDataFrame(for: byfields).sliced(start: start).dataFrameForValueChange(fields: byfields)
         
         do {
             let values = data.doubleDataFrame()

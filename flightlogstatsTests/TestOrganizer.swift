@@ -141,6 +141,7 @@ class TestOrganizer: XCTestCase {
         let writeableLocalUrl = organizer.localFolder.appendingPathComponent("testLocal")
         let writeableCloudUrl = organizer.localFolder.appendingPathComponent("testCloud")
         
+        Logger.test.info("Cleaning test folders")
         for writeableUrl in [writeableCloudUrl, writeableLocalUrl] {
             guard self.prepareAndClearFolder(url: writeableUrl) else {
                 XCTAssertTrue(false)
@@ -204,6 +205,14 @@ class TestOrganizer: XCTestCase {
             }
         }else{
             XCTAssertTrue(false)
+        }
+
+        Logger.test.info("Cleaning test folders")
+        for writeableUrl in [writeableCloudUrl, writeableLocalUrl] {
+            guard self.prepareAndClearFolder(url: writeableUrl) else {
+                XCTAssertTrue(false)
+                return
+            }
         }
     }
     
