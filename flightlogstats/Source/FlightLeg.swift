@@ -19,9 +19,6 @@ struct FlightLeg {
         case end_time = "End"
     }
     
-    @available(*, deprecated, message: "Should not use waypoint but generic CategoricalValues")
-    var waypoint : Waypoint { return Waypoint(name: self.categoricalValues[.AtvWpt] ?? "" )!  }
-    
     let timeRange : TimeRange
     var start : Date { return timeRange.start }
     var end : Date { return timeRange.end }
@@ -62,13 +59,26 @@ struct FlightLeg {
             return displayContext.format(time: self.timeRange.end, since: self.timeRange.start, reference: reference)
         }
     }
-    
+
     static func legs(from data : FlightData,
+                     byfields : [Field],
                      start : Date? = nil,
-                     end : Date? = nil,
-                     byfields : [Field] = [.AtvWpt]) -> [FlightLeg] {
-        var rv : [FlightLeg] = []
+                     end : Date? = nil) -> [FlightLeg] {
         let identifiers : DataFrame<Date,String,Field> = data.categoricalDataFrame(for: byfields).sliced(start: start).dataFrameForValueChange(fields: byfields)
+        return self.extract(from: data, identifiers: identifiers, start: start, end: end)
+    }
+    
+    static func legs(from data : FlightData, interval : TimeInterval, start : Date? = nil, end : Date? = nil) -> [FlightLeg] {
+        let values = data.doubleDataFrame().sliced(start: start,end: end)
+        let schedule = values.indexes.regularShedule(interval: interval)
+        let identifiers = DataFrame<Date,String,Field>(indexes: schedule, values: [:])
+        return self.extract(from: data, identifiers: identifiers, start : start, end : end)
+    }
+    private static func extract(from data : FlightData,
+                        identifiers : DataFrame<Date,String,Field>,
+                     start : Date? = nil,
+                     end : Date? = nil) -> [FlightLeg] {
+        var rv : [FlightLeg] = []
         
         do {
             let values = data.doubleDataFrame()
