@@ -93,9 +93,9 @@ extension FlightLogFile {
     var phasesOfFLight : [FlightLeg] {
         var rv : [FlightLeg] = []
         if let flyingStart = self.flightSummary?.flying?.start, let data = self.data {
-            //rv = FlightLeg.legs(from: data, byfields: [.FltPhase], start: flyingStart)
+            rv = FlightLeg.legs(from: data, byfields: [.FltPhase], start: flyingStart)
             //rv = FlightLeg.legs(from: data, start: flyingStart, byfields: [.AfcsOn,.RollM,.PitchM])
-            rv = FlightLeg.legs(from: data, interval: 60.0*5.0, start: flyingStart)
+            //rv = FlightLeg.legs(from: data, interval: 60.0*5.0, start: flyingStart)
         }
         return rv
     }

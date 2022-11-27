@@ -8,8 +8,9 @@
 import Foundation
 
 public struct CategoricalStats<CategoricalValue : Hashable>{
-    enum Metric : Hashable{
-        case start,end
+    enum Metric : Hashable {
+        case start
+        case end
         case mostFrequent
     }
     
@@ -33,5 +34,15 @@ public struct CategoricalStats<CategoricalValue : Hashable>{
         }
     }
 
+    func value(for metric: Metric) -> CategoricalValue {
+        switch metric {
+        case .end:
+            return self.end
+        case .start:
+            return self.start
+        case .mostFrequent:
+            return self.mostFrequent
+        }
+    }
     
 }

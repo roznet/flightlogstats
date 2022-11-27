@@ -55,21 +55,63 @@ extension Date {
     }
 }
 
-class FlightGroupedData  {
-    typealias Field = FlightData.Field
-    typealias GroupedValueCollected = ValueStats
-    typealias GroupByType = ValueStats.Metric
+class FlightLogFileExport  {
+    enum FlightLogFileExportError : Error {
+        case inconsitentIndexesSize
+    }
     
-    struct GroupByField : Hashable {
+    typealias Field = FlightLogFile.Field
+    typealias CategoricalValue = FlightLogFile.CategoricalValue
+
+    typealias ExportedValueType = ValueStats.Metric
+    typealias ExportedCategoricalType = CategoricalStats<CategoricalValue>.Metric
+    
+    struct ExportedValue : Hashable {
         let field : Field
-        let groupedBy : GroupByType
+        let type : ExportedValueType
     }
         
-    func groupBy(data : FlightData, interval : TimeInterval) throws -> DataFrame<Date,Double,GroupByField> {
-        let valuesDefs : [Field:[GroupByType]] = [.Distance:[.total],
-                                            .E1_EGT_Max:[.max,.min],
-                                            .FTotalizerT:[.total]]
+    struct ExportedCategorical : Hashable {
+        let field : Field
+        let type : ExportedCategoricalType
+    }
+    
+    var values : DataFrame<Date,Double,ExportedValue>
+    var categoricals : DataFrame<Date,CategoricalValue,ExportedCategorical>
+    
+    init(legs : [FlightLeg], valueDefs : [Field:[ExportedValueType]], categoricalDefs : [Field:[ExportedCategoricalType]] ) throws {
+        /*var indexes : [Date] = []
+        var values : [ExportedValue:[Double]]
+        var categoricals : [ExportedCategorical:[CategoricalValue]]
+        */
+        self.values = DataFrame()
+        self.categoricals = DataFrame()
+        for leg in legs {
+            for (field,types) in valueDefs {
+                for type in types {
+                    let value = leg.valueStats(field: field)?.value(for: type) ?? .nan
+                    try self.values.append(field: ExportedValue(field: field, type: type), element: value, for: leg.start)
+                }
+            }
+            for (field,types) in categoricalDefs {
+                for type in types {
+                    let value = leg.categoricalValueStats(field: field)?.value(for: type) ?? ""
+                    try self.categoricals.append(field: ExportedCategorical(field: field, type: type), element: value, for: leg.start)
+                }
+            }
+        }
+    }
+    
+    static func defaultExport(legs : [FlightLeg]) throws -> FlightLogFileExport {
+        let valuesDefs : [Field:[ExportedValueType]] = [.Distance:[.total],
+                                                  .E1_EGT_Max:[.max,.min],
+                                                  .FTotalizerT:[.total]]
         
+        let categoricalDefs : [Field:[ExportedCategoricalType]] = [.AfcsOn:[.mostFrequent], .E1_EGT_MaxIdx:[.end]]
+        
+        return try FlightLogFileExport(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs)
+    }
+    /*
         // categories by most frequency
         //  .E1_EGT_MaxIdx (int)
         //  .FltPhase (str)
@@ -101,4 +143,5 @@ class FlightGroupedData  {
         }
         return rv
     }
+     */
 }
