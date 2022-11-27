@@ -38,42 +38,45 @@ E1 RPM,102,rpm,E1 RPM,,value
 E1 %Pwr,103,%,E1 PctPwr,,value
 E1 OilT,104,deg F,Oil Temperature ,deg. F,value
 E1 OilP,105,psi,Oil Pressure ,psi,value
-E1 TIT1,106,deg F,E1 TIT1,,value
-E1 TIT2,107,deg F,E1 TIT2,,value
-E1 CHT1,108,deg F,E1 CHT1,,value
-E1 CHT2,109,deg F,E1 CHT2,,value
-E1 CHT3,110,deg F,E1 CHT3,,value
-E1 EGTMax,110,deg F,E1 EGTMax,,value
-E1 EGTMaxIdx,110,deg F,E1 EGTMaxIdx,,categorical
-E1 EGTMin,110,deg F,E1 EGTMin,,value
-E1 CHT4,111,deg F,E1 CHT4,,value
-E1 CHT5,112,deg F,E1 CHT5,,value
-E1 CHT6,113,deg F,E1 CHT6,,value
-E1 EGT1,114,deg F,E1 EGT1,,value
-E1 EGT2,115,deg F,E1 EGT2,,value
-E1 EGT3,116,deg F,E1 EGT3,,value
-E1 EGT4,117,deg F,E1 EGT4,,value
-E1 EGT5,118,deg F,E1 EGT5,,value
-E1 EGT6,119,deg F,E1 EGT6,,value
-E1 Torq,120,ft lbs,E1 Torq,,value
-E1 NG,121,%,E1 NG,,value
-E1 ITT,122,deg C,E1 ITT,,value
-HCDI,150,fsd,CDI deflection,,value
-VCDI,151,fsd,VDI/GP/GS deflection,,value
-MagVar,152,deg,Magnetic variation ,degrees,value
-volt1,153,volts,volt1,,value
-volt2,154,volts,volt2,,value
-amp1,155,amps,amp1,,value
-Pitch,156,deg,Pitch Attitude Angle ,degrees,value
-Roll,157,deg,Roll Attitude Angle ,degrees,value
-LatAc,158,G,Lateral G Force ,g,value
-NormAc,159,G,Vertical G Force ,g,value
-E2 FFlow,200,gph,E2 FFlow,,value
-E2 MAP,201,Hg,E2 MAP,,value
-E2 RPM,202,rpm,E2 RPM,,value
-E2 Torq,203,ft lbs,E2 Torq,,value
-E2 NG,204,%,E2 NG,,value
-E2 ITT,205,deg C,E2 ITT,,value
+E1 TIT1,110,deg F,E1 TIT1,,value
+E1 TIT2,111,deg F,E1 TIT2,,value
+E1 CHTMax,120,deg F,E1 CHTMax,,value
+E1 CHTMin,121,deg F,E1 CHTMin,,value
+E1 CHTMaxIdx,122,deg F,E1 CHTMaxIdx,,categorical
+E1 CHT1,130,deg F,E1 CHT1,,value
+E1 CHT2,131,deg F,E1 CHT2,,value
+E1 CHT3,132,deg F,E1 CHT3,,value
+E1 CHT4,133,deg F,E1 CHT4,,value
+E1 CHT5,134,deg F,E1 CHT5,,value
+E1 CHT6,135,deg F,E1 CHT6,,value
+E1 EGTMax,150,deg F,E1 EGTMax,,value
+E1 EGTMin,151,deg F,E1 EGTMin,,value
+E1 EGTMaxIdx,152,deg F,E1 EGTMaxIdx,,categorical
+E1 EGT1,160,deg F,E1 EGT1,,value
+E1 EGT2,161,deg F,E1 EGT2,,value
+E1 EGT3,162,deg F,E1 EGT3,,value
+E1 EGT4,163,deg F,E1 EGT4,,value
+E1 EGT5,164,deg F,E1 EGT5,,value
+E1 EGT6,165,deg F,E1 EGT6,,value
+E1 Torq,170,ft lbs,E1 Torq,,value
+E1 NG,171,%,E1 NG,,value
+E1 ITT,172,deg C,E1 ITT,,value
+HCDI,200,fsd,CDI deflection,,value
+VCDI,201,fsd,VDI/GP/GS deflection,,value
+MagVar,202,deg,Magnetic variation ,degrees,value
+volt1,203,volts,volt1,,value
+volt2,204,volts,volt2,,value
+amp1,205,amps,amp1,,value
+Pitch,206,deg,Pitch Attitude Angle ,degrees,value
+Roll,207,deg,Roll Attitude Angle ,degrees,value
+LatAc,208,G,Lateral G Force ,g,value
+NormAc,209,G,Vertical G Force ,g,value
+E2 FFlow,700,gph,E2 FFlow,,value
+E2 MAP,701,Hg,E2 MAP,,value
+E2 RPM,702,rpm,E2 RPM,,value
+E2 Torq,703,ft lbs,E2 Torq,,value
+E2 NG,704,%,E2 NG,,value
+E2 ITT,705,deg C,E2 ITT,,value
 RollM,800,enum,RollM,,categorical
 PitchM,801,enum,PitchM,,categorical
 RollC,802,deg,RollC,,value

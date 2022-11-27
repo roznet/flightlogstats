@@ -105,9 +105,14 @@ extension FlightLogFile {
         case WndDirect = "WndDirect"
         case WndCross  = "WndCross"
         case FTotalizerT = "FTotalizerT"
-        case E1_EGT_Max = "E1 EGTMax"
         case E1_EGT_MaxIdx = "E1 EGTMaxIdx"
+        case E1_EGT_Max = "E1 EGTMax"
         case E1_EGT_Min = "E1 EGTMin"
+
+        case E1_CHT_MaxIdx = "E1 CHTMaxIdx"
+        case E1_CHT_Max = "E1 CHTMax"
+        case E1_CHT_Min = "E1 CHTMin"
+
         case Coordinate = "Coordinate"
         
         // calculated strings
@@ -246,33 +251,11 @@ extension FlightLogFile {
                 return context.numberWithUnit(valueStats)
             case .E1_PctPwr:
                 return context.numberWithUnit(percent: valueStats)
-            case .E1_CHT1:
+            case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
                 return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_CHT2:
+            case .E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6:
                 return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_CHT3:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_CHT4:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_CHT5:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_CHT6:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_EGT1:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_EGT2:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_EGT3:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_EGT4:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_EGT5:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_EGT6:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_TIT1:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_TIT2:
+            case .E1_TIT1,.E1_TIT2:
                 return context.numberWithUnit(engineTemp: valueStats)
             case .E1_Torq:
                 return context.numberWithUnit(valueStats)
@@ -366,14 +349,10 @@ extension FlightLogFile {
                 return context.numberWithUnit(speed: valueStats)
             case .FTotalizerT:
                 return context.numberWithUnit(gallon: valueStats, used: false)
-            case .E1_EGT_Max:
-                return context.numberWithUnit(engineTemp: valueStats)
-            case .E1_EGT_MaxIdx:
-                return context.numberWithUnit(valueStats)
-            case .E1_EGT_Min:
+            case .E1_EGT_Max,.E1_EGT_Min,.E1_CHT_Max,.E1_CHT_Min:
                 return context.numberWithUnit(engineTemp: valueStats)
             // Not numbers:
-            case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time:
+            case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx:
                 return nil
             }
         }

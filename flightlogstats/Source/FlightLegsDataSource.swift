@@ -33,6 +33,13 @@ class FlightLegsDataSource : TableDataSource {
             groupedFields.formUnion(leg.groupedFields)
         }
         
+        // avoid duplicate, grouped field already appear in left side
+        for field in groupedFields {
+            if fields.contains(field) {
+                fields.remove(field)
+            }
+        }
+        
         self.fields = Array(fields).sorted { $0.order < $1.order }
         self.groupedFields = Array(groupedFields).sorted { $0.order < $1.order }
 
@@ -79,7 +86,7 @@ class FlightLegsDataSource : TableDataSource {
     // helpers:
     
     func field(at indexPath: IndexPath) -> Field? {
-        let fieldIdx = indexPath.item - self.fixedColumnsInfo.count
+        let fieldIdx = indexPath.item - (self.fixedColumnsInfo.count + self.groupedFields.count)
         if self.fields.indices.contains(fieldIdx) {
             return self.fields[fieldIdx]
         }
@@ -142,7 +149,7 @@ class FlightLegsDataSource : TableDataSource {
                 var geoIndex = self.fixedColumnsInfo.count
                 
                 for field in groupedFields {
-                    let fixedAttributed = CellHolder(string: self.formattedCategorical(field: field, row: row), attributes: self.cellAttributes)
+                    let fixedAttributed = CellHolder(string: self.formattedCategorical(field: field, row: row), attributes: self.titleAttributes)
                     self.cellHolders.append(fixedAttributed)
 
                 }

@@ -313,7 +313,7 @@
   },
   {
     "field": "E1 TIT1",
-    "order": 106,
+    "order": 110,
     "unit": "deg F",
     "description": "E1 TIT1",
     "unit_description": "",
@@ -321,15 +321,39 @@
   },
   {
     "field": "E1 TIT2",
-    "order": 107,
+    "order": 111,
     "unit": "deg F",
     "description": "E1 TIT2",
     "unit_description": "",
     "type": "value"
   },
   {
+    "field": "E1 CHTMax",
+    "order": 120,
+    "unit": "deg F",
+    "description": "E1 CHTMax",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E1 CHTMin",
+    "order": 121,
+    "unit": "deg F",
+    "description": "E1 CHTMin",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E1 CHTMaxIdx",
+    "order": 122,
+    "unit": "deg F",
+    "description": "E1 CHTMaxIdx",
+    "unit_description": "",
+    "type": "categorical"
+  },
+  {
     "field": "E1 CHT1",
-    "order": 108,
+    "order": 130,
     "unit": "deg F",
     "description": "E1 CHT1",
     "unit_description": "",
@@ -337,7 +361,7 @@
   },
   {
     "field": "E1 CHT2",
-    "order": 109,
+    "order": 131,
     "unit": "deg F",
     "description": "E1 CHT2",
     "unit_description": "",
@@ -345,39 +369,15 @@
   },
   {
     "field": "E1 CHT3",
-    "order": 110,
+    "order": 132,
     "unit": "deg F",
     "description": "E1 CHT3",
     "unit_description": "",
     "type": "value"
   },
   {
-    "field": "E1 EGTMax",
-    "order": 110,
-    "unit": "deg F",
-    "description": "E1 EGTMax",
-    "unit_description": "",
-    "type": "value"
-  },
-  {
-    "field": "E1 EGTMaxIdx",
-    "order": 110,
-    "unit": "deg F",
-    "description": "E1 EGTMaxIdx",
-    "unit_description": "",
-    "type": "categorical"
-  },
-  {
-    "field": "E1 EGTMin",
-    "order": 110,
-    "unit": "deg F",
-    "description": "E1 EGTMin",
-    "unit_description": "",
-    "type": "value"
-  },
-  {
     "field": "E1 CHT4",
-    "order": 111,
+    "order": 133,
     "unit": "deg F",
     "description": "E1 CHT4",
     "unit_description": "",
@@ -385,7 +385,7 @@
   },
   {
     "field": "E1 CHT5",
-    "order": 112,
+    "order": 134,
     "unit": "deg F",
     "description": "E1 CHT5",
     "unit_description": "",
@@ -393,15 +393,39 @@
   },
   {
     "field": "E1 CHT6",
-    "order": 113,
+    "order": 135,
     "unit": "deg F",
     "description": "E1 CHT6",
     "unit_description": "",
     "type": "value"
   },
   {
+    "field": "E1 EGTMax",
+    "order": 150,
+    "unit": "deg F",
+    "description": "E1 EGTMax",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E1 EGTMin",
+    "order": 151,
+    "unit": "deg F",
+    "description": "E1 EGTMin",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E1 EGTMaxIdx",
+    "order": 152,
+    "unit": "deg F",
+    "description": "E1 EGTMaxIdx",
+    "unit_description": "",
+    "type": "categorical"
+  },
+  {
     "field": "E1 EGT1",
-    "order": 114,
+    "order": 160,
     "unit": "deg F",
     "description": "E1 EGT1",
     "unit_description": "",
@@ -409,7 +433,7 @@
   },
   {
     "field": "E1 EGT2",
-    "order": 115,
+    "order": 161,
     "unit": "deg F",
     "description": "E1 EGT2",
     "unit_description": "",
@@ -417,7 +441,7 @@
   },
   {
     "field": "E1 EGT3",
-    "order": 116,
+    "order": 162,
     "unit": "deg F",
     "description": "E1 EGT3",
     "unit_description": "",
@@ -425,7 +449,7 @@
   },
   {
     "field": "E1 EGT4",
-    "order": 117,
+    "order": 163,
     "unit": "deg F",
     "description": "E1 EGT4",
     "unit_description": "",
@@ -433,7 +457,7 @@
   },
   {
     "field": "E1 EGT5",
-    "order": 118,
+    "order": 164,
     "unit": "deg F",
     "description": "E1 EGT5",
     "unit_description": "",
@@ -441,7 +465,7 @@
   },
   {
     "field": "E1 EGT6",
-    "order": 119,
+    "order": 165,
     "unit": "deg F",
     "description": "E1 EGT6",
     "unit_description": "",
@@ -449,7 +473,7 @@
   },
   {
     "field": "E1 Torq",
-    "order": 120,
+    "order": 170,
     "unit": "ft lbs",
     "description": "E1 Torq",
     "unit_description": "",
@@ -457,7 +481,7 @@
   },
   {
     "field": "E1 NG",
-    "order": 121,
+    "order": 171,
     "unit": "%",
     "description": "E1 NG",
     "unit_description": "",
@@ -465,7 +489,7 @@
   },
   {
     "field": "E1 ITT",
-    "order": 122,
+    "order": 172,
     "unit": "deg C",
     "description": "E1 ITT",
     "unit_description": "",
@@ -473,7 +497,7 @@
   },
   {
     "field": "HCDI",
-    "order": 150,
+    "order": 200,
     "unit": "fsd",
     "description": "CDI deflection",
     "unit_description": "",
@@ -481,7 +505,7 @@
   },
   {
     "field": "VCDI",
-    "order": 151,
+    "order": 201,
     "unit": "fsd",
     "description": "VDI/GP/GS deflection",
     "unit_description": "",
@@ -489,7 +513,7 @@
   },
   {
     "field": "MagVar",
-    "order": 152,
+    "order": 202,
     "unit": "deg",
     "description": "Magnetic variation ",
     "unit_description": "degrees",
@@ -497,7 +521,7 @@
   },
   {
     "field": "volt1",
-    "order": 153,
+    "order": 203,
     "unit": "volts",
     "description": "volt1",
     "unit_description": "",
@@ -505,7 +529,7 @@
   },
   {
     "field": "volt2",
-    "order": 154,
+    "order": 204,
     "unit": "volts",
     "description": "volt2",
     "unit_description": "",
@@ -513,7 +537,7 @@
   },
   {
     "field": "amp1",
-    "order": 155,
+    "order": 205,
     "unit": "amps",
     "description": "amp1",
     "unit_description": "",
@@ -521,7 +545,7 @@
   },
   {
     "field": "Pitch",
-    "order": 156,
+    "order": 206,
     "unit": "deg",
     "description": "Pitch Attitude Angle ",
     "unit_description": "degrees",
@@ -529,7 +553,7 @@
   },
   {
     "field": "Roll",
-    "order": 157,
+    "order": 207,
     "unit": "deg",
     "description": "Roll Attitude Angle ",
     "unit_description": "degrees",
@@ -537,7 +561,7 @@
   },
   {
     "field": "LatAc",
-    "order": 158,
+    "order": 208,
     "unit": "G",
     "description": "Lateral G Force ",
     "unit_description": "g",
@@ -545,7 +569,7 @@
   },
   {
     "field": "NormAc",
-    "order": 159,
+    "order": 209,
     "unit": "G",
     "description": "Vertical G Force ",
     "unit_description": "g",
@@ -553,7 +577,7 @@
   },
   {
     "field": "E2 FFlow",
-    "order": 200,
+    "order": 700,
     "unit": "gph",
     "description": "E2 FFlow",
     "unit_description": "",
@@ -561,7 +585,7 @@
   },
   {
     "field": "E2 MAP",
-    "order": 201,
+    "order": 701,
     "unit": "Hg",
     "description": "E2 MAP",
     "unit_description": "",
@@ -569,7 +593,7 @@
   },
   {
     "field": "E2 RPM",
-    "order": 202,
+    "order": 702,
     "unit": "rpm",
     "description": "E2 RPM",
     "unit_description": "",
@@ -577,7 +601,7 @@
   },
   {
     "field": "E2 Torq",
-    "order": 203,
+    "order": 703,
     "unit": "ft lbs",
     "description": "E2 Torq",
     "unit_description": "",
@@ -585,7 +609,7 @@
   },
   {
     "field": "E2 NG",
-    "order": 204,
+    "order": 704,
     "unit": "%",
     "description": "E2 NG",
     "unit_description": "",
@@ -593,7 +617,7 @@
   },
   {
     "field": "E2 ITT",
-    "order": 205,
+    "order": 705,
     "unit": "deg C",
     "description": "E2 ITT",
     "unit_description": "",

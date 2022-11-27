@@ -150,14 +150,24 @@ struct FieldCalculation {
             x in
             return x.reduce(0, +)
         },
-        FieldCalculation(outputs: [.E1_EGT_Max,.E1_EGT_Min,.E1_EGT_MaxIdx], inputs: [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6]) {
+        FieldCalculation(outputs: [.E1_EGT_Max,.E1_EGT_Min], inputs: [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6]) {
             x in
             let max : Double = x.max() ?? .nan
             let min : Double = x.min() ?? .nan
             let idx : Int = x.firstIndex(of: max) ?? 0
             
             // idx + 1 to represent egt number
-            return [max,min,Double(idx)+1]
+            return [max,min]
+            
+        },
+        FieldCalculation(outputs: [.E1_CHT_Max,.E1_CHT_Min], inputs: [.E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6]) {
+            x in
+            let max : Double = x.max() ?? .nan
+            let min : Double = x.min() ?? .nan
+            let idx : Int = x.firstIndex(of: max) ?? 0
+            
+            // idx + 1 to represent egt number
+            return [max,min]
             
         },
 
@@ -205,7 +215,29 @@ struct FieldCalculation {
                 }
             }
             return "Unknown"
+        },
+        FieldCalculation(stringOutput: .E1_EGT_MaxIdx, multiInputs: [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6], obsCount: 1) {
+            x, _ in
+            let temps = x.map { $0[0] }
+            let max : Double = temps.max() ?? .nan
+            let idx : Int = temps.firstIndex(of: max) ?? -1
+            
+            // idx + 1 to represent egt number
+            let rv = idx >= 0 ? "\(idx+1)" : ""
+            return rv
+        },
+        FieldCalculation(stringOutput: .E1_CHT_MaxIdx, multiInputs: [.E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6], obsCount: 1) {
+            x, _ in
+            let temps = x.map { $0[0] }
+            let max : Double = temps.max() ?? .nan
+            let idx : Int = temps.firstIndex(of: max) ?? -1
+            
+            // idx + 1 to represent egt number
+            let rv = idx >= 0 ? "\(idx+1)" : ""
+            return rv
         }
+
+
     ]
 }
 
