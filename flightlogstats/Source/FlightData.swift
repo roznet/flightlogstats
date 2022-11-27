@@ -21,7 +21,7 @@ class FlightData {
     typealias CategoricalValue = FlightLogFile.CategoricalValue
     typealias MetaField = FlightLogFile.MetaField
     
-    private var fieldsUnits : [Field:GCUnit] = [:]
+    private(set) var fieldsUnits : [Field:GCUnit] = [:]
     
     private var categoricalDataFrame : DataFrame<Date,CategoricalValue,Field> = DataFrame<Date,String,Field>()
     private var doubleDataFrame : DataFrame<Date,Double,Field> = DataFrame<Date,Double,Field>()
@@ -426,13 +426,16 @@ extension FlightData {
                 
                 // add calculated fields
                 data.doubleFields.append(.Distance)
+                data.fieldsUnits[.Distance] = GCUnit.nm()
                 for field in FieldCalculation.calculatedFields {
                     switch field.outputType {
                     case .doubleArray,.double:
                         for f in field.outputs {
                             fieldsMap[f] = data.doubleFields.count
+                            data.fieldsUnits[f] = f.unit
                         }
                         data.doubleFields.append(contentsOf: field.outputs)
+                        
                     case .string:
                         data.categoricalFields.append(field.output)
                     }

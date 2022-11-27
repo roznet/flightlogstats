@@ -151,7 +151,7 @@ class FlightLegsDataSource : TableDataSource {
                 for field in groupedFields {
                     let fixedAttributed = CellHolder(string: self.formattedCategorical(field: field, row: row), attributes: self.titleAttributes)
                     self.cellHolders.append(fixedAttributed)
-
+                    geoIndex += 1
                 }
                 for field in fields {
                     switch field.valueType {

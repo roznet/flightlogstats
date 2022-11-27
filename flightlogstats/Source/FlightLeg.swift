@@ -74,7 +74,7 @@ struct FlightLeg {
             let values = data.doubleDataFrame()
             let categorical = data.categoricalDataFrame()
             
-            let valuesStats : DataFrame<Date,ValueStats,Field> = try values.extractValueStats(indexes: identifiers.indexes, start: start, end: end)
+            let valuesStats : DataFrame<Date,ValueStats,Field> = try values.extractValueStats(indexes: identifiers.indexes, start: start, end: end, units: data.fieldsUnits)
             let categoricalStats : DataFrame<Date,CategoricalValueStats,Field> = try categorical.extractCategoricalStats(indexes: identifiers.indexes, start: start, end: end)
             
             for idx in 0..<identifiers.count {

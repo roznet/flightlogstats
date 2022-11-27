@@ -42,7 +42,7 @@ E1 TIT1,110,deg F,E1 TIT1,,value
 E1 TIT2,111,deg F,E1 TIT2,,value
 E1 CHTMax,120,deg F,E1 CHTMax,,value
 E1 CHTMin,121,deg F,E1 CHTMin,,value
-E1 CHTMaxIdx,122,deg F,E1 CHTMaxIdx,,categorical
+E1 CHTMaxIdx,122,enum,E1 CHTMaxIdx,,categorical
 E1 CHT1,130,deg F,E1 CHT1,,value
 E1 CHT2,131,deg F,E1 CHT2,,value
 E1 CHT3,132,deg F,E1 CHT3,,value
@@ -51,7 +51,7 @@ E1 CHT5,134,deg F,E1 CHT5,,value
 E1 CHT6,135,deg F,E1 CHT6,,value
 E1 EGTMax,150,deg F,E1 EGTMax,,value
 E1 EGTMin,151,deg F,E1 EGTMin,,value
-E1 EGTMaxIdx,152,deg F,E1 EGTMaxIdx,,categorical
+E1 EGTMaxIdx,152,enum,E1 EGTMaxIdx,,categorical
 E1 EGT1,160,deg F,E1 EGT1,,value
 E1 EGT2,161,deg F,E1 EGT2,,value
 E1 EGT3,162,deg F,E1 EGT3,,value
