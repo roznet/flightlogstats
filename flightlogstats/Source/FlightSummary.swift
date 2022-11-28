@@ -93,7 +93,7 @@ struct FlightSummary : Codable {
     }
     
     init( data : FlightData) throws {
-        let values = data.doubleDataFrame(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT,.AltInd] )
+        let values = data.doubleDataFrame(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT,.AltMSL] )
         
         let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd, minimumMatchCount: 5) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
@@ -147,7 +147,7 @@ struct FlightSummary : Codable {
         self.distanceInNm = values.last(field: .Distance)?.value ?? 0.0
         self.altitudeInFeet = values.max(for: .AltInd) ?? 0.0
 
-        let identifiers = data.categoricalDataFrame(for: [.AtvWpt])
+        let identifiers = data.categoricalDataFrame(for: [.AtvWpt]).dataFrameForValueChange(fields: [.AtvWpt])
 
         if let names = identifiers[.AtvWpt]?.values {
             self.route = names.compactMap {

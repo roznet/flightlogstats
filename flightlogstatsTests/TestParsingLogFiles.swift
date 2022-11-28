@@ -98,23 +98,6 @@ class TestParsingLogFiles: XCTestCase {
                 XCTAssertTrue(false)
             }
         }
-        let group  = FlightGroupedData()
-        do {
-            
-            let rv = try group.groupBy(data: data, interval: 60.0)
-            
-            let raw = data.doubleDataFrame(for: rv.fields.map { $0.field } )
-            
-            let rv_e = try raw.extract(indexes: rv.indexes,
-                        createCollector: createCollector,
-                        updateCollector: updateCollector
-            )
-            
-            
-            XCTAssertEqual(rv.count, rv_e.count)
-        }catch{
-            XCTAssertNil(error)
-        }
         
         let identifiers = data.categoricalDataFrame(for: [.AtvWpt,.AfcsOn]).dataFrameForValueChange(fields: [.AtvWpt])
 
@@ -216,8 +199,8 @@ class TestParsingLogFiles: XCTestCase {
         do {
             let summary = try FlightSummary(data: data)
             
-            let routeFull = FlightLeg.legs(from: data, start: nil)
-            let routeFlying = FlightLeg.legs(from: data, start: summary.flying?.start, end: summary.flying?.end)
+            let routeFull = FlightLeg.legs(from: data, byfields: [.AtvWpt], start: nil)
+            let routeFlying = FlightLeg.legs(from: data, byfields: [.AtvWpt], start: summary.flying?.start, end: summary.flying?.end)
             
             let phases = FlightLeg.legs(from: data, byfields: [.FltPhase])
             var phasesCount : [FlightLeg.CategoricalValue:Int] = [:]
@@ -262,7 +245,6 @@ class TestParsingLogFiles: XCTestCase {
                    let fullRouteLastFlyingLeg = fullRouteLastFlyingLeg{
                     XCTAssertEqual(flying.start,firstFlyingLeg.timeRange.start)
                     XCTAssertEqual(fullRouteFirstFlyingLeg.timeRange.end,firstFlyingLeg.timeRange.end)
-                    XCTAssertEqual(firstFlyingLeg.waypoint,fullRouteFirstFlyingLeg.waypoint)
                     
                     XCTAssertEqual(lastFlyingLeg.timeRange.end, flying.end)
                     XCTAssertEqual(lastFlyingLeg.timeRange.start, fullRouteLastFlyingLeg.timeRange.start)

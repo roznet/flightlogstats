@@ -192,7 +192,11 @@ struct FieldCalculation {
         },
         FieldCalculation(output: .FTotalizerT, inputs: [.FTotalizerT,.E1_FFlow]){
             x in
-            return x[0] + (x[1]/3600.0)
+            if x[1].isFinite {
+                return x[0] + (x[1]/3600.0)
+            }else{
+                return x[0]
+            }
         },
         FieldCalculation(stringOutput: .FltPhase, multiInputs: [.IAS,.GndSpd,.AltMSL,.AltGPS,.E1_FFlow], obsCount: 20){
             x, previous in
