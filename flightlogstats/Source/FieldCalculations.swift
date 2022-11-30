@@ -98,7 +98,8 @@ struct FieldCalculation {
         
         var doublesArray : [[Double]] = []
         for field in self.inputs {
-            if let vals = lines[field] {
+            if let vals = lines[field]  {
+                guard vals.count >= self.requiredObservationCount else { return "" }
                 doublesArray.append(vals)
             }
         }

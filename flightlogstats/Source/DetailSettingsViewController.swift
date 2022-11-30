@@ -12,7 +12,7 @@ import RZUtils
 extension Notification.Name {
     static let settingsViewControllerUpdate : Notification.Name = Notification.Name("Notification.Name.settingsViewControllerUpdate")
 }
-class SettingsViewController: UIViewController {
+class DetailSettingsViewController: UIViewController {
     
     @IBOutlet weak var tabFuelField: UITextField!
     @IBOutlet weak var maxFuelField: UITextField!
