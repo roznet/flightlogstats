@@ -34,6 +34,9 @@ enum TestLogFileSamples : String, CaseIterable {
     case flight2 = "log_220417_125002_LFQA" // 1.4Mb
     case flight3 = "log_220417_135002_LFAQ" // 3.2Mb
     
+    
+    case perspective = "log_220825_142831_LSZC"
+    
     static var allSampleNames : [String] { return self.allCases.map { $0.rawValue } }
  }
 
@@ -68,17 +71,19 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertTrue(false)
         }
         
-        let engine = data.doubleDataFrame(for: [.E1_EGT_Max,.E1_EGT_MaxIdx,.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6])
+        let engine = data.doubleDataFrame(for: [.E1_EGT_Max,.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6])
+        let maxindex = data.categoricalDataFrame(for:[.E1_EGT_MaxIdx])
         
         XCTAssertGreaterThan(engine.count, 0)
         for idx in 0..<engine.count {
             let x = engine.row(at: idx)
+            let y = maxindex.row(at: idx)
             let cyls = [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6].map({ x[$0] ?? 0.0 })
             let max = cyls.max() ?? 0.0
-            let maxidx = cyls.firstIndex(of: max) ?? cyls.count
+            let maxidx = Int(cyls.firstIndex(of: max) ?? cyls.count) + 1
             
             XCTAssertEqual(max,x[.E1_EGT_Max])
-            XCTAssertEqual(Double(maxidx)+1.0, x[.E1_EGT_MaxIdx])
+            XCTAssertEqual("\(maxidx)", y[.E1_EGT_MaxIdx], "mismatch for idx=\(idx) date=\(engine.indexes[idx])" )
         }
         
         let wind = data.doubleDataFrame(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])

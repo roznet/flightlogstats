@@ -99,7 +99,6 @@ struct FieldCalculation {
         var doublesArray : [[Double]] = []
         for field in self.inputs {
             if let vals = lines[field]  {
-                guard vals.count >= self.requiredObservationCount else { return "" }
                 doublesArray.append(vals)
             }
         }
@@ -222,8 +221,9 @@ struct FieldCalculation {
         },
         FieldCalculation(stringOutput: .E1_EGT_MaxIdx, multiInputs: [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6], obsCount: 1) {
             x, _ in
-            let temps = x.map { $0[0] }
+            let temps = x.map { $0.last ?? .nan }
             let max : Double = temps.max() ?? .nan
+            guard max.isFinite else { return "" }
             let idx : Int = temps.firstIndex(of: max) ?? -1
             
             // idx + 1 to represent egt number
@@ -232,11 +232,12 @@ struct FieldCalculation {
         },
         FieldCalculation(stringOutput: .E1_CHT_MaxIdx, multiInputs: [.E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6], obsCount: 1) {
             x, _ in
-            let temps = x.map { $0[0] }
+            let temps = x.map { $0.last ?? .nan }
             let max : Double = temps.max() ?? .nan
+            guard max.isFinite else { return "" }
             let idx : Int = temps.firstIndex(of: max) ?? -1
             
-            // idx + 1 to represent egt number
+            // idx + 1 to represent cht number
             let rv = idx >= 0 ? "\(idx+1)" : ""
             return rv
         }

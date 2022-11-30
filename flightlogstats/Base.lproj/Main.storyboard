@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="UIMenu" message="Requires Xcode 11 or later." minToolsVersion="11.0" requiredIntegratedClassName="UICommandDiff"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -799,10 +800,10 @@
             </objects>
             <point key="canvasLocation" x="-326.61870503597123" y="1710.5527638190954"/>
         </scene>
-        <!--Settings View Controller-->
+        <!--Detail Settings View Controller-->
         <scene sceneID="1Ya-r9-PFR">
             <objects>
-                <viewController id="rwj-Ou-8lY" customClass="SettingsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="rwj-Ou-8lY" customClass="DetailSettingsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="2uz-q1-TX9">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="493"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -947,6 +948,65 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mp6-Mv-eJF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-616.54676258992811" y="2403.5175879396984"/>
+        </scene>
+        <!--App Settings View Controller-->
+        <scene sceneID="aat-mz-m61">
+            <objects>
+                <viewController storyboardIdentifier="appSettingsViewController" id="npJ-vZ-DSg" customClass="AppSettingsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="arg-4e-etX">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dtz-ai-54I">
+                                <rect key="frame" x="749.5" y="24" width="64.5" height="34.5"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Done"/>
+                                <connections>
+                                    <action selector="doneButton:" destination="npJ-vZ-DSg" eventType="touchUpInside" id="Dgd-in-ebn"/>
+                                </connections>
+                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="whU-RY-QJG">
+                                <rect key="frame" x="20" y="91" width="824" height="216"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Import Method" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RUR-dW-2PZ">
+                                        <rect key="frame" x="0.0" y="0.0" width="113" height="216"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" changesSelectionAsPrimaryAction="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9GU-58-SNy">
+                                        <rect key="frame" x="113" y="0.0" width="391" height="216"/>
+                                        <menu key="menu" id="kF9-KW-64N">
+                                            <children>
+                                                <command title="All log files" id="1gc-Xa-3nX" userLabel="Automatic"/>
+                                                <command title="Selected File" id="uen-Gl-87Z" userLabel="Select File"/>
+                                                <command title="From date" id="S99-Fy-g7m"/>
+                                            </children>
+                                        </menu>
+                                        <state key="normal" title="All log files"/>
+                                    </button>
+                                    <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" translatesAutoresizingMaskIntoConstraints="NO" id="Qnl-QR-19L">
+                                        <rect key="frame" x="504" y="0.0" width="320" height="216"/>
+                                    </datePicker>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="216" id="Ih1-eb-Ln7"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="7dm-d5-H9h"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="7dm-d5-H9h" firstAttribute="trailing" secondItem="Dtz-ai-54I" secondAttribute="trailing" constant="20" id="HpP-ad-vmK"/>
+                            <constraint firstItem="Dtz-ai-54I" firstAttribute="top" secondItem="7dm-d5-H9h" secondAttribute="top" id="QvP-eg-p1m"/>
+                            <constraint firstItem="7dm-d5-H9h" firstAttribute="trailing" secondItem="whU-RY-QJG" secondAttribute="trailing" constant="5" id="bi7-q2-FqS"/>
+                            <constraint firstItem="RUR-dW-2PZ" firstAttribute="leading" secondItem="7dm-d5-H9h" secondAttribute="leading" constant="5" id="kIA-kQ-rTC"/>
+                            <constraint firstItem="whU-RY-QJG" firstAttribute="top" secondItem="Dtz-ai-54I" secondAttribute="bottom" constant="32.5" id="qdd-N7-HTx"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VeY-Nu-5MD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="102.87769784172663" y="2408.5427135678392"/>
         </scene>
         <!--Graphs View Controller-->
         <scene sceneID="VeH-AF-dEi">

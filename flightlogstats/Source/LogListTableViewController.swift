@@ -67,6 +67,14 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.tableView.reloadData()
                 self.updateButtons()
             },
+            UIAction(title: "Settings", image: UIImage(systemName: "gearshape")){
+                _ in
+                let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(identifier: "appSettingsViewController")
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: true)
+            },
+
             ]
         if FlyStoRequests.hasCredential {
             menuItems.append(UIAction(title: "Logout of FlySto", image: UIImage(systemName: "minus.circle")) {

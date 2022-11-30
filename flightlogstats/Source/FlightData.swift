@@ -492,8 +492,10 @@ extension FlightData {
                         }
                     }
                 }
+
                 self.doubleLine.removeAll()
                 self.stringLine.removeAll()
+                
                 
                 var coord = CLLocationCoordinate2D(latitude: .nan, longitude: .nan)
                 
@@ -564,26 +566,34 @@ extension FlightData {
                         case .string:
                             let previous = data.strings.last?[stringLine.count]
                             let newVal = calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap, previous: previous)
-                            // reset when value changes
-                            var amountToFill : Int = 0
-                            if let prevVal = previous, prevVal != newVal {
-                                for field in self.doubleInputs.keys {
-                                    if let idx = fieldsMap[field] {
-                                        let val = doubleLine[idx]
-                                        if let cnt = self.doubleInputs[field]?.count, cnt > amountToFill {
-                                            amountToFill = cnt
+                            
+                            // If more than one observation, we will need to fill back the new value
+                            // this is assuming the calculation is a look back: for example
+                            // phase of flight, if altitude has gone up we are climbing, and mark climbing back to the
+                            // beginning of the inputs. if 1 observation don't do anything
+                            if calcField.requiredObservationCount > 1 {
+                                // reset when value changes
+                                var amountToFill : Int = 0
+                                // if value changed, restart array and fill all the value for the current inputs
+                                if let prevVal = previous, prevVal != newVal {
+                                    for field in self.doubleInputs.keys {
+                                        if let idx = fieldsMap[field] {
+                                            let val = doubleLine[idx]
+                                            if let cnt = self.doubleInputs[field]?.count, cnt > amountToFill {
+                                                amountToFill = cnt
+                                            }
+                                            self.doubleInputs[field] = [val]
                                         }
-                                        self.doubleInputs[field] = [val]
                                     }
                                 }
-                            }
-                            if amountToFill != 0 {
-                                let cnt = data.strings.count
-                                let downto = max(0,cnt - amountToFill)
-                                for idx in downto..<cnt {
-                                    data.strings[idx][stringLine.count] = newVal
+                                if amountToFill != 0 {
+                                    let cnt = data.strings.count
+                                    let downto = max(0,cnt - amountToFill)
+                                    for idx in downto..<cnt {
+                                        data.strings[idx][stringLine.count] = newVal
+                                    }
+                                    
                                 }
-                                
                             }
                             stringLine.append(newVal)
                         case .double,.doubleArray:
