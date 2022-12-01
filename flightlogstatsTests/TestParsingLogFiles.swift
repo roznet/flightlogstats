@@ -34,6 +34,9 @@ enum TestLogFileSamples : String, CaseIterable {
     case flight2 = "log_220417_125002_LFQA" // 1.4Mb
     case flight3 = "log_220417_135002_LFAQ" // 3.2Mb
     
+    case perspective = "log_210613_032326_LCPH"
+    case diamond = "log_220905_064831_LGMG"
+    
     static var allSampleNames : [String] { return self.allCases.map { $0.rawValue } }
  }
 
@@ -49,6 +52,8 @@ class TestParsingLogFiles: XCTestCase {
     
     func testFlightData() {
         self.runFlightTestData(sample: .flight1)
+        self.runFlightTestData(sample: .perspective)
+        self.runFlightTestData(sample: .diamond)
     }
     
     func runFlightTestData(sample : TestLogFileSamples) {

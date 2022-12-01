@@ -103,7 +103,14 @@
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
 		42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */; };
 		42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */; };
-		42F096DA2938108800201850 /* log_220825_142831_LSZC.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096D92938108800201850 /* log_220825_142831_LSZC.csv */; };
+		42F096E329394C9F00201850 /* log_210617_063632_LOWG.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096DB29394C9F00201850 /* log_210617_063632_LOWG.csv */; };
+		42F096E429394C9F00201850 /* log_220905_063732_LGMG.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096DC29394C9F00201850 /* log_220905_063732_LGMG.csv */; };
+		42F096E529394C9F00201850 /* log_220905_064831_LGMG.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096DD29394C9F00201850 /* log_220905_064831_LGMG.csv */; };
+		42F096E629394C9F00201850 /* log_210613_032326_LCPH.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096DE29394C9F00201850 /* log_210613_032326_LCPH.csv */; };
+		42F096E729394C9F00201850 /* log_220905_063202_LGMG.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096DF29394C9F00201850 /* log_220905_063202_LGMG.csv */; };
+		42F096E829394C9F00201850 /* log_220905_091502_LGIO.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096E029394C9F00201850 /* log_220905_091502_LGIO.csv */; };
+		42F096E929394C9F00201850 /* log_210613_070502_LGAV.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096E129394C9F00201850 /* log_210613_070502_LGAV.csv */; };
+		42F096EA29394C9F00201850 /* log_210613_115132_LDLO.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F096E229394C9F00201850 /* log_210613_115132_LDLO.csv */; };
 		42F1E848284A3C2E00DB732A /* TestParsingCsv.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */; };
 		42F1E84C284A491600DB732A /* log_220502_095923______.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F1E849284A491600DB732A /* log_220502_095923______.csv */; };
 		42F1E84D284A491600DB732A /* log_220414_065328______.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42F1E84A284A491600DB732A /* log_220414_065328______.csv */; };
@@ -223,7 +230,14 @@
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 		42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestParsingLogFiles.swift; sourceTree = "<group>"; };
 		42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BufferedStreamReader.swift; path = Source/BufferedStreamReader.swift; sourceTree = "<group>"; };
-		42F096D92938108800201850 /* log_220825_142831_LSZC.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220825_142831_LSZC.csv; sourceTree = "<group>"; };
+		42F096DB29394C9F00201850 /* log_210617_063632_LOWG.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210617_063632_LOWG.csv; sourceTree = "<group>"; };
+		42F096DC29394C9F00201850 /* log_220905_063732_LGMG.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220905_063732_LGMG.csv; sourceTree = "<group>"; };
+		42F096DD29394C9F00201850 /* log_220905_064831_LGMG.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220905_064831_LGMG.csv; sourceTree = "<group>"; };
+		42F096DE29394C9F00201850 /* log_210613_032326_LCPH.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210613_032326_LCPH.csv; sourceTree = "<group>"; };
+		42F096DF29394C9F00201850 /* log_220905_063202_LGMG.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220905_063202_LGMG.csv; sourceTree = "<group>"; };
+		42F096E029394C9F00201850 /* log_220905_091502_LGIO.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_220905_091502_LGIO.csv; sourceTree = "<group>"; };
+		42F096E129394C9F00201850 /* log_210613_070502_LGAV.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210613_070502_LGAV.csv; sourceTree = "<group>"; };
+		42F096E229394C9F00201850 /* log_210613_115132_LDLO.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210613_115132_LDLO.csv; sourceTree = "<group>"; };
 		42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestParsingCsv.swift; sourceTree = "<group>"; };
 		42F1E849284A491600DB732A /* log_220502_095923______.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "log_220502_095923______.csv"; sourceTree = "<group>"; };
 		42F1E84A284A491600DB732A /* log_220414_065328______.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "log_220414_065328______.csv"; sourceTree = "<group>"; };
@@ -455,7 +469,14 @@
 		4280C8C6280D48E700A0FB32 /* TestAssets */ = {
 			isa = PBXGroup;
 			children = (
-				42F096D92938108800201850 /* log_220825_142831_LSZC.csv */,
+				42F096DE29394C9F00201850 /* log_210613_032326_LCPH.csv */,
+				42F096E129394C9F00201850 /* log_210613_070502_LGAV.csv */,
+				42F096E229394C9F00201850 /* log_210613_115132_LDLO.csv */,
+				42F096DB29394C9F00201850 /* log_210617_063632_LOWG.csv */,
+				42F096DF29394C9F00201850 /* log_220905_063202_LGMG.csv */,
+				42F096DC29394C9F00201850 /* log_220905_063732_LGMG.csv */,
+				42F096DD29394C9F00201850 /* log_220905_064831_LGMG.csv */,
+				42F096E029394C9F00201850 /* log_220905_091502_LGIO.csv */,
 				4203FBCD2905B0C8005B0530 /* rpt_220620_134709_N122DR.csv */,
 				4203FBCC2905B0C8005B0530 /* rpt_220706_135400_N122DR.csv */,
 				42F1E84A284A491600DB732A /* log_220414_065328______.csv */,
@@ -689,14 +710,21 @@
 				420247B02840011300B7E52C /* log_small_sample_fixed.csv in Resources */,
 				42CEA372281C2F7400AB7B5F /* log_220416_161856_LFQA.csv in Resources */,
 				42F1E84E284A491700DB732A /* log_220502_135932_EGPN.csv in Resources */,
+				42F096E429394C9F00201850 /* log_220905_063732_LGMG.csv in Resources */,
 				42CEA370281C2F7400AB7B5F /* log_220417_135002_LFAQ.csv in Resources */,
+				42F096E629394C9F00201850 /* log_210613_032326_LCPH.csv in Resources */,
+				42F096E329394C9F00201850 /* log_210617_063632_LOWG.csv in Resources */,
 				4280C8C8280D48E700A0FB32 /* log_210623_141501_TEST1.csv in Resources */,
+				42F096E729394C9F00201850 /* log_220905_063202_LGMG.csv in Resources */,
 				42F1E84D284A491600DB732A /* log_220414_065328______.csv in Resources */,
+				42F096E529394C9F00201850 /* log_220905_064831_LGMG.csv in Resources */,
 				42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */,
-				42F096DA2938108800201850 /* log_220825_142831_LSZC.csv in Resources */,
 				4203FBD02905B0D2005B0530 /* rpt_220620_134709_N122DR.csv in Resources */,
+				42F096E929394C9F00201850 /* log_210613_070502_LGAV.csv in Resources */,
+				42F096EA29394C9F00201850 /* log_210613_115132_LDLO.csv in Resources */,
 				42F1E84C284A491600DB732A /* log_220502_095923______.csv in Resources */,
 				420247AF2840011300B7E52C /* log_small_sample.csv in Resources */,
+				42F096E829394C9F00201850 /* log_220905_091502_LGIO.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
