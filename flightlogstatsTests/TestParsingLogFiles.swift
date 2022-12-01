@@ -34,9 +34,6 @@ enum TestLogFileSamples : String, CaseIterable {
     case flight2 = "log_220417_125002_LFQA" // 1.4Mb
     case flight3 = "log_220417_135002_LFAQ" // 3.2Mb
     
-    
-    case perspective = "log_220825_142831_LSZC"
-    
     static var allSampleNames : [String] { return self.allCases.map { $0.rawValue } }
  }
 
@@ -51,7 +48,11 @@ class TestParsingLogFiles: XCTestCase {
     }
     
     func testFlightData() {
-        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight1.rawValue, withExtension: "csv"),
+        self.runFlightTestData(sample: .flight1)
+    }
+    
+    func runFlightTestData(sample : TestLogFileSamples) {
+        guard let url = Bundle(for: type(of: self)).url(forResource: sample.rawValue, withExtension: "csv"),
               let data = FlightData(url: url)
         else {
             XCTAssertTrue(false)
@@ -71,8 +72,9 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertTrue(false)
         }
         
-        let engine = data.doubleDataFrame(for: [.E1_EGT_Max,.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6])
-        let maxindex = data.categoricalDataFrame(for:[.E1_EGT_MaxIdx])
+        // get all field so no dropna (to match calculation of maxidx)
+        let engine = data.doubleDataFrame()
+        let maxindex = data.categoricalDataFrame()
         
         XCTAssertGreaterThan(engine.count, 0)
         for idx in 0..<engine.count {
@@ -82,8 +84,12 @@ class TestParsingLogFiles: XCTestCase {
             let max = cyls.max() ?? 0.0
             let maxidx = Int(cyls.firstIndex(of: max) ?? cyls.count) + 1
             
-            XCTAssertEqual(max,x[.E1_EGT_Max])
-            XCTAssertEqual("\(maxidx)", y[.E1_EGT_MaxIdx], "mismatch for idx=\(idx) date=\(engine.indexes[idx])" )
+            if max.isFinite {
+                XCTAssertEqual(max,x[.E1_EGT_Max])
+                XCTAssertEqual("\(maxidx)", y[.E1_EGT_MaxIdx], "mismatch for idx=\(idx) date=\(engine.indexes[idx])" )
+            }else{
+                XCTAssertEqual(y[.E1_EGT_MaxIdx], "")
+            }
         }
         
         let wind = data.doubleDataFrame(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
