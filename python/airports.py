@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+# source of data https://ourairports.com/data/
 import csv
 import sqlite3
 import urllib.request
@@ -64,7 +64,8 @@ with open(airportsfile, encoding='utf-8-sig') as csvf:
     csvReader = csv.DictReader(csvf)
 
     for row in csvReader:
-        db.execute(sql_insert_airports,row)
+        if row['type'] != 'heliport':
+            db.execute(sql_insert_airports,row)
 
 db.commit()
 
