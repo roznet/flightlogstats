@@ -8,6 +8,7 @@
 import Foundation
 import CoreLocation
 import OSLog
+import RZData
 
 struct FlightLeg {
     typealias Field = FlightLogFile.Field

@@ -10,9 +10,12 @@ import CoreLocation
 import RZUtils
 import RZFlight
 import RZUtilsSwift
+import RZData
 
 class DisplayContext {
     typealias Field = FlightLogFile.Field
+    typealias SummaryField = FlightSummary.Field
+    
     enum Style {
         case value
         case range
@@ -47,15 +50,21 @@ class DisplayContext {
     
     //MARK: - format model objets
     func formatDecimal(timeRange : TimeRange) -> String {
-        return timeRange.numberWithUnit.convert(to: GCUnit.decimalhour()).description
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        return formatter.string(from: timeRange.measurement.converted(to: UnitDuration.hours))
     }
     
     func formatHHMM(interval : TimeInterval) -> String {
-        return GCNumberWithUnit(unit: GCUnit.second(), andValue: interval).convert(to: GCUnit.hobbshour()).description
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        return formatter.string(from: Measurement(value: interval, unit: UnitDuration.seconds) )
     }
     
     func formatHHMM(timeRange : TimeRange) -> String {
-        return timeRange.numberWithUnit.convert(to: GCUnit.hobbshour()).description
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        return formatter.string(from: timeRange.measurement)
     }
     
     func format(route : [Waypoint] ) -> String {
@@ -117,12 +126,159 @@ class DisplayContext {
 
     //MARK: - format Fields
     func formatStats(field : Field, valueStats : ValueStats) -> String {
-        return field.numberWithUnit(valueStats: valueStats)?.description ?? ""
+        let formatter = self.measurementFormatter(for: field)
+        if let measurement = self.measurement(field: field, valueStats: valueStats) {
+            return formatter.string(from: measurement)
+        }
+        return ""
     }
-    
-    //MARK: - NumberWithUnits convert
-    func numberWithUnit(gallon : Double) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: GCUnit.usgallon(), andValue: gallon)
+
+    func measurement(field : Field, valueStats : ValueStats) -> Measurement<Dimension>? {
+        switch field {
+        case .AltInd:
+            return self.measurement(altitude: valueStats)
+        case .BaroA:
+            return self.measurement(baro: valueStats)
+        case .AltMSL:
+            return self.measurement(altitude: valueStats)
+        case .OAT:
+            return self.measurement(valueStats)
+        case .IAS:
+            return self.measurement(speed: valueStats)
+        case .GndSpd:
+            return self.measurement(speed: valueStats)
+        case .VSpd:
+            return self.measurement(fpm: valueStats)
+        case .Pitch:
+            return self.measurement(valueStats)
+        case .Roll:
+            return self.measurement(valueStats)
+        case .LatAc:
+            return self.measurement(valueStats)
+        case .NormAc:
+            return self.measurement(valueStats)
+        case .HDG:
+            return self.measurement(degree: valueStats)
+        case .TRK:
+            return self.measurement(degree: valueStats)
+        case .volt1:
+            return self.measurement(valueStats)
+        case .volt2:
+            return self.measurement(valueStats)
+        case .amp1:
+            return self.measurement(valueStats)
+        case .FQtyL:
+            return self.measurement(gallon: valueStats)
+        case .FQtyR:
+            return self.measurement(gallon: valueStats)
+        case .E1_FFlow:
+            return self.measurement(gph: valueStats)
+        case .E1_OilT:
+            return self.measurement(valueStats)
+        case .E1_OilP:
+            return self.measurement(valueStats)
+        case .E1_MAP:
+            return self.measurement(map: valueStats)
+        case .E1_RPM:
+            return self.measurement(valueStats)
+        case .E1_PctPwr:
+            return self.measurement(percent: valueStats)
+        case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
+            return self.measurement(engineTemp: valueStats)
+        case .E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6:
+            return self.measurement(engineTemp: valueStats)
+        case .E1_TIT1,.E1_TIT2:
+            return self.measurement(engineTemp: valueStats)
+        case .E1_Torq:
+            return self.measurement(valueStats)
+        case .E1_NG:
+            return self.measurement(valueStats)
+        case .E1_ITT:
+            return self.measurement(valueStats)
+        case .E2_FFlow:
+            return self.measurement(gph: valueStats)
+        case .E2_MAP:
+            return self.measurement(map: valueStats)
+        case .E2_RPM:
+            return self.measurement(valueStats)
+        case .E2_Torq:
+            return self.measurement(valueStats)
+        case .E2_NG:
+            return self.measurement(valueStats)
+        case .E2_ITT:
+            return self.measurement(valueStats)
+        case .AltGPS:
+            return self.measurement(altitude: valueStats)
+        case .TAS:
+            return self.measurement(speed: valueStats)
+        case .HSIS:
+            return self.measurement(valueStats)
+        case .CRS:
+            return self.measurement(degree: valueStats)
+        case .HCDI:
+            return self.measurement(valueStats)
+        case .VCDI:
+            return self.measurement(valueStats)
+        case .WndSpd:
+            return self.measurement(speed: valueStats)
+        case .WndDr:
+            return self.measurement(degree: valueStats)
+        case .WptDst:
+            return self.measurement(distance: valueStats, total: true)
+        case .WptBrg:
+            return self.measurement(degree: valueStats)
+        case .MagVar:
+            return self.measurement(degree: valueStats)
+        case .RollM:
+            return self.measurement(valueStats)
+        case .PitchM:
+            return self.measurement(valueStats)
+        case .RollC:
+            return self.measurement(degree: valueStats)
+        case .PichC:
+            return self.measurement(degree: valueStats)
+        case .VSpdG:
+            return self.measurement(fpm: valueStats)
+        case .GPSfix:
+            return self.measurement(valueStats)
+        case .HAL:
+            return self.measurement(valueStats)
+        case .VAL:
+            return self.measurement(valueStats)
+        case .HPLwas:
+            return self.measurement(valueStats)
+        case .HPLfd:
+            return self.measurement(valueStats)
+        case .VPLwas:
+            return self.measurement(valueStats)
+        case .Unknown:
+            return self.measurement(valueStats)
+        case .AtvWpt:
+            return self.measurement(valueStats)
+        case .Latitude:
+            return self.measurement(valueStats)
+        case .Longitude:
+            return self.measurement(valueStats)
+        
+        // Calculated
+        case .FQtyT:
+            return self.measurement(gallon: valueStats, used: false)
+        case .Distance:
+            return self.measurement(distance: valueStats, total: true)
+        case .WndCross:
+            return self.measurement(speed: valueStats)
+        case .WndDirect:
+            return self.measurement(speed: valueStats)
+        case .FTotalizerT:
+            return self.measurement(gallon: valueStats, used: false)
+        case .E1_EGT_Max,.E1_EGT_Min,.E1_CHT_Max,.E1_CHT_Min:
+            return self.measurement(engineTemp: valueStats)
+        // Not numbers:
+        case .NAV1,.NAV2,.COM1,.COM2:
+            return nil
+        case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+            return nil
+        }
     }
     
     //MARK: - format values
@@ -142,66 +298,75 @@ class DisplayContext {
         return val.description
     }
     
+    
+    func measurementFormatter(for : Field) -> MeasurementFormatter {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        return formatter
+    }
+    
     //MARK: - format stats
-    func numberWithUnit(baro inch : ValueStats) -> GCNumberWithUnit {
-        let val = GCNumberWithUnit(unit: inch.unit, andValue: inch.end)
-        return val
+    func measurement(_ valueStats : ValueStats) -> Measurement<Dimension> {
+        return Measurement(value: valueStats.average, unit: UnitDimensionLess.scalar)
+    }
+    
+    func measurement(baro inch : ValueStats) -> Measurement<Dimension> {
+        let unit = (inch.unit as? UnitPressure) ?? UnitPressure.inchesOfMercury
+        return Measurement(value: inch.end, unit: unit)
     }
 
-    func numberWithUnit(fpm : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: fpm.unit, andValue: fpm.average)
+    func measurement(fpm : ValueStats) -> Measurement<Dimension> {
+        let unit = (fpm.unit as? UnitSpeed) ?? UnitSpeed.feetPerMinute
+        return Measurement(value: fpm.average, unit: unit)
     }
 
-    func numberWithUnit(degree : ValueStats) -> GCNumberWithUnit {
+    func measurement(degree : ValueStats) -> Measurement<Dimension>{
+        let unit = (degree.unit as? UnitAngle) ?? UnitAngle.degrees
         if degree.average > 0 {
-            return GCNumberWithUnit(unit: degree.unit, andValue: degree.average)
+            return Measurement(value: degree.average, unit: unit)
         }else{
-            return GCNumberWithUnit(unit: degree.unit, andValue: degree.average+360.0)
+            return Measurement(value: degree.average+360, unit: unit)
         }
     }
     
-    func numberWithUnit(gallon : ValueStats, used : Bool = true) -> GCNumberWithUnit {
+    func measurement(gallon : ValueStats, used : Bool = true) -> Measurement<Dimension> {
+        let unit = (gallon.unit as? UnitVolume) ?? UnitVolume.gallons
         if used {
-            return GCNumberWithUnit(unit: gallon.unit, andValue: gallon.max-gallon.min)
+            return Measurement(value: gallon.max - gallon.min, unit: unit)
         }else{
-            return GCNumberWithUnit(unit: gallon.unit, andValue: gallon.end)
+            return Measurement(value: gallon.end, unit: unit)
         }
     }
     
-    func numberWithUnit(distance: ValueStats, total : Bool = false) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: distance.unit, andValue: distance.end)
+    func measurement(distance: ValueStats, total : Bool = false) -> Measurement<Dimension> {
+        let unit = (distance.unit as? UnitLength) ?? UnitLength.nauticalMiles
+        return Measurement(value: distance.end, unit: unit)
     }
     
-    func numberWithUnit(autopilot : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: GCUnit.dimensionless(), andValue: autopilot.end)
+    func measurement(engineTemp : ValueStats) -> Measurement<Dimension> {
+        let unit = (engineTemp.unit as? UnitTemperature) ?? UnitTemperature.fahrenheit
+        return Measurement(value: engineTemp.max, unit: unit)
     }
-    func numberWithUnit(engineTemp : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: engineTemp.unit, andValue: engineTemp.max)
+    func measurement(map: ValueStats) -> Measurement<Dimension> {
+        let unit = (map.unit as? UnitPressure) ?? UnitPressure.inchesOfMercury
+        return Measurement(value: map.average, unit: unit)
     }
-    func numberWithUnit(map: ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: map.unit, andValue: map.average)
+    func measurement(gph : ValueStats) -> Measurement<Dimension> {
+        let unit = (gph.unit as? UnitVolume) ?? UnitVolume.gallons
+        return Measurement(value: gph.average, unit: unit)
     }
-    func numberWithUnit(gph : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: gph.unit, andValue: gph.average)
+    func measurement(speed : ValueStats) -> Measurement<Dimension> {
+        let unit = (speed.unit as? UnitSpeed) ?? UnitSpeed.knots
+        return Measurement(value: speed.average, unit: unit)
     }
-    func numberWithUnit(speed : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: speed.unit, andValue: speed.average)
+    func measurement(altitude : ValueStats) -> Measurement<Dimension> {
+        let unit = (altitude.unit as? UnitLength) ?? UnitLength.feet
+        return Measurement(value: altitude.max, unit: unit)
     }
-    func numberWithUnit(altitude : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: altitude.unit, andValue: altitude.max)
+    func measurement(percent : ValueStats) -> Measurement<Dimension> {
+        let unit = (percent.unit as? UnitPercent) ?? UnitPercent.percentPerOne
+        return Measurement(value: percent.average, unit: unit)
     }
-    func numberWithUnit(percent : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: percent.unit, andValue: percent.average)
-    }
-
-    func numberWithUnit(frequency : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: frequency.unit, andValue: frequency.end)
-    }
-    // default
-    func numberWithUnit(_ stat : ValueStats) -> GCNumberWithUnit {
-        return GCNumberWithUnit(unit: stat.unit, andValue: stat.average)
-    }
-
 }
 
 

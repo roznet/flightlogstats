@@ -24,7 +24,7 @@ class DetailSettingsViewController: UIViewController {
     @IBOutlet private var titleLabels : [UILabel]!
     
     // don't think we should be able change that...?
-    let aircraftFuelUnit : GCUnit = GCUnit.usgallon()
+    let aircraftFuelUnit : UnitVolume = UnitVolume.gallons
     
     var enteredMaxFuel : FuelQuantity {
         get {
@@ -128,24 +128,24 @@ class DetailSettingsViewController: UIViewController {
     
     //MARK: - Helpers
     
-    func update(segment : UISegmentedControl, for unit : GCUnit){
-        if unit.isEqual(to: GCUnit.usgallon() ){
+    func update(segment : UISegmentedControl, for unit : UnitVolume){
+        if unit == UnitVolume.gallons{
             segment.selectedSegmentIndex = 0
-        }else if unit.isEqual(to: GCUnit.liter()){
+        }else if unit == UnitVolume.liters {
             segment.selectedSegmentIndex = 1
         }else{
             Logger.app.error("Invalid unit \(unit) for segment")
         }
     }
     
-    func unit(for segment : UISegmentedControl) -> GCUnit {
+    func unit(for segment : UISegmentedControl) -> UnitVolume {
         if segment.selectedSegmentIndex == 0 {
-            return GCUnit.usgallon()
+            return UnitVolume.gallons
         }else if segment.selectedSegmentIndex == 1 {
-            return GCUnit.liter()
+            return UnitVolume.liters
         }
         Logger.app.error("Invalid segment for unit")
-        return GCUnit.usgallon()
+        return UnitVolume.gallons
     }
 
 }

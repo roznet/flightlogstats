@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import RZData
+
 /*
  * Stats
  *   per minute:

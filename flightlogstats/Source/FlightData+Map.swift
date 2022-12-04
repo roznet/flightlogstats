@@ -7,6 +7,7 @@
 
 import Foundation
 import MapKit
+import RZData
 
 extension FlightData {
     var boundingPoints : (northEast : CLLocationCoordinate2D, southWest : CLLocationCoordinate2D)? {

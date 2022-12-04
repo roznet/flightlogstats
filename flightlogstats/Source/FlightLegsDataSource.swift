@@ -59,15 +59,14 @@ class FlightLegsDataSource : TableDataSource {
     var titleAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.boldSystemFont(ofSize: 14.0)]
     var cellAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.systemFont(ofSize: 14.0)]
     
-    func formattedValueFor(field : Field, row : Int) -> GCNumberWithUnit? {
+    func formattedValueFor(field : Field, row : Int) -> Measurement<Dimension>? {
         guard let leg = self.legs[safe: row],
               let value = leg.valueStats(field: field)
         else {
             // empty string if missing for a blank in the table
             return nil
         }
-        
-        return field.numberWithUnit(valueStats: value, context: self.displayContext)
+        return displayContext.measurement(field: field, valueStats: value)
     }
     
     func formattedCategorical(field : Field, row : Int) -> String{
@@ -157,8 +156,11 @@ class FlightLegsDataSource : TableDataSource {
                     switch field.valueType {
                     case .value:
                         if let nu = self.formattedValueFor(field: field, row: row) {
-                            self.geometries[geoIndex].adjust(for: nu)
-                            self.cellHolders.append(CellHolder(numberWithUnit: nu))
+                            let formatter  = MeasurementFormatter()
+                            formatter.unitStyle = .medium
+                            formatter.unitOptions = .providedUnit
+                            self.geometries[geoIndex].adjust(measurement: nu, formatter: formatter)
+                            self.cellHolders.append(CellHolder(measurement: nu, formatter: formatter))
                         }else{
                             self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
                         }

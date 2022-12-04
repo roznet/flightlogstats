@@ -29,12 +29,12 @@ extension FlightSummary {
         
     }
     
-    func numberWithUnit(for field : Field) -> GCNumberWithUnit? {
+    func measurement(for field : Field) -> Measurement<Dimension>? {
         switch field {
         case .Distance:
-            return GCNumberWithUnit(unit: GCUnit.nm(), andValue: self.distanceInNm)
+            return Measurement(value: self.distanceInNm, unit: UnitLength.nauticalMiles)
         case .Altitude:
-            return GCNumberWithUnit(unit: GCUnit.foot(), andValue: self.altitudeInFeet)
+            return Measurement(value: self.altitudeInFeet, unit: UnitLength.feet)
         case .GroundSpeed:
             if let flying = self.flying?.elapsed,
                let moving = self.moving?.elapsed{
@@ -43,43 +43,42 @@ extension FlightSummary {
                 if nonflying > flying {
                     elapsed = moving
                 }
-                return GCNumberWithUnit(unit: GCUnit.knot(), andValue: self.distanceInNm/(elapsed/3600.0))
+                return Measurement(value: self.distanceInNm/(elapsed/3600.0), unit: UnitSpeed.knots)
             }else{
-                return GCNumberWithUnit(unit: GCUnit.knot(), andValue: 0.0)
+                return Measurement(value: 0.0, unit: UnitSpeed.knots)
             }
-            
-            
         case .FuelStart:
-            return self.fuelStart.totalWithUnit
+            return self.fuelStart.totalMeasurement.measurementDimension
+            
         case .FuelEnd:
-            return self.fuelEnd.totalWithUnit
+            return self.fuelEnd.totalMeasurement.measurementDimension
         case .FuelUsed:
-            return self.fuelUsed.totalWithUnit
+            return self.fuelUsed.totalMeasurement.measurementDimension
         case .FuelTotalizer:
-            return self.fuelTotalizer.totalWithUnit
+            return self.fuelTotalizer.totalMeasurement.measurementDimension
             
         case .GpH:
             if let flying = self.moving?.elapsed {
                 let fuelTotal = (self.fuelTotalizer.total > 0.0 ? self.fuelTotalizer.total : self.fuelUsed.total)
-                return GCNumberWithUnit(unit: GCUnit.gph(), andValue: fuelTotal / (flying/3600.0))
+                return Measurement(value: fuelTotal / (flying/3600.0), unit: UnitFuelFlow.gallonPerHour)
             }else{
-                return GCNumberWithUnit(unit: GCUnit.gph(), andValue: 0.0)
+                return Measurement(value: 0.0, unit: UnitFuelFlow.gallonPerHour)
             }
         case .NmpG:
             if self.distanceInNm > 0.0 {
                 let fuelTotal = (self.fuelTotalizer.total > 0.0 ? self.fuelTotalizer.total : self.fuelUsed.total)
-                return GCNumberWithUnit(unit: GCUnit.nmpergallon(), andValue: (self.distanceInNm) / fuelTotal )
+                return Measurement(value: self.distanceInNm/fuelTotal, unit: UnitFuelEfficiency.nauticalMilesPerGallon)
             }else{
-                return GCNumberWithUnit(unit: GCUnit.nmpergallon(), andValue: 0.0)
+                return Measurement(value: 0.0, unit: UnitFuelEfficiency.nauticalMilesPerGallon)
             }
-
         case .Hobbs:
-            return self.hobbs?.numberWithUnit.convert(to: GCUnit.decimalhour())
+            return self.hobbs?.measurement.converted(to: UnitDuration.hours)
         case .Moving:
-            return self.moving?.numberWithUnit.convert(to: GCUnit.decimalhour())
+            return self.moving?.measurement.converted(to: UnitDuration.hours)
         case .Flying:
-            return self.flying?.numberWithUnit.convert(to: GCUnit.decimalhour())
+            return self.flying?.measurement.converted(to: UnitDuration.hours)
         }
+
     }
-    
+
 }

@@ -10,7 +10,7 @@ import OSLog
 import RZUtils
 import RZUtilsSwift
 import RZFlight
-import TabularData
+import RZData
 
 class FlightData {
     // how often to report progress
@@ -21,7 +21,7 @@ class FlightData {
     typealias CategoricalValue = FlightLogFile.CategoricalValue
     typealias MetaField = FlightLogFile.MetaField
     
-    private(set) var fieldsUnits : [Field:GCUnit] = [:]
+    private(set) var fieldsUnits : [Field:Dimension] = [:]
     
     private var categoricalDataFrame : DataFrame<Date,CategoricalValue,Field> = DataFrame<Date,String,Field>()
     private var doubleDataFrame : DataFrame<Date,Double,Field> = DataFrame<Date,Double,Field>()
@@ -270,7 +270,7 @@ class FlightData {
                 }
                 if include {
                     if current.count == 0 {
-                        current = zip(one,self.doubleFields).map { ValueStats(value: $0, unit: $1.unit) }
+                        current = zip(one,self.doubleFields).map { ValueStats(value: $0, unit: $1.unit.foundationUnit) }
                     }else{
                         for (idx,val) in one.enumerated() {
                             current[idx].update(double: val)
@@ -402,7 +402,7 @@ extension FlightData {
                     case .double:
                         let field = fields[idx]
                         let gcunit = GCUnit.from(logFileUnit: unit)
-                        data.fieldsUnits[field] = gcunit
+                        data.fieldsUnits[field] = gcunit.foundationUnit
                     case .category,.ignore:
                         break
                     }
@@ -426,13 +426,13 @@ extension FlightData {
                 
                 // add calculated fields
                 data.doubleFields.append(.Distance)
-                data.fieldsUnits[.Distance] = GCUnit.nm()
+                data.fieldsUnits[.Distance] = UnitLength.nauticalMiles
                 for field in FieldCalculation.calculatedFields {
                     switch field.outputType {
                     case .doubleArray,.double:
                         for f in field.outputs {
                             fieldsMap[f] = data.doubleFields.count
-                            data.fieldsUnits[f] = f.unit
+                            data.fieldsUnits[f] = f.unit.foundationUnit
                         }
                         data.doubleFields.append(contentsOf: field.outputs)
                         

@@ -55,11 +55,13 @@ class FlightSummaryFuelDataSource: TableDataSource {
         ] {
             self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
             var geoIndex = 1
-            for fuelVal in [fuel.total, fuel.left, fuel.right, totalizer.total] {
-                if fuelVal != 0.0 {
-                    let nu = self.displayContext.numberWithUnit(gallon: fuelVal)
-                    self.geometries[geoIndex].adjust(for: nu)
-                    self.cellHolders.append(CellHolder(numberWithUnit: nu))
+            for fuelVal in [fuel.totalMeasurement, fuel.leftMeasurement, fuel.rightMeasurement, totalizer.totalMeasurement] {
+                if fuelVal.value != 0.0 {
+                    let measurement = fuelVal.measurementDimension
+                    // pick one fuel field, should be all the same
+                    let formatter = self.displayContext.measurementFormatter(for: .FQtyT)
+                    self.geometries[geoIndex].adjust(measurement: measurement, formatter: formatter)
+                    self.cellHolders.append(CellHolder(measurement: measurement, formatter: formatter))
                 }else{
                     self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
                 }

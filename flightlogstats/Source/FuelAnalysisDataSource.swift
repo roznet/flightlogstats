@@ -45,18 +45,21 @@ class FuelAnalysisDataSource: TableDataSource {
         self.rowsCount += 1
     }
     
-    func addLine(name : String, fuel : FuelQuantity, totalizer : FuelQuantity, unit : GCUnit) {
+    static let formatter : MeasurementFormatter = { let formatter = MeasurementFormatter(); formatter.unitStyle = .medium; formatter.unitOptions = .providedUnit; return formatter }()
+    func addLine(name : String, fuel : FuelQuantity, totalizer : FuelQuantity, unit : UnitVolume) {
+        
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
         var geoIndex = 1
-        for nu in [fuel.totalWithUnit.convert(to: unit),
-                   fuel.leftWithUnit.convert(to: unit),
-                   fuel.rightWithUnit.convert(to: unit),
-                   totalizer.totalWithUnit.convert(to: unit)] {
-            if nu.value == 0.0 {
+        for measurement in [fuel.convert(to: unit).totalMeasurement,
+                            fuel.convert(to: unit).leftMeasurement,
+                            fuel.convert(to: unit).rightMeasurement,
+                            totalizer.convert(to: unit).totalMeasurement] {
+            if measurement.value == 0.0 {
                 self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
             }else{
-                self.geometries[geoIndex].adjust(for: nu)
-                self.cellHolders.append(CellHolder(numberWithUnit: nu))
+                self.geometries[geoIndex].adjust(measurement: measurement, formatter: Self.formatter)
+                let newmeasurement : Measurement<Dimension> = Measurement(value: measurement.value, unit: measurement.unit as Dimension)
+                self.cellHolders.append(CellHolder(measurement: newmeasurement, formatter: Self.formatter))
             }
             geoIndex += 1
         }
@@ -124,9 +127,9 @@ class FuelAnalysisDataSource: TableDataSource {
             self.addSeparator()
             
             for (name,fuel,totalizer,unit) in [
-                ("Target", fuelAnalysis.targetFuel, fuelAnalysis.targetFuel, GCUnit.usgallon()),
+                ("Target", fuelAnalysis.targetFuel, fuelAnalysis.targetFuel, UnitVolume.gallons),
                 ("Target Required", fuelAnalysis.targetAdd, fuelAnalysis.targetAddTotalizer, fuelAddedUnit),
-                ("Target Save", fuelAnalysis.targetSave, fuelAnalysis.targetSave, GCUnit.avgasKilogram()),
+                ("Target Save", fuelAnalysis.targetSave, fuelAnalysis.targetSave, UnitVolume.gallons),
             ] {
                 self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
@@ -144,8 +147,8 @@ class FuelAnalysisDataSource: TableDataSource {
             
             self.addSeparator()
             for (name,fuel,totalizer,unit) in [
-                ("New Total", fuelAnalysis.addedTotal, fuelAnalysis.addedTotalTotalizer, GCUnit.usgallon()),
-                ("New Save", fuelAnalysis.addedSave, fuelAnalysis.addedSaveTotalizer, GCUnit.avgasKilogram()),
+                ("New Total", fuelAnalysis.addedTotal, fuelAnalysis.addedTotalTotalizer, UnitVolume.gallons),
+                ("New Save", fuelAnalysis.addedSave, fuelAnalysis.addedSaveTotalizer, UnitVolume.gallons),
             ] {
                 self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }

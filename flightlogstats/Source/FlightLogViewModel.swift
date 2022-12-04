@@ -52,8 +52,8 @@ class FlightLogViewModel {
     var displayContext : DisplayContext { didSet { self.didWrite() } }
     var aircraft : AircraftPerformance { didSet { if oldValue != self.aircraft { self.didWrite() } } }
     var fuelAnalysisInputs : FuelAnalysis.Inputs { didSet { if oldValue != self.fuelAnalysisInputs { self.didWrite() } } }
-    var fuelTargetUnit : GCUnit { didSet { if oldValue != self.fuelTargetUnit { self.didWrite() } } }
-    var fuelAddedUnit : GCUnit { didSet { if oldValue != self.fuelAddedUnit { self.didWrite() } } }
+    var fuelTargetUnit : UnitVolume { didSet { if oldValue != self.fuelTargetUnit { self.didWrite() } } }
+    var fuelAddedUnit : UnitVolume { didSet { if oldValue != self.fuelAddedUnit { self.didWrite() } } }
     
     // MARK: Outputs
     private(set) var legsDataSource : FlightLegsDataSource? = nil
@@ -64,13 +64,10 @@ class FlightLogViewModel {
     
     var fuelMaxTextLabel : String {
         let max = aircraft.fuelMax.convert(to: fuelTargetUnit)
-        let formatter = NumberFormatter()
-        formatter.maximumFractionDigits = 0
-        if let maxText = formatter.string(from: NSNumber(floatLiteral: max.totalWithUnit.value)) {
-            return "max \(maxText)"
-        }else{
-            return "max ??"
-        }
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        formatter.numberFormatter.maximumFractionDigits = 0
+        return "max \(formatter.string(from: max.totalMeasurement))"
     }
     
     var estimatedTotalizerStart : FuelQuantity? {

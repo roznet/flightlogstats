@@ -192,8 +192,8 @@ extension FlightSummary : CustomStringConvertible {
         
         let fields : [Field] = [ .Hobbs, .Distance, .FuelTotalizer]
         for field in fields {
-            if let nu = self.numberWithUnit(for: field) {
-                strs.append(nu.formatDouble())
+            if let nu = self.measurement(for: field) {
+                strs.append(nu.description)
             }
         }
         if strs.count > 0 {

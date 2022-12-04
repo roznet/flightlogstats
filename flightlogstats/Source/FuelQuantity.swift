@@ -14,7 +14,7 @@ struct FuelQuantity : Comparable, Codable {
     static let zero = FuelQuantity(left: 0.0, right: 0.0)
     static let kilogramPerLiter = 0.71
     
-    let unit : GCUnit
+    let unit : UnitVolume
     let left : Double
     let right : Double
     var total : Double { return left + right }
@@ -32,8 +32,8 @@ struct FuelQuantity : Comparable, Codable {
         left = try values.decode(Double.self, forKey: .left)
         right = try values.decode(Double.self, forKey: .right)
         let unitkey = try values.decode(String.self, forKey: .unit)
-        if let u = GCUnit(forKey: unitkey){
-            unit = u
+        if let u = GCUnit(forKey: unitkey), let uu = u.foundationUnit as? UnitVolume{
+            unit = uu
         }else{
             throw FuelQuantityError.invalidUnit
         }
@@ -43,12 +43,16 @@ struct FuelQuantity : Comparable, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(left, forKey: .left)
         try container.encode(right, forKey: .right)
-        try container.encode(unit.key, forKey: .unit)
+        if let u = unit.gcUnit?.key {
+            try container.encode(u, forKey: .unit)
+        }else{
+            try container.encode(GCUnit.usgallon().key, forKey: .unit)
+        }
     }
     
-    var totalWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: left+right) }
-    var leftWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: left ) }
-    var rightWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: self.unit, andValue: right ) }
+    var totalMeasurement : Measurement<UnitVolume> { return Measurement(value: self.total, unit: self.unit)}
+    var leftMeasurement : Measurement<UnitVolume> { return Measurement(value: self.left, unit: self.unit)}
+    var rightMeasurement : Measurement<UnitVolume> { return Measurement(value: self.left, unit: self.unit)}
     
     /// make sure the quantity is positive only, but rebalances if one side is positive the other is negative
     var positiveOnly : FuelQuantity {
@@ -61,84 +65,56 @@ struct FuelQuantity : Comparable, Codable {
         return FuelQuantity(left: max(0.0,self.left), right: max(0.0,self.right), unit: self.unit)
     }
     
-    init(left : Double, right : Double, unit : GCUnit = GCUnit.usgallon()) {
+    init(left : Double, right : Double, unit : UnitVolume = UnitVolume.gallons) {
         self.left = left
         self.right = right
         self.unit = unit
     }
     
-    init(total: Double, unit : GCUnit = GCUnit.usgallon()){
+    init(left : Measurement<UnitVolume>, right : Measurement<UnitVolume>) {
+        self.left = left.value
+        self.unit = left.unit
+        self.right = right.converted(to: self.unit).value
+    }
+    
+    init(total: Double, unit : UnitVolume = UnitVolume.gallons){
         self.left = total / 2.0
         self.right = total / 2.0
         self.unit = unit
     }
     
     static func < (lhs : FuelQuantity, rhs : FuelQuantity) -> Bool {
-        if lhs.unit.isEqual(to: rhs.unit) {
-            return lhs.total < rhs.total
-        }else if lhs.unit.canConvert(to: rhs.unit) {
-            let converted = rhs.convert(to: lhs.unit)
-            return lhs.total < converted.total
-        }else{
-            Logger.app.warning("Incompatible FuelQuantity units \(lhs.unit), \(rhs.unit)")
-            return lhs.total < rhs.total
-        }
+        return lhs.totalMeasurement < rhs.totalMeasurement
     }
     
     static func == (lhs : FuelQuantity, rhs : FuelQuantity) -> Bool {
-        if lhs.unit.isEqual(to: rhs.unit) {
-            return lhs.total == rhs.total
-        }else if lhs.unit.canConvert(to: rhs.unit) {
-            let converted = rhs.convert(to: lhs.unit)
-            return lhs.total == converted.total
-        }else{
-            Logger.app.warning("Incompatible FuelQuantity units \(lhs.unit), \(rhs.unit)")
-            return lhs.total == rhs.total
-        }
+        return lhs.totalMeasurement == rhs.totalMeasurement
     }
 }
 
 func -(left: FuelQuantity,right:FuelQuantity) -> FuelQuantity{
-    if left.unit.isEqual(to: right.unit){
-        return FuelQuantity(left: left.left-right.left, right: left.right-right.right, unit: left.unit)
-    }else if left.unit.canConvert(to: right.unit) {
-        let converted = right.convert(to: left.unit)
-        return FuelQuantity(left: left.left-converted.left, right: left.right-converted.right, unit: left.unit)
-    }else{
-        // do diff anyway
-        Logger.app.warning("Incompatible FuelQuantity units \(left.unit), \(right.unit)")
-        return FuelQuantity(left: left.left-right.left, right: left.right-right.right, unit: left.unit)
-    }
+    return FuelQuantity(left: left.leftMeasurement - right.leftMeasurement, right: left.rightMeasurement - right.rightMeasurement)
 }
 
 func +(left: FuelQuantity,right:FuelQuantity) -> FuelQuantity{
-    if left.unit.isEqual(to: right.unit){
-        return FuelQuantity(left: left.left+right.left, right: left.right+right.right, unit: left.unit)
-    }else if left.unit.canConvert(to: right.unit) {
-        let converted = right.convert(to: left.unit)
-        return FuelQuantity(left: left.left+converted.left, right: left.right+converted.right, unit: left.unit)
-    }else{
-        // do diff anyway
-        Logger.app.warning("Incompatible FuelQuantity units \(left.unit), \(right.unit)")
-        return FuelQuantity(left: left.left+right.left, right: left.right+right.right, unit: left.unit)
-    }
+    return FuelQuantity(left: left.leftMeasurement + right.leftMeasurement, right: left.rightMeasurement + right.rightMeasurement)
 }
 
 extension FuelQuantity : CustomStringConvertible {
     var description: String {
-        return "FuelQuantity(total: \(self.total) \(self.unit.abbr))"
+        let formatter = MeasurementFormatter()
+        return "FuelQuantity(total: \(formatter.string(from: self.totalMeasurement))"
     }
 }
 
 extension FuelQuantity {
-    func convert(to : GCUnit) -> FuelQuantity{
-        if self.unit.isEqual(to: to) {
+    func convert(to newUnit : UnitVolume) -> FuelQuantity{
+        if self.unit == newUnit {
             return self
         }
-        if to.canConvert(to: self.unit) {
-            return FuelQuantity(left: to.convert(self.left, from: self.unit), right: to.convert(self.right, from: self.unit), unit: to)
-        }
-        return self
+        let leftconverted = Measurement(value: self.left, unit: self.unit).converted(to: newUnit).value
+        let rightconverted = Measurement(value: self.right, unit: self.unit).converted(to: newUnit).value
+        return FuelQuantity(left: leftconverted, right: rightconverted, unit: newUnit)
     }
 }
 

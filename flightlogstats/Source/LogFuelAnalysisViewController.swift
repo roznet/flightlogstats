@@ -100,8 +100,8 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }
     
     //MARK: - field to view object links
-    var fuelTargetUnit : GCUnit { return self.flightLogViewModel?.fuelTargetUnit ?? Settings.fuelStoreUnit }
-    var fuelAddedUnit : GCUnit { return self.flightLogViewModel?.fuelAddedUnit ?? Settings.fuelStoreUnit }
+    var fuelTargetUnit : UnitVolume { return self.flightLogViewModel?.fuelTargetUnit ?? Settings.fuelStoreUnit }
+    var fuelAddedUnit : UnitVolume { return self.flightLogViewModel?.fuelAddedUnit ?? Settings.fuelStoreUnit }
     
     var enteredtotalizerStart : FuelQuantity {
         get {
@@ -152,24 +152,24 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }()
     
     
-    func update(segment : UISegmentedControl, for unit : GCUnit){
-        if unit.isEqual(to: GCUnit.usgallon() ){
+    func update(segment : UISegmentedControl, for unit : UnitVolume){
+        if unit == UnitVolume.gallons {
             segment.selectedSegmentIndex = 0
-        }else if unit.isEqual(to: GCUnit.liter()){
+        }else if unit == UnitVolume.liters{
             segment.selectedSegmentIndex = 1
         }else{
             Logger.app.error("Invalid unit \(unit) for segment")
         }
     }
     
-    func unit(for segment : UISegmentedControl) -> GCUnit {
+    func unit(for segment : UISegmentedControl) -> UnitVolume {
         if segment.selectedSegmentIndex == 0 {
-            return GCUnit.usgallon()
+            return UnitVolume.gallons
         }else if segment.selectedSegmentIndex == 1 {
-            return GCUnit.liter()
+            return UnitVolume.liters
         }
         Logger.app.error("Invalid segment for unit")
-        return GCUnit.usgallon()
+        return UnitVolume.gallons
     }
     
     //MARK: - sync view and model

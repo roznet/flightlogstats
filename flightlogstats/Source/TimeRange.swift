@@ -7,6 +7,7 @@
 
 import Foundation
 import RZUtils
+import RZData
 
 struct TimeRange : Codable {
     typealias Field = FlightLogFile.Field
@@ -15,7 +16,7 @@ struct TimeRange : Codable {
     let end : Date
     var elapsed : TimeInterval { return end.timeIntervalSince(start) }
     
-    var numberWithUnit : GCNumberWithUnit { return GCNumberWithUnit(unit: GCUnit.second(), andValue: self.elapsed)}
+    var measurement : Measurement<Dimension> { return Measurement(value: self.elapsed, unit: UnitDuration.seconds)}
     
     init?(valuesByField : DataFrame<Date,Double,Field>?, field : FlightLogFile.Field) {
         guard let start = valuesByField?.first(field: field)?.index,

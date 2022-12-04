@@ -8,6 +8,7 @@
 import Foundation
 import RZFlight
 import RZUtils
+import RZData
 import RZUtilsSwift
 
 struct Trip {
@@ -45,11 +46,11 @@ struct Trip {
     
     private mutating func add(summary : FlightSummary){
         for field in FlightSummary.Field.allCases {
-            if let nu = summary.numberWithUnit(for: field) {
+            if let nu = summary.measurement(for: field) {
                 if stats[field] == nil {
-                    stats[field] = ValueStats(numberWithUnit: nu)
+                    stats[field] = ValueStats(measurement: nu)
                 }else{
-                    stats[field]?.update(numberWithUnit: nu)
+                    stats[field]?.update(measurement: nu)
                 }
             }
         }
@@ -133,7 +134,7 @@ struct Trip {
         }
     }
     
-    func numberWithUnit(field : Field) -> GCNumberWithUnit? {
+    func numberWithUnit(field : Field) -> Measurement<Dimension>? {
         if let stats = self.stats[field] {
             switch field {
             case .FuelStart:
@@ -141,42 +142,38 @@ struct Trip {
             case .FuelEnd:
                 return nil
             case .FuelUsed,.FuelTotalizer:
-                return stats.sumWithUnit
+                return stats.sumMeasurement
             case .Distance:
-                return stats.sumWithUnit
+                return stats.sumMeasurement
             case .Altitude:
-                return stats.maxWithUnit
+                return stats.maxMeasurement
             case .Hobbs,.Flying,.Moving:
-                return stats.sumWithUnit
+                return stats.sumMeasurement
             case .GroundSpeed:
-                if let dist = self.stats[.Distance]?.sumWithUnit.convert(to: GCUnit.nm()),
-                   let flying = self.stats[.Flying]?.sumWithUnit.convert(to: GCUnit.second()),
-                   let moving = self.stats[.Moving]?.sumWithUnit.convert(to: GCUnit.second()) {
+                if let dist = self.stats[.Distance]?.sumMeasurement?.converted(to: UnitLength.nauticalMiles),
+                   let flying = self.stats[.Flying]?.sumMeasurement?.converted(to: UnitDuration.seconds),
+                   let moving = self.stats[.Moving]?.sumMeasurement?.converted(to: UnitDuration.seconds) {
                     var elapsed = flying
-                    do {
-                        let nonflying = try moving - flying
-                        if nonflying > flying {
-                            elapsed = moving
-                        }
+                    
+                    let nonflying = moving - flying
+                    if nonflying > flying {
+                        elapsed = moving
                     }
-                    catch {
-                        return nil
-                    }
-                    return GCNumberWithUnit(unit: GCUnit.knot(), andValue: dist.value/(elapsed.value/3600.0))
+                    return Measurement(value: dist.value/(elapsed.value/3600.0), unit: UnitSpeed.knots)
                 }else{
                     return nil
                 }
             case .GpH:
-                if let total = self.stats[.FuelTotalizer]?.sumWithUnit.convert(to: GCUnit.usgallon()),
-                   let elapsed = self.stats[.Moving]?.sumWithUnit.convert(to: GCUnit.second()) {
-                    return GCNumberWithUnit(unit: GCUnit.gph(), andValue: total.value/(elapsed.value/3600.0))
+                if let total = self.stats[.FuelTotalizer]?.sumMeasurement?.converted(to: UnitVolume.gallons),
+                   let elapsed = self.stats[.Moving]?.sumMeasurement?.converted(to: UnitDuration.seconds) {
+                    return Measurement(value: total.value/(elapsed.value/3600.0), unit: UnitFuelFlow.gallonPerHour)
                 }else{
                     return nil
                 }
             case .NmpG:
-                if let total = self.stats[.FuelTotalizer]?.sumWithUnit.convert(to: GCUnit.usgallon()),
-                   let dist = self.stats[.Distance]?.sumWithUnit.convert(to: GCUnit.nm()) {
-                    return GCNumberWithUnit(unit: GCUnit.nmpergallon(), andValue: dist.value/total.value)
+                if let total = self.stats[.FuelTotalizer]?.sumMeasurement?.converted(to: UnitVolume.gallons),
+                   let dist = self.stats[.Distance]?.sumMeasurement?.converted(to: UnitVolume.gallons) {
+                    return Measurement(value: dist.value/total.value, unit: UnitFuelEfficiency.nauticalMilesPerGallon)
                 }else{
                     return nil
                 }

@@ -7,6 +7,7 @@
 
 import Foundation
 import RZUtils
+import RZData
 
 struct FieldCalculation {
     typealias Field = FlightLogFile.Field

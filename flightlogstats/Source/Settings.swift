@@ -54,25 +54,24 @@ struct CodableStorage<Type : Codable> {
     }
 }
 @propertyWrapper
-struct UnitStorage {
+struct UnitStorage<UnitType : Dimension> {
     private let key : String
-    private let defaultValue : GCUnit
-    init(key : Settings.Key, defaultValue : GCUnit){
+    private let defaultValue : UnitType
+    init(key : Settings.Key, defaultValue : UnitType){
         self.key = key.rawValue
         self.defaultValue = defaultValue
     }
     
-    var wrappedValue : GCUnit {
+    var wrappedValue : UnitType {
         get {
-            if let key = UserDefaults.standard.object(forKey: key) as? String,
-                let unit = GCUnit(forKey: key){
+            if let unit = UserDefaults.standard.object(forKey: key) as? UnitType{
                 return unit
             }else{
                 return defaultValue
             }
         }
         set {
-            UserDefaults.standard.set(newValue.key, forKey: key)
+            UserDefaults.standard.set(newValue, forKey: key)
         }
     }
 }
@@ -105,7 +104,7 @@ struct EnumStorage< Type : RawRepresentable > {
 
 
 struct Settings {
-    static let fuelStoreUnit : GCUnit = GCUnit.usgallon()
+    static let fuelStoreUnit : UnitVolume = UnitVolume.gallons
     
     static var shared : Settings = Settings()
     
@@ -150,11 +149,11 @@ struct Settings {
     @EnumStorage(key: .open_file_mode, defaultValue: Self.defaultOpenFileMode)
     var openFileMode : OpenFileMode
     
-    @UnitStorage(key: .unit_target_fuel, defaultValue: GCUnit.usgallon())
-    var unitTargetFuel : GCUnit
+    @UnitStorage(key: .unit_target_fuel, defaultValue: UnitVolume.gallons)
+    var unitTargetFuel : UnitVolume
     
-    @UnitStorage(key: .unit_added_fuel, defaultValue: GCUnit.liter())
-    var unitAddedFuel : GCUnit
+    @UnitStorage(key: .unit_added_fuel, defaultValue: UnitVolume.liters)
+    var unitAddedFuel : UnitVolume
        
     @UserStorage(key: .added_fuel_left, defaultValue: 0.0)
     private var addedFuelLeft : Double
