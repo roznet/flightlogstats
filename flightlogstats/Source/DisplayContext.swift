@@ -299,10 +299,39 @@ class DisplayContext {
     }
     
     
-    func measurementFormatter(for : Field) -> MeasurementFormatter {
+    private static var defaultFormatter : MeasurementFormatter = {
         let formatter = MeasurementFormatter()
         formatter.unitOptions = .providedUnit
+        formatter.unitStyle = .short
+        formatter.numberFormatter.maximumFractionDigits = 0
         return formatter
+    }()
+    
+    private static var fuelFormatter : MeasurementFormatter = {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        formatter.unitStyle = .short
+        formatter.numberFormatter.maximumFractionDigits = 1
+        return formatter
+    }()
+    
+    private static var mapFormatter : MeasurementFormatter = {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        formatter.unitStyle = .short
+        formatter.numberFormatter.maximumFractionDigits = 2
+        return formatter
+    }()
+    
+    func measurementFormatter(for field : Field) -> MeasurementFormatter {
+        switch field {
+        case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT:
+            return Self.fuelFormatter
+        case .E1_MAP,.E2_MAP:
+            return Self.mapFormatter
+        default:
+            return Self.defaultFormatter
+        }
     }
     
     //MARK: - format stats

@@ -362,6 +362,29 @@
                                             <outlet property="numberWithUnitView" destination="1aR-No-we7" id="zGa-vD-SpL"/>
                                         </connections>
                                     </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="uls-Ow-O89" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                        <rect key="frame" x="129" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="IYG-3C-DrL">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x9U-Zv-fOX" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="x9U-Zv-fOX" firstAttribute="leading" secondItem="IYG-3C-DrL" secondAttribute="leading" id="7CH-PJ-C7C"/>
+                                                <constraint firstAttribute="trailing" secondItem="x9U-Zv-fOX" secondAttribute="trailing" id="EtE-Hb-jw6"/>
+                                                <constraint firstAttribute="bottom" secondItem="x9U-Zv-fOX" secondAttribute="bottom" id="pF5-WJ-ost"/>
+                                                <constraint firstItem="x9U-Zv-fOX" firstAttribute="top" secondItem="IYG-3C-DrL" secondAttribute="top" id="yy4-WE-92Z"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="measurementView" destination="x9U-Zv-fOX" id="CC8-Ts-dWr"/>
+                                        </connections>
+                                    </collectionViewCell>
                                 </cells>
                             </collectionView>
                         </subviews>
@@ -443,6 +466,29 @@
                                         </collectionViewCellContentView>
                                         <connections>
                                             <outlet property="numberWithUnitView" destination="0fZ-ZT-4RI" id="xpn-yU-Vuq"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="eE9-nm-TPT" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                        <rect key="frame" x="129" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="46R-qZ-SqY">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CaI-MF-DXj" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="CaI-MF-DXj" firstAttribute="top" secondItem="46R-qZ-SqY" secondAttribute="top" id="GwN-kf-UDQ"/>
+                                                <constraint firstAttribute="trailing" secondItem="CaI-MF-DXj" secondAttribute="trailing" id="HBv-Gm-deI"/>
+                                                <constraint firstAttribute="bottom" secondItem="CaI-MF-DXj" secondAttribute="bottom" id="hyw-Wg-K7K"/>
+                                                <constraint firstItem="CaI-MF-DXj" firstAttribute="leading" secondItem="46R-qZ-SqY" secondAttribute="leading" id="kZs-ru-WDD"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="measurementView" destination="CaI-MF-DXj" id="dZk-Vf-vrz"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -544,6 +590,29 @@
                                         </collectionViewCellContentView>
                                         <connections>
                                             <outlet property="numberWithUnitView" destination="v2d-IM-YZp" id="oWd-eA-PxW"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="Wnu-cJ-NWo" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                        <rect key="frame" x="120.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Rt5-W7-0gq">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ahL-4i-Z6b" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="ahL-4i-Z6b" firstAttribute="leading" secondItem="Rt5-W7-0gq" secondAttribute="leading" id="Kp9-iw-yIY"/>
+                                                <constraint firstAttribute="bottom" secondItem="ahL-4i-Z6b" secondAttribute="bottom" id="aRs-AA-g5a"/>
+                                                <constraint firstAttribute="trailing" secondItem="ahL-4i-Z6b" secondAttribute="trailing" id="haV-6I-raG"/>
+                                                <constraint firstItem="ahL-4i-Z6b" firstAttribute="top" secondItem="Rt5-W7-0gq" secondAttribute="top" id="rhF-KU-CXA"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="measurementView" destination="ahL-4i-Z6b" id="KgA-9b-Zvd"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -784,6 +853,29 @@
                                         </collectionViewCellContentView>
                                         <connections>
                                             <outlet property="numberWithUnitView" destination="Rsr-6B-SM9" id="9FJ-tj-wpf"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="BYJ-yG-esb" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                        <rect key="frame" x="129" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="BIM-8s-whE">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cGI-ia-h9r" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="cGI-ia-h9r" secondAttribute="trailing" id="BgF-4R-9A3"/>
+                                                <constraint firstItem="cGI-ia-h9r" firstAttribute="top" secondItem="BIM-8s-whE" secondAttribute="top" id="XUB-Lj-sev"/>
+                                                <constraint firstItem="cGI-ia-h9r" firstAttribute="leading" secondItem="BIM-8s-whE" secondAttribute="leading" id="bf2-wt-jWL"/>
+                                                <constraint firstAttribute="bottom" secondItem="cGI-ia-h9r" secondAttribute="bottom" id="cQf-zu-lMe"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="measurementView" destination="cGI-ia-h9r" id="BkK-5Q-3l2"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -1143,6 +1235,29 @@
                                         </collectionViewCellContentView>
                                         <connections>
                                             <outlet property="numberWithUnitView" destination="vvZ-Fy-BzD" id="Kxh-Tp-cJA"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="fT6-iM-MKE" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                        <rect key="frame" x="120.5" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="xob-ct-Qey">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <subviews>
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YMf-xy-Llj" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="YMf-xy-Llj" secondAttribute="trailing" id="QSr-1C-sr9"/>
+                                                <constraint firstItem="YMf-xy-Llj" firstAttribute="top" secondItem="xob-ct-Qey" secondAttribute="top" id="RPm-BX-b7Y"/>
+                                                <constraint firstAttribute="bottom" secondItem="YMf-xy-Llj" secondAttribute="bottom" id="VSq-uV-kRe"/>
+                                                <constraint firstItem="YMf-xy-Llj" firstAttribute="leading" secondItem="xob-ct-Qey" secondAttribute="leading" id="pfe-yv-AlU"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="measurementView" destination="YMf-xy-Llj" id="9j1-Wb-fps"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>

@@ -139,7 +139,7 @@ class FlightLegsDataSource : TableDataSource {
                 self.geometries.append(geometry)
             }
             
-            
+
             for (row,leg) in legs.enumerated() {
                 for info in self.fixedColumnsInfo {
                     let fixedAttributed = CellHolder(string: leg.format(which: info, displayContext: self.displayContext, reference: reference), attributes: self.titleAttributes)
@@ -153,12 +153,10 @@ class FlightLegsDataSource : TableDataSource {
                     geoIndex += 1
                 }
                 for field in fields {
+                    let formatter  = self.displayContext.measurementFormatter(for: field)
                     switch field.valueType {
                     case .value:
                         if let nu = self.formattedValueFor(field: field, row: row) {
-                            let formatter  = MeasurementFormatter()
-                            formatter.unitStyle = .medium
-                            formatter.unitOptions = .providedUnit
                             self.geometries[geoIndex].adjust(measurement: nu, formatter: formatter)
                             self.cellHolders.append(CellHolder(measurement: nu, formatter: formatter))
                         }else{
