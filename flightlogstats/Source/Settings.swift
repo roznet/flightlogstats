@@ -104,7 +104,7 @@ struct EnumStorage< Type : RawRepresentable > {
 
 
 struct Settings {
-    static let fuelStoreUnit : UnitVolume = UnitVolume.gallons
+    static let fuelStoreUnit : UnitVolume = UnitVolume.aviationGallon
     
     static var shared : Settings = Settings()
     
@@ -149,7 +149,7 @@ struct Settings {
     @EnumStorage(key: .open_file_mode, defaultValue: Self.defaultOpenFileMode)
     var openFileMode : OpenFileMode
     
-    @UnitStorage(key: .unit_target_fuel, defaultValue: UnitVolume.gallons)
+    @UnitStorage(key: .unit_target_fuel, defaultValue: UnitVolume.aviationGallon)
     var unitTargetFuel : UnitVolume
     
     @UnitStorage(key: .unit_added_fuel, defaultValue: UnitVolume.liters)

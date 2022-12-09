@@ -90,7 +90,8 @@ class LogListTableViewCell: UITableViewCell {
             
             if let total = flightSummary.measurement(for: .FuelTotalizer),
                let used = flightSummary.measurement(for: .FuelUsed) {
-                self.fuel.attributedText = NSAttributedString(string: total.value != 0.0 ? total.formatDouble() : used.formatDouble(), attributes: cellAttribute)
+                let str = self.displayContext.formatValue(gallon: total.value != 0.0 ? total : used)
+                self.fuel.attributedText = NSAttributedString(string: str, attributes: cellAttribute)
             }else{
                 self.fuel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
             }
@@ -102,8 +103,9 @@ class LogListTableViewCell: UITableViewCell {
                 self.route.isHidden = true
             }
             
-            if let distance = flightSummary.measurement(for: .Distance)?.formatDouble() {
-                self.distance.attributedText = NSAttributedString(string: distance, attributes: cellAttribute)
+            if let distance = flightSummary.measurement(for: .Distance) {
+                let str = self.displayContext.formatValue(distance: distance)
+                self.distance.attributedText = NSAttributedString(string: str, attributes: cellAttribute)
             }else{
                 self.distance.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
             }

@@ -164,15 +164,15 @@ struct Trip {
                     return nil
                 }
             case .GpH:
-                if let total = self.stats[.FuelTotalizer]?.sumMeasurement?.converted(to: UnitVolume.gallons),
+                if let total = self.stats[.FuelTotalizer]?.sumMeasurement?.converted(to: UnitVolume.aviationGallon),
                    let elapsed = self.stats[.Moving]?.sumMeasurement?.converted(to: UnitDuration.seconds) {
                     return Measurement(value: total.value/(elapsed.value/3600.0), unit: UnitFuelFlow.gallonPerHour)
                 }else{
                     return nil
                 }
             case .NmpG:
-                if let total = self.stats[.FuelTotalizer]?.sumMeasurement?.converted(to: UnitVolume.gallons),
-                   let dist = self.stats[.Distance]?.sumMeasurement?.converted(to: UnitVolume.gallons) {
+                if let total = self.stats[.FuelTotalizer]?.sumMeasurement?.converted(to: UnitVolume.aviationGallon),
+                   let dist = self.stats[.Distance]?.sumMeasurement?.converted(to: UnitVolume.aviationGallon) {
                     return Measurement(value: dist.value/total.value, unit: UnitFuelEfficiency.nauticalMilesPerGallon)
                 }else{
                     return nil

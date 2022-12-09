@@ -153,7 +153,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     
     func update(segment : UISegmentedControl, for unit : UnitVolume){
-        if unit == UnitVolume.gallons {
+        if unit == UnitVolume.aviationGallon {
             segment.selectedSegmentIndex = 0
         }else if unit == UnitVolume.liters{
             segment.selectedSegmentIndex = 1
@@ -164,12 +164,12 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     func unit(for segment : UISegmentedControl) -> UnitVolume {
         if segment.selectedSegmentIndex == 0 {
-            return UnitVolume.gallons
+            return UnitVolume.aviationGallon
         }else if segment.selectedSegmentIndex == 1 {
             return UnitVolume.liters
         }
         Logger.app.error("Invalid segment for unit")
-        return UnitVolume.gallons
+        return UnitVolume.aviationGallon
     }
     
     //MARK: - sync view and model

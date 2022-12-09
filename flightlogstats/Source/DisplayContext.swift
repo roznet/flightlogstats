@@ -49,22 +49,34 @@ class DisplayContext {
     }
     
     //MARK: - format model objets
+    
+    private static let decimalFormatter : NumberFormatter = {
+        let rv = NumberFormatter()
+        rv.maximumFractionDigits = 1
+        rv.minimumFractionDigits = 1
+        return rv
+    }()
+    
     func formatDecimal(timeRange : TimeRange) -> String {
-        let formatter = MeasurementFormatter()
-        formatter.unitOptions = .providedUnit
-        return formatter.string(from: timeRange.measurement.converted(to: UnitDuration.hours))
+        return Self.decimalFormatter.string(from: NSNumber(floatLiteral: timeRange.elapsed/3600.0)) ?? ""
     }
     
     func formatHHMM(interval : TimeInterval) -> String {
-        let formatter = MeasurementFormatter()
-        formatter.unitOptions = .providedUnit
-        return formatter.string(from: Measurement(value: interval, unit: UnitDuration.seconds) )
+        let formatter = Self.coumpoundHHMMFormatter
+        return formatter.format(from: Measurement(value: interval, unit: UnitDuration.seconds))
     }
     
+    private static let coumpoundHHMMFormatter :  CompoundMeasurementFormatter<Dimension> = {
+        var rv = CompoundMeasurementFormatter<Dimension>(dimensions: [UnitDuration.hours, UnitDuration.minutes, UnitDuration.seconds], separator: ":")
+        rv.joinStyle = .noUnits
+        rv.numberFormatter.minimumIntegerDigits = 2
+        rv.minimumComponents = 2
+        return rv
+    }()
+    
     func formatHHMM(timeRange : TimeRange) -> String {
-        let formatter = MeasurementFormatter()
-        formatter.unitOptions = .providedUnit
-        return formatter.string(from: timeRange.measurement)
+        let formatter = Self.coumpoundHHMMFormatter
+        return formatter.format(from: timeRange.measurement)
     }
     
     func format(route : [Waypoint] ) -> String {
@@ -282,8 +294,8 @@ class DisplayContext {
     }
     
     //MARK: - format values
-    func formatValue(distance : Double) -> String {
-        return String(format: "%.1f nm", distance )
+    func formatValue(distance : Measurement<Dimension>) -> String {
+        return Self.defaultFormatter.string(from: distance)
     }
 
     func formatValue(numberWithUnit : GCNumberWithUnit, converted to: GCUnit? = nil) -> String {
@@ -293,9 +305,9 @@ class DisplayContext {
         return numberWithUnit.description
     }
     
-    func formatValue(gallon : Double) -> String {
-        let val = GCNumberWithUnit(GCUnit.from(logFileUnit: "gals"), andValue: gallon)
-        return val.description
+    func formatValue(gallon : Measurement<Dimension>) -> String {
+        
+        return Self.fuelFormatter.string(from: gallon)
     }
     
     
@@ -359,7 +371,7 @@ class DisplayContext {
     }
     
     func measurement(gallon : ValueStats, used : Bool = true) -> Measurement<Dimension> {
-        let unit = (gallon.unit as? UnitVolume) ?? UnitVolume.gallons
+        let unit = (gallon.unit as? UnitVolume) ?? UnitVolume.aviationGallon
         if used {
             return Measurement(value: gallon.max - gallon.min, unit: unit)
         }else{
@@ -381,7 +393,7 @@ class DisplayContext {
         return Measurement(value: map.average, unit: unit)
     }
     func measurement(gph : ValueStats) -> Measurement<Dimension> {
-        let unit = (gph.unit as? UnitVolume) ?? UnitVolume.gallons
+        let unit = (gph.unit as? UnitVolume) ?? UnitVolume.aviationGallon
         return Measurement(value: gph.average, unit: unit)
     }
     func measurement(speed : ValueStats) -> Measurement<Dimension> {

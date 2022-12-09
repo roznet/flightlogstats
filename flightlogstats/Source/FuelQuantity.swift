@@ -65,7 +65,7 @@ struct FuelQuantity : Comparable, Codable {
         return FuelQuantity(left: max(0.0,self.left), right: max(0.0,self.right), unit: self.unit)
     }
     
-    init(left : Double, right : Double, unit : UnitVolume = UnitVolume.gallons) {
+    init(left : Double, right : Double, unit : UnitVolume = UnitVolume.aviationGallon) {
         self.left = left
         self.right = right
         self.unit = unit
@@ -77,7 +77,7 @@ struct FuelQuantity : Comparable, Codable {
         self.right = right.converted(to: self.unit).value
     }
     
-    init(total: Double, unit : UnitVolume = UnitVolume.gallons){
+    init(total: Double, unit : UnitVolume = UnitVolume.aviationGallon){
         self.left = total / 2.0
         self.right = total / 2.0
         self.unit = unit

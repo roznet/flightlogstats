@@ -24,7 +24,7 @@ class DetailSettingsViewController: UIViewController {
     @IBOutlet private var titleLabels : [UILabel]!
     
     // don't think we should be able change that...?
-    let aircraftFuelUnit : UnitVolume = UnitVolume.gallons
+    let aircraftFuelUnit : UnitVolume = UnitVolume.aviationGallon
     
     var enteredMaxFuel : FuelQuantity {
         get {
@@ -129,7 +129,7 @@ class DetailSettingsViewController: UIViewController {
     //MARK: - Helpers
     
     func update(segment : UISegmentedControl, for unit : UnitVolume){
-        if unit == UnitVolume.gallons{
+        if unit == UnitVolume.aviationGallon{
             segment.selectedSegmentIndex = 0
         }else if unit == UnitVolume.liters {
             segment.selectedSegmentIndex = 1
@@ -140,12 +140,12 @@ class DetailSettingsViewController: UIViewController {
     
     func unit(for segment : UISegmentedControl) -> UnitVolume {
         if segment.selectedSegmentIndex == 0 {
-            return UnitVolume.gallons
+            return UnitVolume.aviationGallon
         }else if segment.selectedSegmentIndex == 1 {
             return UnitVolume.liters
         }
         Logger.app.error("Invalid segment for unit")
-        return UnitVolume.gallons
+        return UnitVolume.aviationGallon
     }
 
 }

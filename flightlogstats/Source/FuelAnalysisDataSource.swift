@@ -127,9 +127,9 @@ class FuelAnalysisDataSource: TableDataSource {
             self.addSeparator()
             
             for (name,fuel,totalizer,unit) in [
-                ("Target", fuelAnalysis.targetFuel, fuelAnalysis.targetFuel, UnitVolume.gallons),
+                ("Target", fuelAnalysis.targetFuel, fuelAnalysis.targetFuel, UnitVolume.aviationGallon),
                 ("Target Required", fuelAnalysis.targetAdd, fuelAnalysis.targetAddTotalizer, fuelAddedUnit),
-                ("Target Save", fuelAnalysis.targetSave, fuelAnalysis.targetSave, UnitVolume.gallons),
+                ("Target Save", fuelAnalysis.targetSave, fuelAnalysis.targetSave, UnitVolume.aviationGallon),
             ] {
                 self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
@@ -147,8 +147,8 @@ class FuelAnalysisDataSource: TableDataSource {
             
             self.addSeparator()
             for (name,fuel,totalizer,unit) in [
-                ("New Total", fuelAnalysis.addedTotal, fuelAnalysis.addedTotalTotalizer, UnitVolume.gallons),
-                ("New Save", fuelAnalysis.addedSave, fuelAnalysis.addedSaveTotalizer, UnitVolume.gallons),
+                ("New Total", fuelAnalysis.addedTotal, fuelAnalysis.addedTotalTotalizer, UnitVolume.aviationGallon),
+                ("New Save", fuelAnalysis.addedSave, fuelAnalysis.addedSaveTotalizer, UnitVolume.aviationGallon),
             ] {
                 self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
