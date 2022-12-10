@@ -52,7 +52,7 @@ struct FuelTanks<UnitType : Dimension> : Comparable, Codable {
     
     var totalMeasurement : Measurement<UnitType> { return Measurement(value: self.total, unit: self.unit)}
     var leftMeasurement : Measurement<UnitType> { return Measurement(value: self.left, unit: self.unit)}
-    var rightMeasurement : Measurement<UnitType> { return Measurement(value: self.left, unit: self.unit)}
+    var rightMeasurement : Measurement<UnitType> { return Measurement(value: self.right, unit: self.unit)}
     
     /// make sure the quantity is positive only, but rebalances if one side is positive the other is negative
     var positiveOnly : FuelTanks {
@@ -102,7 +102,7 @@ func +<UnitType>(left: FuelTanks<UnitType>,right:FuelTanks<UnitType>) -> FuelTan
 
 
 extension FuelTanks {
-    func convert(to newUnit : UnitType) -> FuelTanks{
+    func converted(to newUnit : UnitType) -> FuelTanks{
         if self.unit == newUnit {
             return self
         }
@@ -113,12 +113,12 @@ extension FuelTanks {
 }
 
 func min<UnitType>(_ lhs : FuelTanks<UnitType>, _ rhs : FuelTanks<UnitType>) -> FuelTanks<UnitType> {
-    let converted = rhs.convert(to: lhs.unit)
+    let converted = rhs.converted(to: lhs.unit)
     return FuelTanks<UnitType>(left: min(lhs.left,converted.left), right: min(lhs.right,converted.right), unit: lhs.unit)
 }
 
 func max<UnitType>(_ lhs : FuelTanks<UnitType>, _ rhs : FuelTanks<UnitType>) -> FuelTanks<UnitType> {
-    let converted = rhs.convert(to: lhs.unit)
+    let converted = rhs.converted(to: lhs.unit)
     return FuelTanks(left: max(lhs.left,converted.left), right: max(lhs.right,converted.right), unit: lhs.unit)
 }
 
@@ -128,7 +128,7 @@ extension FuelQuantity {
     static let zero = FuelTanks(left: 0.0, right: 0.0, unit: Settings.fuelStoreUnit)
     
     init(avgas fuelMass : FuelMass) {
-        let inkilograms = fuelMass.convert(to: UnitMass.kilograms)
+        let inkilograms = fuelMass.converted(to: UnitMass.kilograms)
         self.left = inkilograms.left / FuelMass.avgasKilogramPerLiter
         self.right = inkilograms.right / FuelMass.avgasKilogramPerLiter
         self.unit = UnitVolume.liters
@@ -141,7 +141,7 @@ extension FuelMass {
     static let avgasKilogramPerLiter = 0.71
     
     init(avgas fuelQuantity: FuelQuantity){
-        let inLiters = fuelQuantity.convert(to: UnitVolume.liters)
+        let inLiters = fuelQuantity.converted(to: UnitVolume.liters)
         self.left = inLiters.left * Self.avgasKilogramPerLiter
         self.right = inLiters.right * Self.avgasKilogramPerLiter
         self.unit = UnitMass.kilograms

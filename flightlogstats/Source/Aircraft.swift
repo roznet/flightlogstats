@@ -40,8 +40,8 @@ class Aircraft: NSManagedObject {
                                        gph: self.gph )
         }
         set {
-            self.fuel_max = newValue.fuelMax.convert(to: Settings.fuelStoreUnit).total
-            self.fuel_tab = newValue.fuelTab.convert(to: Settings.fuelStoreUnit).total
+            self.fuel_max = newValue.fuelMax.converted(to: Settings.fuelStoreUnit).total
+            self.fuel_tab = newValue.fuelTab.converted(to: Settings.fuelStoreUnit).total
             self.gph = newValue.gph
         }
     }

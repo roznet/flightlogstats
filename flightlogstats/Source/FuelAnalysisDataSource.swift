@@ -52,10 +52,11 @@ class FuelAnalysisDataSource: TableDataSource {
         
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
         var geoIndex = 1
-        for measurement in [fuel.convert(to: unit).totalMeasurement,
-                            fuel.convert(to: unit).leftMeasurement,
-                            fuel.convert(to: unit).rightMeasurement,
-                            totalizer.convert(to: unit).totalMeasurement] {
+        let converted = fuel.converted(to: unit)
+        for measurement in [converted.totalMeasurement,
+                            converted.leftMeasurement,
+                            converted.rightMeasurement,
+                            totalizer.converted(to: unit).totalMeasurement] {
             if measurement.value == 0.0 {
                 self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
             }else{

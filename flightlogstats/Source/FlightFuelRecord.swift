@@ -33,7 +33,7 @@ class FlightFuelRecord: NSManagedObject {
             return FuelQuantity(total: start, unit: Settings.fuelStoreUnit)
         }
         set {
-            let ingallons = newValue.convert(to: Settings.fuelStoreUnit)
+            let ingallons = newValue.converted(to: Settings.fuelStoreUnit)
             self.totalizer_fuel_start = ingallons.total
         }
     }
@@ -41,7 +41,7 @@ class FlightFuelRecord: NSManagedObject {
     var addedFuel : FuelQuantity {
         get { return FuelQuantity(left: self.added_fuel_left, right: self.added_fuel_right, unit: Settings.fuelStoreUnit) }
         set {
-            let ingallons = newValue.convert(to: Settings.fuelStoreUnit)
+            let ingallons = newValue.converted(to: Settings.fuelStoreUnit)
             self.added_fuel_left = ingallons.left
             self.added_fuel_right = ingallons.right
         }
@@ -49,7 +49,7 @@ class FlightFuelRecord: NSManagedObject {
 
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.target_fuel, unit: Settings.fuelStoreUnit) }
-        set { let ingallons = newValue.convert(to: Settings.fuelStoreUnit); self.target_fuel = ingallons.total }
+        set { let ingallons = newValue.converted(to: Settings.fuelStoreUnit); self.target_fuel = ingallons.total }
     }
 
     func nextTotalizerStart(for used : FuelQuantity) -> FuelQuantity {

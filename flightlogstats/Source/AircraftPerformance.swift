@@ -23,7 +23,7 @@ struct AircraftPerformance : Equatable {
     }
     
     func endurance(fuel : FuelQuantity) -> Endurance {
-        let inGallon = fuel.convert(to: UnitVolume.aviationGallon)
+        let inGallon = fuel.converted(to: UnitVolume.aviationGallon)
         return (inGallon.total / gph) * 3600.0
     }
     

@@ -111,7 +111,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
             return Settings.shared.targetFuel
         }
         set {
-            let converted = newValue.convert(to: self.fuelTargetUnit)
+            let converted = newValue.converted(to: self.fuelTargetUnit)
             self.fuelTotalizerStartField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.total))
         }
 
@@ -125,7 +125,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
             return Settings.shared.targetFuel
         }
         set {
-            let converted = newValue.convert(to: self.fuelTargetUnit)
+            let converted = newValue.converted(to: self.fuelTargetUnit)
             self.fuelTargetField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.total))
         }
     }
@@ -139,7 +139,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
             return Settings.shared.addedFuel
         }
         set {
-            let converted = newValue.convert(to: self.fuelAddedUnit)
+            let converted = newValue.converted(to: self.fuelAddedUnit)
             self.fuelAddedLeftField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.left))
             self.fuelAddedRightField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.right))
         }
@@ -240,9 +240,9 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         }else{
             let targetUnit = Settings.shared.unitTargetFuel
             let addedUnit = Settings.shared.unitAddedFuel
-            let newInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel.convert(to: targetUnit),
-                                                addedfuel: FuelQuantity.zero.convert(to: addedUnit),
-                                                totalizerStartFuel: Settings.shared.totalizerStartFuel.convert(to: targetUnit))
+            let newInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel.converted(to: targetUnit),
+                                                addedfuel: FuelQuantity.zero.converted(to: addedUnit),
+                                                totalizerStartFuel: Settings.shared.totalizerStartFuel.converted(to: targetUnit))
             if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
                 viewModel.fuelAnalysisInputs = newInputs
             }

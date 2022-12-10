@@ -38,6 +38,8 @@ class DisplayContext {
     var timeFormatter : DateFormatter
     var dateFormatter : DateFormatter
 
+    var baroUnit : UnitPressure = UnitPressure.hectopascals
+    
     init() {
         self.timeFormatter = DateFormatter()
         self.timeFormatter.dateStyle = .none
@@ -65,10 +67,12 @@ class DisplayContext {
         return rv
     }()
     
+    @available(*, deprecated, message: "Use measurement and formatter")
     func formatDecimal(timeRange : TimeRange) -> String {
         return Self.decimalFormatter.string(from: NSNumber(floatLiteral: timeRange.elapsed/3600.0)) ?? ""
     }
     
+    @available(*, deprecated, message: "Use measurement and formatter")
     func formatHHMM(interval : TimeInterval) -> String {
         let formatter = Self.coumpoundHHMMFormatter
         return formatter.format(from: Measurement(value: interval, unit: UnitDuration.seconds))
@@ -83,11 +87,13 @@ class DisplayContext {
         return rv
     }()
     
+    @available(*, deprecated, message: "Use measurement and formatter")
     func formatHHMM(timeRange : TimeRange) -> String {
         let formatter = Self.coumpoundHHMMFormatter
         return formatter.format(from: timeRange.measurement)
     }
     
+    //MARK: - Categorical/string formatting
     func format(route : [Waypoint] ) -> String {
         return route.map { $0.name }.joined(separator: ",")
     }
@@ -121,6 +127,7 @@ class DisplayContext {
     ///   - since: the beginning of the period that date is relevant, for example in a leg that would be the start the leg
     ///   - reference: This is the reference date of which to compute general elapsed, typically the first date of the log
     /// - Returns: formatted date according to the convention
+    @available(*, deprecated, message: "Use measurement and formatter")
     func format(time : Date, since : Date? = nil, reference : Date? = nil) -> String {
         switch self.dateStyle {
         case .elapsed:
@@ -140,12 +147,12 @@ class DisplayContext {
         }
     }
 
+    @available(*, deprecated, message: "Use measurement and formatter")
     func format(date : Date) -> String {
         return self.dateFormatter.string(from: date)
     }
 
-
-    //MARK: - format Fields
+    @available(*, deprecated, message: "Use measurement and formatter")
     func formatStats(field : Field, valueStats : ValueStats) -> String {
         let formatter = self.measurementFormatter(for: field)
         if let measurement = self.measurement(field: field, valueStats: valueStats) {
@@ -154,6 +161,7 @@ class DisplayContext {
         return ""
     }
 
+    //MARK: - Format ValueStats for Fields
     func measurement(field : Field, valueStats : ValueStats) -> Measurement<Dimension>? {
         switch field {
         case .AltInd:
@@ -346,7 +354,7 @@ class DisplayContext {
     
     func measurementFormatter(for field : Field) -> MeasurementFormatter {
         switch field {
-        case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT:
+        case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT,.E1_FFlow,.E2_FFlow:
             return Self.fuelFormatter
         case .E1_MAP,.E2_MAP:
             return Self.mapFormatter
@@ -362,7 +370,7 @@ class DisplayContext {
     
     func measurement(baro inch : ValueStats) -> Measurement<Dimension> {
         let unit = (inch.unit as? UnitPressure) ?? UnitPressure.inchesOfMercury
-        return Measurement(value: inch.end, unit: unit)
+        return Measurement(value: inch.end, unit: unit).converted(to: self.baroUnit)
     }
 
     func measurement(fpm : ValueStats) -> Measurement<Dimension> {
@@ -415,7 +423,7 @@ class DisplayContext {
     }
     func measurement(percent : ValueStats) -> Measurement<Dimension> {
         let unit = (percent.unit as? UnitPercent) ?? UnitPercent.percentPerOne
-        return Measurement(value: percent.average, unit: unit)
+        return Measurement(value: percent.average, unit: unit).converted(to: UnitPercent.percentPerHundred)
     }
 }
 

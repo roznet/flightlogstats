@@ -34,7 +34,7 @@ class DetailSettingsViewController: UIViewController {
             return Settings.shared.aircraftPerformance.fuelMax
         }
         set {
-            let converted = newValue.convert(to: self.aircraftFuelUnit)
+            let converted = newValue.converted(to: self.aircraftFuelUnit)
             self.maxFuelField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.total))
         }
     }
@@ -47,7 +47,7 @@ class DetailSettingsViewController: UIViewController {
             return Settings.shared.aircraftPerformance.fuelTab
         }
         set {
-            let converted = newValue.convert(to: self.aircraftFuelUnit)
+            let converted = newValue.converted(to: self.aircraftFuelUnit)
             self.tabFuelField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: converted.total))
         }
     }

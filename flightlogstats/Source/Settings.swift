@@ -184,17 +184,17 @@ struct Settings {
     
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }
-        set { self.targetFuelTotal = newValue.convert(to: Settings.fuelStoreUnit).total }
+        set { self.targetFuelTotal = newValue.converted(to: Settings.fuelStoreUnit).total }
     }
     var totalizerStartFuel : FuelQuantity {
         get { return FuelQuantity(total: self.totalizerStartFuelTotal, unit: Settings.fuelStoreUnit ) }
-        set { self.totalizerStartFuelTotal = newValue.convert(to: Settings.fuelStoreUnit).total }
+        set { self.totalizerStartFuelTotal = newValue.converted(to: Settings.fuelStoreUnit).total }
     }
 
     var addedFuel : FuelQuantity {
         get { return FuelQuantity(left: self.addedFuelLeft, right: self.addedFuelRight, unit: Settings.fuelStoreUnit ) }
         set {
-            let ingallons = newValue.convert(to: Settings.fuelStoreUnit )
+            let ingallons = newValue.converted(to: Settings.fuelStoreUnit )
             self.addedFuelLeft = ingallons.left
             self.addedFuelRight = ingallons.right
         }

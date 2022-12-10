@@ -63,7 +63,7 @@ class FlightLogViewModel {
     private(set) var phasesOfFlightDataSource : FlightLegsDataSource? = nil
     
     var fuelMaxTextLabel : String {
-        let max = aircraft.fuelMax.convert(to: fuelTargetUnit)
+        let max = aircraft.fuelMax.converted(to: fuelTargetUnit)
         let formatter = MeasurementFormatter()
         formatter.unitOptions = .providedUnit
         formatter.numberFormatter.maximumFractionDigits = 0

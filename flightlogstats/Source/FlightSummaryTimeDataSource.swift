@@ -7,6 +7,8 @@
 
 import UIKit
 import OSLog
+import RZUtils
+import RZUtilsSwift
 
 class FlightSummaryTimeDataSource: TableDataSource {
     let flightSummary : FlightSummary
@@ -34,25 +36,33 @@ class FlightSummaryTimeDataSource: TableDataSource {
     func addLine(title : String, description : String, since : TimeRange? = nil, elapsed : TimeRange? = nil){
         self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
         self.cellHolders.append(CellHolder(string: description, attributes: self.cellAttributes))
-        
+        var geoIndex = 2
+
         if let date = since?.end {
             self.cellHolders.append(CellHolder(string: self.displayContext.format(time: date),
                                                            attributes: self.cellAttributes))
         }else{
             self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
         }
+        geoIndex += 1
         
         if let since = since, since.elapsed > 0 {
-            self.cellHolders.append(CellHolder(string: self.displayContext.formatHHMM(timeRange: since),
-                                                           attributes: self.cellAttributes))
+            self.geometries[geoIndex].adjust(measurement: since.measurement, compound: DisplayContext.coumpoundHHMMFormatter)
+            self.cellHolders.append(CellHolder(measurement: since.measurement, compound: DisplayContext.coumpoundHHMMFormatter))
+            
+            //self.cellHolders.append(CellHolder(string: self.displayContext.formatHHMM(timeRange: since),attributes: self.cellAttributes))
         }else{
             self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
         }
-        if let elapsed = elapsed {
-            self.cellHolders.append(CellHolder(string: self.displayContext.formatHHMM(timeRange: elapsed),
-                                                           attributes: self.cellAttributes))
-            self.cellHolders.append(CellHolder(string: self.displayContext.formatDecimal(timeRange: elapsed),
-                                                           attributes: self.cellAttributes))
+        geoIndex += 1
+        
+        if let elapsed = elapsed?.measurement {
+            self.geometries[geoIndex].adjust(measurement: elapsed, compound: DisplayContext.coumpoundHHMMFormatter)
+            self.cellHolders.append(CellHolder(measurement: elapsed, compound: DisplayContext.coumpoundHHMMFormatter))
+            geoIndex += 1
+            let hobbs = elapsed.converted(to: UnitDuration.hours)
+            self.geometries[geoIndex].adjust(measurement: hobbs, formatter: DisplayContext.enduranceFormatter)
+            self.cellHolders.append(CellHolder(measurement: hobbs, formatter: DisplayContext.enduranceFormatter))
         }else{
             self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
             self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
@@ -76,12 +86,27 @@ class FlightSummaryTimeDataSource: TableDataSource {
         self.cellHolders  = []
         self.geometries   = []
         self.rowsCount = 0
+        self.rowsCount = 0
         
         self.cellAttributes = ViewConfig.shared.cellAttributes
         self.titleAttributes = ViewConfig.shared.titleAttributes
 
-        for title in [ "", "", "Time", "Since Start", "Elapsed", "Logbook" ] {
+        for title in [ "", "", "Time" ] {
             self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
+            self.geometries.append(RZNumberWithUnitGeometry())
+        }
+        for title in [ "Since Start", "Elapsed", "Logbook" ] {
+            self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
+            
+            let geometry = RZNumberWithUnitGeometry()
+            geometry.timeAlignment = .withNumber
+            geometry.defaultUnitAttribute = self.cellAttributes
+            geometry.defaultNumberAttribute = self.cellAttributes
+            geometry.numberAlignment = .right
+            geometry.alignment = .center
+            geometry.unitAlignment = .hide
+            
+            self.geometries.append(geometry)
         }
         self.rowsCount += 1
         
