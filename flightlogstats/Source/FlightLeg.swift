@@ -121,9 +121,7 @@ struct FlightLeg {
 
 extension FlightLeg : CustomStringConvertible {
     var description: String {
-        let displayContext = DisplayContext()
-        let time = displayContext.formatHHMM(timeRange: self.timeRange)
-        return String(format: "<FlightLeg %@>", time )
+        return "FlightLeg(\(start))"
     }
 }
 

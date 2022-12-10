@@ -189,14 +189,14 @@ class FlightLogViewModel {
            let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)),
            let first = fields.suffix(2).first,
            let last = fields.suffix(2).last {
-            ds.xUnit = first.unit
+            ds.xUnit = first.unit.gcUnit
             if let firstSerie = self.graphDataSerie(field: first),
                let lastSerie = self.graphDataSerie(field: last){
                 
                 GCStatsDataSerie.reduce(toCommonRange: firstSerie, and: lastSerie)
                 let xy = GCStatsInterpFunction.xySerieFor(x: firstSerie, andY: lastSerie)
                 
-                if let data = GCSimpleGraphDataHolder(xy, type:gcGraphType.scatterPlot, color: self.colors.first!, andUnit: last.unit) {
+                if let data = GCSimpleGraphDataHolder(xy, type:gcGraphType.scatterPlot, color: self.colors.first!, andUnit: last.unit.gcUnit) {
                     ds.add(data)
                 }
             }
@@ -215,7 +215,7 @@ class FlightLogViewModel {
                 if let serie = self.graphDataSerie(field: field) {
                     let color = colors[colorIdx % colors.count]
                     
-                    if let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: color, andUnit: field.unit) {
+                    if let data = GCSimpleGraphDataHolder(serie, type:gcGraphType.graphLine, color: color, andUnit: field.unit.gcUnit) {
                         data.axisForSerie = UInt( colorIdx )
                         if colorIdx == 0, let leg = leg,
                            let gradientSerie = GCStatsDataSerie() {

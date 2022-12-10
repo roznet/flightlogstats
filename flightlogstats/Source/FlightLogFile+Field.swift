@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 import RZUtils
 import RZData
-
+import RZUtilsSwift
 
 extension FlightLogFile {
     typealias CategoricalValue = String
@@ -141,7 +141,7 @@ extension FlightLogFile {
             let unit_description : String
             let type : String
 
-            lazy var unit : GCUnit = { return GCUnit.from(logFileUnit: self.unit_key) }()
+            lazy var unit : Dimension = { return GCUnit.from(logFileUnit: self.unit_key).foundationUnit ?? UnitDimensionLess.scalar }()
             
             private enum CodingKeys : String, CodingKey {
                 case field, order, unit_key = "unit", description, unit_description, type
@@ -167,11 +167,11 @@ extension FlightLogFile {
             return rv
         }()
         
-        static func unit(for field: Field) -> GCUnit {
+        static func unit(for field: Field) -> Dimension {
             if var def = Self.fieldDefinitions[field] {
                 return def.unit
             }
-            return GCUnit.dimensionless()
+            return UnitDimensionLess.scalar
 
         }
         
@@ -189,11 +189,11 @@ extension FlightLogFile {
             return self.rawValue
         }
         
-        var unit : GCUnit {
+        var unit : Dimension {
             if var def = Self.fieldDefinitions[self] {
                 return def.unit
             }
-            return GCUnit.dimensionless()
+            return UnitDimensionLess.scalar
         }
         
         var order : Int {

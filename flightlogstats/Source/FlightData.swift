@@ -270,7 +270,7 @@ class FlightData {
                 }
                 if include {
                     if current.count == 0 {
-                        current = zip(one,self.doubleFields).map { ValueStats(value: $0, unit: $1.unit.foundationUnit) }
+                        current = zip(one,self.doubleFields).map { ValueStats(value: $0, unit: $1.unit) }
                     }else{
                         for (idx,val) in one.enumerated() {
                             current[idx].update(double: val)
@@ -401,8 +401,8 @@ extension FlightData {
                     switch isDouble {
                     case .double:
                         let field = fields[idx]
-                        let gcunit = GCUnit.from(logFileUnit: unit)
-                        data.fieldsUnits[field] = gcunit.foundationUnit
+                        let unit = Dimension.from(logFileUnit: unit)
+                        data.fieldsUnits[field] = unit
                     case .category,.ignore:
                         break
                     }
@@ -432,7 +432,7 @@ extension FlightData {
                     case .doubleArray,.double:
                         for f in field.outputs {
                             fieldsMap[f] = data.doubleFields.count
-                            data.fieldsUnits[f] = f.unit.foundationUnit
+                            data.fieldsUnits[f] = f.unit
                         }
                         data.doubleFields.append(contentsOf: field.outputs)
                         

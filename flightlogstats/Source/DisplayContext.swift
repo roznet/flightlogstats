@@ -12,6 +12,20 @@ import RZFlight
 import RZUtilsSwift
 import RZData
 
+struct DisplayedValue {
+    enum Formatter {
+        case measurement(MeasurementFormatter)
+        case compound(CompoundMeasurementFormatter<Dimension>)
+        case date(DateFormatter)
+    }
+    
+    let measurement : Measurement<Dimension>
+    let formatter : Formatter
+    
+    var measurementFormatter : MeasurementFormatter? { guard case let .measurement(rv) = self.formatter else { return nil }; return rv }
+    var compoundFormatter : CompoundMeasurementFormatter<Dimension>? { guard case let .compound(rv) = self.formatter else { return nil }; return rv }
+}
+
 class DisplayContext {
     typealias Field = FlightLogFile.Field
     typealias SummaryField = FlightSummary.Field
@@ -38,7 +52,9 @@ class DisplayContext {
     var timeFormatter : DateFormatter
     var dateFormatter : DateFormatter
 
+    // configurable
     var baroUnit : UnitPressure = UnitPressure.hectopascals
+    var temperatureUnit : UnitTemperature = UnitTemperature.celsius
     
     init() {
         self.timeFormatter = DateFormatter()
@@ -51,22 +67,7 @@ class DisplayContext {
     }
     
     //MARK: - format model objets
-    
-    public static let enduranceFormatter : MeasurementFormatter = {
-        let rv = MeasurementFormatter()
-        rv.numberFormatter.minimumFractionDigits = 1
-        rv.numberFormatter.maximumFractionDigits = 1
-        rv.unitOptions = .providedUnit
-        return rv
-    }()
-    
-    public static let decimalFormatter : NumberFormatter = {
-        let rv = NumberFormatter()
-        rv.maximumFractionDigits = 1
-        rv.minimumFractionDigits = 1
-        return rv
-    }()
-    
+
     @available(*, deprecated, message: "Use measurement and formatter")
     func formatDecimal(timeRange : TimeRange) -> String {
         return Self.decimalFormatter.string(from: NSNumber(floatLiteral: timeRange.elapsed/3600.0)) ?? ""
@@ -78,14 +79,6 @@ class DisplayContext {
         return formatter.format(from: Measurement(value: interval, unit: UnitDuration.seconds))
     }
     
-    public static let coumpoundHHMMFormatter :  CompoundMeasurementFormatter<Dimension> = {
-        var rv = CompoundMeasurementFormatter<Dimension>(dimensions: [UnitDuration.hours, UnitDuration.minutes, UnitDuration.seconds], separator: ":")
-        rv.joinStyle = .noUnits
-        rv.numberFormatter.minimumIntegerDigits = 2
-        rv.numberFormatter.maximumFractionDigits = 0
-        rv.minimumComponents = 2
-        return rv
-    }()
     
     @available(*, deprecated, message: "Use measurement and formatter")
     func formatHHMM(timeRange : TimeRange) -> String {
@@ -162,7 +155,7 @@ class DisplayContext {
     }
 
     //MARK: - Format ValueStats for Fields
-    func measurement(field : Field, valueStats : ValueStats) -> Measurement<Dimension>? {
+    func measurementOld(field : Field, valueStats : ValueStats) -> Measurement<Dimension>? {
         switch field {
         case .AltInd:
             return self.measurement(altitude: valueStats)
@@ -310,6 +303,16 @@ class DisplayContext {
         }
     }
     
+    func measurement(field : Field, valueStats : ValueStats) -> Measurement<Dimension>? {
+        let metric = self.valueStatsMetric(for: field)
+        var measurement = valueStats.measurement(for: metric)
+        if let displayUnit = self.displayUnit(for: field) {
+            measurement?.convert(to: displayUnit)
+        }
+        return measurement
+    }
+
+    
     //MARK: - format values
     func formatValue(distance : Measurement<Dimension>) -> String {
         return Self.defaultFormatter.string(from: distance)
@@ -327,7 +330,32 @@ class DisplayContext {
         return Self.fuelFormatter.string(from: gallon)
     }
     
+    //MARK: - Formatters
     
+    public static let enduranceFormatter : MeasurementFormatter = {
+        let rv = MeasurementFormatter()
+        rv.numberFormatter.minimumFractionDigits = 1
+        rv.numberFormatter.maximumFractionDigits = 1
+        rv.unitOptions = .providedUnit
+        return rv
+    }()
+    
+    public static let decimalFormatter : NumberFormatter = {
+        let rv = NumberFormatter()
+        rv.maximumFractionDigits = 1
+        rv.minimumFractionDigits = 1
+        return rv
+    }()
+    
+    public static let coumpoundHHMMFormatter :  CompoundMeasurementFormatter<Dimension> = {
+        var rv = CompoundMeasurementFormatter<Dimension>(dimensions: [UnitDuration.hours, UnitDuration.minutes, UnitDuration.seconds], separator: ":")
+        rv.joinStyle = .noUnits
+        rv.numberFormatter.minimumIntegerDigits = 2
+        rv.numberFormatter.maximumFractionDigits = 0
+        rv.minimumComponents = 2
+        return rv
+    }()
+
     private static var defaultFormatter : MeasurementFormatter = {
         let formatter = MeasurementFormatter()
         formatter.unitOptions = .providedUnit
@@ -364,6 +392,172 @@ class DisplayContext {
     }
     
     //MARK: - format stats
+    func valueStatsMetric(for field : Field) -> ValueStats.Metric {
+        switch field {
+        case .AltInd,.AltGPS,.AltMSL:
+            return .max
+        case .BaroA:
+            return .average
+        case .OAT:
+            return .average
+        case .IAS,.GndSpd,.VSpd,.TAS:
+            return .average
+        case .WndSpd:
+            return .average
+        case .Pitch,.Roll:
+            return .average
+        case .LatAc,.NormAc:
+            return .max
+        case .HDG,.TRK,.CRS:
+            return .average
+        case .volt1,.volt2,.amp1:
+            return .average
+        case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT:
+            // could be .max-.min
+            return .end
+        case .E1_FFlow,.E2_FFlow:
+            return .average
+        case .E1_OilT,.E1_OilP:
+            return .average
+        case .E1_MAP,.E2_MAP:
+            return .average
+        case .E1_RPM,.E2_RPM:
+            return .average
+        case .E1_PctPwr:
+            return .average
+        case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
+            return .max
+        case .E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6:
+            return .max
+        case .E1_TIT1,.E1_TIT2:
+            return .max
+        case .E1_Torq,.E1_NG,.E2_Torq,.E2_NG:
+            return .average
+        case .E1_ITT,.E2_ITT:
+            return .max
+        case .HSIS,.HCDI,.VCDI:
+            return .average
+        case .WndDr:
+            return .average
+        case .WptDst:
+            return .end
+        case .WptBrg,.MagVar:
+            return .average
+        case .RollM,.PitchM,.RollC,.PichC:
+            return .average
+        case .VSpdG,.GPSfix,.HAL,.VAL,.HPLwas,.HPLfd,.VPLwas:
+            return .average
+        
+        // Calculated
+        case .Distance:
+            return .end
+        case .WndCross,.WndDirect:
+            return .average
+        case .E1_EGT_Max,.E1_CHT_Max:
+            return .max
+        case .E1_EGT_Min,.E1_CHT_Min:
+            return .max
+        case .Latitude:
+            return .start
+        case .Longitude:
+            return .start
+            
+        // Not numbers:
+        case .Unknown:
+            return .start
+        case .AtvWpt:
+            return .start
+        case .NAV1,.NAV2,.COM1,.COM2:
+            return .start
+        case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+            return .start
+        }
+    }
+
+    func displayUnit(for field : Field) -> Dimension? {
+        switch field {
+        case .AltInd,.AltGPS,.AltMSL:
+            return UnitLength.feet
+        case .BaroA:
+            return self.baroUnit
+        case .OAT:
+            return self.temperatureUnit
+        case .IAS,.GndSpd,.VSpd,.TAS,.WndSpd:
+            return UnitSpeed.knots
+        case .Pitch,.Roll,.HDG,.TRK,.CRS:
+            return UnitAngle.degrees
+        case .WndDr,.WptBrg:
+            return UnitAngle.degrees
+        case .WptDst:
+            return UnitLength.nauticalMiles
+        case .LatAc,.NormAc:
+            return nil
+        case .amp1:
+            return UnitElectricCurrent.amperes
+        case .volt1,.volt2:
+            return UnitElectricPotentialDifference.volts
+        case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT:
+            // could be .max-.min
+            return UnitVolume.aviationGallon
+        case .E1_FFlow,.E2_FFlow:
+            return UnitFuelFlow.gallonPerHour
+        case .E1_OilT:
+            return UnitTemperature.fahrenheit
+        case .E1_OilP:
+            return UnitPressure.poundsForcePerSquareInch
+        case .E1_MAP,.E2_MAP:
+            return UnitPressure.inchesOfMercury
+        case .E1_RPM,.E2_RPM:
+            return UnitAngularVelocity.revolutionsPerMinute
+        case .E1_PctPwr:
+            return UnitPercent.percentPerHundred
+        case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
+            return UnitTemperature.fahrenheit
+        case .E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6:
+            return UnitTemperature.fahrenheit
+        case .E1_TIT1,.E1_TIT2:
+            return UnitTemperature.fahrenheit
+        case .E1_Torq,.E2_Torq:
+            return UnitEnergy.footPound
+        case .E2_NG,.E1_NG:
+            return UnitPercent.percentPerHundred
+        case .E1_ITT,.E2_ITT:
+            return UnitTemperature.celsius
+        case .HSIS,.HCDI,.VCDI:
+            return UnitAngle.degrees
+        case .MagVar:
+            return UnitAngle.degrees
+        case .RollC,.PichC:
+            return UnitAngle.degrees
+        case .RollM,.PitchM:
+            return nil
+        case .VSpdG,.GPSfix,.HAL,.VAL,.HPLwas,.HPLfd,.VPLwas:
+            return UnitDimensionLess.scalar
+        
+        // Calculated
+        case .Distance:
+            return UnitLength.nauticalMiles
+        case .WndCross,.WndDirect:
+            return UnitSpeed.knots
+        case .E1_EGT_Max,.E1_CHT_Max:
+            return UnitTemperature.fahrenheit
+        case .E1_EGT_Min,.E1_CHT_Min:
+            return UnitTemperature.fahrenheit
+        case .Latitude:
+            return nil
+        case .Longitude:
+            return nil
+            
+        // Not numbers:
+        case .Unknown:
+            return nil
+        case .AtvWpt,.NAV1,.NAV2,.COM1,.COM2:
+            return nil
+        case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+            return nil
+        }
+    }
+
     func measurement(_ valueStats : ValueStats) -> Measurement<Dimension> {
         return Measurement(value: valueStats.average, unit: UnitDimensionLess.scalar)
     }
