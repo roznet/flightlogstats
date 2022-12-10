@@ -56,8 +56,16 @@
     "type": "value"
   },
   {
-    "field": "OAT",
+    "field": "AltB",
     "order": 8,
+    "unit": "ft Baro",
+    "description": "",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "OAT",
+    "order": 10,
     "unit": "deg C",
     "description": "OAT ",
     "unit_description": "degrees C",
@@ -65,7 +73,7 @@
   },
   {
     "field": "IAS",
-    "order": 9,
+    "order": 11,
     "unit": "kt",
     "description": "Indicated airspeed ",
     "unit_description": "kts",
@@ -73,7 +81,7 @@
   },
   {
     "field": "TAS",
-    "order": 10,
+    "order": 12,
     "unit": "kt",
     "description": "True airspeed ",
     "unit_description": "knots",
@@ -81,7 +89,7 @@
   },
   {
     "field": "GndSpd",
-    "order": 11,
+    "order": 13,
     "unit": "kt",
     "description": "Ground Speed ",
     "unit_description": "kts",
@@ -89,7 +97,7 @@
   },
   {
     "field": "VSpd",
-    "order": 12,
+    "order": 20,
     "unit": "fpm",
     "description": "Vertical speed ",
     "unit_description": "fpm",
@@ -97,7 +105,7 @@
   },
   {
     "field": "VSpdG",
-    "order": 13,
+    "order": 21,
     "unit": "fpm",
     "description": "GPS vertical speed ",
     "unit_description": "fpm",
@@ -105,7 +113,7 @@
   },
   {
     "field": "HDG",
-    "order": 14,
+    "order": 22,
     "unit": "deg",
     "description": "Magnetic Heading ",
     "unit_description": "degrees",
@@ -113,7 +121,7 @@
   },
   {
     "field": "TRK",
-    "order": 15,
+    "order": 23,
     "unit": "deg",
     "description": "Ground Track ",
     "unit_description": "degrees magnetic",
@@ -121,7 +129,7 @@
   },
   {
     "field": "CRS",
-    "order": 16,
+    "order": 24,
     "unit": "deg",
     "description": "Selected course",
     "unit_description": "",
@@ -129,39 +137,71 @@
   },
   {
     "field": "WptBrg",
-    "order": 17,
+    "order": 30,
     "unit": "deg",
     "description": "Bearing to next waypoint ",
     "unit_description": "degrees",
     "type": "value"
   },
   {
+    "field": "FQtyT",
+    "order": 30,
+    "unit": "gals",
+    "description": "Fuel Qty Total",
+    "unit_description": "gals",
+    "type": "value"
+  },
+  {
     "field": "WndDr",
-    "order": 18,
+    "order": 31,
     "unit": "deg",
     "description": "Wind Direction ",
     "unit_description": "degrees",
     "type": "value"
   },
   {
+    "field": "FQtyL",
+    "order": 31,
+    "unit": "gals",
+    "description": "Fuel Qty Left ",
+    "unit_description": "gals",
+    "type": "value"
+  },
+  {
     "field": "WndSpd",
-    "order": 19,
+    "order": 32,
     "unit": "kt",
     "description": "Wind Speed ",
     "unit_description": "knots",
+    "type": "value"
+  },
+  {
+    "field": "FQtyR",
+    "order": 32,
+    "unit": "gals",
+    "description": "Fuel Qty Right ",
+    "unit_description": "gals",
     "type": "value"
   },
   {
     "field": "WndDirect",
-    "order": 20,
+    "order": 33,
     "unit": "kt",
     "description": "Wind Speed ",
     "unit_description": "knots",
     "type": "value"
   },
   {
+    "field": "FTotalizerT",
+    "order": 33,
+    "unit": "gals",
+    "description": "Fuel Totalizer Total",
+    "unit_description": "gals",
+    "type": "value"
+  },
+  {
     "field": "WndCross",
-    "order": 21,
+    "order": 34,
     "unit": "kt",
     "description": "Wind Speed ",
     "unit_description": "knots",
@@ -169,47 +209,15 @@
   },
   {
     "field": "WptDst",
-    "order": 22,
+    "order": 35,
     "unit": "nm",
     "description": "Distance to next waypoint ",
     "unit_description": "nm",
     "type": "value"
   },
   {
-    "field": "FQtyT",
-    "order": 23,
-    "unit": "gals",
-    "description": "Fuel Qty Total",
-    "unit_description": "gals",
-    "type": "value"
-  },
-  {
-    "field": "FQtyL",
-    "order": 24,
-    "unit": "gals",
-    "description": "Fuel Qty Left ",
-    "unit_description": "gals",
-    "type": "value"
-  },
-  {
-    "field": "FQtyR",
-    "order": 25,
-    "unit": "gals",
-    "description": "Fuel Qty Right ",
-    "unit_description": "gals",
-    "type": "value"
-  },
-  {
-    "field": "FTotalizerT",
-    "order": 26,
-    "unit": "gals",
-    "description": "Fuel Totalizer Total",
-    "unit_description": "gals",
-    "type": "value"
-  },
-  {
     "field": "HSIS",
-    "order": 27,
+    "order": 40,
     "unit": "enum",
     "description": "HSI source",
     "unit_description": "",
@@ -217,7 +225,7 @@
   },
   {
     "field": "NAV1",
-    "order": 28,
+    "order": 41,
     "unit": "MHz",
     "description": "Nav1 frequency",
     "unit_description": "",
@@ -225,7 +233,7 @@
   },
   {
     "field": "NAV2",
-    "order": 29,
+    "order": 42,
     "unit": "MHz",
     "description": "Nav2 frequency",
     "unit_description": "",
@@ -233,7 +241,7 @@
   },
   {
     "field": "COM1",
-    "order": 30,
+    "order": 43,
     "unit": "MHz",
     "description": "Com1 frequency",
     "unit_description": "",
@@ -241,7 +249,7 @@
   },
   {
     "field": "COM2",
-    "order": 31,
+    "order": 44,
     "unit": "MHz",
     "description": "Com2 frequency",
     "unit_description": "",
@@ -249,7 +257,7 @@
   },
   {
     "field": "AfcsOn",
-    "order": 32,
+    "order": 45,
     "unit": "bool",
     "description": "Autopilot On/Off",
     "unit_description": "",
@@ -257,7 +265,7 @@
   },
   {
     "field": "GPSfix",
-    "order": 33,
+    "order": 46,
     "unit": "enum",
     "description": "GPSfix",
     "unit_description": "",
@@ -496,6 +504,14 @@
     "type": "value"
   },
   {
+    "field": "E1 Fpres",
+    "order": 175,
+    "unit": "psi",
+    "description": "",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
     "field": "HCDI",
     "order": 200,
     "unit": "fsd",
@@ -620,6 +636,38 @@
     "order": 705,
     "unit": "deg C",
     "description": "E2 ITT",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E2 %Pwr",
+    "order": 706,
+    "unit": "%",
+    "description": "",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E2 FPres",
+    "order": 707,
+    "unit": "psi",
+    "description": "",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E2 OilT",
+    "order": 708,
+    "unit": "deg F",
+    "description": "",
+    "unit_description": "",
+    "type": "value"
+  },
+  {
+    "field": "E2 OilP",
+    "order": 708,
+    "unit": "psi",
+    "description": "",
     "unit_description": "",
     "type": "value"
   },

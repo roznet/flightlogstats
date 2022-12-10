@@ -28,6 +28,7 @@ extension Dimension {
         case "ft" : return UnitLength.feet
         case "ft lbs" : return UnitEnergy.footPound // torque
         case "ft msl" : return UnitLength.feet
+        case "ft Baro" : return UnitLength.feet
         case "ft wgs" : return UnitLength.feet
         case "gals" : return UnitVolume.aviationGallon
         case "gph" : return UnitFuelFlow.gallonPerHour

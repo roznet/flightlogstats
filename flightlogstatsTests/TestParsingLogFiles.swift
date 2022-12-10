@@ -13,6 +13,7 @@ import RZFlight
 import FMDB
 import CoreLocation
 import RZUtils
+import RZData
 import RZFlight
 
 extension Logger {

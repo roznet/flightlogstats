@@ -8,6 +8,10 @@
 import Foundation
 import RZUtils
 
+extension TimeInterval {
+    var measurement : Measurement<Dimension> { return Measurement<Dimension>(value: self, unit: UnitDuration.seconds) }
+}
+
 struct AircraftPerformance : Equatable {
     typealias Endurance = TimeInterval
     

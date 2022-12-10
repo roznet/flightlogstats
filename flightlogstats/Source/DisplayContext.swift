@@ -19,11 +19,88 @@ struct DisplayedValue {
         case date(DateFormatter)
     }
     
-    let measurement : Measurement<Dimension>
+    enum Value {
+        case measurement(Measurement<Dimension>)
+        case date(Date)
+    }
+    
     let formatter : Formatter
+    let value : Value
+    
+    var measurement : Measurement<Dimension>? { guard case let .measurement(rv) = self.value else { return nil }; return rv }
+    var date : Date? { guard case let .date(rv) = self.value else { return nil }; return rv }
     
     var measurementFormatter : MeasurementFormatter? { guard case let .measurement(rv) = self.formatter else { return nil }; return rv }
     var compoundFormatter : CompoundMeasurementFormatter<Dimension>? { guard case let .compound(rv) = self.formatter else { return nil }; return rv }
+    var dateFormatter : DateFormatter? { guard case let .date(rv) = self.formatter else { return nil }; return rv }
+    
+    var string : String {
+        switch self.formatter {
+        case .measurement(let fmt):
+            switch self.value {
+            case .measurement(let m):
+                return fmt.string(from: m)
+            case .date(let d):
+                return d.description
+            }
+        case .date(let fmt):
+            switch self.value {
+            case .measurement(let m):
+                return m.description
+            case .date(let d):
+                return fmt.string(from: d)
+            }
+        case .compound(let fmt):
+            switch self.value {
+            case .measurement(let m):
+                return fmt.format(from: m)
+            case .date(let d):
+                return d.description
+            }
+        }
+    }
+    typealias CellHolder = TableDataSource.CellHolder
+    
+    func cellHolder(attributes : [NSAttributedString.Key:Any]) -> CellHolder {
+        switch self.formatter {
+        case .measurement(let fmt):
+            switch self.value {
+            case .measurement(let m):
+                return CellHolder(measurement: m, formatter: fmt, attributes: attributes)
+            case .date(let d):
+                return CellHolder(string: d.description, attributes: attributes)
+            }
+        case .date(let fmt):
+            switch self.value {
+            case .measurement(let m):
+                return CellHolder(string: m.description, attributes: attributes)
+            case .date(let d):
+                return CellHolder(string: fmt.string(from: d), attributes: attributes)
+            }
+        case .compound(let fmt):
+            switch self.value {
+            case .measurement(let m):
+                return CellHolder(measurement: m, compound: fmt)
+            case .date(let d):
+                return CellHolder(string: d.description, attributes: attributes)
+            }
+        }
+
+    }
+    
+    func adjust(geometry : RZNumberWithUnitGeometry) {
+        guard case let .measurement(measurement) = self.value else { return }
+        switch self.formatter {
+        case .measurement(let fmt):
+            geometry.adjust(measurement: measurement, formatter: fmt)
+        case .compound(let cmp):
+            geometry.adjust(measurement: measurement, compound: cmp)
+        case .date:
+            break
+        }
+    }
+    
+    
 }
 
 class DisplayContext {
@@ -157,7 +234,7 @@ class DisplayContext {
     //MARK: - Format ValueStats for Fields
     func measurementOld(field : Field, valueStats : ValueStats) -> Measurement<Dimension>? {
         switch field {
-        case .AltInd:
+        case .AltInd,.AltB:
             return self.measurement(altitude: valueStats)
         case .BaroA:
             return self.measurement(baro: valueStats)
@@ -195,15 +272,15 @@ class DisplayContext {
             return self.measurement(gallon: valueStats)
         case .E1_FFlow:
             return self.measurement(gph: valueStats)
-        case .E1_OilT:
+        case .E1_OilT,.E2_OilT:
             return self.measurement(valueStats)
-        case .E1_OilP:
+        case .E1_OilP,.E2_OilP:
             return self.measurement(valueStats)
         case .E1_MAP:
             return self.measurement(map: valueStats)
         case .E1_RPM:
             return self.measurement(valueStats)
-        case .E1_PctPwr:
+        case .E1_PctPwr,.E2_PctPwr:
             return self.measurement(percent: valueStats)
         case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
             return self.measurement(engineTemp: valueStats)
@@ -300,6 +377,8 @@ class DisplayContext {
             return nil
         case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
             return nil
+        case .E1_FPres,.E2_FPres:
+            return self.measurement(valueStats)
         }
     }
     
@@ -394,7 +473,7 @@ class DisplayContext {
     //MARK: - format stats
     func valueStatsMetric(for field : Field) -> ValueStats.Metric {
         switch field {
-        case .AltInd,.AltGPS,.AltMSL:
+        case .AltInd,.AltGPS,.AltMSL,.AltB:
             return .max
         case .BaroA:
             return .average
@@ -415,15 +494,15 @@ class DisplayContext {
         case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT:
             // could be .max-.min
             return .end
-        case .E1_FFlow,.E2_FFlow:
+        case .E1_FFlow,.E2_FFlow,.E1_FPres,.E2_FPres:
             return .average
-        case .E1_OilT,.E1_OilP:
+        case .E1_OilT,.E1_OilP,.E2_OilP,.E2_OilT:
             return .average
         case .E1_MAP,.E2_MAP:
             return .average
         case .E1_RPM,.E2_RPM:
             return .average
-        case .E1_PctPwr:
+        case .E1_PctPwr,.E2_PctPwr:
             return .average
         case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
             return .max
@@ -476,7 +555,7 @@ class DisplayContext {
 
     func displayUnit(for field : Field) -> Dimension? {
         switch field {
-        case .AltInd,.AltGPS,.AltMSL:
+        case .AltInd,.AltGPS,.AltMSL,.AltB:
             return UnitLength.feet
         case .BaroA:
             return self.baroUnit
@@ -501,15 +580,15 @@ class DisplayContext {
             return UnitVolume.aviationGallon
         case .E1_FFlow,.E2_FFlow:
             return UnitFuelFlow.gallonPerHour
-        case .E1_OilT:
+        case .E1_OilT,.E2_OilT:
             return UnitTemperature.fahrenheit
-        case .E1_OilP:
+        case .E1_OilP,.E2_OilP:
             return UnitPressure.poundsForcePerSquareInch
         case .E1_MAP,.E2_MAP:
             return UnitPressure.inchesOfMercury
         case .E1_RPM,.E2_RPM:
             return UnitAngularVelocity.revolutionsPerMinute
-        case .E1_PctPwr:
+        case .E1_PctPwr,.E2_PctPwr:
             return UnitPercent.percentPerHundred
         case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
             return UnitTemperature.fahrenheit
@@ -523,6 +602,8 @@ class DisplayContext {
             return UnitPercent.percentPerHundred
         case .E1_ITT,.E2_ITT:
             return UnitTemperature.celsius
+        case .E1_FPres,.E2_FPres:
+            return UnitPressure.poundsForcePerSquareInch
         case .HSIS,.HCDI,.VCDI:
             return UnitAngle.degrees
         case .MagVar:
@@ -558,6 +639,97 @@ class DisplayContext {
         }
     }
 
+    func displayedValue(field : Field, measurement : Measurement<Dimension>) -> DisplayedValue {
+        var measurement = measurement
+        if let preferredUnit = self.displayUnit(for: field) {
+            measurement.convert(to: preferredUnit)
+        }
+        
+        switch field {
+        case .AltInd,.AltGPS,.AltMSL,.AltB:
+             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .BaroA:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .OAT:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .IAS,.GndSpd,.VSpd,.TAS,.WndSpd:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .Pitch,.Roll,.HDG,.TRK,.CRS:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .WndDr,.WptBrg:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .WptDst:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .LatAc,.NormAc:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .amp1:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .volt1,.volt2:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT:
+            // could be .max-.min
+            return DisplayedValue(formatter: .measurement(Self.fuelFormatter), value: .measurement(measurement))
+        case .E1_FFlow,.E2_FFlow:
+            return DisplayedValue(formatter: .measurement(Self.fuelFormatter), value: .measurement(measurement))
+        case .E1_OilT,.E2_OilT:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_OilP,.E2_OilP:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_MAP,.E2_MAP:
+            return DisplayedValue(formatter: .measurement(Self.mapFormatter), value: .measurement(measurement))
+        case .E1_FPres,.E2_FPres:
+            return DisplayedValue(formatter: .measurement(Self.mapFormatter), value: .measurement(measurement))
+        case .E1_RPM,.E2_RPM:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_PctPwr,.E2_PctPwr:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_CHT1,.E1_CHT2,.E1_CHT3,.E1_CHT4,.E1_CHT5,.E1_CHT6:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_TIT1,.E1_TIT2:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_Torq,.E2_Torq:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E2_NG,.E1_NG:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_ITT,.E2_ITT:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .HSIS,.HCDI,.VCDI:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .MagVar:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .RollC,.PichC:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .RollM,.PitchM:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .VSpdG,.GPSfix,.HAL,.VAL,.HPLwas,.HPLfd,.VPLwas:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        
+        // Calculated
+        case .Distance:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .WndCross,.WndDirect:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_EGT_Max,.E1_CHT_Max:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .E1_EGT_Min,.E1_CHT_Min:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .Latitude:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .Longitude:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            
+        // Not numbers:
+        case .Unknown:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .AtvWpt,.NAV1,.NAV2,.COM1,.COM2:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        }
+    }
+    
     func measurement(_ valueStats : ValueStats) -> Measurement<Dimension> {
         return Measurement(value: valueStats.average, unit: UnitDimensionLess.scalar)
     }
