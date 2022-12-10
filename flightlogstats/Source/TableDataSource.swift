@@ -20,6 +20,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
         case attributedString(NSAttributedString)
         case numberWithUnit(GCNumberWithUnit,[NSAttributedString.Key:Any]?)
         case measurement(Measurement<Dimension>,MeasurementFormatter,[NSAttributedString.Key:Any]?)
+        case compoundMeasurement(Measurement<Dimension>,CompoundMeasurementFormatter<Dimension>,[NSAttributedString.Key:Any]?)
         
         init(string : String, attributes: [NSAttributedString.Key:Any] ) {
             self = .attributedString(NSAttributedString(string: string, attributes: attributes))
@@ -30,7 +31,11 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
         init(measurement: Measurement<Dimension>, formatter : MeasurementFormatter, attributes : [NSAttributedString.Key:Any]? = nil){
             self = .measurement(measurement, formatter, attributes)
         }
-        
+
+        init(measurement: Measurement<Dimension>, compound : CompoundMeasurementFormatter<Dimension>, attributes : [NSAttributedString.Key:Any]? = nil){
+            self = .compoundMeasurement(measurement, compound, attributes)
+        }
+
     }
     
     var indexPathSelectedCallback : IndexPathSelectedCallback? = nil
@@ -112,7 +117,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
             switch holder {
             case .attributedString(let attributedString):
                 return attributedString.size()
-            case .numberWithUnit,.measurement:
+            case .numberWithUnit,.measurement,.compoundMeasurement:
                 return self.geometries[indexPath.item].totalSize
             }
         }else{
@@ -153,7 +158,17 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MeasurementCollectionViewCell", for: indexPath)
                 if let nuCell = cell as? MeasurementCollectionViewCell {
                     nuCell.measurementView.measurement = me
-                    nuCell.measurementView.formatter = formatter
+                    nuCell.measurementView.formatter = MeasurementView.Formatter.measurement(formatter)
+                    nuCell.measurementView.geometry = self.geometries[indexPath.item]
+                    nuCell.measurementView.attributes = attr
+                }
+                self.setBackgroundColor(for: cell, itemAt: indexPath)
+                return cell
+            case .compoundMeasurement(let me, let comp, let attr):
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MeasurementCollectionViewCell", for: indexPath)
+                if let nuCell = cell as? MeasurementCollectionViewCell {
+                    nuCell.measurementView.measurement = me
+                    nuCell.measurementView.formatter = MeasurementView.Formatter.compound(comp)
                     nuCell.measurementView.geometry = self.geometries[indexPath.item]
                     nuCell.measurementView.attributes = attr
                 }

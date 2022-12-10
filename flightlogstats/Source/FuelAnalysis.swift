@@ -22,8 +22,6 @@ class FuelAnalysis {
     
     typealias Endurance = AircraftPerformance.Endurance
     
-    
-    
     let aircraft : AircraftPerformance
     let currentFuel : FuelQuantity
     let totalizerUsedFuel : FuelQuantity
@@ -40,6 +38,7 @@ class FuelAnalysis {
     }
     
     var targetSave : FuelQuantity { return self.aircraft.fuelMax - self.targetFuel }
+    var targetSaveMass : FuelMass { return FuelMass(avgas: self.targetSave) }
     
     var targetAdd  : FuelQuantity { return self.targetFuel - self.currentFuel }
     var targetAddTotalizer  : FuelQuantity { return self.targetFuel - self.currentFuelTotalizer }
@@ -47,10 +46,12 @@ class FuelAnalysis {
     var addedTotal : FuelQuantity  { return max(min(self.currentFuel + self.inputs.addedfuel,self.aircraft.fuelMax),self.currentFuel) }
     var addedFuel : FuelQuantity { return self.addedTotal - self.currentFuel }
     var addedSave : FuelQuantity { return self.aircraft.fuelMax - self.addedTotal }
+    var addedSaveMass : FuelMass { return FuelMass(avgas: self.addedSave) }
 
     var addedTotalTotalizer : FuelQuantity  { return max(min(self.currentFuelTotalizer + self.inputs.addedfuel,self.aircraft.fuelMax),self.currentFuelTotalizer) }
     var addedFuelTotalizer : FuelQuantity { return self.addedTotalTotalizer - self.currentFuelTotalizer }
     var addedSaveTotalizer : FuelQuantity { return self.aircraft.fuelMax - self.addedTotalTotalizer }
+    var addedSaveMassTotalizer : FuelMass { return FuelMass(avgas: self.addedSaveTotalizer) }
     
     var currentEndurance : Endurance { return self.aircraft.endurance(fuel: self.currentFuel) }
     var addedTotalEndurance : Endurance { return self.aircraft.endurance(fuel: self.addedTotal ) }

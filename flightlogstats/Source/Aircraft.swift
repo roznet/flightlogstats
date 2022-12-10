@@ -35,8 +35,8 @@ class Aircraft: NSManagedObject {
     
     var aircraftPerformance : AircraftPerformance {
         get {
-            return AircraftPerformance(fuelMax: FuelQuantity(total: self.fuel_max, unit: Settings.fuelStoreUnit),
-                                       fuelTab: FuelQuantity(total: self.fuel_tab, unit: Settings.fuelStoreUnit),
+            return AircraftPerformance(fuelMax: FuelTanks(total: self.fuel_max, unit: Settings.fuelStoreUnit),
+                                       fuelTab: FuelTanks(total: self.fuel_tab, unit: Settings.fuelStoreUnit),
                                        gph: self.gph )
         }
         set {

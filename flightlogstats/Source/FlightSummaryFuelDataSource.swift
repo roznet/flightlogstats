@@ -39,6 +39,8 @@ class FlightSummaryFuelDataSource: TableDataSource {
         self.cellAttributes = ViewConfig.shared.cellAttributes
         self.titleAttributes = ViewConfig.shared.titleAttributes
         
+        let formatter = self.displayContext.measurementFormatter(for: .FQtyT)
+
         for title in [ "Fuel", "Total", "Left", "Right", "Totalizer" ] {
             self.cellHolders.append(CellHolder(string: title, attributes: self.titleAttributes))
             let geometry = RZNumberWithUnitGeometry()
@@ -49,6 +51,7 @@ class FlightSummaryFuelDataSource: TableDataSource {
             geometry.alignment = .center
             self.geometries.append(geometry)
         }
+        
         for (name,fuel,totalizer) in [("Start", self.flightSummary.fuelStart,self.flightSummary.fuelStart),
                                       ("End", self.flightSummary.fuelEnd,self.flightSummary.fuelStart-self.flightSummary.fuelTotalizer),
                                       ("Used", self.flightSummary.fuelUsed,self.flightSummary.fuelTotalizer)
@@ -59,7 +62,7 @@ class FlightSummaryFuelDataSource: TableDataSource {
                 if fuelVal.value != 0.0 {
                     let measurement = fuelVal.measurementDimension
                     // pick one fuel field, should be all the same
-                    let formatter = self.displayContext.measurementFormatter(for: .FQtyT)
+                    
                     self.geometries[geoIndex].adjust(measurement: measurement, formatter: formatter)
                     self.cellHolders.append(CellHolder(measurement: measurement, formatter: formatter))
                 }else{

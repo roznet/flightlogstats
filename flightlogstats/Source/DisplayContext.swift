@@ -50,7 +50,15 @@ class DisplayContext {
     
     //MARK: - format model objets
     
-    private static let decimalFormatter : NumberFormatter = {
+    public static let enduranceFormatter : MeasurementFormatter = {
+        let rv = MeasurementFormatter()
+        rv.numberFormatter.minimumFractionDigits = 1
+        rv.numberFormatter.maximumFractionDigits = 1
+        rv.unitOptions = .providedUnit
+        return rv
+    }()
+    
+    public static let decimalFormatter : NumberFormatter = {
         let rv = NumberFormatter()
         rv.maximumFractionDigits = 1
         rv.minimumFractionDigits = 1
@@ -66,10 +74,11 @@ class DisplayContext {
         return formatter.format(from: Measurement(value: interval, unit: UnitDuration.seconds))
     }
     
-    private static let coumpoundHHMMFormatter :  CompoundMeasurementFormatter<Dimension> = {
+    public static let coumpoundHHMMFormatter :  CompoundMeasurementFormatter<Dimension> = {
         var rv = CompoundMeasurementFormatter<Dimension>(dimensions: [UnitDuration.hours, UnitDuration.minutes, UnitDuration.seconds], separator: ":")
         rv.joinStyle = .noUnits
         rv.numberFormatter.minimumIntegerDigits = 2
+        rv.numberFormatter.maximumFractionDigits = 0
         rv.minimumComponents = 2
         return rv
     }()

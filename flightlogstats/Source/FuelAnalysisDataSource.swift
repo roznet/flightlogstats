@@ -29,6 +29,7 @@ class FuelAnalysisDataSource: TableDataSource {
         self.flightSummary = flightSummary
         self.flightLogViewModel = flightViewModel
         self.displayContext = DisplayContext()
+        self.fuelFormatter = self.displayContext.measurementFormatter(for: .FQtyT)
         
         super.init(rows: 0, columns: self.columnsHeaders.count, frozenColumns: 1, frozenRows: 1)
     }
@@ -44,9 +45,10 @@ class FuelAnalysisDataSource: TableDataSource {
         }
         self.rowsCount += 1
     }
+
+    private var fuelFormatter : MeasurementFormatter
     
-    static let formatter : MeasurementFormatter = { let formatter = MeasurementFormatter(); formatter.unitStyle = .medium; formatter.unitOptions = .providedUnit; return formatter }()
-    func addLine(name : String, fuel : FuelQuantity, totalizer : FuelQuantity, unit : UnitVolume) {
+    func addLine<UnitType>(name : String, fuel : FuelTanks<UnitType>, totalizer : FuelTanks<UnitType>, unit : UnitType) {
         
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
         var geoIndex = 1
@@ -57,9 +59,9 @@ class FuelAnalysisDataSource: TableDataSource {
             if measurement.value == 0.0 {
                 self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
             }else{
-                self.geometries[geoIndex].adjust(measurement: measurement, formatter: Self.formatter)
+                self.geometries[geoIndex].adjust(measurement: measurement, formatter: self.fuelFormatter)
                 let newmeasurement : Measurement<Dimension> = Measurement(value: measurement.value, unit: measurement.unit as Dimension)
-                self.cellHolders.append(CellHolder(measurement: newmeasurement, formatter: Self.formatter))
+                self.cellHolders.append(CellHolder(measurement: newmeasurement, formatter: self.fuelFormatter))
             }
             geoIndex += 1
         }
@@ -68,17 +70,18 @@ class FuelAnalysisDataSource: TableDataSource {
     
     func addLine(name : String, endurance  : Endurance, totalizer : Endurance) {
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
-        let nu = endurance.numberWithUnit.convert(to: GCUnit.hobbshour())
-        let nuT = totalizer.numberWithUnit.convert(to: GCUnit.hobbshour())
         
-        self.cellHolders.append(CellHolder(numberWithUnit: nu))
-        self.geometries[1].adjust(for: nu)
+        let measurement = Measurement(value: endurance, unit: UnitDuration.seconds).measurementDimension
+        let measurementT = Measurement(value: totalizer, unit: UnitDuration.seconds).measurementDimension
+        
+        self.cellHolders.append(CellHolder(measurement: measurement, compound: DisplayContext.coumpoundHHMMFormatter))
+        self.geometries[1].adjust(measurement: measurement, compound: DisplayContext.coumpoundHHMMFormatter)
         
         self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
         self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
         
-        self.cellHolders.append(CellHolder(numberWithUnit: nuT))
-        self.geometries[4].adjust(for: nuT)
+        self.cellHolders.append(CellHolder(measurement: measurementT, compound: DisplayContext.coumpoundHHMMFormatter))
+        self.geometries[4].adjust(measurement: measurementT, compound: DisplayContext.coumpoundHHMMFormatter)
         
         self.rowsCount += 1
     }
@@ -93,6 +96,9 @@ class FuelAnalysisDataSource: TableDataSource {
         if let displayContext = self.flightLogViewModel?.displayContext {
             self.displayContext = displayContext
         }
+        
+        // update if settings changed
+        self.fuelFormatter = self.displayContext.measurementFormatter(for: .FQtyT)
         
         if let aircraft = self.flightLogViewModel?.aircraft,
            let inputs = self.flightLogViewModel?.fuelAnalysisInputs,
@@ -134,6 +140,8 @@ class FuelAnalysisDataSource: TableDataSource {
                 self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
             
+            self.addLine(name: "Target Mass Save", fuel: fuelAnalysis.targetSaveMass, totalizer: fuelAnalysis.addedSaveMassTotalizer, unit: UnitMass.kilograms )
+            
             self.addLine(name: "Target Endurance", endurance: fuelAnalysis.targetEndurance, totalizer: fuelAnalysis.targetEndurance)
             self.addLine(name: "Target Lost Endurance", endurance: fuelAnalysis.targetLostEndurance, totalizer: fuelAnalysis.targetLostEndurance)
             self.addSeparator()
@@ -152,6 +160,7 @@ class FuelAnalysisDataSource: TableDataSource {
             ] {
                 self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
             }
+            self.addLine(name: "New Mass Save", fuel: fuelAnalysis.addedSaveMass, totalizer: fuelAnalysis.addedSaveMassTotalizer, unit: UnitMass.kilograms )
             self.addLine(name: "New Endurance", endurance: fuelAnalysis.addedTotalEndurance, totalizer: fuelAnalysis.addedTotalEnduranceTotalizer)
             self.addLine(name: "Lost Endurance", endurance: fuelAnalysis.addedLostEndurance, totalizer: fuelAnalysis.addedLostEnduranceTotalizer)
         }

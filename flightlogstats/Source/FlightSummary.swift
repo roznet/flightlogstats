@@ -77,9 +77,9 @@ struct FlightSummary : Codable {
         }
         self.engineOn = nil
         
-        self.fuelStart = FuelQuantity(left: info.start_fuel_quantity_left, right: info.start_fuel_quantity_right)
-        self.fuelEnd = FuelQuantity(left: info.end_fuel_quantity_left, right: info.end_fuel_quantity_right)
-        self.fuelTotalizer = FuelQuantity(total: info.fuel_totalizer_total)
+        self.fuelStart = FuelQuantity(left: info.start_fuel_quantity_left, right: info.start_fuel_quantity_right, unit: Settings.fuelStoreUnit)
+        self.fuelEnd = FuelQuantity(left: info.end_fuel_quantity_left, right: info.end_fuel_quantity_right, unit: Settings.fuelStoreUnit)
+        self.fuelTotalizer = FuelQuantity(total: info.fuel_totalizer_total, unit: Settings.fuelStoreUnit)
         
         self.distanceInNm = info.total_distance
         self.altitudeInFeet = info.max_altitude
@@ -140,9 +140,9 @@ struct FlightSummary : Codable {
         let fuel_end_r = values.last(field: .FQtyR)?.value ?? 0.0
         let fuel_totalizer = values.last(field: .FTotalizerT)?.value ?? 0.0
         
-        self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r)
-        self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r)
-        self.fuelTotalizer = FuelQuantity(total: fuel_totalizer)
+        self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r, unit: Settings.fuelStoreUnit)
+        self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r, unit: Settings.fuelStoreUnit)
+        self.fuelTotalizer = FuelQuantity(total: fuel_totalizer, unit: Settings.fuelStoreUnit)
         
         self.distanceInNm = values.last(field: .Distance)?.value ?? 0.0
         self.altitudeInFeet = values.max(for: .AltInd) ?? 0.0

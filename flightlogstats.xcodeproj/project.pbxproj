@@ -52,7 +52,7 @@
 		4264C23628267EDC00F40436 /* FlightLeg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23528267EDC00F40436 /* FlightLeg.swift */; };
 		4264C23828267F6600F40436 /* Waypoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23728267F6600F40436 /* Waypoint.swift */; };
 		4264C23A2826858700F40436 /* FlightSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C2392826858700F40436 /* FlightSummary.swift */; };
-		4264C23C282691EF00F40436 /* FuelQuantity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23B282691EF00F40436 /* FuelQuantity.swift */; };
+		4264C23C282691EF00F40436 /* FuelTanks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23B282691EF00F40436 /* FuelTanks.swift */; };
 		4264C23E2826922C00F40436 /* TimeRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23D2826922C00F40436 /* TimeRange.swift */; };
 		4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4268A0C328357E2600A3CB05 /* KnownAirports.swift */; };
 		4268A0C728357E6300A3CB05 /* KDTree in Frameworks */ = {isa = PBXBuildFile; productRef = 4268A0C628357E6300A3CB05 /* KDTree */; };
@@ -178,7 +178,7 @@
 		4264C23528267EDC00F40436 /* FlightLeg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLeg.swift; path = Source/FlightLeg.swift; sourceTree = "<group>"; };
 		4264C23728267F6600F40436 /* Waypoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Waypoint.swift; path = Source/Waypoint.swift; sourceTree = "<group>"; };
 		4264C2392826858700F40436 /* FlightSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightSummary.swift; path = Source/FlightSummary.swift; sourceTree = "<group>"; };
-		4264C23B282691EF00F40436 /* FuelQuantity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelQuantity.swift; path = Source/FuelQuantity.swift; sourceTree = "<group>"; };
+		4264C23B282691EF00F40436 /* FuelTanks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelTanks.swift; path = Source/FuelTanks.swift; sourceTree = "<group>"; };
 		4264C23D2826922C00F40436 /* TimeRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimeRange.swift; path = Source/TimeRange.swift; sourceTree = "<group>"; };
 		4268A0C328357E2600A3CB05 /* KnownAirports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KnownAirports.swift; path = Source/KnownAirports.swift; sourceTree = "<group>"; };
 		4268A0C82842851900A3CB05 /* ProgressReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReport.swift; path = Source/ProgressReport.swift; sourceTree = "<group>"; };
@@ -524,7 +524,7 @@
 			isa = PBXGroup;
 			children = (
 				4264C23728267F6600F40436 /* Waypoint.swift */,
-				4264C23B282691EF00F40436 /* FuelQuantity.swift */,
+				4264C23B282691EF00F40436 /* FuelTanks.swift */,
 				4268A0C328357E2600A3CB05 /* KnownAirports.swift */,
 				4239290C2864D08800CD33C0 /* AircraftPerformance.swift */,
 				4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */,
@@ -788,7 +788,7 @@
 				4264C2342825B58F00F40436 /* Settings.swift in Sources */,
 				421EE5C12928E01E00996EC6 /* FlightLogFileExport.swift in Sources */,
 				42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */,
-				4264C23C282691EF00F40436 /* FuelQuantity.swift in Sources */,
+				4264C23C282691EF00F40436 /* FuelTanks.swift in Sources */,
 				4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */,
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
