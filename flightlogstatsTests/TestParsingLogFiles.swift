@@ -73,7 +73,7 @@ class TestParsingLogFiles: XCTestCase {
         if let engineOn = speedPower.dropFirst(field: .E1_PctPwr, matching: { $0 > 0 }),
            let moving = engineOn.dropFirst(field: .GndSpd,matching: { $0 > 0 }) {
             XCTAssertLessThan(engineOn.count, data.count)
-            XCTAssertLessThan(moving.count, engineOn.count)
+            XCTAssertLessThanOrEqual(moving.count, engineOn.count)
         }else{
             XCTAssertTrue(false)
         }
@@ -83,21 +83,23 @@ class TestParsingLogFiles: XCTestCase {
         let maxindex = data.categoricalDataFrame()
         
         XCTAssertGreaterThan(engine.count, 0)
-        for idx in 0..<engine.count {
-            let x = engine.row(at: idx)
-            let y = maxindex.row(at: idx)
-            let cyls = [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6].map({ x[$0] ?? 0.0 })
-            let max = cyls.max() ?? 0.0
-            let maxidx = Int(cyls.firstIndex(of: max) ?? cyls.count) + 1
-            
-            if max.isFinite {
-                XCTAssertEqual(max,x[.E1_EGT_Max])
-                XCTAssertEqual("\(maxidx)", y[.E1_EGT_MaxIdx], "mismatch for idx=\(idx) date=\(engine.indexes[idx])" )
-            }else{
-                XCTAssertEqual(y[.E1_EGT_MaxIdx], "")
+        let cylsFields : [FlightLogFile.Field] = [.E1_EGT1,.E1_EGT2,.E1_EGT3,.E1_EGT4,.E1_EGT5,.E1_EGT6]
+        if engine.has(fields: cylsFields) {
+            for idx in 0..<engine.count {
+                let x = engine.row(at: idx)
+                let y = maxindex.row(at: idx)
+                let cyls = cylsFields.map({ x[$0] ?? 0.0 })
+                let max = cyls.max() ?? 0.0
+                let maxidx = Int(cyls.firstIndex(of: max) ?? cyls.count) + 1
+                
+                if max.isFinite {
+                    XCTAssertEqual(max,x[.E1_EGT_Max])
+                    XCTAssertEqual("\(maxidx)", y[.E1_EGT_MaxIdx], "mismatch for idx=\(idx) date=\(engine.indexes[idx])" )
+                }else{
+                    XCTAssertEqual(y[.E1_EGT_MaxIdx], "")
+                }
             }
         }
-        
         let wind = data.doubleDataFrame(for: [.WndDirect,.WndCross,.WndSpd,.WndDr, .CRS])
         
         for idx in 0..<wind.count {
