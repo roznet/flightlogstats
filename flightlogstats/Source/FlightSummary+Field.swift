@@ -27,6 +27,23 @@ extension FlightSummary {
         case Flying
         case Moving
         
+        
+        var equivalentLogField : FlightLogFile.Field {
+            switch self {
+            case .FuelStart: return .FQtyT
+            case .FuelEnd: return .FQtyT
+            case .FuelUsed: return .FQtyT
+            case .FuelTotalizer: return .FTotalizerT
+            case .GpH: return .E1_FFlow
+            case .NmpG: return .Distance
+            case .Distance: return .Distance
+            case .Altitude: return .AltMSL
+            case .Hobbs: return .Lcl_Time
+            case .Flying: return .Lcl_Time
+            case .Moving: return .Lcl_Time
+            case .GroundSpeed: return .GndSpd
+            }
+        }
     }
     
     func measurement(for field : Field) -> Measurement<Dimension>? {

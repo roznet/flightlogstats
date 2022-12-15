@@ -305,6 +305,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     //MARK: - build list functionality
     
     func buildList() {
+        Logger.ui.info( "aircrafts \(self.logFileOrganizer.aircraftSystemIds)")
+        
         if self.filterEmpty {
             AppDelegate.worker.async {
                 self.fullLogInfoList = self.logFileOrganizer.nonEmptyLogFileInfos

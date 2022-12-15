@@ -62,7 +62,7 @@ E1 EGT6,165,deg F,E1 EGT6,,value
 E1 Torq,170,ft lbs,E1 Torq,,value
 E1 NG,171,%,E1 NG,,value
 E1 ITT,172,deg C,E1 ITT,,value
-E1 Fpres,175,psi,,,value
+E1 FPres,175,psi,,,value
 HCDI,200,fsd,CDI deflection,,value
 VCDI,201,fsd,VDI/GP/GS deflection,,value
 MagVar,202,deg,Magnetic variation ,degrees,value

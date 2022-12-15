@@ -197,7 +197,6 @@ class DisplayContext {
     ///   - since: the beginning of the period that date is relevant, for example in a leg that would be the start the leg
     ///   - reference: This is the reference date of which to compute general elapsed, typically the first date of the log
     /// - Returns: formatted date according to the convention
-    @available(*, deprecated, message: "Use measurement and formatter")
     func format(time : Date, since : Date? = nil, reference : Date? = nil) -> String {
         switch self.dateStyle {
         case .elapsed:
@@ -217,7 +216,6 @@ class DisplayContext {
         }
     }
 
-    @available(*, deprecated, message: "Use measurement and formatter")
     func format(date : Date) -> String {
         return self.dateFormatter.string(from: date)
     }
@@ -435,7 +433,7 @@ class DisplayContext {
         return rv
     }()
 
-    private static var defaultFormatter : MeasurementFormatter = {
+    public static var defaultFormatter : MeasurementFormatter = {
         let formatter = MeasurementFormatter()
         formatter.unitOptions = .providedUnit
         formatter.unitStyle = .short
@@ -465,6 +463,8 @@ class DisplayContext {
             return Self.fuelFormatter
         case .E1_MAP,.E2_MAP:
             return Self.mapFormatter
+        case .Lcl_Time:
+            return Self.enduranceFormatter
         default:
             return Self.defaultFormatter
         }

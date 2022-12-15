@@ -44,80 +44,101 @@ struct Trip {
         self.label = bucket.description
     }
     
-    private mutating func add(summary : FlightSummary){
-        for field in FlightSummary.Field.allCases {
-            if let nu = summary.measurement(for: field) {
-                if stats[field] == nil {
-                    stats[field] = ValueStats(measurement: nu)
-                }else{
-                    stats[field]?.update(measurement: nu)
+    var startingFlight : FlightLogFileInfo? { return self.flightLogFileInfos.last }
+    var endingFlight : FlightLogFileInfo? { return self.flightLogFileInfos.first }
+    
+    func isNewer(than other: Trip) -> Bool {
+        guard let otherstart = other.startingFlight else { return false }
+        return self.startingFlight?.isNewer(than: otherstart) ?? false
+    }
+    
+    func isOlder(than other: Trip) -> Bool {
+        guard let otherstart = other.startingFlight else { return false }
+        return self.startingFlight?.isOlder(than: otherstart) ?? false
+    }
+    
+    mutating func add(info : FlightLogFileInfo) {
+        if let summary = info.flightSummary {
+            for field in FlightSummary.Field.allCases {
+                if let nu = summary.measurement(for: field) {
+                    if stats[field] == nil {
+                        stats[field] = ValueStats(measurement: nu)
+                    }else{
+                        stats[field]?.update(measurement: nu)
+                    }
                 }
+            }
+
+            self.flightLogFileInfos.append(info)
+            self.flightLogFileInfos.sort {
+                $0.isNewer(than: $1)
             }
         }
     }
     
-    private mutating func add(base : Airport, info : FlightLogFileInfo) -> Bool {
-        var rv = false
+    private mutating func check(base : Airport, info : FlightLogFileInfo) -> CheckStatus {
+        var rv : CheckStatus = .sameTrip
         if let summary = info.flightSummary,
            let startAirport = summary.startAirport,
            let endAirport = summary.endAirport{
             
-            if let last = self.flightLogFileInfos.last {
+            if let last = self.endingFlight {
+                // special case, local flight should be new trip
+                if let lastStart = last.flightSummary?.startAirport,
+                   let lastEnd = last.flightSummary?.endAirport {
+                    // this is a local flight but last one wasn't, start new trip
+                    if lastStart == lastEnd && lastStart == base {
+                        if startAirport != endAirport  {
+                            rv = .startsTrip
+                        }
+                    }
+                }
+                
                 if last.isNewer(than: info) && startAirport == base{
-                    rv = true
+                    rv = .endsTrip
                 }
                 if !last.isNewer(than: info) && endAirport == base {
-                    rv = true
+                    rv = .endsTrip
                 }
-            }
-            
-            self.add(summary: summary)
-            
-            flightLogFileInfos.append(info)
-            flightLogFileInfos.sort {
-                $0.isNewer(than: $1)
             }
         }
         return rv
     }
     
-    private mutating func add(bucket : GCStatsDateBuckets, info : FlightLogFileInfo) -> Bool {
-        var rv = false
+    
+    private mutating func check(bucket : GCStatsDateBuckets, info : FlightLogFileInfo) -> CheckStatus {
+        var rv : CheckStatus = .sameTrip
         if let summary = info.flightSummary,
            let start = summary.hobbs?.start {
-            if self.self.flightLogFileInfos.count == 0 {
-                flightLogFileInfos.append(info)
-                bucket.bucket(start)
+            if bucket.contains(start) {
+                rv = .sameTrip
             }else{
-                if bucket.contains(start) {
-                    self.add(summary: summary)
-                    flightLogFileInfos.append(info)
-                    flightLogFileInfos.sort {
-                        $0.isNewer(than: $1)
-                    }
-                    
-                }else{
-                    rv = true
-                }
+                rv = .startsTrip
             }
         }
         
         return rv
     }
     
+    enum CheckStatus {
+        case sameTrip
+        case startsTrip
+        case endsTrip
+    }
+    
     /// Add the info to the trip
     /// - Parameter info: info to add
     /// - Returns: true if this info concludes the trip
-    mutating func add(info : FlightLogFileInfo) -> Bool {
+    mutating func check(info : FlightLogFileInfo) -> CheckStatus {
         switch aggregation {
         case .awayFromBase(let base):
-            return self.add(base: base, info: info)
+            return self.check(base: base, info: info)
         case .calendarUnit(let bucket):
-            return self.add(bucket: bucket, info: info)
+            return self.check(bucket: bucket, info: info)
         }
     }
-    
-    func next(info: FlightLogFileInfo) -> Trip? {
+
+    func new(info: FlightLogFileInfo) -> Trip? {
         switch self.aggregation {
         case .awayFromBase(let base):
             return Trip(base: base)
@@ -125,16 +146,13 @@ struct Trip {
             if let summary = info.flightSummary,
                let start = summary.hobbs?.start {
                 bucket.bucket(start)
-                var rv = Trip(bucket: bucket)
-                rv.add(summary: summary)
-                rv.flightLogFileInfos = [info]
-                return rv
+                return Trip(bucket: bucket)
             }
             return nil
         }
     }
     
-    func numberWithUnit(field : Field) -> Measurement<Dimension>? {
+    func measurement(field : Field) -> Measurement<Dimension>? {
         if let stats = self.stats[field] {
             switch field {
             case .FuelStart:
@@ -188,14 +206,20 @@ struct Trip {
 extension Trip : CustomStringConvertible {
     var description: String {
         var strs : [String] = [ "\(self.count) legs" ]
+        strs.append(contentsOf: self.flightLogFileInfos.compactMap( { $0.start_airport_icao} ).reversed() )
+        if let end = self.flightLogFileInfos.first?.end_airport_icao {
+            strs.append(end)
+        }
+            
         if let date = self.flightLogFileInfos.last?.start_time {
             strs.append(date.formatted(date: .abbreviated, time: .omitted))
         }
-        if let time = self.numberWithUnit(field: .Hobbs) {
-            strs.append(time.description)
+        if let time = self.measurement(field: .Hobbs) {
+            
+            strs.append(DisplayContext.enduranceFormatter.string(from: time))
         }
-        if let distance = self.numberWithUnit(field: .Distance) {
-            strs.append(distance.description)
+        if let distance = self.measurement(field: .Distance) {
+            strs.append(DisplayContext.defaultFormatter.string(from: distance))
         }
         let desc = strs.joined(separator: ", ")
         return "Trip(\(desc))"

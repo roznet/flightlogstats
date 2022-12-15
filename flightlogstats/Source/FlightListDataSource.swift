@@ -69,14 +69,14 @@ class FlightListDataSource: TableDataSource  {
             geometry.numberAlignment = .right
             geometry.unitAlignment = .left
             geometry.alignment = .left
+            if field.equivalentLogField == .Lcl_Time {
+                geometry.unitAlignment = .hide
+            }
             self.geometries.append(geometry)
             self.cellHolders.append(CellHolder(string: field.rawValue, attributes: titleAttributes))
         }
         row += 1
         var tripIndex : Int = 0
-        let formatter = MeasurementFormatter()
-        formatter.unitOptions = .providedUnit
-        
         for trip in trips.trips {
             for info in trip.flightLogFileInfos {
                 if let summary = info.flightSummary, let hobbs = summary.hobbs {
@@ -88,6 +88,7 @@ class FlightListDataSource: TableDataSource  {
                     var geoIndex = self.headers.count
                     for field in fields {
                         if let measurement = summary.measurement(for: field) {
+                            let formatter = self.displayContext.measurementFormatter(for: field.equivalentLogField)
                             geometries[geoIndex].adjust(measurement: measurement, formatter: formatter)
                             self.cellHolders.append(CellHolder(measurement: measurement, formatter: formatter))
                         }else{
@@ -110,7 +111,8 @@ class FlightListDataSource: TableDataSource  {
             var geoIndex = self.headers.count
             
             for field in fields {
-                if let nu = trip.numberWithUnit(field: field) {
+                if let nu = trip.measurement(field: field) {
+                    let formatter = self.displayContext.measurementFormatter(for: field.equivalentLogField)
                     geometries[geoIndex].adjust(measurement: nu, formatter: formatter, numberAttribute: titleAttributes)
                     self.cellHolders.append(CellHolder(measurement: nu, formatter: formatter, attributes: titleAttributes))
                 }else{

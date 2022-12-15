@@ -224,6 +224,10 @@ class FlightLogFileInfo: NSManagedObject {
         return self.log_file_name! > other.log_file_name!
     }
     
+    func isOlder(than other : FlightLogFileInfo) -> Bool {
+        return self.log_file_name! < other.log_file_name!
+    }
+    
     var isEmpty : Bool {
         if let elapsed = self.flightSummary?.flying?.elapsed,
            let distance = self.flightSummary?.distanceInNm {

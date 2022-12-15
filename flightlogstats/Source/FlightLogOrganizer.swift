@@ -111,6 +111,14 @@ class FlightLogOrganizer {
         }
     }
 
+    //MARK: - Aircraft management
+    
+    func aircraft(systemId : SystemId) -> Aircraft? {
+        return self.managedAircrafts[systemId]
+    }
+    
+    var aircraftSystemIds : [SystemId] { return Array(self.managedAircrafts.keys) }
+    
     //MARK: - Progress management
     var progress : ProgressReport? = nil
 
@@ -136,7 +144,8 @@ class FlightLogOrganizer {
     private let queue = OperationQueue()
 
     /// managed aircrafts keyed of system_id
-    private var managedAircrafts : [String:Aircraft] = [:]
+    typealias SystemId = AvionicsSystem.SystemId
+    private var managedAircrafts : [SystemId:Aircraft] = [:]
     
     private var flightLogFileList : FlightLogFileList {
         let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )

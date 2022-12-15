@@ -9,7 +9,7 @@ import Foundation
 import RZFlight
 import RZUtils
 import RZUtilsSwift
-
+import OSLog
 
 class Trips {
     
@@ -52,23 +52,40 @@ class Trips {
     }
     
     func computeTrips(first : Trip) {
-        var trips : [ Trip ] = []
+        var trips : [Trip] = []
         var trip : Trip = first
         
-        for info in self.flightFileInfos {
-            if trip.add(info: info) {
+        // go from first to last trip
+        for info in self.flightFileInfos.sorted(by: { $0.isOlder(than: $1) } ) {
+            switch trip.check(info: info) {
+            case .endsTrip:
+                trip.add(info: info)
                 trips.append(trip)
-                if let next = trip.next(info: info) {
+                Logger.app.info("Ended trip : \(trip.description)")
+                if let next = trip.new(info: info) {
                     trip = next
                 }else{
-                    // no more
                     break
                 }
+            case .startsTrip:
+                trips.append(trip)
+                Logger.app.info("Ended trip : \(trip.description)")
+                if let next = trip.new(info: info) {
+                    trip = next
+                    trip.add(info: info)
+                }else{
+                    break
+                }
+            case .sameTrip:
+                trip.add(info: info)
             }
         }
         if !trip.empty {
+            Logger.app.info("Ended trip : \(trip.description)")
             trips.append(trip)
         }
+    
+        trips.sort { $0.isNewer(than: $1)}
         
         self.trips = trips
     }

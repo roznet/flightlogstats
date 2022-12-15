@@ -10,17 +10,18 @@ import OSLog
 import CoreData
 
 class AvionicsSystem : CustomStringConvertible, Codable {
+    typealias SystemId = String
     
     let info : [String:String]
     let aircraftIdentifier : String
     let airframeName : String
-    let systemId : String
+    let systemId : SystemId
     
     var description: String { return "Avionics(\(systemId),\(aircraftIdentifier),\(airframeName))" }
     
     var uniqueFileName : String { return "sys_\(systemId).json" }
     
-    init(aircraftIdentifier : String, airframeName : String, systemId : String) {
+    init(aircraftIdentifier : String, airframeName : String, systemId : SystemId) {
         self.airframeName = airframeName
         self.aircraftIdentifier = aircraftIdentifier
         self.systemId = systemId
