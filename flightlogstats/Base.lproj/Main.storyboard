@@ -1178,10 +1178,12 @@
                                 <rect key="frame" x="0.0" y="576.5" width="834" height="60"/>
                                 <subviews>
                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="5cU-4P-yg2">
-                                        <rect key="frame" x="0.0" y="14.5" width="191" height="32"/>
+                                        <rect key="frame" x="0.0" y="14.5" width="383" height="32"/>
                                         <segments>
                                             <segment title="Waypoints"/>
                                             <segment title="Flight Phase"/>
+                                            <segment title="Comms"/>
+                                            <segment title="Auto Pilot"/>
                                         </segments>
                                         <connections>
                                             <action selector="segmentChanged:" destination="9Nf-CY-m6R" eventType="valueChanged" id="pBG-De-SuF"/>

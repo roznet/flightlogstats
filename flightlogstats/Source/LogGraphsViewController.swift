@@ -30,6 +30,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     enum LegDisplayType {
         case waypoints
         case phasesOfFlight
+        case comm
+        case autopilot
     }
     
     enum GraphStyle {
@@ -38,16 +40,22 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         case scatterPlot
     }
     
-    var legDisplayType : LegDisplayType = .waypoints
+    var legDisplayType : LegDisplayType = .waypoints { didSet {
+        switch self.legDisplayType {
+        case .phasesOfFlight:
+            self.flightLogViewModel?.legsByFields = [.FltPhase]
+        case .waypoints:
+            self.flightLogViewModel?.legsByFields = [.AtvWpt]
+        case .comm:
+            self.flightLogViewModel?.legsByFields = [.COM1,.COM2]
+        case .autopilot:
+            self.flightLogViewModel?.legsByFields = [.AfcsOn,.RollM,.PitchM]
+        }
+    }}
     var graphDisplayType : GraphStyle = .singleGraph
     
     var useLegsDataSource : FlightLegsDataSource?  {
-        switch self.legDisplayType {
-        case .waypoints:
-            return self.flightLogViewModel?.legsDataSource
-        case .phasesOfFlight:
-            return self.flightLogViewModel?.phasesOfFlightDataSource
-        }
+        return self.flightLogViewModel?.legsDataSource
     }
     
     override func viewDidLoad() {
@@ -114,9 +122,18 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         if self.legTypeSegment == sender {
             if self.legTypeSegment.selectedSegmentIndex == 0 {
                 self.legDisplayType = .waypoints
-            }else{
+            }else if self.legTypeSegment.selectedSegmentIndex == 1 {
                 self.legDisplayType = .phasesOfFlight
+            }else if self.legTypeSegment.selectedSegmentIndex == 2 {
+                self.legDisplayType = .comm
+            }else if self.legTypeSegment.selectedSegmentIndex == 3 {
+                self.legDisplayType = .autopilot
             }
+            // may have to rebuild
+            AppDelegate.worker.async {
+                self.flightLogViewModel?.build()
+            }
+            
             self.updateUI()
         }else if self.graphTypeSegment == sender {
             if sender.selectedSegmentIndex == 0 {

@@ -91,18 +91,33 @@ public class FlightLogFile {
 extension FlightLogFile {
     
     var phasesOfFLight : [FlightLeg] {
-        var rv : [FlightLeg] = []
-        if let flyingStart = self.flightSummary?.flying?.start, let data = self.data {
-            rv = FlightLeg.legs(from: data, byfields: [.FltPhase], start: flyingStart)
-            //rv = FlightLeg.legs(from: data, start: flyingStart, byfields: [.AfcsOn,.RollM,.PitchM])
-            //rv = FlightLeg.legs(from: data, interval: 60.0*5.0, start: flyingStart)
-        }
-        return rv
+        return self.legs(byfields: [.FltPhase])
     }
     
     func meta(key : MetaField) -> String? {
         self.parse()
         return self.data?.meta[key]
+    }
+    
+    func legs(interval : TimeInterval) -> [FlightLeg] {
+        var rv : [FlightLeg] = []
+        if let flyingStart = self.flightSummary?.flying?.start, let data = self.data {
+            rv = FlightLeg.legs(from: data, interval: interval, start: flyingStart)
+        }
+        return rv
+    }
+    
+    func legs(byfields : [Field]) -> [FlightLeg] {
+        // byfields examples:
+        //    [.FltPhase] phases of flights
+        //    [.AfcsOn,.RollM,.PitchM] auto pilot settings
+        //rv = FlightLeg.legs(from: data, interval: 60.0*5.0, start: flyingStart)
+
+        var rv : [FlightLeg] = []
+        if let flyingStart = self.flightSummary?.flying?.start, let data = self.data {
+            rv = FlightLeg.legs(from: data, byfields:  byfields, start: flyingStart)
+        }
+        return rv
     }
     
     func updateFlightLogFileInfo(info : FlightLogFileInfo){

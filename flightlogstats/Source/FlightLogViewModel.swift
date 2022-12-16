@@ -17,6 +17,7 @@ extension Notification.Name {
 }
 
 class FlightLogViewModel {
+    typealias Field = FlightLogFile.Field
     
     let flightLogFileInfo : FlightLogFileInfo
    
@@ -54,13 +55,13 @@ class FlightLogViewModel {
     var fuelAnalysisInputs : FuelAnalysis.Inputs { didSet { if oldValue != self.fuelAnalysisInputs { self.didWrite() } } }
     var fuelTargetUnit : UnitVolume { didSet { if oldValue != self.fuelTargetUnit { self.didWrite() } } }
     var fuelAddedUnit : UnitVolume { didSet { if oldValue != self.fuelAddedUnit { self.didWrite() } } }
+    var legsByFields : [Field] { didSet { if oldValue != self.legsByFields { self.didWrite() } } }
     
     // MARK: Outputs
     private(set) var legsDataSource : FlightLegsDataSource? = nil
     private(set) var fuelDataSource : FlightSummaryFuelDataSource? = nil
     private(set) var timeDataSource : FlightSummaryTimeDataSource? = nil
     private(set) var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
-    private(set) var phasesOfFlightDataSource : FlightLegsDataSource? = nil
     
     var fuelMaxTextLabel : String {
         let max = aircraft.fuelMax.converted(to: fuelTargetUnit)
@@ -110,6 +111,7 @@ class FlightLogViewModel {
         
         self.fuelTargetUnit = Settings.shared.unitTargetFuel
         self.fuelAddedUnit = Settings.shared.unitAddedFuel
+        self.legsByFields = [.AtvWpt]
     }
 
     func updateForSettings() {
@@ -152,17 +154,21 @@ class FlightLogViewModel {
                 self.fuelAnalysisDataSource = FuelAnalysisDataSource(flightSummary: summary, flightViewModel: self)
                 self.fuelAnalysisDataSource?.prepare()
                 
-                let legs = self.flightLogFileInfo.legs
-                if legs.count > 0 {
-                    let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: self.displayContext)
-                    self.legsDataSource = legsDataSource
+                // cheat/special case to save time, use precomputed
+                if self.legsByFields == [.AtvWpt] {
+                    let legs = self.flightLogFileInfo.legs
+                    if legs.count > 0 {
+                        let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: self.displayContext)
+                        self.legsDataSource = legsDataSource
+                    }else{
+                        self.legsDataSource = nil
+                    }
                 }else{
-                    self.legsDataSource = nil
-                }
-                if let phases = self.flightLogFileInfo.flightLog?.phasesOfFLight {
-                    self.phasesOfFlightDataSource = FlightLegsDataSource(legs: phases, displayContext: self.displayContext)
-                }else{
-                    self.phasesOfFlightDataSource = nil
+                    if let legs = self.flightLogFileInfo.flightLog?.legs(byfields: self.legsByFields) {
+                        self.legsDataSource = FlightLegsDataSource(legs: legs, displayContext: self.displayContext)
+                    }else{
+                        self.legsDataSource = nil
+                    }
                 }
             }
             NotificationCenter.default.post(name: .flightLogViewModelChanged, object: self)
