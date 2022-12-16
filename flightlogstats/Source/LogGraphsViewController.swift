@@ -9,8 +9,12 @@ import UIKit
 import OSLog
 import RZUtils
 import RZUtilsUniversal
+import MapKit
 
-class LogGraphsViewController: UIViewController, ViewModelDelegate {
+class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDelegate {
+
+    
+    @IBOutlet weak var mapView: MKMapView!
 
     @IBOutlet weak var graphView: GCSimpleGraphView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
@@ -25,7 +29,12 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     
     // start with two decent default
     var graphFields : [FlightLogFile.Field] = [.IAS, .AltInd]
-    var legSelected : FlightLeg? = nil
+    var selectedLeg : FlightLeg? = nil
+
+    private var mapViewOverlay : FlightDataMapOverlay? = nil
+    
+    var graphEnabled = true
+    var mapEnabled = true
     
     enum LegDisplayType {
         case waypoints
@@ -61,7 +70,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        self.mapView.delegate = self
     }
 
     
@@ -106,13 +115,13 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                let leg = self.legsDataSource?.leg(at: selected){
                 self.graphFields = self.graphFields.filter { $0 != field }
                 self.graphFields.append(field)
-                self.legSelected = leg
+                self.selectedLeg = leg
             }
             self.updateUI()
         }else{
             // just unselected row, remove highlight
-            if self.legSelected != nil {
-                self.legSelected = nil
+            if self.selectedLeg != nil {
+                self.selectedLeg = nil
                 self.updateUI()
             }
         }
@@ -157,9 +166,8 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
             if self.flightLogFileInfo?.flightSummary != nil {
                 DispatchQueue.main.async {
                     if self.legsCollectionView != nil {
-                        self.graphView.isHidden = false
-                        self.legsCollectionView.isHidden = false
                         
+                        self.legsCollectionView.isHidden = false
                         if let legsDataSource = self.useLegsDataSource {
                             self.legsDataSource = legsDataSource
                             self.legsCollectionView.dataSource = self.legsDataSource
@@ -175,16 +183,36 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
                             self.legsDataSource = nil
                         }
 
-                        if self.graphDisplayType == .scatterPlot {
-                            let ds = self.flightLogViewModel?.scatterDataSource(fields: self.graphFields.suffix(2))
-                            self.graphView.dataSource = ds
-                            self.graphView.displayConfig = ds
-                        }else{
-                            let ds = self.flightLogViewModel?.graphDataSource(fields: self.graphFields.suffix(self.graphDisplayType == .singleGraph ? 1 : 2), leg: self.legSelected)
-                            self.graphView.dataSource = ds
-                            self.graphView.displayConfig = ds
+                        self.graphView.isHidden = !self.graphEnabled
+                        if self.graphEnabled {
+                            if self.graphDisplayType == .scatterPlot {
+                                let ds = self.flightLogViewModel?.scatterDataSource(fields: self.graphFields.suffix(2))
+                                self.graphView.dataSource = ds
+                                self.graphView.displayConfig = ds
+                            }else{
+                                let ds = self.flightLogViewModel?.graphDataSource(fields: self.graphFields.suffix(self.graphDisplayType == .singleGraph ? 1 : 2), leg: self.selectedLeg)
+                                self.graphView.dataSource = ds
+                                self.graphView.displayConfig = ds
+                            }
+                            self.graphView.setNeedsDisplay()
                         }
-                        self.graphView.setNeedsDisplay()
+                        
+                        self.mapView.isHidden = !self.mapEnabled
+                        if self.mapEnabled {
+                            if let overlay = self.flightLogFileInfo?.flightLog?.mapOverlayView {
+                                if let oldOverlay = self.mapViewOverlay {
+                                    self.mapView.removeOverlay(oldOverlay)
+                                }
+                                if let selectedLeg = self.selectedLeg {
+                                    overlay.highlightTimeRange = selectedLeg.timeRange
+                                }else{
+                                    overlay.highlightTimeRange = nil
+                                }
+                                self.mapViewOverlay = overlay
+                                self.mapView.addOverlay(overlay)
+                                self.mapView.setVisibleMapRect(overlay.boundingMapRect, edgePadding: .init(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0), animated: true)
+                            }
+                        }
                         self.view.setNeedsDisplay()
                     }
                 }
@@ -211,6 +239,15 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate {
         DispatchQueue.main.async {
             self.updateUI()
         }
+    }
+
+    //MARK: - Mapview Delegate
+    
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if (overlay as? FlightDataMapOverlay) == self.mapViewOverlay {
+            return FlightDataMapOverlayView(overlay: overlay)
+        }
+        return MKOverlayRenderer()
     }
 
 }

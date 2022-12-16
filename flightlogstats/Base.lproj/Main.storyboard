@@ -1170,12 +1170,21 @@
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4M1-lB-EUH" customClass="GCSimpleGraphView">
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="r8C-3q-fsx" userLabel="Graph Map Stack View">
                                 <rect key="frame" x="0.0" y="24" width="834" height="552.5"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            </view>
-                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="5He-7J-abp">
-                                <rect key="frame" x="0.0" y="576.5" width="834" height="60"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4M1-lB-EUH" customClass="GCSimpleGraphView">
+                                        <rect key="frame" x="0.0" y="0.0" width="417" height="552.5"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                    </view>
+                                    <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oTf-lX-xiU">
+                                        <rect key="frame" x="417" y="0.0" width="417" height="552.5"/>
+                                        <standardMapConfiguration key="preferredConfiguration"/>
+                                    </mapView>
+                                </subviews>
+                            </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="5He-7J-abp" userLabel="Selector Stack View">
+                                <rect key="frame" x="0.0" y="571.5" width="834" height="60"/>
                                 <subviews>
                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="5cU-4P-yg2">
                                         <rect key="frame" x="0.0" y="14.5" width="383" height="32"/>
@@ -1206,7 +1215,7 @@
                                 </constraints>
                             </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="RIe-Tr-gEa" userLabel="Legs Collection View">
-                                <rect key="frame" x="0.0" y="636.5" width="834" height="492.5"/>
+                                <rect key="frame" x="0.0" y="631.5" width="834" height="497.5"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="Ouf-s9-dep" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
@@ -1283,17 +1292,17 @@
                         <viewLayoutGuide key="safeArea" id="W2e-Qs-i2X"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="4M1-lB-EUH" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" id="2F8-SF-plS"/>
-                            <constraint firstItem="4M1-lB-EUH" firstAttribute="top" secondItem="W2e-Qs-i2X" secondAttribute="top" id="3M6-31-sNB"/>
                             <constraint firstItem="W2e-Qs-i2X" firstAttribute="trailing" secondItem="5He-7J-abp" secondAttribute="trailing" id="DBU-yh-0pd"/>
                             <constraint firstItem="5He-7J-abp" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" id="DUc-oV-3et"/>
                             <constraint firstItem="W2e-Qs-i2X" firstAttribute="bottom" secondItem="RIe-Tr-gEa" secondAttribute="bottom" id="FOS-mY-xwr"/>
                             <constraint firstItem="RIe-Tr-gEa" firstAttribute="top" secondItem="5He-7J-abp" secondAttribute="bottom" id="M9o-sg-5cV"/>
-                            <constraint firstItem="4M1-lB-EUH" firstAttribute="height" secondItem="W2e-Qs-i2X" secondAttribute="height" multiplier="0.5" id="ODi-6K-rbF"/>
                             <constraint firstItem="RIe-Tr-gEa" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" id="X8U-Ix-Yh2"/>
+                            <constraint firstItem="r8C-3q-fsx" firstAttribute="top" secondItem="W2e-Qs-i2X" secondAttribute="top" id="XwQ-PU-sxI"/>
+                            <constraint firstItem="r8C-3q-fsx" firstAttribute="bottom" secondItem="5He-7J-abp" secondAttribute="top" constant="5" id="aTV-S8-LQx"/>
                             <constraint firstItem="W2e-Qs-i2X" firstAttribute="trailing" secondItem="RIe-Tr-gEa" secondAttribute="trailing" id="drB-Hq-JQs"/>
-                            <constraint firstItem="5He-7J-abp" firstAttribute="top" secondItem="4M1-lB-EUH" secondAttribute="bottom" id="mnv-Vu-K7c"/>
-                            <constraint firstItem="W2e-Qs-i2X" firstAttribute="trailing" secondItem="4M1-lB-EUH" secondAttribute="trailing" id="rZP-cF-84l"/>
+                            <constraint firstItem="r8C-3q-fsx" firstAttribute="leading" secondItem="W2e-Qs-i2X" secondAttribute="leading" id="jcE-9d-4kg"/>
+                            <constraint firstItem="r8C-3q-fsx" firstAttribute="trailing" secondItem="W2e-Qs-i2X" secondAttribute="trailing" id="nCy-Ai-dBs"/>
+                            <constraint firstItem="r8C-3q-fsx" firstAttribute="height" secondItem="W2e-Qs-i2X" secondAttribute="height" multiplier="0.5" id="vED-Up-Zez"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Graphs" image="chart.xyaxis.line" catalog="system" id="bRF-Na-7CO"/>
@@ -1302,6 +1311,7 @@
                         <outlet property="graphView" destination="4M1-lB-EUH" id="2CR-Z2-IkI"/>
                         <outlet property="legTypeSegment" destination="5cU-4P-yg2" id="mZU-jR-mgH"/>
                         <outlet property="legsCollectionView" destination="RIe-Tr-gEa" id="vBy-FA-dKQ"/>
+                        <outlet property="mapView" destination="oTf-lX-xiU" id="koB-pm-Cx1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eLc-8L-xlr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
