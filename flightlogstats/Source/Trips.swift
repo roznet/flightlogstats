@@ -51,40 +51,68 @@ class Trips {
         }
     }
     
+    func countAircrafts(message: String, infos : [FlightLogFileInfo]) {
+        var systems : [String:Int] = [:]
+        for info in infos {
+            let systemId = info.system_id ?? "Null"
+            systems[systemId, default: 0] += 1
+        }
+        Logger.app.info( "\(message) \(systems)" )
+    }
+    
     func computeTrips(first : Trip) {
         var trips : [Trip] = []
         var trip : Trip = first
         
         // go from first to last trip
-        for info in self.flightFileInfos.sorted(by: { $0.isOlder(than: $1) } ) {
-            switch trip.check(info: info) {
-            case .endsTrip:
-                trip.add(info: info)
-                trips.append(trip)
-                Logger.app.info("Ended trip : \(trip.description)")
-                if let next = trip.new(info: info) {
-                    trip = next
-                }else{
-                    break
-                }
-            case .startsTrip:
-                trips.append(trip)
-                Logger.app.info("Ended trip : \(trip.description)")
-                if let next = trip.new(info: info) {
-                    trip = next
+        var infos = self.flightFileInfos.sorted { $0.isOlder(than: $1) }
+        
+        var countGuard : Int = self.flightFileInfos.count + 1
+        
+        while countGuard > 0 && infos.count > 0 {
+            self.countAircrafts(message: "trip start", infos: infos)
+            countGuard -= 1
+            var leftOver : [FlightLogFileInfo] = []
+            let aircraftCheck = infos.first
+            for info in infos {
+                switch trip.check(info: info, sample: aircraftCheck) {
+                case .endsTrip:
                     trip.add(info: info)
-                }else{
+                    trips.append(trip)
+                    Logger.app.info("Ended trip : \(trip.description)")
+                    if let next = trip.new(info: info) {
+                        trip = next
+                    }else{
+                        break
+                    }
+                case .startsTrip:
+                    trips.append(trip)
+                    Logger.app.info("Ended trip : \(trip.description)")
+                    if let next = trip.new(info: info) {
+                        trip = next
+                        trip.add(info: info)
+                    }else{
+                        break
+                    }
+                case .sameTrip:
+                    trip.add(info: info)
+                case .ignore:
+                    leftOver.append(info)
                     break
                 }
-            case .sameTrip:
-                trip.add(info: info)
             }
+            if !trip.empty {
+                Logger.app.info("Ended trip : \(trip.description)")
+                trips.append(trip)
+                if let next = trip.new(){
+                    trip = next
+                }                
+            }
+            infos = leftOver.sorted { $0.isOlder(than: $1) }
         }
-        if !trip.empty {
-            Logger.app.info("Ended trip : \(trip.description)")
-            trips.append(trip)
+        if countGuard == 0 {
+            Logger.app.error("infinite loop guard hit")
         }
-    
         trips.sort { $0.isNewer(than: $1)}
         
         self.trips = trips

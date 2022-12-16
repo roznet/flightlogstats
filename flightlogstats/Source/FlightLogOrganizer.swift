@@ -187,16 +187,23 @@ class FlightLogOrganizer {
             let fetchedInfo : [FlightLogFileInfo] = try self.persistentContainer.viewContext.fetch(fetchRequest)
             var added = 0
             let existing = self.managedFlightLogs.count
+            var needSave = false
             for info in fetchedInfo {
                 if let filename = info.log_file_name {
                     if self.managedFlightLogs[filename] == nil {
                         added += 1
                         info.container = self
+                        if info.updateForKnownIssues() {
+                            needSave = true
+                        }
                         self.managedFlightLogs[filename] = info
                     }
                 }
             }
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
+            if needSave {
+                Logger.app.info("Found corrections to be done")
+            }
             Logger.app.info("Loaded \(fetchedInfo.count) Logs: existing \(existing) added \(added) ")
             self.updateInfo(count: 1)
         }catch{

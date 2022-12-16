@@ -161,6 +161,17 @@ class FlightLogFileInfo: NSManagedObject {
         
     }
 
+    func updateForKnownIssues() -> Bool {
+        var rv = false
+        if let system_id = self.system_id {
+            let noQuotes = system_id.replacingOccurrences(of: "\"", with: "")
+            if noQuotes != system_id {
+                self.system_id = noQuotes
+                rv = true
+            }
+        }
+        return rv
+    }
     
     func populate(for url : URL){
         let dateFormatter = DateFormatter()
@@ -219,6 +230,15 @@ class FlightLogFileInfo: NSManagedObject {
         return nil
     }
     //MARK: - Analysis
+    
+    func isSameAircraft(as other : FlightLogFileInfo) -> Bool {
+        guard
+            let thisSystem = self.system_id, let otherSystem = other.system_id
+        else {
+            return false
+        }
+        return thisSystem == otherSystem
+    }
     
     func isNewer(than other : FlightLogFileInfo) -> Bool {
         return self.log_file_name! > other.log_file_name!

@@ -77,12 +77,15 @@ struct Trip {
     }
     
     private mutating func check(base : Airport, info : FlightLogFileInfo) -> CheckStatus {
+        
         var rv : CheckStatus = .sameTrip
         if let summary = info.flightSummary,
            let startAirport = summary.startAirport,
            let endAirport = summary.endAirport{
             
             if let last = self.endingFlight {
+                guard last.isSameAircraft(as: info) else { return .ignore }
+                
                 // special case, local flight should be new trip
                 if let lastStart = last.flightSummary?.startAirport,
                    let lastEnd = last.flightSummary?.endAirport {
@@ -124,31 +127,36 @@ struct Trip {
         case sameTrip
         case startsTrip
         case endsTrip
+        case ignore
     }
     
     /// Add the info to the trip
     /// - Parameter info: info to add
+    /// - Parameter sample: sample of info in the trip to see if compatible
     /// - Returns: true if this info concludes the trip
-    mutating func check(info : FlightLogFileInfo) -> CheckStatus {
+    mutating func check(info : FlightLogFileInfo, sample : FlightLogFileInfo? = nil) -> CheckStatus {
         switch aggregation {
         case .awayFromBase(let base):
+            if let sample = sample, !sample.isSameAircraft(as: info) {
+                return .ignore
+            }
             return self.check(base: base, info: info)
         case .calendarUnit(let bucket):
             return self.check(bucket: bucket, info: info)
         }
     }
 
-    func new(info: FlightLogFileInfo) -> Trip? {
+    func new(info: FlightLogFileInfo? = nil) -> Trip? {
         switch self.aggregation {
         case .awayFromBase(let base):
             return Trip(base: base)
         case .calendarUnit(let bucket):
-            if let summary = info.flightSummary,
+            if let summary = info?.flightSummary,
                let start = summary.hobbs?.start {
                 bucket.bucket(start)
                 return Trip(bucket: bucket)
             }
-            return nil
+            return Trip(unit: bucket.calendarUnit, referenceDate: bucket.refOrNil)
         }
     }
     
