@@ -71,6 +71,9 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDel
         super.viewDidLoad()
 
         self.mapView.delegate = self
+        
+        self.mapView.isHidden = !self.mapEnabled
+        self.graphView.isHidden = !self.graphEnabled
     }
 
     

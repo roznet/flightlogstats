@@ -1182,6 +1182,7 @@
                                         <standardMapConfiguration key="preferredConfiguration"/>
                                     </mapView>
                                 </subviews>
+                                <variation key="heightClass=regular-widthClass=compact" axis="vertical"/>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="5He-7J-abp" userLabel="Selector Stack View">
                                 <rect key="frame" x="0.0" y="571.5" width="834" height="60"/>
