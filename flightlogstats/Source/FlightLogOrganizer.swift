@@ -383,7 +383,7 @@ class FlightLogOrganizer {
         var someNew : Int = 0
         self.progress?.update(state: .start, message: .updatingInfo)
         var index : Double = 0.0
-        var indexTotal : Double = Double(flightLogFileList.count)
+        let indexTotal : Double = Double(flightLogFileList.count)
         for flightLog in flightLogFileList.flightLogFiles {
             index += 1.0
             let filename = flightLog.name

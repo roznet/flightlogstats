@@ -364,7 +364,7 @@ class DisplayContext {
             return .average
         
         // Calculated
-        case .Distance:
+        case .Distance,.Elapsed:
             return .end
         case .WndCross,.WndDirect:
             return .average
@@ -454,6 +454,8 @@ class DisplayContext {
         // Calculated
         case .Distance:
             return UnitLength.nauticalMiles
+        case .Elapsed:
+            return UnitDuration.seconds
         case .WndCross,.WndDirect:
             return UnitSpeed.knots
         case .E1_EGT_Max,.E1_CHT_Max:
@@ -545,6 +547,8 @@ class DisplayContext {
         // Calculated
         case .Distance:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .Elapsed:
+            return DisplayedValue(formatter: .compound(Self.coumpoundHHMMFormatter), value: .measurement(measurement))
         case .WndCross,.WndDirect:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .E1_EGT_Max,.E1_CHT_Max:

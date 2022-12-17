@@ -109,7 +109,8 @@ extension FlightLogFile {
         
         // Calculated
         case FQtyT = "FQtyT"
-        case Distance = "Distance"
+        case Distance = "Distance" // in nauticalmiles
+        case Elapsed = "Elapsed"  // in seconds
         case WndDirect = "WndDirect"
         case WndCross  = "WndCross"
         case FTotalizerT = "FTotalizerT"

@@ -9,46 +9,6 @@ import Foundation
 import MapKit
 import RZData
 
-extension FlightData {
-    var boundingPoints : (northEast : CLLocationCoordinate2D, southWest : CLLocationCoordinate2D)? {
-        
-        var northEastPoint : CLLocationCoordinate2D? = nil
-        var southWestPoint : CLLocationCoordinate2D? = nil
-        
-        guard let column = self.coordinateDataFrame(for: [.Coordinate])[.Coordinate] else { return nil }
-        
-        for point in column {
-            let coord = point.value
-            if coord.longitude <= -180.0 {
-                continue
-            }
-
-            if let east = northEastPoint, let west = southWestPoint {
-                if coord.latitude > east.latitude {
-                    northEastPoint?.latitude = coord.latitude
-                }
-                if coord.longitude > east.longitude {
-                    northEastPoint?.longitude = coord.longitude
-                }
-                if coord.latitude < west.latitude {
-                    southWestPoint?.latitude = coord.latitude
-                }
-                if coord.longitude < west.longitude{
-                    southWestPoint?.longitude = coord.longitude
-                }
-            }else{
-                northEastPoint = coord
-                southWestPoint = coord
-            }
-        }
-        if let ne = northEastPoint, let sw = southWestPoint {
-            return (northEast: ne, southWest: sw)
-        }else{
-            return nil
-        }
-    }
-}
-
 extension MKMapRect {
     init(southWest : CLLocationCoordinate2D, northEast : CLLocationCoordinate2D) {
         let neMapPoint = MKMapPoint(northEast)
@@ -68,23 +28,84 @@ extension CLLocationCoordinate2D {
 class FlightDataMapOverlay : NSObject, MKOverlay {
     var coordinate: CLLocationCoordinate2D
     var boundingMapRect: MKMapRect
+    var highlightCoordinate: CLLocationCoordinate2D
+    var highlightMapRect : MKMapRect
 
     var coordinates : DataFrame<Date,CLLocationCoordinate2D,FlightLogFile.Field>.Column
     
-    var highlightTimeRange : TimeRange? = nil
+    var highlightTimeRange : TimeRange? = nil {
+        didSet { self.updateBounds() }
+    }
     var colorChange : [Date] = []
     
     init(data : FlightData) {
         self.coordinates = data.coordinateColumn
-        if let boundingPoints = data.boundingPoints {
-            self.boundingMapRect = MKMapRect(southWest: boundingPoints.southWest, northEast: boundingPoints.northEast)
-            self.coordinate = boundingPoints.southWest.halfWay(to: boundingPoints.northEast)
-        }else{
-            self.boundingMapRect = MKMapRect()
-            self.coordinate = CLLocationCoordinate2D()
+        
+        self.boundingMapRect = MKMapRect()
+        self.highlightMapRect = MKMapRect()
+        self.coordinate = CLLocationCoordinate2D()
+        self.highlightCoordinate = CLLocationCoordinate2D()
+
+        super.init()
+        
+        self.updateBounds()
+    }
+    
+    private func updateBounds() {
+        
+        var southWest : CLLocationCoordinate2D? = nil
+        var northEast : CLLocationCoordinate2D? = nil
+
+        var highlightSouthWest : CLLocationCoordinate2D? = nil
+        var highlightNorthEast : CLLocationCoordinate2D? = nil
+        
+        for point in coordinates {
+            let coord = point.value
+            if coord.longitude <= -180.0 || coord.latitude <= -180.0 {
+                continue
+            }
+
+            if southWest == nil {
+                southWest = coord
+                northEast = coord
+                
+                continue
+            }
+            
+            southWest = CLLocationCoordinate2D(latitude: min(southWest!.latitude,coord.latitude),
+                                               longitude: min(southWest!.longitude,coord.longitude))
+            northEast = CLLocationCoordinate2D(latitude: max(northEast!.latitude,coord.latitude),
+                                               longitude: max(northEast!.longitude,coord.longitude))
+
+            if let range = highlightTimeRange {
+                if (range.start <= point.index) && (point.index <= range.end) {
+                    if highlightSouthWest == nil {
+                        highlightSouthWest = coord
+                        highlightNorthEast = coord
+                    }else{
+                        highlightSouthWest = CLLocationCoordinate2D(latitude: min(highlightSouthWest!.latitude,coord.latitude),
+                                                                    longitude: min(highlightSouthWest!.longitude,coord.longitude))
+                        highlightNorthEast = CLLocationCoordinate2D(latitude: max(highlightNorthEast!.latitude,coord.latitude),
+                                                                    longitude: max(highlightNorthEast!.longitude,coord.longitude))
+                    }
+                }
+            }else{
+                highlightNorthEast = northEast
+                highlightSouthWest = southWest
+            }
+        }
+        if southWest != nil {
+            self.boundingMapRect = MKMapRect(southWest: southWest!, northEast: northEast!)
+            self.coordinate = southWest!.halfWay(to: northEast!)
         }
         
-        super.init()
+        if highlightSouthWest == nil {
+            self.highlightMapRect = self.boundingMapRect
+            self.highlightCoordinate = self.coordinate
+        }else{
+            self.highlightMapRect = MKMapRect(southWest: highlightSouthWest!, northEast: highlightNorthEast!)
+            self.highlightCoordinate = highlightSouthWest!.halfWay(to: highlightNorthEast!)
+        }
     }
 }
 
@@ -100,7 +121,7 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
         if let mapOverlay = self.overlay as? FlightDataMapOverlay {
             var last : CGPoint? = nil
             context.beginPath()
-            context.setLineWidth( 2.0 / zoomScale )
+            context.setLineWidth( 5.0 / zoomScale )
             var pathState : PathState = .primary
             
             for point in mapOverlay.coordinates {
@@ -123,7 +144,7 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
                         context.setStrokeColor(UIColor.systemBlue.cgColor)
                         context.strokePath()
                         context.beginPath()
-                        context.setLineWidth( 2.0 / zoomScale )
+                        context.setLineWidth( 5.0 / zoomScale )
                         context.setStrokeColor(UIColor.systemRed.cgColor)
                         pathState = .primary
                     }

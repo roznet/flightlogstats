@@ -213,7 +213,9 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDel
                                 }
                                 self.mapViewOverlay = overlay
                                 self.mapView.addOverlay(overlay)
-                                self.mapView.setVisibleMapRect(overlay.boundingMapRect, edgePadding: .init(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0), animated: true)
+                                self.mapView.setVisibleMapRect(overlay.highlightMapRect,
+                                                               edgePadding: .init(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0),
+                                                               animated: true)
                             }
                         }
                         self.view.setNeedsDisplay()

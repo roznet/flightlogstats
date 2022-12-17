@@ -324,6 +324,7 @@ extension FlightData {
         var skipped : Int = 0
         var lastLocation : CLLocation? = nil
         var runningDistance : CLLocationDistance = 0.0
+        var firstDate : Date? = nil
         
         var units : [String] = []
 
