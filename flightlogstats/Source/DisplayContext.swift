@@ -449,9 +449,7 @@ class DisplayContext {
             return UnitTemperature.fahrenheit
         case .E1_EGT_Min,.E1_CHT_Min:
             return UnitTemperature.fahrenheit
-        case .Latitude:
-            return nil
-        case .Longitude:
+        case .Latitude,.Longitude:
             return nil
             
         // Not numbers:
