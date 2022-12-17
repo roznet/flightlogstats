@@ -61,7 +61,7 @@ struct DisplayedValue {
     }
     typealias CellHolder = TableDataSource.CellHolder
     
-    func cellHolder(attributes : [NSAttributedString.Key:Any]) -> CellHolder {
+    func cellHolder(attributes : [NSAttributedString.Key:Any]? = nil) -> CellHolder {
         switch self.formatter {
         case .measurement(let fmt):
             switch self.value {
@@ -88,13 +88,15 @@ struct DisplayedValue {
 
     }
     
-    func adjust(geometry : RZNumberWithUnitGeometry) {
+    func adjust(geometry : RZNumberWithUnitGeometry,
+                numberAttribute : [NSAttributedString.Key:Any]? = nil,
+                unitAttribute : [NSAttributedString.Key:Any]? = nil) {
         guard case let .measurement(measurement) = self.value else { return }
         switch self.formatter {
         case .measurement(let fmt):
-            geometry.adjust(measurement: measurement, formatter: fmt)
+            geometry.adjust(measurement: measurement, formatter: fmt, numberAttribute: numberAttribute, unitAttribute: unitAttribute)
         case .compound(let cmp):
-            geometry.adjust(measurement: measurement, compound: cmp)
+            geometry.adjust(measurement: measurement, compound: cmp, numberAttribute: numberAttribute, unitAttribute: unitAttribute)
         case .date:
             break
         }
@@ -145,13 +147,10 @@ class DisplayContext {
     
     //MARK: - format model objets
 
-    //@available(*, deprecated, message: "Use measurement and formatter")
     func formatDecimal(timeRange : TimeRange) -> String {
         return Self.decimalFormatter.string(from: NSNumber(floatLiteral: timeRange.elapsed/3600.0)) ?? ""
     }
     
-    
-    //@available(*, deprecated, message: "Use measurement and formatter")
     func formatHHMM(timeRange : TimeRange) -> String {
         let formatter = Self.coumpoundHHMMFormatter
         return formatter.format(from: timeRange.measurement)
@@ -225,24 +224,6 @@ class DisplayContext {
         return measurement
     }
 
-    
-    //MARK: - format values
-    func formatValue(distance : Measurement<Dimension>) -> String {
-        return Self.defaultFormatter.string(from: distance)
-    }
-
-    func formatValue(numberWithUnit : GCNumberWithUnit, converted to: GCUnit? = nil) -> String {
-        if let to = to {
-            return numberWithUnit.convert(to: to).description
-        }
-        return numberWithUnit.description
-    }
-    
-    func formatValue(gallon : Measurement<Dimension>) -> String {
-        
-        return Self.fuelFormatter.string(from: gallon)
-    }
-    
     //MARK: - Formatters
     
     public static let enduranceFormatter : MeasurementFormatter = {
@@ -276,6 +257,25 @@ class DisplayContext {
         formatter.numberFormatter.maximumFractionDigits = 0
         return formatter
     }()
+
+    public static var defaultFormatterTwoDigit : MeasurementFormatter = {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        formatter.unitStyle = .short
+        formatter.numberFormatter.maximumFractionDigits = 2
+        formatter.numberFormatter.minimumFractionDigits = 2
+        return formatter
+    }()
+
+    public static var defaultFormatterOneDigit : MeasurementFormatter = {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        formatter.unitStyle = .short
+        formatter.numberFormatter.maximumFractionDigits = 1
+        formatter.numberFormatter.minimumFractionDigits = 1
+        return formatter
+    }()
+
     
     private static var fuelFormatter : MeasurementFormatter = {
         let formatter = MeasurementFormatter()
@@ -292,20 +292,7 @@ class DisplayContext {
         formatter.numberFormatter.maximumFractionDigits = 2
         return formatter
     }()
-    
-    func measurementFormatter(for field : Field) -> MeasurementFormatter {
-        switch field {
-        case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT,.E1_FFlow,.E2_FFlow:
-            return Self.fuelFormatter
-        case .E1_MAP,.E2_MAP:
-            return Self.mapFormatter
-        case .Lcl_Time:
-            return Self.enduranceFormatter
-        default:
-            return Self.defaultFormatter
-        }
-    }
-    
+        
     //MARK: - format stats
     func valueStatsMetric(for field : Field) -> ValueStats.Metric {
         switch field {
@@ -477,9 +464,9 @@ class DisplayContext {
         }
     }
 
-    func displayedValue(field : Field, measurement : Measurement<Dimension>) -> DisplayedValue {
+    func displayedValue(field : Field, measurement : Measurement<Dimension>, providedUnit : Bool = false) -> DisplayedValue {
         var measurement = measurement
-        if let preferredUnit = self.displayUnit(for: field) {
+        if !providedUnit, let preferredUnit = self.displayUnit(for: field) {
             measurement.convert(to: preferredUnit)
         }
         
@@ -499,11 +486,11 @@ class DisplayContext {
         case .WptDst:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .LatAc,.NormAc:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterTwoDigit), value: .measurement(measurement))
         case .amp1:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterTwoDigit), value: .measurement(measurement))
         case .volt1,.volt2:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
         case .FQtyL,.FQtyR,.FQtyT,.FTotalizerT:
             // could be .max-.min
             return DisplayedValue(formatter: .measurement(Self.fuelFormatter), value: .measurement(measurement))
@@ -512,7 +499,7 @@ class DisplayContext {
         case .E1_OilT,.E2_OilT:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .E1_OilP,.E2_OilP:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
         case .E1_MAP,.E2_MAP:
             return DisplayedValue(formatter: .measurement(Self.mapFormatter), value: .measurement(measurement))
         case .E1_FPres,.E2_FPres:
@@ -534,16 +521,18 @@ class DisplayContext {
         case .E1_ITT,.E2_ITT:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .HSIS,.HCDI,.VCDI:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
         case .MagVar:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
         case .RollC,.PichC:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
         case .RollM,.PitchM:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
+        case .VSpdG,.GPSfix,.HPLwas,.HPLfd,.VPLwas:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
+        case .HAL,.VAL:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
-        case .VSpdG,.GPSfix,.HAL,.VAL,.HPLwas,.HPLfd,.VPLwas:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
-        
+
         // Calculated
         case .Distance:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
@@ -555,10 +544,8 @@ class DisplayContext {
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .E1_EGT_Min,.E1_CHT_Min:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
-        case .Latitude:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
-        case .Longitude:
-            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .Latitude,.Longitude:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterTwoDigit), value: .measurement(measurement))
             
         // Not numbers:
         case .Unknown:
@@ -568,68 +555,6 @@ class DisplayContext {
         case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         }
-    }
-    
-    func measurement(_ valueStats : ValueStats) -> Measurement<Dimension> {
-        return Measurement(value: valueStats.average, unit: UnitDimensionLess.scalar)
-    }
-    
-    func measurement(baro inch : ValueStats) -> Measurement<Dimension> {
-        let unit = (inch.unit as? UnitPressure) ?? UnitPressure.inchesOfMercury
-        return Measurement(value: inch.end, unit: unit).converted(to: self.baroUnit)
-    }
-
-    func measurement(fpm : ValueStats) -> Measurement<Dimension> {
-        let unit = (fpm.unit as? UnitSpeed) ?? UnitSpeed.feetPerMinute
-        return Measurement(value: fpm.average, unit: unit)
-    }
-
-    func measurement(degree : ValueStats) -> Measurement<Dimension>{
-        let unit = (degree.unit as? UnitAngle) ?? UnitAngle.degrees
-        if degree.average > 0 {
-            return Measurement(value: degree.average, unit: unit)
-        }else{
-            return Measurement(value: degree.average+360, unit: unit)
-        }
-    }
-    
-    func measurement(gallon : ValueStats, used : Bool = true) -> Measurement<Dimension> {
-        let unit = (gallon.unit as? UnitVolume) ?? UnitVolume.aviationGallon
-        if used {
-            return Measurement(value: gallon.max - gallon.min, unit: unit)
-        }else{
-            return Measurement(value: gallon.end, unit: unit)
-        }
-    }
-    
-    func measurement(distance: ValueStats, total : Bool = false) -> Measurement<Dimension> {
-        let unit = (distance.unit as? UnitLength) ?? UnitLength.nauticalMiles
-        return Measurement(value: distance.end, unit: unit)
-    }
-    
-    func measurement(engineTemp : ValueStats) -> Measurement<Dimension> {
-        let unit = (engineTemp.unit as? UnitTemperature) ?? UnitTemperature.fahrenheit
-        return Measurement(value: engineTemp.max, unit: unit)
-    }
-    func measurement(map: ValueStats) -> Measurement<Dimension> {
-        let unit = (map.unit as? UnitPressure) ?? UnitPressure.inchesOfMercury
-        return Measurement(value: map.average, unit: unit)
-    }
-    func measurement(gph : ValueStats) -> Measurement<Dimension> {
-        let unit = (gph.unit as? UnitVolume) ?? UnitVolume.aviationGallon
-        return Measurement(value: gph.average, unit: unit)
-    }
-    func measurement(speed : ValueStats) -> Measurement<Dimension> {
-        let unit = (speed.unit as? UnitSpeed) ?? UnitSpeed.knots
-        return Measurement(value: speed.average, unit: unit)
-    }
-    func measurement(altitude : ValueStats) -> Measurement<Dimension> {
-        let unit = (altitude.unit as? UnitLength) ?? UnitLength.feet
-        return Measurement(value: altitude.max, unit: unit)
-    }
-    func measurement(percent : ValueStats) -> Measurement<Dimension> {
-        let unit = (percent.unit as? UnitPercent) ?? UnitPercent.percentPerOne
-        return Measurement(value: percent.average, unit: unit).converted(to: UnitPercent.percentPerHundred)
     }
 }
 

@@ -312,13 +312,6 @@
 			name = DetailViews;
 			sourceTree = "<group>";
 		};
-		421EE5C22929538600996EC6 /* DataUtils */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = DataUtils;
-			sourceTree = "<group>";
-		};
 		423EF3512872E74900EA7415 /* MainListViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -382,7 +375,6 @@
 		4280C87C280D43E400A0FB32 /* flightlogstats */ = {
 			isa = PBXGroup;
 			children = (
-				421EE5C22929538600996EC6 /* DataUtils */,
 				42A11EA128E882F90031D209 /* Communications */,
 				42478A4F28153EBE00212BF2 /* Utils */,
 				42E13B8B2813DBA100AF38AC /* Storage */,

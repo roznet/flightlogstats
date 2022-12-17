@@ -59,14 +59,18 @@ class FlightLegsDataSource : TableDataSource {
     var titleAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.boldSystemFont(ofSize: 14.0)]
     var cellAttributes : [NSAttributedString.Key:Any] = [.font:UIFont.systemFont(ofSize: 14.0)]
     
-    func formattedValueFor(field : Field, row : Int) -> Measurement<Dimension>? {
+    func dispayedValue(field : Field, row : Int) -> DisplayedValue? {
         guard let leg = self.legs[safe: row],
               let value = leg.valueStats(field: field)
         else {
             // empty string if missing for a blank in the table
             return nil
         }
-        return displayContext.measurement(field: field, valueStats: value)
+        if let measurement = displayContext.measurement(field: field, valueStats: value) {
+            return displayContext.displayedValue(field: field, measurement: measurement)
+        }else{
+            return nil
+        }
     }
     
     func formattedCategorical(field : Field, row : Int) -> String{
@@ -153,12 +157,11 @@ class FlightLegsDataSource : TableDataSource {
                     geoIndex += 1
                 }
                 for field in fields {
-                    let formatter  = self.displayContext.measurementFormatter(for: field)
                     switch field.valueType {
                     case .value:
-                        if let nu = self.formattedValueFor(field: field, row: row) {
-                            self.geometries[geoIndex].adjust(measurement: nu, formatter: formatter)
-                            self.cellHolders.append(CellHolder(measurement: nu, formatter: formatter))
+                        if let dv = self.dispayedValue(field: field, row: row) {
+                            dv.adjust(geometry: self.geometries[geoIndex])
+                            self.cellHolders.append(dv.cellHolder(attributes: self.cellAttributes))
                         }else{
                             self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
                         }

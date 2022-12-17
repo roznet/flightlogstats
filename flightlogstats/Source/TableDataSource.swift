@@ -22,7 +22,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
         case measurement(Measurement<Dimension>,MeasurementFormatter,[NSAttributedString.Key:Any]?)
         case compoundMeasurement(Measurement<Dimension>,CompoundMeasurementFormatter<Dimension>,[NSAttributedString.Key:Any]?)
         
-        init(string : String, attributes: [NSAttributedString.Key:Any] ) {
+        init(string : String, attributes: [NSAttributedString.Key:Any]? = nil ) {
             self = .attributedString(NSAttributedString(string: string, attributes: attributes))
         }
         init(numberWithUnit : GCNumberWithUnit, attributes : [NSAttributedString.Key:Any]? = nil){

@@ -11,7 +11,6 @@ import RZUtils
 import RZUtilsSwift
 
 class FlightListDataSource: TableDataSource  {
-    
     var logInfos : [FlightLogFileRecord]
     var logFileOrganizer = FlightLogOrganizer.shared
     
@@ -88,9 +87,9 @@ class FlightListDataSource: TableDataSource  {
                     var geoIndex = self.headers.count
                     for field in fields {
                         if let measurement = summary.measurement(for: field) {
-                            let formatter = self.displayContext.measurementFormatter(for: field.equivalentLogField)
-                            geometries[geoIndex].adjust(measurement: measurement, formatter: formatter)
-                            self.cellHolders.append(CellHolder(measurement: measurement, formatter: formatter))
+                            let dv = self.displayContext.displayedValue(field: field.equivalentLogField, measurement: measurement)
+                            dv.adjust(geometry: geometries[geoIndex])
+                            self.cellHolders.append(dv.cellHolder(attributes: cellAttributes))
                         }else{
                             self.cellHolders.append(CellHolder(string: "", attributes: cellAttributes))
                         }
@@ -112,9 +111,9 @@ class FlightListDataSource: TableDataSource  {
             
             for field in fields {
                 if let nu = trip.measurement(field: field) {
-                    let formatter = self.displayContext.measurementFormatter(for: field.equivalentLogField)
-                    geometries[geoIndex].adjust(measurement: nu, formatter: formatter, numberAttribute: titleAttributes)
-                    self.cellHolders.append(CellHolder(measurement: nu, formatter: formatter, attributes: titleAttributes))
+                    let dv = self.displayContext.displayedValue(field: field.equivalentLogField, measurement: nu)
+                    dv.adjust(geometry: geometries[geoIndex], numberAttribute: titleAttributes)
+                    self.cellHolders.append(dv.cellHolder(attributes: titleAttributes))
                 }else{
                     self.cellHolders.append(CellHolder(string: "", attributes: cellAttributes))
                 }

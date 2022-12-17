@@ -29,7 +29,6 @@ class FuelAnalysisDataSource: TableDataSource {
         self.flightSummary = flightSummary
         self.flightLogViewModel = flightViewModel
         self.displayContext = DisplayContext()
-        self.fuelFormatter = self.displayContext.measurementFormatter(for: .FQtyT)
         
         super.init(rows: 0, columns: self.columnsHeaders.count, frozenColumns: 1, frozenRows: 1)
     }
@@ -46,8 +45,6 @@ class FuelAnalysisDataSource: TableDataSource {
         self.rowsCount += 1
     }
 
-    private var fuelFormatter : MeasurementFormatter
-    
     func addLine<UnitType>(name : String, fuel : FuelTanks<UnitType>, totalizer : FuelTanks<UnitType>, unit : UnitType) {
         
         self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
@@ -60,9 +57,9 @@ class FuelAnalysisDataSource: TableDataSource {
             if measurement.value == 0.0 {
                 self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
             }else{
-                self.geometries[geoIndex].adjust(measurement: measurement, formatter: self.fuelFormatter)
-                let newmeasurement : Measurement<Dimension> = Measurement(value: measurement.value, unit: measurement.unit as Dimension)
-                self.cellHolders.append(CellHolder(measurement: newmeasurement, formatter: self.fuelFormatter))
+                let dv = displayContext.displayedValue(field: .FQtyT, measurement: measurement.measurementDimension, providedUnit: true)
+                dv.adjust(geometry: self.geometries[geoIndex])
+                self.cellHolders.append(dv.cellHolder())
             }
             geoIndex += 1
         }
@@ -97,10 +94,7 @@ class FuelAnalysisDataSource: TableDataSource {
         if let displayContext = self.flightLogViewModel?.displayContext {
             self.displayContext = displayContext
         }
-        
-        // update if settings changed
-        self.fuelFormatter = self.displayContext.measurementFormatter(for: .FQtyT)
-        
+                
         if let aircraft = self.flightLogViewModel?.aircraft,
            let inputs = self.flightLogViewModel?.fuelAnalysisInputs,
            let fuelTargetUnit = self.flightLogViewModel?.fuelTargetUnit,
