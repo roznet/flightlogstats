@@ -12,7 +12,7 @@
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
         <attribute name="status_date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="upload_status" optional="YES" attributeType="String"/>
-        <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileInfo" inverseName="flysto_status" inverseEntity="FlightLogFileInfo"/>
+        <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileRecord" inverseName="flysto_status" inverseEntity="FlightLogFileRecord"/>
     </entity>
     <entity name="FlightFuelRecord" representedClassName=".FlightFuelRecord" syncable="YES" codeGenerationType="category">
         <attribute name="added_fuel_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -20,9 +20,9 @@
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
         <attribute name="target_fuel" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="totalizer_fuel_start" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileInfo" inverseName="fuel_record" inverseEntity="FlightLogFileInfo"/>
+        <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileRecord" inverseName="fuel_record" inverseEntity="FlightLogFileRecord"/>
     </entity>
-    <entity name="FlightLogFileInfo" representedClassName=".FlightLogFileInfo" syncable="YES" codeGenerationType="category">
+    <entity name="FlightLogFileRecord" representedClassName=".FlightLogFileRecord" syncable="YES" codeGenerationType="category">
         <attribute name="airframe_name" optional="YES" attributeType="String"/>
         <attribute name="end_airport_icao" optional="YES" attributeType="String"/>
         <attribute name="end_fuel_quantity_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>

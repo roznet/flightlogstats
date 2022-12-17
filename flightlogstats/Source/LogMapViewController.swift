@@ -15,7 +15,7 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
     
-    var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
+    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileInfo }
     var legsDataSource : FlightLegsDataSource? = nil
     
     var flightLogViewModel : FlightLogViewModel? = nil
@@ -35,7 +35,7 @@ class LogMapViewController: UIViewController, MKMapViewDelegate, ViewModelDelega
         
         self.updateUI()
         
-        NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue:nil){
+        NotificationCenter.default.addObserver(forName: .logFileRecordUpdated, object: nil, queue:nil){
             notification in
             DispatchQueue.main.async{
                 self.updateUI()

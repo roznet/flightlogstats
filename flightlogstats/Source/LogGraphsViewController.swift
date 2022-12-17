@@ -22,7 +22,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDel
     @IBOutlet weak var graphTypeSegment: UISegmentedControl!
     @IBOutlet weak var legTypeSegment: UISegmentedControl!
     
-    var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
+    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileInfo }
     var legsDataSource : FlightLegsDataSource? = nil
     
     var flightLogViewModel : FlightLogViewModel? = nil
@@ -82,7 +82,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDel
         
         self.updateUI()
         
-        NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue:nil){
+        NotificationCenter.default.addObserver(forName: .logFileRecordUpdated, object: nil, queue:nil){
             notification in
             DispatchQueue.main.async{
                 self.updateUI()

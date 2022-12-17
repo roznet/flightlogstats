@@ -19,7 +19,7 @@ extension Notification.Name {
 class FlightLogViewModel {
     typealias Field = FlightLogFile.Field
     
-    let flightLogFileInfo : FlightLogFileInfo
+    let flightLogFileInfo : FlightLogFileRecord
    
     // Every change update state
     private var writeState : Int = 0
@@ -94,7 +94,7 @@ class FlightLogViewModel {
     }
     
     // MARK: - Setup
-    init(fileInfo : FlightLogFileInfo, displayContext : DisplayContext, progress : ProgressReport? = nil){
+    init(fileInfo : FlightLogFileRecord, displayContext : DisplayContext, progress : ProgressReport? = nil){
         self.flightLogFileInfo = fileInfo
         self.progress = progress
         self.displayContext = displayContext
@@ -122,7 +122,7 @@ class FlightLogViewModel {
         self.didWrite()
     }
     
-    func isSameLog(as other : FlightLogFileInfo) -> Bool {
+    func isSameLog(as other : FlightLogFileRecord) -> Bool {
         return other.log_file_name == self.flightLogFileInfo.log_file_name
     }
     

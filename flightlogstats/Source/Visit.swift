@@ -14,8 +14,8 @@ struct Visit {
     
     let airport : Airport
     
-    let arrivingFlight : FlightLogFileInfo
-    var departingFlight : FlightLogFileInfo? = nil
+    let arrivingFlight : FlightLogFileRecord
+    var departingFlight : FlightLogFileRecord? = nil
     
     var numberOfDays : Int {
         if let arrivingTime = arrivingFlight.flightSummary?.hobbs?.end,
@@ -25,7 +25,7 @@ struct Visit {
         return 0
     }
     
-    mutating func departed(with flight : FlightLogFileInfo){
+    mutating func departed(with flight : FlightLogFileRecord){
         self.departingFlight = flight
     }
 }

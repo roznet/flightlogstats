@@ -45,7 +45,7 @@ struct FlightSummary : Codable {
     let distanceInNm : Double
     let altitudeInFeet : Double
     
-    init?( info : FlightLogFileInfo ) {
+    init?( info : FlightLogFileRecord ) {
         guard let start = info.start_time_moving, let end = info.end_time else {
             return nil
         }

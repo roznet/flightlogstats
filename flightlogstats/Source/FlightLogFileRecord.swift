@@ -11,15 +11,15 @@ import OSLog
 import RZUtils
 
 extension Notification.Name {
-    static let logFileInfoUpdated : Notification.Name = Notification.Name("Notification.Name.logFileInfoUpdated")
+    static let logFileRecordUpdated : Notification.Name = Notification.Name("Notification.Name.logFileRecordUpdated")
 }
 
-class FlightLogFileInfo: NSManagedObject {
+class FlightLogFileRecord: NSManagedObject {
     enum FlightLogFileInfoError : Error {
         case invalidFlightLog
     }
     
-    enum InfoStatus : String {
+    enum RecordStatus : String {
         case notParsed
         case parsed
         case empty
@@ -32,17 +32,17 @@ class FlightLogFileInfo: NSManagedObject {
         didSet {
             if let fromLog = self.flightLog?.flightSummary {
                 self.flightSummary = fromLog
-                self.infoStatus = .parsed
+                self.recordStatus = .parsed
             }
         }
     }
     
     var legs : [FlightLeg] { return self.flightLog?.legs ?? [] }
     
-    var infoStatus : InfoStatus {
+    var recordStatus : RecordStatus {
         get {
             if let status = self.info_status {
-                if let rv = InfoStatus(rawValue: status ) {
+                if let rv = RecordStatus(rawValue: status ) {
                     return rv
                 }else{
                     return .notParsed
@@ -59,7 +59,7 @@ class FlightLogFileInfo: NSManagedObject {
     static let currentVersion : Int32 = 1
     
     var requiresVersionUpdate : Bool { return self.version < Self.currentVersion }
-    var requiresParsing : Bool { return self.requiresVersionUpdate || self.infoStatus == .notParsed }
+    var requiresParsing : Bool { return self.requiresVersionUpdate || self.recordStatus == .notParsed }
     
     //MARK: - database utilities
     func delete() {
@@ -104,7 +104,7 @@ class FlightLogFileInfo: NSManagedObject {
         self.log_file_name = flightLog.name
         
         // start empty
-        self.infoStatus = .empty
+        self.recordStatus = .empty
         
         if let system_id = flightLog.meta(key: .system_id) {
             self.system_id = system_id
@@ -120,7 +120,7 @@ class FlightLogFileInfo: NSManagedObject {
                 self.start_time = hobbs.start
                 self.end_time = hobbs.end
                 // if we have some times, then consider it parsed
-                self.infoStatus = .parsed
+                self.recordStatus = .parsed
             }
             
             if let moving = flightSummary.moving {
@@ -154,10 +154,10 @@ class FlightLogFileInfo: NSManagedObject {
             self.total_distance = flightSummary.distanceInNm
             self.max_altitude = flightSummary.altitudeInFeet
         }else{
-            self.infoStatus = .notParsed
+            self.recordStatus = .notParsed
         }
         
-        self.version = FlightLogFileInfo.currentVersion
+        self.version = FlightLogFileRecord.currentVersion
         
     }
 
@@ -231,7 +231,7 @@ class FlightLogFileInfo: NSManagedObject {
     }
     //MARK: - Analysis
     
-    func isSameAircraft(as other : FlightLogFileInfo) -> Bool {
+    func isSameAircraft(as other : FlightLogFileRecord) -> Bool {
         guard
             let thisSystem = self.system_id, let otherSystem = other.system_id
         else {
@@ -240,11 +240,11 @@ class FlightLogFileInfo: NSManagedObject {
         return thisSystem == otherSystem
     }
     
-    func isNewer(than other : FlightLogFileInfo) -> Bool {
+    func isNewer(than other : FlightLogFileRecord) -> Bool {
         return self.log_file_name! > other.log_file_name!
     }
     
-    func isOlder(than other : FlightLogFileInfo) -> Bool {
+    func isOlder(than other : FlightLogFileRecord) -> Bool {
         return self.log_file_name! < other.log_file_name!
     }
     

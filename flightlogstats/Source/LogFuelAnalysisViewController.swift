@@ -31,7 +31,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     var fuelDataSource : FuelAnalysisDataSource? { return self.flightLogViewModel?.fuelAnalysisDataSource }
     
     var flightLogViewModel : FlightLogViewModel? = nil
-    var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
+    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileInfo }
     
     //MARK: - delegate functions
     

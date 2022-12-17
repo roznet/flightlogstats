@@ -12,7 +12,7 @@ import RZUtilsSwift
 
 class FlightListDataSource: TableDataSource  {
     
-    var logInfos : [FlightLogFileInfo]
+    var logInfos : [FlightLogFileRecord]
     var logFileOrganizer = FlightLogOrganizer.shared
     
     var trips : Trips

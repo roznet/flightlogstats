@@ -25,32 +25,32 @@ class FlightLogOrganizer {
     public static var shared = FlightLogOrganizer()
     
     //MARK: - List management
-    var flightLogFileInfos : [FlightLogFileInfo] {
+    var flightLogFileInfos : [FlightLogFileRecord] {
         let list = Array(self.managedFlightLogs.values)
         return list.sorted { $0.isNewer(than: $1) }
     }
     
-    var first : FlightLogFileInfo? {
+    var first : FlightLogFileRecord? {
         self.flightLogFileInfos.first
     }
-    var firstNonEmpty : FlightLogFileInfo? {
+    var firstNonEmpty : FlightLogFileRecord? {
         self.nonEmptyLogFileInfos.first
     }
 
     var count : Int { return managedFlightLogs.count }
     
-    subscript(_ name : String) -> FlightLogFileInfo? {
+    subscript(_ name : String) -> FlightLogFileRecord? {
         return self.managedFlightLogs[name]
     }
     
-    subscript(log: FlightLogFile) -> FlightLogFileInfo? {
+    subscript(log: FlightLogFile) -> FlightLogFileRecord? {
         return self.managedFlightLogs[log.name]
     }
     
-    func flight(following info: FlightLogFileInfo) -> FlightLogFileInfo? {
-        var rv : FlightLogFileInfo? = nil
+    func flight(following info: FlightLogFileRecord) -> FlightLogFileRecord? {
+        var rv : FlightLogFileRecord? = nil
         
-        var following : FlightLogFileInfo? = nil
+        var following : FlightLogFileRecord? = nil
         for candidate in self.flightLogFileInfos.reversed() {
             if  info == candidate {
                 if let following = following,
@@ -67,10 +67,10 @@ class FlightLogOrganizer {
         return rv
     }
     
-    func flight(preceding info: FlightLogFileInfo) -> FlightLogFileInfo? {
-        var rv : FlightLogFileInfo? = nil
+    func flight(preceding info: FlightLogFileRecord) -> FlightLogFileRecord? {
+        var rv : FlightLogFileRecord? = nil
         
-        var following : FlightLogFileInfo? = nil
+        var following : FlightLogFileRecord? = nil
         for candidate in self.actualFlightLogFileInfos {
             if let following = following,
                info == following {
@@ -87,8 +87,8 @@ class FlightLogOrganizer {
         
         return rv
     }
-    func filter(filter : (FlightLogFileInfo) -> Bool) -> [FlightLogFileInfo] {
-        var logs : [FlightLogFileInfo] = []
+    func filter(filter : (FlightLogFileRecord) -> Bool) -> [FlightLogFileRecord] {
+        var logs : [FlightLogFileRecord] = []
         for info in self.flightLogFileInfos {
             if filter(info) {
                 logs.append(info)
@@ -97,14 +97,14 @@ class FlightLogOrganizer {
         return logs
     }
     
-    var nonEmptyLogFileInfos : [FlightLogFileInfo] {
+    var nonEmptyLogFileInfos : [FlightLogFileRecord] {
         return self.filter() {
             info in
             return !info.isEmpty
         }
     }
 
-    var actualFlightLogFileInfos : [FlightLogFileInfo] {
+    var actualFlightLogFileInfos : [FlightLogFileRecord] {
         return self.filter() {
             info in
             return info.isFlight
@@ -137,7 +137,7 @@ class FlightLogOrganizer {
     }
     
     /// managed logs keyed of log_file_name
-    private var managedFlightLogs : [String:FlightLogFileInfo] = [:]
+    private var managedFlightLogs : [String:FlightLogFileRecord] = [:]
     private var currentState : UpdateState = .complete
     private var missingCount : Int = 0
     private var doneCount : Int = 0
@@ -181,10 +181,10 @@ class FlightLogOrganizer {
     }
     
     private func loadLogsFromContainer() {
-        let fetchRequest = FlightLogFileInfo.fetchRequest()
+        let fetchRequest = FlightLogFileRecord.fetchRequest()
         
         do {
-            let fetchedInfo : [FlightLogFileInfo] = try self.persistentContainer.viewContext.fetch(fetchRequest)
+            let fetchedInfo : [FlightLogFileRecord] = try self.persistentContainer.viewContext.fetch(fetchRequest)
             var added = 0
             let existing = self.managedFlightLogs.count
             var needSave = false
@@ -237,7 +237,7 @@ class FlightLogOrganizer {
         let firstMissingCheck : Bool = (currentState == .complete)
         currentState = .updatingInfoFromData
         AppDelegate.worker.async {
-            var missing : [FlightLogFileInfo] = []
+            var missing : [FlightLogFileRecord] = []
             for (_,info) in self.managedFlightLogs {
                 if force || info.requiresParsing{
                     if firstMissingCheck, let log_file_name = info.log_file_name {
@@ -266,7 +266,7 @@ class FlightLogOrganizer {
                 for info in missing[..<min(count,missing.count)] {
                     guard let log_file_name = info.log_file_name
                     else {
-                        info.infoStatus = .error
+                        info.recordStatus = .error
                         continue
                     }
                     
@@ -285,17 +285,17 @@ class FlightLogOrganizer {
                         do {
                             try info.updateFromFlightLog(flightLog: flightLog)
                         }catch{
-                            info.infoStatus = .error
+                            info.recordStatus = .error
                             Logger.app.error("Failed to update log \(error.localizedDescription)")
                         }
                         
-                        NotificationCenter.default.post(name: .logFileInfoUpdated, object: info)
+                        NotificationCenter.default.post(name: .logFileRecordUpdated, object: info)
                         if requiresParsing {
                             flightLog.clear()
                         }
                         done.append(log_file_name)
                     }else{
-                        info.infoStatus = .error
+                        info.recordStatus = .error
                     }
                     self.doneCount += 1
                     if !reportParsingProgress {
@@ -381,7 +381,11 @@ class FlightLogOrganizer {
     
     func add(flightLogFileList : FlightLogFileList){
         var someNew : Int = 0
+        self.progress?.update(state: .start, message: .updatingInfo)
+        var index : Double = 0.0
+        var indexTotal : Double = Double(flightLogFileList.count)
         for flightLog in flightLogFileList.flightLogFiles {
+            index += 1.0
             let filename = flightLog.name
             if filename.isLogFile {
                 if let existing = self.managedFlightLogs[filename] {
@@ -390,14 +394,16 @@ class FlightLogOrganizer {
                         existing.flightLog = flightLog
                     }
                 }else{
-                    let fileInfo = FlightLogFileInfo(context: self.persistentContainer.viewContext)
+                    let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
                     fileInfo.container = self
                     flightLog.updateFlightLogFileInfo(info: fileInfo)
                     self.managedFlightLogs[ filename ] = fileInfo
                     someNew += 1
+                    self.progress?.update(state: .progressing(index / indexTotal), message: .updatingInfo)
                 }
             }
         }
+        self.progress?.update(state: .complete, message: .updatingInfo)
         if someNew > 0 {
             Logger.app.info("Found \(someNew) local files to add")
             self.saveContext()
@@ -407,7 +413,7 @@ class FlightLogOrganizer {
         }
     }
     
-    func delete(info : FlightLogFileInfo){
+    func delete(info : FlightLogFileRecord){
         if let name = info.log_file_name {
             self.managedFlightLogs.removeValue(forKey: name)
             info.delete()

@@ -8,7 +8,7 @@
 import UIKit
 
 class LogListTableViewCell: UITableViewCell {
-    var flightLogFileInfo : FlightLogFileInfo? = nil
+    var flightLogFileInfo : FlightLogFileRecord? = nil
     var displayContext : DisplayContext = DisplayContext()
     
     @IBOutlet weak var flightIcon: UIImageView!
@@ -22,7 +22,7 @@ class LogListTableViewCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var fileName: UILabel!
     
-    func shouldRefresh(for info : FlightLogFileInfo) -> Bool {
+    func shouldRefresh(for info : FlightLogFileRecord) -> Bool {
         if let current = self.flightLogFileInfo {
             return info.log_file_name == current.log_file_name
         }else{
@@ -36,7 +36,7 @@ class LogListTableViewCell: UITableViewCell {
         }
     }
     
-    func update(minimum info: FlightLogFileInfo){
+    func update(minimum info: FlightLogFileRecord){
         self.flightLogFileInfo = info
         
         let titleAttribute = ViewConfig.shared.titleAttributes
@@ -62,7 +62,7 @@ class LogListTableViewCell: UITableViewCell {
 
     }
     
-    func update(with info: FlightLogFileInfo){
+    func update(with info: FlightLogFileRecord){
         self.update(minimum: info)
         
         let titleAttribute = ViewConfig.shared.titleAttributes

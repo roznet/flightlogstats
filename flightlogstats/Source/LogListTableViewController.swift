@@ -13,14 +13,14 @@ import UniformTypeIdentifiers
 import OSLog
 
 protocol LogSelectionDelegate : AnyObject {
-    func selectlogInfo(_ info : FlightLogFileInfo)
+    func selectlogInfo(_ info : FlightLogFileRecord)
     var logInfoIsSelected : Bool { get }
 }
 
 class LogListTableViewController: UITableViewController, UIDocumentPickerDelegate, UISearchResultsUpdating {
 
-    var logInfoList : [FlightLogFileInfo] = []
-    var fullLogInfoList : [FlightLogFileInfo] = []
+    var logInfoList : [FlightLogFileRecord] = []
+    var fullLogInfoList : [FlightLogFileRecord] = []
     
     var logFileOrganizer = FlightLogOrganizer.shared
     
@@ -32,7 +32,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     var filterEmpty = true
     
-    func flightInfo(at indexPath : IndexPath) -> FlightLogFileInfo? {
+    func flightInfo(at indexPath : IndexPath) -> FlightLogFileRecord? {
         return self.logInfoList[indexPath.row]
     }
     
@@ -279,9 +279,9 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let logCell = (cell as? LogListTableViewCell) {
-            NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue: nil){
+            NotificationCenter.default.addObserver(forName: .logFileRecordUpdated, object: nil, queue: nil){
                 notification in
-                if let info = (notification.object as? FlightLogFileInfo) {
+                if let info = (notification.object as? FlightLogFileRecord) {
                     if logCell.shouldRefresh(for: info) {
                         DispatchQueue.main.async {
                             if let file_name = info.log_file_name {

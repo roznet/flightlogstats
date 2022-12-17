@@ -120,7 +120,7 @@ extension FlightLogFile {
         return rv
     }
     
-    func updateFlightLogFileInfo(info : FlightLogFileInfo){
+    func updateFlightLogFileInfo(info : FlightLogFileRecord){
         try? info.updateFromFlightLog(flightLog: self)
     }
     

@@ -31,7 +31,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Settings.registerDefaults()
 
         FlightLogOrganizer.shared.loadFromContainer()
-        FlightLogOrganizer.shared.addMissingFromLocal()
+        AppDelegate.worker.async {
+            FlightLogOrganizer.shared.addMissingFromLocal()
+        }
         
         return true
     }

@@ -23,7 +23,7 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
     
-    var flightLogFileInfo : FlightLogFileInfo? { return self.flightLogViewModel?.flightLogFileInfo }
+    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileInfo }
     var legsDataSource : FlightLegsDataSource? = nil
     var fuelDataSource : FlightSummaryFuelDataSource? = nil
     var timeDataSource : FlightSummaryTimeDataSource? = nil
@@ -42,7 +42,7 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
         if self.flightLogViewModel?.shouldBuild ?? true {
             self.updateMinimumUI()
         }
-        NotificationCenter.default.addObserver(forName: .logFileInfoUpdated, object: nil, queue:nil){
+        NotificationCenter.default.addObserver(forName: .logFileRecordUpdated, object: nil, queue:nil){
             notification in
             DispatchQueue.main.async{
                 self.updateUI()

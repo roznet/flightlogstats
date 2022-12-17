@@ -17,14 +17,14 @@ class Trips {
         case trips
         case months
     }
-    private let flightFileInfos : [FlightLogFileInfo]
+    private let flightFileInfos : [FlightLogFileRecord]
     
     private(set) var base : Airport? = nil
     private(set) var airportVisits : [Airport:[Visit]] = [:]
     private(set) var trips : [Trip] = []
     
     var aggregation : Aggregation
-    init(infos : [FlightLogFileInfo], aggregation : Aggregation = .trips){
+    init(infos : [FlightLogFileRecord], aggregation : Aggregation = .trips){
         self.flightFileInfos = infos
         self.aggregation = aggregation
     }
@@ -51,7 +51,7 @@ class Trips {
         }
     }
     
-    func countAircrafts(message: String, infos : [FlightLogFileInfo]) {
+    func countAircrafts(message: String, infos : [FlightLogFileRecord]) {
         var systems : [String:Int] = [:]
         for info in infos {
             let systemId = info.system_id ?? "Null"
@@ -72,7 +72,7 @@ class Trips {
         while countGuard > 0 && infos.count > 0 {
             self.countAircrafts(message: "trip start", infos: infos)
             countGuard -= 1
-            var leftOver : [FlightLogFileInfo] = []
+            var leftOver : [FlightLogFileRecord] = []
             let aircraftCheck = infos.first
             for info in infos {
                 switch trip.check(info: info, sample: aircraftCheck) {

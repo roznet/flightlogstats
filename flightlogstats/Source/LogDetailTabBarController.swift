@@ -68,7 +68,7 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
         return self.logViewModel != nil
     }
     
-    func selectlogInfo(_ info: FlightLogFileInfo) {
+    func selectlogInfo(_ info: FlightLogFileRecord) {
         if self.progress == nil {
             self.progress = ProgressReport(message: .parsingInfo) {
                 progress in
@@ -81,8 +81,7 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
         // notifiy it change but may not be complete
         self.viewModelHasChanged(viewModel: viewModel)
         AppDelegate.worker.async {
-            #warning("don't checkin")
-            //self.logViewModel?.build()
+            self.logViewModel?.build()
         }
     }
     

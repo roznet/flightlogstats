@@ -14,7 +14,7 @@ import RZUtilsSwift
 struct Trip {
     typealias Field = FlightSummary.Field
     /// infos in the trips sorted from newest to oldest
-    var flightLogFileInfos : [FlightLogFileInfo] = []
+    var flightLogFileInfos : [FlightLogFileRecord] = []
     var count : Int { return self.flightLogFileInfos.count }
     var stats : [Field:ValueStats] = [:]
     
@@ -44,8 +44,8 @@ struct Trip {
         self.label = bucket.description
     }
     
-    var startingFlight : FlightLogFileInfo? { return self.flightLogFileInfos.last }
-    var endingFlight : FlightLogFileInfo? { return self.flightLogFileInfos.first }
+    var startingFlight : FlightLogFileRecord? { return self.flightLogFileInfos.last }
+    var endingFlight : FlightLogFileRecord? { return self.flightLogFileInfos.first }
     
     func isNewer(than other: Trip) -> Bool {
         guard let otherstart = other.startingFlight else { return false }
@@ -57,7 +57,7 @@ struct Trip {
         return self.startingFlight?.isOlder(than: otherstart) ?? false
     }
     
-    mutating func add(info : FlightLogFileInfo) {
+    mutating func add(info : FlightLogFileRecord) {
         if let summary = info.flightSummary {
             for field in FlightSummary.Field.allCases {
                 if let nu = summary.measurement(for: field) {
@@ -76,7 +76,7 @@ struct Trip {
         }
     }
     
-    private mutating func check(base : Airport, info : FlightLogFileInfo) -> CheckStatus {
+    private mutating func check(base : Airport, info : FlightLogFileRecord) -> CheckStatus {
         
         var rv : CheckStatus = .sameTrip
         if let summary = info.flightSummary,
@@ -109,7 +109,7 @@ struct Trip {
     }
     
     
-    private mutating func check(bucket : GCStatsDateBuckets, info : FlightLogFileInfo) -> CheckStatus {
+    private mutating func check(bucket : GCStatsDateBuckets, info : FlightLogFileRecord) -> CheckStatus {
         var rv : CheckStatus = .sameTrip
         if let summary = info.flightSummary,
            let start = summary.hobbs?.start {
@@ -134,7 +134,7 @@ struct Trip {
     /// - Parameter info: info to add
     /// - Parameter sample: sample of info in the trip to see if compatible
     /// - Returns: true if this info concludes the trip
-    mutating func check(info : FlightLogFileInfo, sample : FlightLogFileInfo? = nil) -> CheckStatus {
+    mutating func check(info : FlightLogFileRecord, sample : FlightLogFileRecord? = nil) -> CheckStatus {
         switch aggregation {
         case .awayFromBase(let base):
             if let sample = sample, !sample.isSameAircraft(as: info) {
@@ -146,7 +146,7 @@ struct Trip {
         }
     }
 
-    func new(info: FlightLogFileInfo? = nil) -> Trip? {
+    func new(info: FlightLogFileRecord? = nil) -> Trip? {
         switch self.aggregation {
         case .awayFromBase(let base):
             return Trip(base: base)
