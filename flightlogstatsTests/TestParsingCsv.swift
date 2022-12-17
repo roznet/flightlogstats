@@ -30,11 +30,26 @@ class TestParsingCsv: XCTestCase {
     }
     
     func testBasics() throws {
-        let string = "#aa,b=\"1.2\", c=\"a b\"\r\n#yyy,  degrees,  deg F,     kt\n  Lcl Date,   Latitude,   E1 CHT4,  IAS,\n   , 51.2,  300.23, 100.0\n2022-04-16,   , 320.0,    110"
+        let string = """
+#airframe_info,airframe_name=\"an\",  system_id=\"sid\", c=\"a b\"
+#yyy-mm-dd, hh:mm:ss,   hh:mm, ident, degrees, degrees, ft,     kt, deg F
+Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude,  AltInd,  IAS, E1 CHT4
+2022-05-02, 13:58:26,  +00:00,  A, 56.4534912,   -3.0175426,  300.23, 100.0,   240.0
+2022-05-02, 13:58:27,  +00:00,  A, 56.4534950,   -3.0175436,  320.0,    110.0,  242.0
+"""
         guard let stream = self.streamForString(string: string) else { XCTAssertTrue(false); return }
         
         let data = try FlightData(inputStream: stream)
-        print( data )
+        
+        let doubleDf = data.doubleDataFrame()
+        let categoricalDf = data.categoricalDataFrame()
+        
+        XCTAssertTrue(doubleDf.has(fields: [.E1_CHT4,.IAS]))
+        XCTAssertTrue(categoricalDf.has(field: .AtvWpt))
+        
+        XCTAssertEqual(data.meta[.system_id], "sid")
+        XCTAssertEqual(data.meta[.airframe_name], "an")
+        
     }
 
     func disableTestDataFrame() {

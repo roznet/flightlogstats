@@ -81,7 +81,8 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
         // notifiy it change but may not be complete
         self.viewModelHasChanged(viewModel: viewModel)
         AppDelegate.worker.async {
-            self.logViewModel?.build()
+            #warning("don't checkin")
+            //self.logViewModel?.build()
         }
     }
     

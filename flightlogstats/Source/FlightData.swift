@@ -357,7 +357,7 @@ extension FlightData {
                     if keyval.count == 2 {
                         let metaFieldDescription = String(keyval[0])
                         if let metaField = MetaField(rawValue: metaFieldDescription) {
-                            data.meta[metaField] = String(keyval[1])
+                            data.meta[metaField] = String(keyval[1]).replacingOccurrences(of: "\"", with: "")
                         }else{
                             Logger.app.warning("Unknown meta field \(metaFieldDescription)")
                         }
@@ -366,7 +366,7 @@ extension FlightData {
             }else if first.hasPrefix("#"){
                 units = line
                 for unit in units {
-                    if unit.hasPrefix("yyy-") || unit.hasPrefix("hh:") {
+                    if unit.hasPrefix("#yyy-") || unit.hasPrefix("hh:") {
                         columnIsDouble.append(.ignore)
                     }else if unit == "ident" || unit == "enum" {
                         columnIsDouble.append(.category)
