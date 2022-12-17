@@ -548,116 +548,6 @@
             </objects>
             <point key="canvasLocation" x="1888" y="872"/>
         </scene>
-        <!--Map View Controller-->
-        <scene sceneID="SDL-fH-bz2">
-            <objects>
-                <viewController id="tIL-BH-og2" userLabel="Map View Controller" customClass="LogMapViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="yF0-BN-oP4">
-                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Kna-gp-9gB">
-                                <rect key="frame" x="0.0" y="24" width="834" height="552.5"/>
-                                <standardMapConfiguration key="preferredConfiguration"/>
-                            </mapView>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="b18-pk-RPc" userLabel="Legs Collection View">
-                                <rect key="frame" x="0.0" y="576.5" width="834" height="552.5"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewLayout key="collectionViewLayout" id="lyT-6t-B01" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="BIA-GU-Ufd" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="kKH-3M-Srp">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GYx-tf-2kC" userLabel="label">
-                                                    <rect key="frame" x="4" y="14.5" width="42" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="GYx-tf-2kC" firstAttribute="centerX" secondItem="kKH-3M-Srp" secondAttribute="centerX" id="DDC-Sy-yUZ"/>
-                                                <constraint firstItem="GYx-tf-2kC" firstAttribute="centerY" secondItem="kKH-3M-Srp" secondAttribute="centerY" id="Eqj-Ej-Bt8"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="label" destination="GYx-tf-2kC" id="pFo-Fj-hrO"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="oox-Kb-ZBZ" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
-                                        <rect key="frame" x="60.5" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="YAh-xf-iLj">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v2d-IM-YZp" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                                </view>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="v2d-IM-YZp" firstAttribute="top" secondItem="YAh-xf-iLj" secondAttribute="top" id="B50-vI-9ru"/>
-                                                <constraint firstAttribute="bottom" secondItem="v2d-IM-YZp" secondAttribute="bottom" id="De9-R3-foY"/>
-                                                <constraint firstItem="v2d-IM-YZp" firstAttribute="leading" secondItem="YAh-xf-iLj" secondAttribute="leading" id="WYX-Fy-Imv"/>
-                                                <constraint firstAttribute="trailing" secondItem="v2d-IM-YZp" secondAttribute="trailing" id="fWE-LD-u2c"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="numberWithUnitView" destination="v2d-IM-YZp" id="oWd-eA-PxW"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="Wnu-cJ-NWo" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
-                                        <rect key="frame" x="120.5" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Rt5-W7-0gq">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ahL-4i-Z6b" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                                </view>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="ahL-4i-Z6b" firstAttribute="leading" secondItem="Rt5-W7-0gq" secondAttribute="leading" id="Kp9-iw-yIY"/>
-                                                <constraint firstAttribute="bottom" secondItem="ahL-4i-Z6b" secondAttribute="bottom" id="aRs-AA-g5a"/>
-                                                <constraint firstAttribute="trailing" secondItem="ahL-4i-Z6b" secondAttribute="trailing" id="haV-6I-raG"/>
-                                                <constraint firstItem="ahL-4i-Z6b" firstAttribute="top" secondItem="Rt5-W7-0gq" secondAttribute="top" id="rhF-KU-CXA"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="measurementView" destination="ahL-4i-Z6b" id="KgA-9b-Zvd"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="Xjq-va-TNy"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="Xjq-va-TNy" firstAttribute="bottom" secondItem="b18-pk-RPc" secondAttribute="bottom" id="2dD-1h-HHZ"/>
-                            <constraint firstItem="Kna-gp-9gB" firstAttribute="height" secondItem="Xjq-va-TNy" secondAttribute="height" multiplier="0.5" id="3bh-xz-RGP"/>
-                            <constraint firstItem="Kna-gp-9gB" firstAttribute="leading" secondItem="Xjq-va-TNy" secondAttribute="leading" id="IUC-KX-J3F"/>
-                            <constraint firstItem="b18-pk-RPc" firstAttribute="leading" secondItem="Xjq-va-TNy" secondAttribute="leading" id="WR1-JG-2Nj"/>
-                            <constraint firstItem="Kna-gp-9gB" firstAttribute="top" secondItem="Xjq-va-TNy" secondAttribute="top" id="dzp-pa-RS4"/>
-                            <constraint firstItem="Xjq-va-TNy" firstAttribute="trailing" secondItem="b18-pk-RPc" secondAttribute="trailing" id="mdH-Rm-45x"/>
-                            <constraint firstItem="Xjq-va-TNy" firstAttribute="trailing" secondItem="Kna-gp-9gB" secondAttribute="trailing" id="mxU-vI-Msr"/>
-                            <constraint firstItem="b18-pk-RPc" firstAttribute="top" secondItem="Kna-gp-9gB" secondAttribute="bottom" id="rJz-dF-xeR"/>
-                        </constraints>
-                    </view>
-                    <tabBarItem key="tabBarItem" title="Maps" image="map" catalog="system" id="Wmd-bY-ksl"/>
-                    <connections>
-                        <outlet property="legsCollectionView" destination="b18-pk-RPc" id="FsN-zr-35j"/>
-                        <outlet property="mapView" destination="Kna-gp-9gB" id="tfg-qF-ZZd"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Zhf-cq-gzj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-965" y="1711"/>
-        </scene>
         <!--Calculations View Controller-->
         <scene sceneID="sKo-Gz-sxa">
             <objects>
@@ -1165,7 +1055,7 @@
         <!--Graphs View Controller-->
         <scene sceneID="VeH-AF-dEi">
             <objects>
-                <viewController id="9Nf-CY-m6R" userLabel="Graphs View Controller" customClass="LogGraphsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="9Nf-CY-m6R" userLabel="Graphs View Controller" customClass="LogMapGraphsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="N8L-EL-blt">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1548,7 +1438,6 @@
                         <segue destination="jUv-0p-pFh" kind="relationship" relationship="viewControllers" id="0ZO-f2-Ddq"/>
                         <segue destination="Ixv-6V-WSf" kind="relationship" relationship="viewControllers" id="rRH-bd-ha2"/>
                         <segue destination="9Nf-CY-m6R" kind="relationship" relationship="viewControllers" id="eLJ-yQ-zhg"/>
-                        <segue destination="tIL-BH-og2" kind="relationship" relationship="viewControllers" id="1af-Bv-7hF"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7Wo-SB-lJ9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1562,7 +1451,6 @@
         <image name="chart.xyaxis.line" catalog="system" width="128" height="102"/>
         <image name="fuelpump" catalog="system" width="128" height="122"/>
         <image name="gearshape" catalog="system" width="128" height="123"/>
-        <image name="map" catalog="system" width="128" height="112"/>
         <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
         <image name="tablecells" catalog="system" width="128" height="93"/>
         <image name="timer" catalog="system" width="128" height="123"/>

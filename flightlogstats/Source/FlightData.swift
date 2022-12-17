@@ -51,6 +51,9 @@ class FlightData {
         return self.coordinatesArray.last { CLLocationCoordinate2DIsValid($0) } ?? kCLLocationCoordinate2DInvalid
     }
 
+    var firstDate : Date? { return self.dates.first }
+    var lastDate : Date? { return self.dates.last }
+    
     private var doubleFieldToIndex : [Field:Int] {
         var rv : [Field:Int] = [:]
         for (idx,field) in doubleFields.enumerated() {

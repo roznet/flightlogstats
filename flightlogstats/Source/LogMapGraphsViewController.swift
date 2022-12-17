@@ -11,7 +11,7 @@ import RZUtils
 import RZUtilsUniversal
 import MapKit
 
-class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDelegate {
+class LogMapGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDelegate {
 
     
     @IBOutlet weak var mapView: MKMapView!
@@ -130,23 +130,32 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDel
         }
     }
     
+    private func pushLetTypeViewToModel() {
+        if !self.userInterfaceIsReady {
+            return
+        }
+
+        if self.legTypeSegment.selectedSegmentIndex == 0 {
+            self.legDisplayType = .waypoints
+        }else if self.legTypeSegment.selectedSegmentIndex == 1 {
+            self.legDisplayType = .phasesOfFlight
+        }else if self.legTypeSegment.selectedSegmentIndex == 2 {
+            self.legDisplayType = .comm
+        }else if self.legTypeSegment.selectedSegmentIndex == 3 {
+            self.legDisplayType = .autopilot
+        }
+    }
+    
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
         if self.legTypeSegment == sender {
-            if self.legTypeSegment.selectedSegmentIndex == 0 {
-                self.legDisplayType = .waypoints
-            }else if self.legTypeSegment.selectedSegmentIndex == 1 {
-                self.legDisplayType = .phasesOfFlight
-            }else if self.legTypeSegment.selectedSegmentIndex == 2 {
-                self.legDisplayType = .comm
-            }else if self.legTypeSegment.selectedSegmentIndex == 3 {
-                self.legDisplayType = .autopilot
-            }
+            self.pushLetTypeViewToModel()
             // may have to rebuild
             AppDelegate.worker.async {
                 self.flightLogViewModel?.build()
             }
             
             self.updateUI()
+            
         }else if self.graphTypeSegment == sender {
             if sender.selectedSegmentIndex == 0 {
                 self.graphDisplayType = .singleGraph
@@ -159,10 +168,10 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDel
         }
     }
     
+    var userInterfaceIsReady : Bool { return self.legsCollectionView != nil }
     
     func updateUI(){
-        if self.legsCollectionView == nil {
-            // not ready
+        if !self.userInterfaceIsReady {
             return
         }
         AppDelegate.worker.async {
@@ -242,6 +251,7 @@ class LogGraphsViewController: UIViewController, ViewModelDelegate, MKMapViewDel
         }
         
         DispatchQueue.main.async {
+            self.pushLetTypeViewToModel()
             self.updateUI()
         }
     }

@@ -19,7 +19,7 @@
 		4209D85F2860DDF000B79A07 /* FlightLogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D85E2860DDF000B79A07 /* FlightLogViewModel.swift */; };
 		4209D8612860F4A600B79A07 /* LogDetailTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D8602860F4A600B79A07 /* LogDetailTabBarController.swift */; };
 		4209D864286187CB00B79A07 /* LogFuelAnalysisViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D863286187CB00B79A07 /* LogFuelAnalysisViewController.swift */; };
-		4209D8662861881300B79A07 /* LogGraphsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D8652861881300B79A07 /* LogGraphsViewController.swift */; };
+		4209D8662861881300B79A07 /* LogMapGraphsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D8652861881300B79A07 /* LogMapGraphsViewController.swift */; };
 		421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */; };
 		421EE5BF290C53E600996EC6 /* Aircraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5BE290C53E600996EC6 /* Aircraft.swift */; };
 		421EE5C12928E01E00996EC6 /* FlightLogFileExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5C02928E01E00996EC6 /* FlightLogFileExport.swift */; };
@@ -85,7 +85,6 @@
 		42A11EAA28FAFD7C0031D209 /* FlightFlyStoStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A11EA928FAFD7C0031D209 /* FlightFlyStoStatus.swift */; };
 		42A20B522896F0CF00439880 /* Trips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B512896F0CF00439880 /* Trips.swift */; };
 		42A20B55289C577F00439880 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B54289C577F00439880 /* Trip.swift */; };
-		42A20B57289D78D700439880 /* LogMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B56289D78D700439880 /* LogMapViewController.swift */; };
 		42A20B5A289D7D1500439880 /* FlightData+Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B59289D7D1500439880 /* FlightData+Map.swift */; };
 		42A20B5C28A09F1100439880 /* ProgressReportOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B5B28A09F1100439880 /* ProgressReportOverlay.swift */; };
 		42A7A0BF28154A2400DF4495 /* FlightLogFileRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A7A0BE28154A2400DF4495 /* FlightLogFileRecord.swift */; };
@@ -146,7 +145,7 @@
 		4209D85E2860DDF000B79A07 /* FlightLogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogViewModel.swift; path = Source/FlightLogViewModel.swift; sourceTree = "<group>"; };
 		4209D8602860F4A600B79A07 /* LogDetailTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailTabBarController.swift; path = Source/LogDetailTabBarController.swift; sourceTree = "<group>"; };
 		4209D863286187CB00B79A07 /* LogFuelAnalysisViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogFuelAnalysisViewController.swift; path = Source/LogFuelAnalysisViewController.swift; sourceTree = "<group>"; };
-		4209D8652861881300B79A07 /* LogGraphsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogGraphsViewController.swift; path = Source/LogGraphsViewController.swift; sourceTree = "<group>"; };
+		4209D8652861881300B79A07 /* LogMapGraphsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogMapGraphsViewController.swift; path = Source/LogMapGraphsViewController.swift; sourceTree = "<group>"; };
 		421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysisDataSource.swift; path = Source/FuelAnalysisDataSource.swift; sourceTree = "<group>"; };
 		421EE5BE290C53E600996EC6 /* Aircraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Aircraft.swift; path = Source/Aircraft.swift; sourceTree = "<group>"; };
 		421EE5C02928E01E00996EC6 /* FlightLogFileExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileExport.swift; path = Source/FlightLogFileExport.swift; sourceTree = "<group>"; };
@@ -210,7 +209,6 @@
 		42A11EA928FAFD7C0031D209 /* FlightFlyStoStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightFlyStoStatus.swift; path = Source/FlightFlyStoStatus.swift; sourceTree = "<group>"; };
 		42A20B512896F0CF00439880 /* Trips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trips.swift; path = Source/Trips.swift; sourceTree = "<group>"; };
 		42A20B54289C577F00439880 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trip.swift; path = Source/Trip.swift; sourceTree = "<group>"; };
-		42A20B56289D78D700439880 /* LogMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogMapViewController.swift; path = Source/LogMapViewController.swift; sourceTree = "<group>"; };
 		42A20B59289D7D1500439880 /* FlightData+Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FlightData+Map.swift"; path = "Source/FlightData+Map.swift"; sourceTree = "<group>"; };
 		42A20B5B28A09F1100439880 /* ProgressReportOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReportOverlay.swift; path = Source/ProgressReportOverlay.swift; sourceTree = "<group>"; };
 		42A7A0BE28154A2400DF4495 /* FlightLogFileRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileRecord.swift; path = Source/FlightLogFileRecord.swift; sourceTree = "<group>"; };
@@ -309,8 +307,7 @@
 				4209D8602860F4A600B79A07 /* LogDetailTabBarController.swift */,
 				4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */,
 				4209D863286187CB00B79A07 /* LogFuelAnalysisViewController.swift */,
-				4209D8652861881300B79A07 /* LogGraphsViewController.swift */,
-				42A20B56289D78D700439880 /* LogMapViewController.swift */,
+				4209D8652861881300B79A07 /* LogMapGraphsViewController.swift */,
 			);
 			name = DetailViews;
 			sourceTree = "<group>";
@@ -765,7 +762,6 @@
 				42606A1C288DC57600AE858C /* RZNumberWithUnitCollectionViewCell.swift in Sources */,
 				42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */,
 				4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */,
-				42A20B57289D78D700439880 /* LogMapViewController.swift in Sources */,
 				4268A0C92842851900A3CB05 /* ProgressReport.swift in Sources */,
 				42478A5128153EF300212BF2 /* Log.swift in Sources */,
 				42A20B55289C577F00439880 /* Trip.swift in Sources */,
@@ -783,7 +779,7 @@
 				425A8DE2287094BD002DCB0C /* FlightFuelRecord.swift in Sources */,
 				42606A20288DE0A300AE858C /* FlightListDataSource.swift in Sources */,
 				4239290D2864D08800CD33C0 /* AircraftPerformance.swift in Sources */,
-				4209D8662861881300B79A07 /* LogGraphsViewController.swift in Sources */,
+				4209D8662861881300B79A07 /* LogMapGraphsViewController.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
 				4264C2342825B58F00F40436 /* Settings.swift in Sources */,
 				421EE5C12928E01E00996EC6 /* FlightLogFileExport.swift in Sources */,
