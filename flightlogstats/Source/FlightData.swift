@@ -72,74 +72,32 @@ class FlightData {
     
     private init() {}
     
-    static var methodBuffered = true
-    
     convenience init?(url: URL, progress : ProgressReport? = nil){
         self.init()
         
-        if Self.methodBuffered {
-            var inputSize = 0
-            do {
-                let resources = try url.resourceValues(forKeys: [.fileSizeKey] )
-                if let fileSize = resources.fileSize {
-                    inputSize = fileSize
-                }
-            }catch{
-                inputSize = 0
+        var inputSize = 0
+        do {
+            let resources = try url.resourceValues(forKeys: [.fileSizeKey] )
+            if let fileSize = resources.fileSize {
+                inputSize = fileSize
             }
-            
-            guard let inputStream = InputStream(url: url) else { return nil }
-            do {
-                try self.parse(inputStream: inputStream, totalSize: inputSize, progress: progress)
-            }catch{
-                return nil
-            }
-        }else{
-            var lines : [String.SubSequence] = []
-            do {
-                let str = try String(contentsOf: url, encoding: .macOSRoman)
-                lines = str.split(whereSeparator: \.isNewline)
-            }catch {
-                Logger.app.error("Failed to read \(url.lastPathComponent) \(error.localizedDescription)")
-                return nil
-            }
-                                    
-            self.init(lines: lines, progress: progress)
+        }catch{
+            inputSize = 0
+        }
+        
+        guard let inputStream = InputStream(url: url) else { return nil }
+        do {
+            try self.parse(inputStream: inputStream, totalSize: inputSize, progress: progress)
+        }catch{
+            return nil
         }
     }
-    
-    convenience init(lines : [String.SubSequence], progress : ProgressReport? = nil) {
-        self.init()
-        self.parse(array: lines, progress: progress)
-    }
-    
+        
     convenience init(inputStream : InputStream,progress : ProgressReport? = nil) throws {
         self.init()
         try self.parse(inputStream: inputStream)
     }
     
-
-    //MARK: - parse Memory
-    
-    private func parse(array : [String.SubSequence], progress : ProgressReport? = nil){
-        let start = Date()
-        var state = ParsingState(data: self)
-        var done_sofar = 0
-        
-        self.values.reserveCapacity(array.count)
-        self.strings.reserveCapacity(array.count)
-        
-        let trimCharSet = CharacterSet(charactersIn: "\" ")
-        progress?.update(state: .progressing(0.0), message: .parsingInfo)
-        for line in array {
-            progress?.update(state: .progressing(Double(done_sofar)/Double(array.count)))
-            done_sofar += 1
-            let vals = line.split(separator: ",").map { $0.trimmingCharacters(in: trimCharSet)}
-            state.process(line: vals)
-        }
-        progress?.update(state: .complete)
-        Logger.app.info("Parsed \(array.count) lines in \(Date().timeIntervalSince(start)) secs")
-    }
 
 
     //MARK: - external and derived info
@@ -299,7 +257,7 @@ extension FlightData {
     //MARK: - Parsing State
 
     //
-    private struct ParsingState {
+    private class ParsingState : CsvInterpreter {
         enum ColumnType {
             case double
             case category
@@ -307,7 +265,7 @@ extension FlightData {
         }
         
         var lastReportTime = Date()
-        var totalSize = 0
+        var totalSize : Int
         
         var fields : [Field] = []
         var columnIsDouble : [ColumnType] = []
@@ -339,9 +297,11 @@ extension FlightData {
         var doubleInputs : [Field:[Double]] = [:]
         var doubleInputsCount : Int = 0
         
-        init(data : FlightData){
+        init(data : FlightData, totalSize : Int, progress : ProgressReport? = nil){
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
             self.data = data
+            self.progress = progress
+            self.totalSize = totalSize
             for calcField in FieldCalculation.calculatedFields {
                 if calcField.requiredObservationCount > 0 {
                     self.doubleInputsCount = max(self.doubleInputsCount,calcField.requiredObservationCount)
@@ -351,10 +311,31 @@ extension FlightData {
                 }
             }
         }
+        var interpretStartTime : Date? = nil
+        var progress : ProgressReport?
         
-        mutating func process(line : [String]){
+        func start() {
+            self.interpretStartTime = Date()
+            self.progress?.update(state: .progressing(0.0), message: .parsingInfo)
+        }
+        func finished() {
+            self.progress?.update(state: .complete)
+            if totalSize > 0 {
+                let formatter = ByteCountFormatter()
+                if let interpretStartTime = self.interpretStartTime {
+                    Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize))) in \(Date().timeIntervalSince(interpretStartTime)) secs")
+                }else{
+                    Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize)))")
+                }
+            }
+        }
+        func process(line : [String], readCount : Int){
             guard let first = line.first else { return }
             
+            if totalSize > 0 {
+                progress?.update(state: .progressing(min(1.0,Double(readCount)/Double(totalSize))))
+            }
+
             if first.hasPrefix("#airframe") {
                 for val in line {
                     let keyval = val.split(separator: "=")
@@ -497,9 +478,8 @@ extension FlightData {
                     }
                 }
 
-                self.doubleLine.removeAll()
-                self.stringLine.removeAll()
-                
+                self.doubleLine.removeAll(keepingCapacity: true)
+                self.stringLine.removeAll(keepingCapacity: true)
                 
                 var coord = CLLocationCoordinate2D(latitude: .nan, longitude: .nan)
                 
@@ -525,15 +505,14 @@ extension FlightData {
                 }
                 if coord.latitude.isFinite && coord.longitude.isFinite {
                     data.coordinatesArray.append(coord)
-                }else{
-                    data.coordinatesArray.append(kCLLocationCoordinate2DInvalid)
-                }
-                if coord.latitude.isFinite && coord.longitude.isFinite {
                     let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
                     if let last = lastLocation {
                         runningDistance += location.distance(from: last)
                     }
                     lastLocation = location
+
+                }else{
+                    data.coordinatesArray.append(kCLLocationCoordinate2DInvalid)
                 }
                 // match order with what was added for fields
                 doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
@@ -614,202 +593,17 @@ extension FlightData {
     }
     
     //MARK: - parse stream
-    
-    private enum State {
-        case beginningOfDocument
-        case endOfDocument
         
-        
-        case beginningOfLine
-        case maybeEndOfLine
-        case endOfLine
-        
-        case maybeInField
-        case inField
-        case endOfField
-
-        case inQuotedField
-        case maybeEndOfQuotedField
-    }
-    
-    private struct CSVScalar  {
-        static let CarriageReturn : UnicodeScalar = "\r"
-        static let LineFeed : UnicodeScalar = "\n"
-        static let DoubleQuote : UnicodeScalar = "\""
-        static let Comma : UnicodeScalar = ","
-        static let Space : UnicodeScalar = " "
-    }
-    
-    enum ParseError : Error {
-        case invalidStateForComma
-        case invalidStateForNewLine
-        case invalidStateForQuote
-        case invalidStateForOtherChar
-    }
-    
     func parse(inputStream : InputStream, totalSize : Int = 0, progress : ProgressReport? = nil) throws {
-        let start = Date()
-        progress?.update(state: .progressing(0.0), message: .parsingInfo)
 
-        var parsingState = ParsingState(data: self)
-        //var done_sofar = 0
-        
+        let parsingState = ParsingState(data: self, totalSize: totalSize, progress: progress)
         let bufferedStreamReader = BufferedStreamReader(inputStream: inputStream)
-        var state : State = .beginningOfDocument
-        
-        var fieldBuffer : [UInt8] = []
-        
-        var line : [String] = []
-        
-        while state != .endOfDocument {
-            let byte = bufferedStreamReader.pop()
-            switch byte {
-            case .error(let error):
-                Logger.app.error("Failed to read stream \(error.localizedDescription)")
-                state = .endOfDocument
-            case .endOfFile:
-                state = .endOfDocument
-            case .char(let char):
-                
-                let scalar = UnicodeScalar(char)
-                if state == .beginningOfDocument {
-                    state = .beginningOfLine
-                }
-                
-                if state == .endOfLine {
-                    state = .beginningOfLine
-                }
-                
-                switch scalar {
-                case CSVScalar.Comma:
-                    switch state {
-                    case .beginningOfLine:
-                        state = .endOfField
-                    case .inField, .maybeInField:
-                        state = .endOfField
-                    case .inQuotedField:
-                        fieldBuffer.append(char)
-                    case .maybeEndOfQuotedField,.endOfField:
-                        state = .endOfField
-                    default:
-                        throw ParseError.invalidStateForComma
-                    }
-                case CSVScalar.CarriageReturn:
-                    switch state {
-                    case .endOfField, .beginningOfLine, .inField, .maybeInField, .maybeEndOfQuotedField:
-                        state = .maybeEndOfLine
-                    case .inQuotedField:
-                        fieldBuffer.append(char)
-                    default:
-                        throw ParseError.invalidStateForNewLine
-                    }
-                case CSVScalar.LineFeed:
-                    switch state {
-                    case .endOfField, .beginningOfLine, .inField, .maybeInField, .maybeEndOfQuotedField:
-                        state = .endOfLine
-                    case .inQuotedField:
-                        fieldBuffer.append(char)
-                    case .maybeEndOfLine:
-                        state = .beginningOfLine
-                    default:
-                        throw ParseError.invalidStateForNewLine
-                    }
-                case CSVScalar.Space:
-                    switch state {
-                    case .inField:
-                        fieldBuffer.append(char)
-                    default:
-                        state = .maybeInField
-                    }
-                case CSVScalar.DoubleQuote:
-                    switch state {
-                    case .beginningOfLine, .endOfField:
-                        state = .inQuotedField
-                    case .maybeEndOfQuotedField:
-                        // double double quote, to escape double quote
-                        fieldBuffer.append(char)
-                        state = .inQuotedField
-                    case .inField:
-                        fieldBuffer.append(char)
-                    case .inQuotedField:
-                        // first one
-                        state = .maybeEndOfQuotedField
-                    default:
-                        throw ParseError.invalidStateForQuote
-                    }
-                default:
-                    switch state {
-                    case .beginningOfLine, .endOfField:
-                        fieldBuffer.append(char)
-                        state = .inField
-                    case .maybeEndOfQuotedField:
-                        state = .maybeEndOfQuotedField
-                    case .maybeInField:
-                        fieldBuffer.append(char)
-                        state = .inField
-                    case .inField, .inQuotedField:
-                        fieldBuffer.append(char)
-                    default:
-                        throw ParseError.invalidStateForOtherChar
-                    }
-                }
-            }
-            if state == .endOfField || state == .endOfLine || state == .maybeEndOfLine || state == .endOfDocument {
-                if let value = String(data: Data(fieldBuffer), encoding: .utf8) {
-                    line.append(value)
-                }else{
-                    line.append("") // empty
-                }
-                fieldBuffer.removeAll()
-                if state != .endOfField {
-                    parsingState.process(line: line)
-                    line.removeAll()
-                    if totalSize > 0 {
-                        progress?.update(state: .progressing(min(1.0,Double(bufferedStreamReader.readCount)/Double(totalSize))))
-                    }
-                }
-            }
-        }
-        progress?.update(state: .complete)
-        if totalSize > 0 {
-            let formatter = ByteCountFormatter()
-            Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize))) in \(Date().timeIntervalSince(start)) secs")
-        }
+        try CsvParser.parse(bufferedStreamReader: bufferedStreamReader, interpreter: parsingState)
     }
     
     private func convertDataFrame() {
-        self.doubleDataFrame.clear(fields: self.doubleFields)
-        self.categoricalDataFrame.clear(fields: self.categoricalFields)
+        self.doubleDataFrame = DataFrame(indexes: self.dates, fields: self.doubleFields, rows: self.values)
+        self.categoricalDataFrame = DataFrame(indexes: self.dates, fields: self.categoricalFields, rows: self.strings)
         self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
-        self.doubleDataFrame.reserveCapacity(self.dates.capacity)
-        self.categoricalDataFrame.reserveCapacity(self.dates.capacity)
-        
-        guard dates.first != nil else { return }
-        
-        var lastdate = dates.first!
-        for (date,row) in zip(dates,values) {
-            if date < lastdate {
-                Logger.app.info("Resetting inconsistent date after \(self.doubleDataFrame.count) out of \(self.dates.count)")
-                self.doubleDataFrame.clear(fields: self.doubleFields)
-                self.doubleDataFrame.reserveCapacity(self.dates.capacity)
-            }
-            // edge case date is repeated
-            if self.doubleDataFrame.count == 0 || date != lastdate {
-                self.doubleDataFrame.unsafeFastAppend(fields: self.doubleFields, elements: row, for: date)
-                lastdate = date
-            }
-        }
-        
-        lastdate = dates.first!
-        for (date,row) in zip(dates,strings) {
-            if date < lastdate {
-                self.categoricalDataFrame.clear(fields: self.categoricalFields)
-                self.categoricalDataFrame.reserveCapacity(self.dates.capacity)
-            }
-            if self.categoricalDataFrame.count == 0 || date != lastdate {
-                self.categoricalDataFrame.unsafeFastAppend(fields: self.categoricalFields, elements: row, for: date)
-                lastdate = date
-            }
-        }
     }
 }

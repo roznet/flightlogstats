@@ -75,6 +75,7 @@
 		4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */; };
 		4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
+		4290B460294E5DA10089B158 /* CsvParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4290B45F294E5DA10089B158 /* CsvParser.swift */; };
 		429949D7282816A100CA1B89 /* DisplayContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D6282816A100CA1B89 /* DisplayContext.swift */; };
 		429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */; };
 		429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */; };
@@ -201,6 +202,7 @@
 		4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210623_141501_TEST1.csv; sourceTree = "<group>"; };
 		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		4290B45F294E5DA10089B158 /* CsvParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CsvParser.swift; path = Source/CsvParser.swift; sourceTree = "<group>"; };
 		429949D6282816A100CA1B89 /* DisplayContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisplayContext.swift; path = Source/DisplayContext.swift; sourceTree = "<group>"; };
 		429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewCell.swift; path = Source/TableCollectionViewCell.swift; sourceTree = "<group>"; };
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
@@ -327,6 +329,7 @@
 			isa = PBXGroup;
 			children = (
 				42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */,
+				4290B45F294E5DA10089B158 /* CsvParser.swift */,
 				42478A5028153EF300212BF2 /* Log.swift */,
 				4264C2332825B58F00F40436 /* Settings.swift */,
 				4264C23D2826922C00F40436 /* TimeRange.swift */,
@@ -780,6 +783,7 @@
 				4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */,
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
+				4290B460294E5DA10089B158 /* CsvParser.swift in Sources */,
 				425B345B2894140800548557 /* ViewConfig.swift in Sources */,
 				4240B6BB28A94E7C004D4F40 /* CalendarStatsViewController.swift in Sources */,
 				42A20B522896F0CF00439880 /* Trips.swift in Sources */,

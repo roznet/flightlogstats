@@ -381,7 +381,7 @@ class FlightLogOrganizer {
     
     func add(flightLogFileList : FlightLogFileList){
         var someNew : Int = 0
-        self.progress?.update(state: .start, message: .updatingInfo)
+        self.progress?.update(state: .start, message: .addingFiles)
         var index : Double = 0.0
         let indexTotal : Double = Double(flightLogFileList.count)
         for flightLog in flightLogFileList.flightLogFiles {
@@ -399,11 +399,11 @@ class FlightLogOrganizer {
                     flightLog.updateFlightLogFileInfo(info: fileInfo)
                     self.managedFlightLogs[ filename ] = fileInfo
                     someNew += 1
-                    self.progress?.update(state: .progressing(index / indexTotal), message: .updatingInfo)
+                    self.progress?.update(state: .progressing(index / indexTotal), message: .addingFiles)
                 }
             }
         }
-        self.progress?.update(state: .complete, message: .updatingInfo)
+        self.progress?.update(state: .complete, message: .addingFiles)
         if someNew > 0 {
             Logger.app.info("Found \(someNew) local files to add")
             self.saveContext()
