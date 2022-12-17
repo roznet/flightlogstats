@@ -601,9 +601,85 @@ extension FlightData {
         try CsvParser.parse(bufferedStreamReader: bufferedStreamReader, interpreter: parsingState)
     }
     
-    private func convertDataFrame() {
+    private func convertDataFrameSlow() {
         self.doubleDataFrame = DataFrame(indexes: self.dates, fields: self.doubleFields, rows: self.values)
         self.categoricalDataFrame = DataFrame(indexes: self.dates, fields: self.categoricalFields, rows: self.strings)
         self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
+    }
+    
+    private func convertDataFrame() {
+        // Below is the code of the function below copied explicitely.
+        // that local typed copy is significantly faster than the generic code...
+        // so keeping the explicitly copied loop for now
+        //self.doubleDataFrame = DataFrame(indexes: self.dates, fields: self.doubleFields, rows: self.values)
+        guard self.dates.first != nil else {
+            return
+        }
+        
+        var lastindex = self.dates.first!
+        var builtIndexes : [Date] = []
+        var builtValues : [Field:[Double]] = [:]
+        
+        builtIndexes.reserveCapacity(self.dates.capacity)
+        
+        for field in self.doubleFields {
+            builtValues[field] = []
+            builtValues[field]?.reserveCapacity(builtIndexes.capacity)
+        }
+        
+        for (index,row) in zip(self.dates,self.values) {
+            if index < lastindex {
+                builtIndexes.removeAll(keepingCapacity: true)
+                for field in self.doubleFields {
+                    builtValues[field]?.removeAll(keepingCapacity: true)
+                }
+            }
+            // edge case date is repeated
+            if builtIndexes.count == 0 || index != lastindex {
+                // for some reason doing it manually here is much faster than calling function on dataframe?
+                builtIndexes.append(index)
+                for (field,element) in zip(doubleFields,row) {
+                    //self.values[field, default: []].append(element)
+                    builtValues[field]?.append(element)
+                }
+
+                lastindex = index
+            }
+        }
+        self.doubleDataFrame = DataFrame(indexes: builtIndexes, values: builtValues)
+
+        builtIndexes = []
+        var builtCategorical : [Field:[CategoricalValue]] = [:]
+        
+        builtIndexes.reserveCapacity(self.dates.capacity)
+        
+        for field in self.categoricalFields {
+            builtCategorical[field] = []
+            builtCategorical[field]?.reserveCapacity(builtIndexes.capacity)
+        }
+        
+        for (index,row) in zip(self.dates,self.strings) {
+            if index < lastindex {
+                builtIndexes.removeAll(keepingCapacity: true)
+                for field in self.categoricalFields {
+                    builtValues[field]?.removeAll(keepingCapacity: true)
+                }
+            }
+            // edge case date is repeated
+            if builtIndexes.count == 0 || index != lastindex {
+                // for some reason doing it manually here is much faster than calling function on dataframe?
+                builtIndexes.append(index)
+                for (field,element) in zip(categoricalFields,row) {
+                    //self.values[field, default: []].append(element)
+                    builtCategorical[field]?.append(element)
+                }
+
+                lastindex = index
+            }
+        }
+        self.categoricalDataFrame = DataFrame(indexes: builtIndexes, values: builtCategorical)
+        
+        self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
+
     }
 }
