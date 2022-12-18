@@ -145,7 +145,7 @@ struct FlightSummary : Codable {
         self.fuelTotalizer = FuelQuantity(total: fuel_totalizer, unit: Settings.fuelStoreUnit)
         
         self.distanceInNm = values.last(field: .Distance)?.value ?? 0.0
-        self.altitudeInFeet = values.max(for: .AltInd) ?? 0.0
+        self.altitudeInFeet = values.max(for: .AltMSL) ?? 0.0
 
         let identifiers = data.categoricalDataFrame(for: [.AtvWpt]).dataFrameForValueChange(fields: [.AtvWpt])
 
