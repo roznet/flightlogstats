@@ -58,6 +58,16 @@ class FlightLogFileRecord: NSManagedObject {
     
     static let currentVersion : Int32 = 1
     
+    var fuelRecord : FlightFuelRecord {
+        self.ensureDependentRecords()
+        return self.fuel_record!
+    }
+    
+    var aircraftRecord : AircraftRecord {
+        self.ensureDependentRecords()
+        return self.aircraft_record!
+    }
+    
     var requiresVersionUpdate : Bool { return self.version < Self.currentVersion }
     var requiresParsing : Bool { return self.requiresVersionUpdate || self.recordStatus == .notParsed }
     
@@ -264,8 +274,8 @@ class FlightLogFileRecord: NSManagedObject {
         }
         return nil
     }
-    //MARK: - Analysis
     
+    //MARK: - Analysis
     func isSameAircraft(as other : FlightLogFileRecord) -> Bool {
         guard
             let thisSystem = self.system_id, let otherSystem = other.system_id
@@ -310,8 +320,12 @@ class FlightLogFileRecord: NSManagedObject {
         if log_file_name?.contains(searchText) ?? false {
             return true
         }
+        if self.aircraftRecord.contains(searchText) {
+            return true
+        }
         return false
     }
+    
     func dataSerie(fields : [FlightLogFile.Field]) -> [FlightLogFile.Field:GCStatsDataSerie] {
         if let flightLog = self.flightLog {
             return flightLog.dataSerie(fields: fields)

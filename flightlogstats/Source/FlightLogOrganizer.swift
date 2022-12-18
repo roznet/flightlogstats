@@ -169,8 +169,12 @@ class FlightLogOrganizer {
             (storeDescription,error) in
             if let error = error {
                 Logger.app.error("Failed to load \(error.localizedDescription)")
+            }else{
+                let path = storeDescription.url?.path ?? ""
+                Logger.app.info("Loaded store \(storeDescription.type) \(path)")
+                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                self.checkForUpdates()
             }
-            container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         }
         return container
     }()
@@ -187,9 +191,12 @@ class FlightLogOrganizer {
         }
     }
     
+    func checkForUpdates() {
+        Settings.shared.databaseVersion = 1
+    }
+    
     func loadFromContainer() {
         self.loadAircraftFromContainer()
-
         self.loadLogsFromContainer()
     }
     
@@ -404,8 +411,12 @@ class FlightLogOrganizer {
         self.progress?.update(state: .start, message: .addingFiles)
         var index : Double = 0.0
         let indexTotal : Double = Double(flightLogFileList.count)
+        
+        let group = DispatchGroup()
+        let queue = DispatchQueue(label: "Parsing", attributes: .concurrent)
+        
         for flightLog in flightLogFileList.flightLogFiles {
-            index += 1.0
+            
             let filename = flightLog.name
             if filename.isLogFile {
                 if let existing = self.managedFlightLogs[filename] {
@@ -413,23 +424,33 @@ class FlightLogOrganizer {
                     if flightLog.isParsed || existing.flightLog == nil {
                         existing.flightLog = flightLog
                     }
+                    index += 1.0
                 }else{
-                    let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
-                    fileInfo.container = self
-                    flightLog.updateFlightLogFileInfo(info: fileInfo)
-                    self.managedFlightLogs[ filename ] = fileInfo
-                    someNew += 1
-                    self.progress?.update(state: .progressing(index / indexTotal), message: .addingFiles)
+                    group.enter()
+                    queue.async {
+                        let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
+                        fileInfo.container = self
+                        flightLog.updateFlightLogFileInfo(info: fileInfo)
+                        DispatchQueue.synchronized(self){
+                            self.managedFlightLogs[ filename ] = fileInfo
+                            someNew += 1
+                            index += 1.0
+                        }
+                        self.progress?.update(state: .progressing(index / indexTotal), message: .addingFiles)
+                        group.leave()
+                    }
                 }
             }
         }
-        self.progress?.update(state: .complete, message: .addingFiles)
-        if someNew > 0 {
-            Logger.app.info("Found \(someNew) local files to add")
-            self.saveContext()
-            NotificationCenter.default.post(name: .localFileListChanged, object: self)
-        }else{
-            Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
+        group.notify(queue: AppDelegate.worker){
+            self.progress?.update(state: .complete, message: .addingFiles)
+            if someNew > 0 {
+                Logger.app.info("Found \(someNew) local files to add")
+                self.saveContext()
+                NotificationCenter.default.post(name: .localFileListChanged, object: self)
+            }else{
+                Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
+            }
         }
     }
     
@@ -444,18 +465,18 @@ class FlightLogOrganizer {
     }
     
     func deleteAndResetDatabase() {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "FlightLogFileInfo")
-        do {
-
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-
-            try self.persistentContainer.viewContext.execute(deleteRequest)
-        } catch let error {
-            Logger.app.error("Failed to reset \(error.localizedDescription)")
+        let coordinator = self.persistentContainer.persistentStoreCoordinator
+        for store in coordinator.persistentStores {
+            if let url = store.url {
+                do {
+                    try coordinator.destroyPersistentStore(at: url, type: NSPersistentStore.StoreType(rawValue: store.type))
+                }catch{
+                    Logger.app.error("failed to reset store \(error)")
+                }
+            }
         }
 
         self.managedFlightLogs = [:]
-        
     }
     
     func deleteLocalFilesAndDatabase() {

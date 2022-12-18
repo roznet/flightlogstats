@@ -68,4 +68,8 @@ class AircraftRecord: NSManagedObject {
     var latestFlight : FlightLogFileRecord? {
         return self.flightRecords.last
     }
+    
+    func contains(_ searchText : String ) -> Bool {
+        return self.airframeName.contains(searchText) || self.aircraftIdentifier.contains(searchText)
+    }
 }

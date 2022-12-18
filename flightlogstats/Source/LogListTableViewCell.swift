@@ -22,6 +22,8 @@ class LogListTableViewCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var fileName: UILabel!
     
+    @IBOutlet weak var identifier: UILabel!
+    
     func shouldRefresh(for info : FlightLogFileRecord) -> Bool {
         if let current = self.flightLogFileInfo {
             return info.log_file_name == current.log_file_name
@@ -59,6 +61,7 @@ class LogListTableViewCell: UITableViewCell {
         self.route.isHidden = true
         self.flightIcon.isHidden = true
         self.flightTime.isHidden = true
+        self.identifier.isHidden = true
 
     }
     
@@ -118,6 +121,14 @@ class LogListTableViewCell: UITableViewCell {
                 airports.append(to.icao)
             }
             self.airports.attributedText = NSAttributedString(string: airports.joined(separator: "-"), attributes: titleAttribute)
+            
+            if info.aircraftRecord.aircraftIdentifier != "" {
+                self.identifier.attributedText = NSAttributedString(string: info.aircraftRecord.aircraftIdentifier,attributes: cellAttribute)
+                self.identifier.isHidden = false
+            }else{
+                self.identifier.isHidden = true
+            }
+            
         }else{
             self.totalTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
             self.flightTime.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
@@ -125,6 +136,7 @@ class LogListTableViewCell: UITableViewCell {
             self.route.attributedText = nil
             self.distance.attributedText = nil
             self.airports.attributedText = nil
+            self.identifier.attributedText = nil
         }
     }
     

@@ -136,6 +136,8 @@ struct Settings {
         case totalizer_start_fuel = "totalizer_start_fuel"
         case fuel_config_first_use_acknowledged = "fuel_config_first_use_acknowledged"
         case flysto_credentials = "flysto.credentials"
+        
+        case database_version = "database_version"
     }
     
     static func registerDefaults() {
@@ -145,7 +147,10 @@ struct Settings {
             //Key.unit_target_fuel.rawValue : "usgallon"
         ])
     }
-        
+
+    @UserStorage(key: .database_version, defaultValue: 1)
+    var databaseVersion : Int
+    
     @EnumStorage(key: .open_file_mode, defaultValue: Self.defaultOpenFileMode)
     var openFileMode : OpenFileMode
     

@@ -79,7 +79,6 @@ class Trips {
                 case .endsTrip:
                     trip.add(info: info)
                     trips.append(trip)
-                    Logger.app.info("Ended trip : \(trip.description)")
                     if let next = trip.new(info: info) {
                         trip = next
                     }else{
@@ -87,7 +86,6 @@ class Trips {
                     }
                 case .startsTrip:
                     trips.append(trip)
-                    Logger.app.info("Ended trip : \(trip.description)")
                     if let next = trip.new(info: info) {
                         trip = next
                         trip.add(info: info)
@@ -102,7 +100,6 @@ class Trips {
                 }
             }
             if !trip.empty {
-                Logger.app.info("Ended trip : \(trip.description)")
                 trips.append(trip)
                 if let next = trip.new(){
                     trip = next

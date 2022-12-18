@@ -31,13 +31,13 @@
                                             <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
                                                 <rect key="frame" x="0.0" y="0.0" width="474" height="55"/>
                                                 <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="251" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
                                                         <rect key="frame" x="0.0" y="0.0" width="406.5" height="55"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" ambiguous="YES" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
                                                         <rect key="frame" x="411.5" y="0.0" width="62.5" height="55"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
@@ -1008,8 +1008,8 @@
                                     <action selector="doneButton:" destination="npJ-vZ-DSg" eventType="touchUpInside" id="Dgd-in-ebn"/>
                                 </connections>
                             </button>
-                            <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="whU-RY-QJG">
-                                <rect key="frame" x="20" y="91" width="824" height="216"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="whU-RY-QJG">
+                                <rect key="frame" x="5" y="91" width="824" height="216"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Import Method" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RUR-dW-2PZ">
                                         <rect key="frame" x="0.0" y="0.0" width="113" height="216"/>
@@ -1209,10 +1209,10 @@
             </objects>
             <point key="canvasLocation" x="527" y="1559"/>
         </scene>
-        <!--Flight Logs-->
+        <!--Flight Logs List-->
         <scene sceneID="ifI-4a-r8r">
             <objects>
-                <tableViewController clearsSelectionOnViewWillAppear="NO" id="JdO-DO-Gh9" customClass="LogListTableViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController clearsSelectionOnViewWillAppear="NO" id="JdO-DO-Gh9" userLabel="Flight Logs List" customClass="LogListTableViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="oIf-wu-Id9">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1228,12 +1228,23 @@
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="eHV-1q-1DG">
                                             <rect key="frame" x="5" y="5" width="95.5" height="89"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dGn-BM-a9i" userLabel="Airports">
+                                                <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jOR-W7-Yxi">
                                                     <rect key="frame" x="0.0" y="0.0" width="95.5" height="16.5"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dGn-BM-a9i" userLabel="Airports">
+                                                            <rect key="frame" x="0.0" y="0.0" width="54" height="16.5"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y12-SJ-bD9" userLabel="Identifier">
+                                                            <rect key="frame" x="54" y="0.0" width="41.5" height="16.5"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                </stackView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="EGTF,OCK," textAlignment="natural" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BsR-3f-wqd" userLabel="route">
                                                     <rect key="frame" x="0.0" y="24.5" width="95.5" height="16"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
@@ -1257,7 +1268,6 @@
                                                 <constraint firstItem="knq-lT-6lR" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="dpo-0a-pVr"/>
                                                 <constraint firstItem="BsR-3f-wqd" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="ho5-f9-UUP"/>
                                                 <constraint firstItem="fnr-Qm-BJe" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="lq3-XF-g3P"/>
-                                                <constraint firstItem="dGn-BM-a9i" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="x7x-1k-1mV"/>
                                             </constraints>
                                         </stackView>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="bottom" translatesAutoresizingMaskIntoConstraints="NO" id="f5y-BP-W6W">
@@ -1335,6 +1345,7 @@
                                     <outlet property="flightIcon" destination="kWF-h7-DKy" id="zbq-Dr-Xmc"/>
                                     <outlet property="flightTime" destination="TJ6-sh-rHB" id="iJf-Ua-ldq"/>
                                     <outlet property="fuel" destination="bU9-Ql-uYs" id="Uix-YJ-qx9"/>
+                                    <outlet property="identifier" destination="y12-SJ-bD9" id="ylC-hK-ase"/>
                                     <outlet property="route" destination="BsR-3f-wqd" id="5ny-QM-Ak7"/>
                                     <outlet property="totalTime" destination="y30-6u-gfG" id="lE2-aO-C9q"/>
                                 </connections>
