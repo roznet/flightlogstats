@@ -341,14 +341,14 @@
 			name = Utils;
 			sourceTree = "<group>";
 		};
-		425F4ED92893285000F691BD /* Stats */ = {
+		425F4ED92893285000F691BD /* StatsViews */ = {
 			isa = PBXGroup;
 			children = (
 				425F4EDA2893288A00F691BD /* StatsTabBarController.swift */,
 				425F4EDC289328DC00F691BD /* TripsStatsViewController.swift */,
 				4240B6BA28A94E7C004D4F40 /* CalendarStatsViewController.swift */,
 			);
-			name = Stats;
+			name = StatsViews;
 			sourceTree = "<group>";
 		};
 		4280C871280D43E400A0FB32 = {
@@ -413,10 +413,10 @@
 			isa = PBXGroup;
 			children = (
 				42A20B58289D7CDB00439880 /* Support */,
-				425F4ED92893285000F691BD /* Stats */,
-				423EF3512872E74900EA7415 /* MainListViews */,
-				4209D8622861878900B79A07 /* DetailViews */,
 				4209D85D2860DDBE00B79A07 /* Table */,
+				423EF3512872E74900EA7415 /* MainListViews */,
+				425F4ED92893285000F691BD /* StatsViews */,
+				4209D8622861878900B79A07 /* DetailViews */,
 				4209D85C2860DD9500B79A07 /* DataSources */,
 				4209D85E2860DDF000B79A07 /* FlightLogViewModel.swift */,
 				429949D6282816A100CA1B89 /* DisplayContext.swift */,
@@ -430,9 +430,9 @@
 		4280C8C4280D467A00A0FB32 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				42A20B4F2896F07C00439880 /* Flight */,
 				42A20B53289C576600439880 /* Trips */,
 				42A20B502896F0A200439880 /* Entities */,
-				42A20B4F2896F07C00439880 /* Flight */,
 				42B3842F28609A3C009458CC /* FieldCalculations.swift */,
 			);
 			name = Model;

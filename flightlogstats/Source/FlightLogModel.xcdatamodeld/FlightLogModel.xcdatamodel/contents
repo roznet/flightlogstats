@@ -7,6 +7,11 @@
         <attribute name="fuel_tab" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="gph" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="system_id" optional="YES" attributeType="String"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="system_id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="FlightFlyStoStatus" representedClassName=".FlightFlyStoStatus" syncable="YES" codeGenerationType="category">
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
@@ -21,6 +26,11 @@
         <attribute name="target_fuel" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="totalizer_fuel_start" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileRecord" inverseName="fuel_record" inverseEntity="FlightLogFileRecord"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="log_file_name"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="FlightLogFileRecord" representedClassName=".FlightLogFileRecord" syncable="YES" codeGenerationType="category">
         <attribute name="airframe_name" optional="YES" attributeType="String"/>
@@ -46,5 +56,10 @@
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="flysto_status" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFlyStoStatus" inverseName="log_file_info" inverseEntity="FlightFlyStoStatus"/>
         <relationship name="fuel_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFuelRecord" inverseName="log_file_info" inverseEntity="FlightFuelRecord"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="log_file_name"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
 </model>

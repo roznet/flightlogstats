@@ -159,6 +159,7 @@ class FlightLogOrganizer {
             if let error = error {
                 Logger.app.error("Failed to load \(error.localizedDescription)")
             }
+            container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         }
         return container
     }()

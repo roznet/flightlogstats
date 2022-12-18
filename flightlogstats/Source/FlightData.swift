@@ -608,10 +608,6 @@ extension FlightData {
     }
     
     private func convertDataFrame() {
-        // Below is the code of the function below copied explicitely.
-        // that local typed copy is significantly faster than the generic code...
-        // so keeping the explicitly copied loop for now
-        //self.doubleDataFrame = DataFrame(indexes: self.dates, fields: self.doubleFields, rows: self.values)
         guard self.dates.first != nil else {
             return
         }
