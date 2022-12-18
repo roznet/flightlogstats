@@ -113,8 +113,19 @@ class FlightLogOrganizer {
 
     //MARK: - Aircraft management
     
-    func aircraft(systemId : SystemId) -> Aircraft? {
-        return self.managedAircrafts[systemId]
+    func aircraft(systemId : SystemId, airframeName : String? = nil) -> AircraftRecord {
+        if let rv = self.managedAircrafts[systemId] {
+            return rv
+        }else{
+            let newAircraft = AircraftRecord(context: self.persistentContainer.viewContext)
+            newAircraft.system_id = systemId
+            newAircraft.airframe_name = airframeName
+            // set default performance
+            newAircraft.aircraftPerformance = Settings.shared.aircraftPerformance
+            self.managedAircrafts[systemId] = newAircraft
+            self.saveContext()
+            return newAircraft
+        }
     }
     
     var aircraftSystemIds : [SystemId] { return Array(self.managedAircrafts.keys) }
@@ -145,7 +156,7 @@ class FlightLogOrganizer {
 
     /// managed aircrafts keyed of system_id
     typealias SystemId = AvionicsSystem.SystemId
-    private var managedAircrafts : [SystemId:Aircraft] = [:]
+    private var managedAircrafts : [SystemId:AircraftRecord] = [:]
     
     private var flightLogFileList : FlightLogFileList {
         let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
@@ -177,8 +188,9 @@ class FlightLogOrganizer {
     }
     
     func loadFromContainer() {
-        self.loadLogsFromContainer()
         self.loadAircraftFromContainer()
+
+        self.loadLogsFromContainer()
     }
     
     private func loadLogsFromContainer() {
@@ -213,10 +225,10 @@ class FlightLogOrganizer {
     }
 
     private func loadAircraftFromContainer() {
-        let fetchRequest = Aircraft.fetchRequest()
+        let fetchRequest = AircraftRecord.fetchRequest()
         
         do {
-            let fetchAircrafts : [Aircraft] = try self.persistentContainer.viewContext.fetch(fetchRequest)
+            let fetchAircrafts : [AircraftRecord] = try self.persistentContainer.viewContext.fetch(fetchRequest)
             var added = 0
             let existing = self.managedAircrafts.count
             for aircraft in fetchAircrafts {
@@ -346,8 +358,8 @@ class FlightLogOrganizer {
                 Logger.app.error("Failed to load local \(error.localizedDescription)")
             case .success(let urls):
                 let logs = FlightLogFileList(urls: urls)
-                self.add(flightLogFileList: logs)
                 self.add(aircrafts: urls)
+                self.add(flightLogFileList: logs)
                 self.updateInfo(count: 1)
             }
         }
@@ -360,9 +372,14 @@ class FlightLogOrganizer {
             if url.logFileType == .aircraft {
                 checked += 1
                 if let avionics = AvionicsSystem.from(jsonUrl: url) {
-                    if self.managedAircrafts[ avionics.systemId ] == nil {
+                    if let aircraft = self.managedAircrafts[ avionics.systemId ]  {
+                        if aircraft.avionicsSystem != avionics {
+                            aircraft.avionicsSystem = avionics
+                            someNew += 1
+                        }
+                    }else{
                         Logger.app.info("Registering \(avionics)")
-                        let aircraft = Aircraft(context: self.persistentContainer.viewContext)
+                        let aircraft = AircraftRecord(context: self.persistentContainer.viewContext)
                         aircraft.avionicsSystem = avionics
                         aircraft.aircraftPerformance = Settings.shared.aircraftPerformance
                         self.managedAircrafts[avionics.systemId] = aircraft
@@ -379,6 +396,8 @@ class FlightLogOrganizer {
             Logger.app.info("No missing aircraft in \(checked) checked")
         }
     }
+    
+    
     
     func add(flightLogFileList : FlightLogFileList){
         var someNew : Int = 0

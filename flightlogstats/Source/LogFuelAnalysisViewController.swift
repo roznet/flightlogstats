@@ -229,7 +229,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         // Make sure UI ready
         guard self.fuelTargetField != nil else { return }
         
-        self.flightLogFileInfo?.ensureFuelRecord()
+        self.flightLogFileInfo?.ensureDependentRecords()
         
         self.updateFromSettings()
         

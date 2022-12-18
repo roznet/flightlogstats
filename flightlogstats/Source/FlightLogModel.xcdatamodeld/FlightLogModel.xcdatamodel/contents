@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="AircraftRecord" representedClassName=".Aircraft" syncable="YES" codeGenerationType="category">
+    <entity name="AircraftRecord" representedClassName=".AircraftRecord" syncable="YES" codeGenerationType="category">
         <attribute name="aircraft_identifier" optional="YES" attributeType="String"/>
         <attribute name="airframe_name" optional="YES" attributeType="String"/>
         <attribute name="fuel_max" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="fuel_tab" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="gph" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="system_id" optional="YES" attributeType="String"/>
+        <attribute name="system_id" attributeType="String"/>
+        <relationship name="file_records" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightLogFileRecord" inverseName="aircraft_record" inverseEntity="FlightLogFileRecord"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="system_id"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
-    <entity name="FlightFlyStoStatus" representedClassName=".FlightFlyStoStatus" syncable="YES" codeGenerationType="category">
+    <entity name="FlightFlyStoRecord" representedClassName=".FlightFlyStoRecord" syncable="YES" codeGenerationType="category">
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
         <attribute name="status_date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="upload_status" optional="YES" attributeType="String"/>
@@ -22,7 +23,7 @@
     <entity name="FlightFuelRecord" representedClassName=".FlightFuelRecord" syncable="YES" codeGenerationType="category">
         <attribute name="added_fuel_left" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="added_fuel_right" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="log_file_name" optional="YES" attributeType="String"/>
+        <attribute name="log_file_name" attributeType="String"/>
         <attribute name="target_fuel" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="totalizer_fuel_start" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="log_file_info" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileRecord" inverseName="fuel_record" inverseEntity="FlightLogFileRecord"/>
@@ -42,7 +43,7 @@
         <attribute name="end_time_moving" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fuel_totalizer_total" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="info_status" optional="YES" attributeType="String"/>
-        <attribute name="log_file_name" optional="YES" attributeType="String"/>
+        <attribute name="log_file_name" attributeType="String"/>
         <attribute name="max_altitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="route" optional="YES" attributeType="String"/>
         <attribute name="start_airport_icao" optional="YES" attributeType="String"/>
@@ -54,7 +55,8 @@
         <attribute name="system_id" optional="YES" attributeType="String"/>
         <attribute name="total_distance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="version" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="flysto_status" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFlyStoStatus" inverseName="log_file_info" inverseEntity="FlightFlyStoStatus"/>
+        <relationship name="aircraft_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AircraftRecord" inverseName="file_records" inverseEntity="AircraftRecord"/>
+        <relationship name="flysto_status" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFlyStoRecord" inverseName="log_file_info" inverseEntity="FlightFlyStoRecord"/>
         <relationship name="fuel_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFuelRecord" inverseName="log_file_info" inverseEntity="FlightFuelRecord"/>
         <uniquenessConstraints>
             <uniquenessConstraint>

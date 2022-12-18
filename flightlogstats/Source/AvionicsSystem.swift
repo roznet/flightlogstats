@@ -9,11 +9,12 @@ import Foundation
 import OSLog
 import CoreData
 
-class AvionicsSystem : CustomStringConvertible, Codable {
+class AvionicsSystem : CustomStringConvertible, Equatable, Codable {
     typealias SystemId = String
+    typealias AircraftIdentifier = String
     
     let info : [String:String]
-    let aircraftIdentifier : String
+    let aircraftIdentifier : AircraftIdentifier
     let airframeName : String
     let systemId : SystemId
     
@@ -21,7 +22,11 @@ class AvionicsSystem : CustomStringConvertible, Codable {
     
     var uniqueFileName : String { return "sys_\(systemId).json" }
     
-    init(aircraftIdentifier : String, airframeName : String, systemId : SystemId) {
+    static func ==(lhs: AvionicsSystem, rhs: AvionicsSystem) -> Bool {
+        return lhs.systemId == rhs.systemId && lhs.airframeName == rhs.airframeName && lhs.aircraftIdentifier == rhs.aircraftIdentifier
+    }
+    
+    init(aircraftIdentifier : AircraftIdentifier, airframeName : String, systemId : SystemId) {
         self.airframeName = airframeName
         self.aircraftIdentifier = aircraftIdentifier
         self.systemId = systemId
@@ -78,5 +83,5 @@ class AvionicsSystem : CustomStringConvertible, Codable {
         }
     }
     
-    
+
 }

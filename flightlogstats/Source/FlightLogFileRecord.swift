@@ -153,6 +153,8 @@ class FlightLogFileRecord: NSManagedObject {
             
             self.total_distance = flightSummary.distanceInNm
             self.max_altitude = flightSummary.altitudeInFeet
+            
+            self.ensureAircraftRecord()
         }else{
             self.recordStatus = .notParsed
         }
@@ -170,6 +172,10 @@ class FlightLogFileRecord: NSManagedObject {
                 rv = true
             }
         }
+        if self.ensureAircraftRecord() {
+            rv = true
+        }
+        
         return rv
     }
     
@@ -187,31 +193,60 @@ class FlightLogFileRecord: NSManagedObject {
         }
     }
     
-    //MARK: - FLySto
-    
-    func ensureFlyStoStatus() {
-        if self.flysto_status == nil,
-           let container = self.container {
-            let context = container.persistentContainer.viewContext
-            let status = FlightFlyStoStatus(context: context)
-            status.status = .ready
-            self.flysto_status = status
+    //MARK: - Ensure dependent object
+
+    func ensureDependentRecords() {
+        var save = false
+        
+        if self.ensureFlyStoStatus() {
+            save = true
+        }
+        if self.ensureFuelRecord() {
+            save = true
+        }
+        if self.ensureAircraftRecord(){
+            save = true
+        }
+        
+        if save {
             self.saveContext()
         }
     }
     
-    //MARK: - Fuel Records
     
-    func ensureFuelRecord() {
+    @discardableResult
+    private func ensureAircraftRecord() -> Bool {
+        if self.aircraft_record == nil, let container = self.container, let sysid = self.system_id {
+            self .aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
+            return true
+        }
+        return false
+    }
+    
+    private func ensureFlyStoStatus() -> Bool {
+        if self.flysto_status == nil,
+           let container = self.container {
+            let context = container.persistentContainer.viewContext
+            let status = FlightFlyStoRecord(context: context)
+            status.status = .ready
+            self.flysto_status = status
+            return true
+        }
+        return false
+    }
+    
+    private func ensureFuelRecord() -> Bool {
         if self.fuel_record == nil,
            let container = self.container {
             let context = container.persistentContainer.viewContext
             let record = FlightFuelRecord(context: context)
             // initialise with default
             record.setupFromSettings()
+            record.log_file_name = self.log_file_name
             self.fuel_record = record
-            self.saveContext()
+            return true
         }
+        return false
     }
     
     var estimatedTotalizerStart : FuelQuantity? {
@@ -223,7 +258,7 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     var nextTotalizerStart : FuelQuantity? {
-        self.ensureFuelRecord()
+        self.ensureDependentRecords()
         if let record = self.fuel_record {
             return record.nextTotalizerStart(for: FuelQuantity(total: self.fuel_totalizer_total, unit: Settings.fuelStoreUnit))
         }

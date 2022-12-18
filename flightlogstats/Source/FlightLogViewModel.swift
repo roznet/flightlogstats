@@ -37,8 +37,7 @@ class FlightLogViewModel {
     
     private func save() {
         AppDelegate.worker.async {
-            self.flightLogFileInfo.ensureFuelRecord()
-            self.flightLogFileInfo.ensureFlyStoStatus()
+            self.flightLogFileInfo.ensureDependentRecords()
             if let record = self.flightLogFileInfo.fuel_record {
                 record.fuelAnalysisInputs = self.fuelAnalysisInputs
                 self.flightLogFileInfo.saveContext()
@@ -78,12 +77,12 @@ class FlightLogViewModel {
         return nil
     }
     
-    var flystoStatus : FlightFlyStoStatus.Status {
+    var flystoStatus : FlightFlyStoRecord.Status {
         get {
             return self.flightLogFileInfo.flysto_status?.status ?? .ready
         }
         set {
-            self.flightLogFileInfo.ensureFlyStoStatus()
+            self.flightLogFileInfo.ensureDependentRecords()
             self.flightLogFileInfo.flysto_status?.status = newValue
             self.flightLogFileInfo.flysto_status?.status_date = Date()
         }
@@ -99,8 +98,7 @@ class FlightLogViewModel {
         self.progress = progress
         self.displayContext = displayContext
         self.aircraft = Settings.shared.aircraftPerformance
-        fileInfo.ensureFuelRecord()
-        fileInfo.ensureFlyStoStatus()
+        fileInfo.ensureDependentRecords()
         if let record = fileInfo.fuel_record {
             self.fuelAnalysisInputs = record.fuelAnalysisInputs
         }else{

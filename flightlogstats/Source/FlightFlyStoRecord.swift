@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-class FlightFlyStoStatus : NSManagedObject {
+class FlightFlyStoRecord : NSManagedObject {
     enum Status : String {
         /// files with status pending should be uploaded when opportunity occurs in background upload
         case pending

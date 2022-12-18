@@ -8,13 +8,19 @@
 import UIKit
 import CoreData
 
-class Aircraft: NSManagedObject {
-
+class AircraftRecord: NSManagedObject {
+    typealias SystemId = AvionicsSystem.SystemId
+    typealias AircraftIdentifier = AvionicsSystem.AircraftIdentifier
+    
     weak var container : FlightLogOrganizer? = nil
     func saveContext() {
         self.container?.saveContext()
     }
 
+    var systemId : SystemId { return self.system_id ?? "" }
+    var aircraftIdentifier : AircraftIdentifier { return self.aircraft_identifier ?? "" }
+    var airframeName : String { return self.airframe_name ?? "" }
+    
     var avionicsSystem : AvionicsSystem? {
         get {
             guard let i = self.aircraft_identifier, let n = self.airframe_name, let s = self.system_id else { return nil }
@@ -44,5 +50,22 @@ class Aircraft: NSManagedObject {
             self.fuel_tab = newValue.fuelTab.converted(to: Settings.fuelStoreUnit).total
             self.gph = newValue.gph
         }
+    }
+    
+    var flightRecords : [FlightLogFileRecord] {
+        var rv : [FlightLogFileRecord] = []
+        if let flights = self.file_records {
+            for flight in flights {
+                if let record = flight as? FlightLogFileRecord {
+                    rv.append(record)
+                }
+            }
+        }
+        
+        return rv.sorted { $0.isNewer(than: $1) }
+    }
+    
+    var latestFlight : FlightLogFileRecord? {
+        return self.flightRecords.last
     }
 }
