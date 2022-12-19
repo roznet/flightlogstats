@@ -179,7 +179,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         if let maxTextLabel = self.flightLogViewModel?.fuelMaxTextLabel {
             self.maxFuelSubLabel.text = maxTextLabel
         }
-        if let maxFuel = self.flightLogViewModel?.aircraft.fuelMax {
+        if let maxFuel = self.flightLogViewModel?.aircraftPerformance.fuelMax {
             if maxFuel.totalMeasurement < self.enteredFuelTarget.totalMeasurement {
                 self.enteredFuelTarget = maxFuel
             }
@@ -211,7 +211,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }
 
     private func checkViewConsistency() {
-        if let aircraft = self.flightLogViewModel?.aircraft {
+        if let aircraft = self.flightLogViewModel?.aircraftPerformance {
             if self.enteredFuelTarget == aircraft.fuelMax {
                 self.fuelTargetSegment.selectedSegmentIndex = 0
             }else if self.enteredFuelTarget == aircraft.fuelTab {
@@ -290,7 +290,9 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
                 Logger.ui.info("Update Fuel Analysis for settings change")
                 self.pushModelToView()
                 self.updateUI()
-                self.flightLogFileInfo?.saveContext()
+                AppDelegate.worker.async {
+                    self.flightLogFileInfo?.saveContext()
+                }
             }
         }
     }
@@ -301,11 +303,11 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         
         if segment == self.fuelTargetSegment {
             if segment.selectedSegmentIndex == 0 {
-                if let newTarget = self.flightLogViewModel?.aircraft.fuelMax {
+                if let newTarget = self.flightLogViewModel?.aircraftPerformance.fuelMax {
                     self.enteredFuelTarget = newTarget
                 }
             }else if segment.selectedSegmentIndex == 1 {
-                if let newTarget = self.flightLogViewModel?.aircraft.fuelTab {
+                if let newTarget = self.flightLogViewModel?.aircraftPerformance.fuelTab {
                     self.enteredFuelTarget = newTarget
                 }
             }

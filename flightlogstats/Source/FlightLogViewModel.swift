@@ -63,7 +63,7 @@ class FlightLogViewModel {
     private(set) var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
     private(set) var aircraftDataSource : AircraftSummaryDataSource? = nil
     
-    var aircraft : AircraftPerformance {
+    var aircraftPerformance : AircraftPerformance {
         get {
             return self.flightLogFileInfo.aircraftRecord.aircraftPerformance
         }
@@ -85,7 +85,7 @@ class FlightLogViewModel {
     }
     
     var fuelMaxTextLabel : String {
-        let max = aircraft.fuelMax.converted(to: fuelTargetUnit)
+        let max = aircraftPerformance.fuelMax.converted(to: fuelTargetUnit)
         let formatter = MeasurementFormatter()
         formatter.unitOptions = .providedUnit
         formatter.numberFormatter.maximumFractionDigits = 0
@@ -94,7 +94,7 @@ class FlightLogViewModel {
     
     var estimatedTotalizerStart : FuelQuantity? {
         if let rv = self.flightLogFileInfo.estimatedTotalizerStart {
-            return min(rv, self.aircraft.fuelMax)
+            return min(rv, self.aircraftPerformance.fuelMax)
         }
         return nil
     }
@@ -151,7 +151,7 @@ class FlightLogViewModel {
     func isValid(added : FuelQuantity) -> Bool {
         if let summary = self.flightLogFileInfo.flightSummary {
             let target = added + summary.fuelEnd
-            return target >= summary.fuelEnd && target < self.aircraft.fuelMax
+            return target >= summary.fuelEnd && target < self.aircraftPerformance.fuelMax
         }else{
             return true
         }

@@ -95,12 +95,12 @@ class FuelAnalysisDataSource: TableDataSource {
             self.displayContext = displayContext
         }
                 
-        if let aircraft = self.flightLogViewModel?.aircraft,
+        if let aircraftPerformance = self.flightLogViewModel?.aircraftPerformance,
            let inputs = self.flightLogViewModel?.fuelAnalysisInputs,
            let fuelTargetUnit = self.flightLogViewModel?.fuelTargetUnit,
            let fuelAddedUnit = self.flightLogViewModel?.fuelAddedUnit {
             
-            let fuelAnalysis = FuelAnalysis(aircraft: aircraft,
+            let fuelAnalysis = FuelAnalysis(aircraftPerformance: aircraftPerformance,
                                             current: flightSummary.fuelEnd,
                                             totalizer: flightSummary.fuelTotalizer,
                                             inputs: inputs)

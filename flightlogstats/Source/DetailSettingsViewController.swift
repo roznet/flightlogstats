@@ -30,14 +30,16 @@ class DetailSettingsViewController: UIViewController {
     let aircraftFuelUnit : UnitVolume = UnitVolume.aviationGallon
     
     var flightLogViewModel : FlightLogViewModel? = nil
-    var aircraft : AircraftPerformance { return self.flightLogViewModel?.aircraft ?? Settings.shared.aircraftPerformance }
+    var aircraftPerformance : AircraftPerformance { return self.flightLogViewModel?.aircraftPerformance ?? Settings.shared.aircraftPerformance }
+    
+    var enteredAircraftPerformance : AircraftPerformance { return AircraftPerformance(fuelMax: self.enteredMaxFuel, fuelTab: self.enteredTabFuel, gph: self.enteredGph) }
     
     var enteredMaxFuel : FuelQuantity {
         get {
             if let maxFuel =  self.maxFuelField.text, let value = Double( maxFuel )  {
                 return FuelQuantity(total: value, unit: self.aircraftFuelUnit)
             }
-            return self.aircraft.fuelMax
+            return self.aircraftPerformance.fuelMax
         }
         set {
             let converted = newValue.converted(to: self.aircraftFuelUnit)
@@ -50,7 +52,7 @@ class DetailSettingsViewController: UIViewController {
             if let tabFuel =  self.tabFuelField.text, let value = Double( tabFuel )  {
                 return FuelQuantity(total: value, unit: self.aircraftFuelUnit)
             }
-            return self.aircraft.fuelTab
+            return self.aircraftPerformance.fuelTab
         }
         set {
             let converted = newValue.converted(to: self.aircraftFuelUnit)
@@ -63,10 +65,10 @@ class DetailSettingsViewController: UIViewController {
             if let gph =  self.gphField.text, let value = Double( gph )  {
                 return value
             }
-            return self.aircraft.gph
+            return self.aircraftPerformance.gph
         }
         set {
-            self.tabFuelField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: newValue))
+            self.gphField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: newValue))
         }
     }
     
@@ -108,15 +110,17 @@ class DetailSettingsViewController: UIViewController {
         Settings.shared.unitAddedFuel = self.unit(for: self.addedUnitSegment)
         Settings.shared.unitTargetFuel = self.unit(for: self.targetUnitSegment)
         
-        let aircraft = AircraftPerformance(fuelMax: self.enteredMaxFuel, fuelTab: self.enteredTabFuel, gph: self.enteredGph)
-        Settings.shared.aircraftPerformance = aircraft
+        let aircraftPerformance = self.enteredAircraftPerformance
+        Settings.shared.aircraftPerformance = aircraftPerformance
+        self.flightLogViewModel?.aircraftPerformance = aircraftPerformance
+        
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     func pushModelToView() {
-        self.enteredGph = self.aircraft.gph
-        self.enteredTabFuel = self.aircraft.fuelTab
-        self.enteredMaxFuel = self.aircraft.fuelMax
+        self.enteredGph = self.aircraftPerformance.gph
+        self.enteredTabFuel = self.aircraftPerformance.fuelTab
+        self.enteredMaxFuel = self.aircraftPerformance.fuelMax
         
         self.update(segment: self.addedUnitSegment, for: Settings.shared.unitAddedFuel)
         self.update(segment: self.targetUnitSegment, for: Settings.shared.unitTargetFuel)
