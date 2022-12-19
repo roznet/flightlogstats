@@ -253,7 +253,7 @@ class FlightLogOrganizer {
                 if let filename = info.log_file_name {
                     if self.managedFlightLogs[filename] == nil {
                         added += 1
-                        info.container = self
+                        info.organizer = self
                         if info.updateForKnownIssues() {
                             needSave = true
                         }
@@ -470,7 +470,7 @@ class FlightLogOrganizer {
                     group.enter()
                     queue.async {
                         let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
-                        fileInfo.container = self
+                        fileInfo.organizer = self
                         flightLog.updateFlightLogFileInfo(info: fileInfo)
                         DispatchQueue.synchronized(self){
                             self.managedFlightLogs[ filename ] = fileInfo

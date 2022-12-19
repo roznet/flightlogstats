@@ -11,6 +11,7 @@ import RZUtils
 import RZFlight
 import RZUtilsSwift
 import RZData
+import UIKit
 
 struct DisplayedValue {
     enum Formatter {
@@ -144,6 +145,8 @@ class DisplayContext {
         self.dateFormatter.dateStyle = .medium
         self.dateFormatter.timeStyle = .none
     }
+    
+    var horizontalSizeClass : UIUserInterfaceSizeClass = .regular
     
     //MARK: - format model objets
 

@@ -74,6 +74,6 @@ class AircraftSummaryDataSource: TableDataSource {
         
         self.addLine(title: "Identifier", string: self.aircraftRecord.aircraftIdentifier)
         self.addLine(title: "Airframe", string: self.aircraftRecord.airframeName)
-        self.addLine(title: "Last flight Date", date: self.aircraftRecord.lastestFlightDate)
+        self.addLine(title: "Last", date: self.aircraftRecord.lastestFlightDate)
     }
 }

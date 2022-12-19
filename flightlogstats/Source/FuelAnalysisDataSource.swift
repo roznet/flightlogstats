@@ -45,9 +45,31 @@ class FuelAnalysisDataSource: TableDataSource {
         self.rowsCount += 1
     }
 
+    func adaptedName(name : String) -> String {
+        if self.displayContext.horizontalSizeClass == .regular {
+            return name
+        }
+        
+        let short : [String:String] = [ "Target Required" : "Required",
+                                        "Target Save" : "Save",
+                                        "Target Mass Save" : "Mass Save",
+                                        "Target Endurance" : "Endurance",
+                                        "Target Lost" : "Lost",
+                                        "Current Endurance" : "Endurance",
+                                        "New Save" : "Save",
+                                        "New Mass Save": "Mass Save",
+                                        "New Endurance" : "Endurance",
+                                        "Lost Endurance" : "Lost"
+        ]
+        if let adapted = short[name] {
+            return adapted
+        }
+        return name
+    }
+    
     func addLine<UnitType>(name : String, fuel : FuelTanks<UnitType>, totalizer : FuelTanks<UnitType>, unit : UnitType) {
         
-        self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
+        self.cellHolders.append(CellHolder(string: self.adaptedName(name: name), attributes: self.titleAttributes))
         var geoIndex = 1
         let converted = fuel.converted(to: unit)
         for measurement in [converted.totalMeasurement,
@@ -67,7 +89,7 @@ class FuelAnalysisDataSource: TableDataSource {
     }
     
     func addLine(name : String, endurance  : Endurance, totalizer : Endurance) {
-        self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
+        self.cellHolders.append(CellHolder(string: self.adaptedName(name: name), attributes: self.titleAttributes))
         
         let measurement = Measurement(value: endurance, unit: UnitDuration.seconds).measurementDimension
         let measurementT = Measurement(value: totalizer, unit: UnitDuration.seconds).measurementDimension
@@ -123,6 +145,7 @@ class FuelAnalysisDataSource: TableDataSource {
                 self.addSeparator()
             }
             
+            
             self.addLine(name: "Current", fuel: fuelAnalysis.currentFuel, totalizer: fuelAnalysis.currentFuelTotalizer, unit: fuelTargetUnit)
             self.addLine(name: "Current Endurance", endurance: fuelAnalysis.currentEndurance, totalizer: fuelAnalysis.currentEnduranceTotalizer)
             self.addSeparator()
@@ -138,7 +161,7 @@ class FuelAnalysisDataSource: TableDataSource {
             self.addLine(name: "Target Mass Save", fuel: fuelAnalysis.targetSaveMass, totalizer: fuelAnalysis.addedSaveMassTotalizer, unit: UnitMass.kilograms )
             
             self.addLine(name: "Target Endurance", endurance: fuelAnalysis.targetEndurance, totalizer: fuelAnalysis.targetEndurance)
-            self.addLine(name: "Target Lost Endurance", endurance: fuelAnalysis.targetLostEndurance, totalizer: fuelAnalysis.targetLostEndurance)
+            self.addLine(name: "Target Lost", endurance: fuelAnalysis.targetLostEndurance, totalizer: fuelAnalysis.targetLostEndurance)
             self.addSeparator()
             
             for (name,fuel,totalizer,unit) in [

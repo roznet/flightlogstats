@@ -26,7 +26,7 @@ class FlightLogFileRecord: NSManagedObject {
         case error
     }
     
-    weak var container : FlightLogOrganizer? = nil
+    weak var organizer : FlightLogOrganizer? = nil
     
     var flightLog : FlightLogFile? = nil {
         didSet {
@@ -86,7 +86,7 @@ class FlightLogFileRecord: NSManagedObject {
     
     func parseAndUpdate(progress : ProgressReport? = nil) {
         if flightLog == nil {
-            guard let container = self.container,
+            guard let container = self.organizer,
                   let log_file_name = self.log_file_name
             else { return }
             self.flightLog = container.flightLogFile(name: log_file_name)
@@ -104,7 +104,7 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     func saveContext() {
-        self.container?.saveContext()
+        self.organizer?.saveContext()
     }
     
     //MARK: - get require data from files
@@ -226,7 +226,7 @@ class FlightLogFileRecord: NSManagedObject {
     
     @discardableResult
     private func ensureAircraftRecord() -> Bool {
-        if self.aircraft_record == nil, let container = self.container, let sysid = self.system_id {
+        if self.aircraft_record == nil, let container = self.organizer, let sysid = self.system_id {
             self .aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
             return true
         }
@@ -235,7 +235,7 @@ class FlightLogFileRecord: NSManagedObject {
     
     private func ensureFlyStoStatus() -> Bool {
         if self.flysto_record == nil,
-           let container = self.container {
+           let container = self.organizer {
             let context = container.persistentContainer.viewContext
             let status = FlightFlyStoRecord(context: context)
             status.status = .ready
@@ -247,7 +247,7 @@ class FlightLogFileRecord: NSManagedObject {
     
     private func ensureFuelRecord() -> Bool {
         if self.fuel_record == nil,
-           let container = self.container {
+           let container = self.organizer {
             let context = container.persistentContainer.viewContext
             let record = FlightFuelRecord(context: context)
             // initialise with default
@@ -261,7 +261,7 @@ class FlightLogFileRecord: NSManagedObject {
     
     var estimatedTotalizerStart : FuelQuantity? {
         var rv : FuelQuantity? = nil
-        if let previous = self.container?.flight(preceding: self) {
+        if let previous = self.organizer?.flight(preceding: self) {
             rv = previous.nextTotalizerStart
         }
         return rv
