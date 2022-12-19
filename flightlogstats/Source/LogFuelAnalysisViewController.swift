@@ -79,6 +79,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.flightLogViewModel?.displayContext.horizontalSizeClass = self.traitCollection.horizontalSizeClass
         self.setupViewFromModel()
         self.updateUI()
     }
