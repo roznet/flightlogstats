@@ -234,12 +234,12 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     private func ensureFlyStoStatus() -> Bool {
-        if self.flysto_status == nil,
+        if self.flysto_record == nil,
            let container = self.container {
             let context = container.persistentContainer.viewContext
             let status = FlightFlyStoRecord(context: context)
             status.status = .ready
-            self.flysto_status = status
+            self.flysto_record = status
             return true
         }
         return false

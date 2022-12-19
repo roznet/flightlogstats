@@ -23,15 +23,21 @@ class DetailSettingsViewController: UIViewController {
     @IBOutlet private var labels : [UILabel]!
     @IBOutlet private var titleLabels : [UILabel]!
     
+    @IBOutlet weak var aircraftIdentifier: UILabel!
+    @IBOutlet weak var airframeName: UILabel!
+    
     // don't think we should be able change that...?
     let aircraftFuelUnit : UnitVolume = UnitVolume.aviationGallon
+    
+    var flightLogViewModel : FlightLogViewModel? = nil
+    var aircraft : AircraftPerformance { return self.flightLogViewModel?.aircraft ?? Settings.shared.aircraftPerformance }
     
     var enteredMaxFuel : FuelQuantity {
         get {
             if let maxFuel =  self.maxFuelField.text, let value = Double( maxFuel )  {
                 return FuelQuantity(total: value, unit: self.aircraftFuelUnit)
             }
-            return Settings.shared.aircraftPerformance.fuelMax
+            return self.aircraft.fuelMax
         }
         set {
             let converted = newValue.converted(to: self.aircraftFuelUnit)
@@ -44,7 +50,7 @@ class DetailSettingsViewController: UIViewController {
             if let tabFuel =  self.tabFuelField.text, let value = Double( tabFuel )  {
                 return FuelQuantity(total: value, unit: self.aircraftFuelUnit)
             }
-            return Settings.shared.aircraftPerformance.fuelTab
+            return self.aircraft.fuelTab
         }
         set {
             let converted = newValue.converted(to: self.aircraftFuelUnit)
@@ -57,7 +63,7 @@ class DetailSettingsViewController: UIViewController {
             if let gph =  self.gphField.text, let value = Double( gph )  {
                 return value
             }
-            return Settings.shared.aircraftPerformance.gph
+            return self.aircraft.gph
         }
         set {
             self.tabFuelField.text = Self.fuelFormatter.string(from: NSNumber(floatLiteral: newValue))
@@ -77,15 +83,16 @@ class DetailSettingsViewController: UIViewController {
         self.maxFuelField.font = ViewConfig.shared.defaultTextEntryFont
         self.gphField.font = ViewConfig.shared.defaultTextEntryFont
         
+        self.airframeName.font = ViewConfig.shared.defaultBodyFont
+        self.aircraftIdentifier.font = ViewConfig.shared.defaultBodyFont
+        
         for label in self.labels {
             label.font = ViewConfig.shared.defaultBodyFont
         }
         for label in self.titleLabels {
             label.font = ViewConfig.shared.defaultTitleFont
         }
-        
     }
-
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -103,18 +110,27 @@ class DetailSettingsViewController: UIViewController {
         
         let aircraft = AircraftPerformance(fuelMax: self.enteredMaxFuel, fuelTab: self.enteredTabFuel, gph: self.enteredGph)
         Settings.shared.aircraftPerformance = aircraft
-        
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     func pushModelToView() {
-        let aircraft = Settings.shared.aircraftPerformance
-        self.enteredGph = aircraft.gph
-        self.enteredTabFuel = aircraft.fuelTab
-        self.enteredMaxFuel = aircraft.fuelMax
+        self.enteredGph = self.aircraft.gph
+        self.enteredTabFuel = self.aircraft.fuelTab
+        self.enteredMaxFuel = self.aircraft.fuelMax
         
         self.update(segment: self.addedUnitSegment, for: Settings.shared.unitAddedFuel)
         self.update(segment: self.targetUnitSegment, for: Settings.shared.unitTargetFuel)
+        
+        if let flightLogViewModel = self.flightLogViewModel {
+            self.aircraftIdentifier.text = flightLogViewModel.aircraftIdentifier
+            self.airframeName.text = flightLogViewModel.airframeName
+            self.aircraftIdentifier.isHidden = false
+            self.airframeName.isHidden = false
+        }else{
+            self.aircraftIdentifier.isHidden = true
+            self.airframeName.isHidden = true
+        }
+
     }
     
     //MARK: - UI updates

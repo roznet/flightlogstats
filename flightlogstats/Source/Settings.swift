@@ -64,14 +64,16 @@ struct UnitStorage<UnitType : Dimension> {
     
     var wrappedValue : UnitType {
         get {
-            if let unit = UserDefaults.standard.object(forKey: key) as? UnitType{
-                return unit
+            if let gcUnitKey = UserDefaults.standard.object(forKey: key) as? String{
+                return (GCUnit(forKey: gcUnitKey)?.foundationUnit as? UnitType) ?? defaultValue
             }else{
                 return defaultValue
             }
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: key)
+            if let gcUnit = newValue.gcUnit {
+                UserDefaults.standard.set(gcUnit.key, forKey: key)
+            }
         }
     }
 }

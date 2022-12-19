@@ -63,7 +63,26 @@ class FlightLogViewModel {
     private(set) var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
     private(set) var aircraftDataSource : AircraftSummaryDataSource? = nil
     
-    var aircraft : AircraftPerformance { return self.flightLogFileInfo.aircraftRecord.aircraftPerformance }
+    var aircraft : AircraftPerformance {
+        get {
+            return self.flightLogFileInfo.aircraftRecord.aircraftPerformance
+        }
+        set {
+            self.flightLogFileInfo.aircraftRecord.aircraftPerformance = newValue
+        }
+    }
+    
+    var aircraftIdentifier : String {
+        var rv = self.flightLogFileInfo.aircraftRecord.aircraftIdentifier
+        if rv == "" {
+            rv = self.flightLogFileInfo.aircraftRecord.systemId
+        }
+        return rv
+    }
+    
+    var airframeName : String {
+        return self.flightLogFileInfo.aircraftRecord.airframeName
+    }
     
     var fuelMaxTextLabel : String {
         let max = aircraft.fuelMax.converted(to: fuelTargetUnit)
@@ -82,12 +101,12 @@ class FlightLogViewModel {
     
     var flystoStatus : FlightFlyStoRecord.Status {
         get {
-            return self.flightLogFileInfo.flysto_status?.status ?? .ready
+            return self.flightLogFileInfo.flysto_record?.status ?? .ready
         }
         set {
             self.flightLogFileInfo.ensureDependentRecords()
-            self.flightLogFileInfo.flysto_status?.status = newValue
-            self.flightLogFileInfo.flysto_status?.status_date = Date()
+            self.flightLogFileInfo.flysto_record?.status = newValue
+            self.flightLogFileInfo.flysto_record?.status_date = Date()
         }
     }
     

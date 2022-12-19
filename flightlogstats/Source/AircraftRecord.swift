@@ -55,7 +55,7 @@ class AircraftRecord: NSManagedObject {
     /// Flight records sorted most recent first
     var flightRecords : [FlightLogFileRecord] {
         var rv : [FlightLogFileRecord] = []
-        if let flights = self.file_records {
+        if let flights = self.log_file_records {
             for flight in flights {
                 if let record = flight as? FlightLogFileRecord {
                     rv.append(record)

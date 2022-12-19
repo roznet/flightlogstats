@@ -179,6 +179,14 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         if let maxTextLabel = self.flightLogViewModel?.fuelMaxTextLabel {
             self.maxFuelSubLabel.text = maxTextLabel
         }
+        if let maxFuel = self.flightLogViewModel?.aircraft.fuelMax {
+            if maxFuel.totalMeasurement < self.enteredFuelTarget.totalMeasurement {
+                self.enteredFuelTarget = maxFuel
+            }
+            if maxFuel.totalMeasurement < self.enteredtotalizerStart.totalMeasurement {
+                self.enteredtotalizerStart = maxFuel
+            }
+        }
     }
     
     private func pushViewToModel() {
@@ -188,8 +196,6 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         self.flightLogViewModel?.fuelAnalysisInputs = inputs
         self.flightLogViewModel?.fuelAddedUnit = self.unit(for: self.fuelAddedUnitSegment)
         self.flightLogViewModel?.fuelTargetUnit = self.unit(for: self.fuelTargetUnitSegment)
-
-        
     }
         
     private func pushModelToView() {
@@ -275,16 +281,22 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         }
     }
     
-    // MARK: - Segment and units
-    
-    @IBAction func showConfig(_ sender: Any) {
-        NotificationCenter.default.addObserver(forName: .settingsViewControllerUpdate, object: nil, queue: nil){
-            _ in
-            Logger.ui.info("Update Fuel Analysis for settings change")
-            self.pushModelToView()
-            self.updateUI()
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let detailSettings = (segue.destination as? DetailSettingsViewController) {
+            Logger.app.info("Show detail")
+            detailSettings.flightLogViewModel = self.flightLogViewModel
+            NotificationCenter.default.addObserver(forName: .settingsViewControllerUpdate, object: nil, queue: nil){
+                _ in
+                Logger.ui.info("Update Fuel Analysis for settings change")
+                self.pushModelToView()
+                self.updateUI()
+                self.flightLogFileInfo?.saveContext()
+            }
         }
     }
+    
+    // MARK: - Segment and units
+
     @objc func segmentDidChange(_ segment : UISegmentedControl) {
         
         if segment == self.fuelTargetSegment {

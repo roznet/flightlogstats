@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -871,7 +870,6 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" image="gearshape" catalog="system" title="Config"/>
                                 <connections>
-                                    <action selector="showConfig:" destination="Ixv-6V-WSf" eventType="touchUpInside" id="UFJ-X8-QRs"/>
                                     <segue destination="rwj-Ou-8lY" kind="popoverPresentation" popoverAnchorView="r8v-c1-eqN" id="216-YI-8DU">
                                         <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                                     </segue>
@@ -933,7 +931,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="GU4-th-mSz">
-                                <rect key="frame" x="46" y="33" width="228" height="205"/>
+                                <rect key="frame" x="46" y="33" width="228" height="266.5"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Aircraft Information" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wpM-Sj-GdW" userLabel="Aircraft Information">
                                         <rect key="frame" x="0.0" y="0.0" width="228" height="20.5"/>
@@ -941,8 +939,26 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TM6-yr-IhF" userLabel="Aircraft Id">
+                                        <rect key="frame" x="0.0" y="20.5" width="228" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S8B-bJ-RJI" userLabel="Airframe">
+                                        <rect key="frame" x="0.0" y="41" width="228" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Performance Information" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tkS-0U-hff" userLabel="Performance Information">
+                                        <rect key="frame" x="0.0" y="61.5" width="228" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I29-fW-aax">
-                                        <rect key="frame" x="0.0" y="20.5" width="228" height="34"/>
+                                        <rect key="frame" x="0.0" y="82" width="228" height="34"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Maximum Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J16-lI-GnY">
                                                 <rect key="frame" x="0.0" y="0.0" width="182" height="34"/>
@@ -961,7 +977,7 @@
                                         </constraints>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QgF-xl-L95">
-                                        <rect key="frame" x="0.0" y="54.5" width="228" height="34"/>
+                                        <rect key="frame" x="0.0" y="116" width="228" height="34"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tab Fuel (gal)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qpd-JB-xKS">
                                                 <rect key="frame" x="0.0" y="0.0" width="182" height="34"/>
@@ -980,7 +996,7 @@
                                         </constraints>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BvO-CV-F3f">
-                                        <rect key="frame" x="0.0" y="88.5" width="228" height="34"/>
+                                        <rect key="frame" x="0.0" y="150" width="228" height="34"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="gal / hour" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pag-k2-e0X">
                                                 <rect key="frame" x="0.0" y="0.0" width="182" height="34"/>
@@ -999,13 +1015,13 @@
                                         </constraints>
                                     </stackView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Units" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2ul-fF-r7h">
-                                        <rect key="frame" x="0.0" y="122.5" width="228" height="20.5"/>
+                                        <rect key="frame" x="0.0" y="184" width="228" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="YNt-48-o2G">
-                                        <rect key="frame" x="0.0" y="143" width="228" height="31"/>
+                                        <rect key="frame" x="0.0" y="204.5" width="228" height="31"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Target" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qr9-X7-sRS">
                                                 <rect key="frame" x="0.0" y="0.0" width="50" height="31"/>
@@ -1023,7 +1039,7 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="b1P-DP-lpq">
-                                        <rect key="frame" x="0.0" y="174" width="228" height="31"/>
+                                        <rect key="frame" x="0.0" y="235.5" width="228" height="31"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Added" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6fA-KW-SUe">
                                                 <rect key="frame" x="0.0" y="0.0" width="50" height="31"/>
@@ -1056,6 +1072,8 @@
                     </view>
                     <connections>
                         <outlet property="addedUnitSegment" destination="WRo-Hp-j7p" id="d6Y-vs-p41"/>
+                        <outlet property="aircraftIdentifier" destination="TM6-yr-IhF" id="95b-xh-aBL"/>
+                        <outlet property="airframeName" destination="S8B-bJ-RJI" id="Wvm-WI-GYw"/>
                         <outlet property="gphField" destination="wH9-FN-Lpe" id="NMU-N6-jsf"/>
                         <outlet property="maxFuelField" destination="iGY-wM-bHq" id="aP4-Z6-e89"/>
                         <outlet property="tabFuelField" destination="q97-GF-00Q" id="ac7-lh-EGW"/>
@@ -1067,6 +1085,7 @@
                         <outletCollection property="titleLabels" destination="2ul-fF-r7h" collectionClass="NSMutableArray" id="7mF-WC-coa"/>
                         <outletCollection property="labels" destination="Qr9-X7-sRS" collectionClass="NSMutableArray" id="xgw-K9-W4o"/>
                         <outletCollection property="labels" destination="6fA-KW-SUe" collectionClass="NSMutableArray" id="3Zg-EB-9dk"/>
+                        <outletCollection property="titleLabels" destination="tkS-0U-hff" collectionClass="NSMutableArray" id="mWq-NZ-gCJ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mp6-Mv-eJF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

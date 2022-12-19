@@ -179,8 +179,12 @@ class FlightLogOrganizer {
         return container
     }()
 
+    private static let enableCloudKit : Bool = false
+    
     lazy var persistentCloudContainer : NSPersistentCloudKitContainer? = {
-        return nil
+        if !Self.enableCloudKit {
+            return nil
+        }
         
         let container = NSPersistentCloudKitContainer(name: "FlightLogModel")
 
@@ -190,7 +194,7 @@ class FlightLogOrganizer {
         var path = url.deletingLastPathComponent().path
         path.append("/FlightLogModelCloud.sqlite")
         cloudStoreDescription.url = URL(fileURLWithPath: path)
-        cloudStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "net.ro-z.flightlog1000")
+        cloudStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "net.ro-z.flightlogstats")
         
         container.loadPersistentStores() {
             (storeDescription,error) in
@@ -450,7 +454,7 @@ class FlightLogOrganizer {
         let indexTotal : Double = Double(flightLogFileList.count)
         
         let group = DispatchGroup()
-        let queue = DispatchQueue(label: "Parsing", attributes: .concurrent)
+        let queue = DispatchQueue(label: "Parsing")
         
         for flightLog in flightLogFileList.flightLogFiles {
             
