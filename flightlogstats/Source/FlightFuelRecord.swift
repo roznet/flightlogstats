@@ -11,7 +11,8 @@ import RZUtils
 
 /// Record for the end of a flight
 class FlightFuelRecord: NSManagedObject {
-
+    weak var container : FlightLogOrganizer? = nil
+    
     var fuelAnalysisInputs : FuelAnalysis.Inputs {
         get {
             return FuelAnalysis.Inputs(targetFuel: self.targetFuel, addedfuel: self.addedFuel, totalizerStartFuel: self.totalizerStartFuel)

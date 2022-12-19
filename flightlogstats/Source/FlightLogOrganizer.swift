@@ -178,6 +178,34 @@ class FlightLogOrganizer {
         }
         return container
     }()
+
+    lazy var persistentCloudContainer : NSPersistentCloudKitContainer? = {
+        return nil
+        
+        let container = NSPersistentCloudKitContainer(name: "FlightLogModel")
+
+        guard let cloudStoreDescription = container.persistentStoreDescriptions.first,
+              let url = cloudStoreDescription.url else { return nil }
+        
+        var path = url.deletingLastPathComponent().path
+        path.append("/FlightLogModelCloud.sqlite")
+        cloudStoreDescription.url = URL(fileURLWithPath: path)
+        cloudStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "net.ro-z.flightlog1000")
+        
+        container.loadPersistentStores() {
+            (storeDescription,error) in
+            if let error = error {
+                Logger.app.error("Failed to load \(error.localizedDescription)")
+            }else{
+                let path = storeDescription.url?.path ?? ""
+                Logger.app.info("Loaded store \(storeDescription.type) \(path)")
+                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                self.checkForUpdates()
+            }
+        }
+        return container
+    }()
+
     
     func saveContext() {
         let context = persistentContainer.viewContext
@@ -186,7 +214,16 @@ class FlightLogOrganizer {
                 try context.save()
             }catch{
                 let nserror = error as NSError
-                Logger.app.error("Failed to load \(nserror)")
+                Logger.app.error("Failed to save context \(nserror)")
+            }
+        }
+        if let cloudContext = persistentCloudContainer?.viewContext,
+            cloudContext.hasChanges {
+            do {
+                try cloudContext.save()
+            }catch{
+                let nserror = error as NSError
+                Logger.app.error("Failed to save cloud contexts \(nserror)")
             }
         }
     }
@@ -634,7 +671,63 @@ class FlightLogOrganizer {
         }
     }
     
-    //MARK: - sync with cloud
+    //MARK: - sync with cloudKit Records
+    private var managedCloudAircrafts : [SystemId:AircraftRecord] = [:]
+    // LogFilename to fuelrecord
+    private var managedCloudFuelRecords : [String:FlightFuelRecord] = [:]
+    
+    private func loadFromCloudContainer() {
+        self.loadAircraftFromCloudContainer()
+        self.loadFuelRecordsFromCloudContainer()
+    }
+    
+    private func loadAircraftFromCloudContainer() {
+        guard let cloudContainer = self.persistentCloudContainer else { return }
+        
+        let fetchRequest = AircraftRecord.fetchRequest()
+        
+        do {
+            let fetchAircrafts : [AircraftRecord] = try cloudContainer.viewContext.fetch(fetchRequest)
+            var added = 0
+            let existing = self.managedCloudAircrafts.count
+            for aircraft in fetchAircrafts {
+                if let systemId = aircraft.system_id {
+                    added += 1
+                    aircraft.container = self
+                    self.managedAircrafts[systemId] = aircraft
+                }
+            }
+            NotificationCenter.default.post(name: .aircraftListChanged, object: self)
+            Logger.app.info("Loaded \(fetchAircrafts.count) Aircrafts from Cloud: existing \(existing) added \(added)")
+        }catch{
+            Logger.app.error("Failed to query for aircrafts")
+        }
+    }
+
+    private func loadFuelRecordsFromCloudContainer() {
+        guard let cloudContainer = self.persistentCloudContainer else { return }
+        
+        let fetchRequest = FlightFuelRecord.fetchRequest()
+        
+        do {
+            let fuelRecords : [FlightFuelRecord] = try cloudContainer.viewContext.fetch(fetchRequest)
+            var added = 0
+            let existing = self.managedCloudFuelRecords.count
+            for record in fuelRecords {
+                if let logFileName = record.log_file_name {
+                    added += 1
+                    record.container = self
+                    self.managedCloudFuelRecords[logFileName] = record
+                }
+            }
+            NotificationCenter.default.post(name: .aircraftListChanged, object: self)
+            Logger.app.info("Loaded \(fuelRecords.count) Aircrafts: existing \(existing) added \(added)")
+        }catch{
+            Logger.app.error("Failed to query for fuelRecord")
+        }
+    }
+
+    //MARK: - sync with cloud drive files
     private var cachedQuery : NSMetadataQuery? = nil
     private var cachedLocalFlightLogList : FlightLogFileList? = nil
     
@@ -675,6 +768,7 @@ class FlightLogOrganizer {
             query.predicate = NSPredicate(format: "%K LIKE '*'", NSMetadataItemPathKey)
             query.start()
         }
+        self.loadFromCloudContainer()
     }
 
     @objc func didFinishGathering() {
