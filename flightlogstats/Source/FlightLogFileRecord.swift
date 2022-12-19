@@ -286,13 +286,33 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     func isNewer(than other : FlightLogFileRecord) -> Bool {
+        if let start = self.start_time, let otherStart = other.start_time {
+            return start.compare(otherStart) == .orderedDescending
+        }
         return self.log_file_name! > other.log_file_name!
     }
     
     func isOlder(than other : FlightLogFileRecord) -> Bool {
+        if let start = self.start_time, let otherStart = other.start_time {
+            return start.compare(otherStart) == .orderedAscending
+        }
         return self.log_file_name! < other.log_file_name!
     }
     
+    func isEarlier(than date : Date) -> Bool {
+        if let start = self.start_time {
+            return date.compare(start) == .orderedAscending
+        }
+        return false
+    }
+
+    func isLater(than date : Date) -> Bool {
+        if let start = self.start_time {
+            return date.compare(start) == .orderedDescending
+        }
+        return false
+    }
+
     var isEmpty : Bool {
         if let elapsed = self.flightSummary?.flying?.elapsed,
            let distance = self.flightSummary?.distanceInNm {

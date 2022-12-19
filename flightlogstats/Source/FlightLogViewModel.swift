@@ -50,17 +50,20 @@ class FlightLogViewModel {
     
     // MARK: - Configurations and user inputs
     var displayContext : DisplayContext { didSet { self.didWrite() } }
-    var aircraft : AircraftPerformance { didSet { if oldValue != self.aircraft { self.didWrite() } } }
     var fuelAnalysisInputs : FuelAnalysis.Inputs { didSet { if oldValue != self.fuelAnalysisInputs { self.didWrite() } } }
     var fuelTargetUnit : UnitVolume { didSet { if oldValue != self.fuelTargetUnit { self.didWrite() } } }
     var fuelAddedUnit : UnitVolume { didSet { if oldValue != self.fuelAddedUnit { self.didWrite() } } }
     var legsByFields : [Field] { didSet { if oldValue != self.legsByFields { self.didWrite() } } }
     
+    //let aircraft : AircraftPerformance { return self.ai}
     // MARK: Outputs
     private(set) var legsDataSource : FlightLegsDataSource? = nil
     private(set) var fuelDataSource : FlightSummaryFuelDataSource? = nil
     private(set) var timeDataSource : FlightSummaryTimeDataSource? = nil
     private(set) var fuelAnalysisDataSource : FuelAnalysisDataSource? = nil
+    private(set) var aircraftDataSource : AircraftSummaryDataSource? = nil
+    
+    var aircraft : AircraftPerformance { return self.flightLogFileInfo.aircraftRecord.aircraftPerformance }
     
     var fuelMaxTextLabel : String {
         let max = aircraft.fuelMax.converted(to: fuelTargetUnit)
@@ -97,7 +100,6 @@ class FlightLogViewModel {
         self.flightLogFileInfo = fileInfo
         self.progress = progress
         self.displayContext = displayContext
-        self.aircraft = Settings.shared.aircraftPerformance
         fileInfo.ensureDependentRecords()
         if let record = fileInfo.fuel_record {
             self.fuelAnalysisInputs = record.fuelAnalysisInputs
@@ -113,7 +115,6 @@ class FlightLogViewModel {
     }
 
     func updateForSettings() {
-        self.aircraft = Settings.shared.aircraftPerformance
         self.fuelTargetUnit = Settings.shared.unitTargetFuel
         self.fuelAddedUnit = Settings.shared.unitAddedFuel
 
@@ -169,6 +170,9 @@ class FlightLogViewModel {
                     }
                 }
             }
+            let aircraftRecord = self.flightLogFileInfo.aircraftRecord
+            self.aircraftDataSource = AircraftSummaryDataSource(aircaftRecord: aircraftRecord)
+            
             NotificationCenter.default.post(name: .flightLogViewModelChanged, object: self)
             self.save()
             self.didBuild()

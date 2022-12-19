@@ -52,6 +52,7 @@ class AircraftRecord: NSManagedObject {
         }
     }
     
+    /// Flight records sorted most recent first
     var flightRecords : [FlightLogFileRecord] {
         var rv : [FlightLogFileRecord] = []
         if let flights = self.file_records {
@@ -66,10 +67,74 @@ class AircraftRecord: NSManagedObject {
     }
     
     var latestFlight : FlightLogFileRecord? {
-        return self.flightRecords.last
+        return self.flightRecords.first
+    }
+    var lastestFlightDate : Date? {
+        return self.latestFlight?.start_time
     }
     
     func contains(_ searchText : String ) -> Bool {
         return self.airframeName.contains(searchText) || self.aircraftIdentifier.contains(searchText)
     }
+    
+    func flight(preceding : FlightLogFileRecord) -> FlightLogFileRecord? {
+        let records = self.flightRecords
+        // assume sorted from newest to oldest
+        for record in records {
+            if record.isOlder(than: preceding) {
+                return record
+            }
+        }
+        return nil
+    }
+
+    func flightsEarlier(than date : Date) -> [FlightLogFileRecord] {
+        let records = self.flightRecords
+        var rv : [FlightLogFileRecord] = []
+        // assume sorted from newest to oldest
+        for record in records {
+            if record.isEarlier(than: date) {
+                rv.append(record)
+            }
+        }
+        return rv
+    }
+
+    enum FuelRequest {
+        case tanks
+        case totalizer
+        case tanksPlusAdded
+        case totalizerPlusAdded
+    }
+    
+    func fuel(on date : Date, request : FuelRequest = .tanks) -> FuelQuantity {
+        var rv : FuelQuantity = FuelQuantity.zero
+        let previousFlights = self.flightsEarlier(than: date)
+        if let preceding = previousFlights.first,
+           let summary = preceding.flightSummary {
+            switch request {
+            case .tanks:
+                rv = summary.fuelEnd
+            case .totalizer:
+                rv = summary.fuelStart - summary.fuelTotalizer
+            case .tanksPlusAdded:
+                rv = summary.fuelEnd + preceding.fuelRecord.addedFuel
+            case .totalizerPlusAdded:
+                rv = summary.fuelStart - summary.fuelTotalizer + preceding.fuelRecord.addedFuel
+            }
+        }
+        return rv
+    }
+    
+    //   Categorical
+    //    Last Airport
+    //    Identifier
+    //    Airframe Name
+    //   Double
+    //    Current Fuel Total
+    //    Total Flights
+    //   Date
+    //    Previous Flight Date
+    //    Last Flight Date
+    
 }

@@ -71,11 +71,167 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="bpy-ox-lYh" userLabel="Aircraft Time Stack View">
+                                <rect key="frame" x="5" y="84" width="824" height="100"/>
+                                <subviews>
+                                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="eVk-Et-Ymk" userLabel="Aircraft Collection View">
+                                        <rect key="frame" x="0.0" y="0.0" width="412" height="100"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <collectionViewLayout key="collectionViewLayout" id="eGA-L5-cez" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
+                                        <cells>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="v9g-eF-IFD" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="RUH-Tl-j1z">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CvX-4o-XOb">
+                                                            <rect key="frame" x="4.5" y="15" width="41.5" height="20.5"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="CvX-4o-XOb" firstAttribute="centerX" secondItem="RUH-Tl-j1z" secondAttribute="centerX" id="Lzz-4h-TwP"/>
+                                                        <constraint firstItem="CvX-4o-XOb" firstAttribute="centerY" secondItem="RUH-Tl-j1z" secondAttribute="centerY" id="ZES-hi-tVs"/>
+                                                    </constraints>
+                                                </collectionViewCellContentView>
+                                                <connections>
+                                                    <outlet property="label" destination="CvX-4o-XOb" id="kFo-FW-hYP"/>
+                                                </connections>
+                                            </collectionViewCell>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="sjk-De-ng9" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                                <rect key="frame" x="60.5" y="0.0" width="50" height="50"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Yb6-al-Xyp">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nbN-pK-bij" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                        </view>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="nbN-pK-bij" firstAttribute="top" secondItem="Yb6-al-Xyp" secondAttribute="top" id="7YA-jO-eHs"/>
+                                                        <constraint firstAttribute="bottom" secondItem="nbN-pK-bij" secondAttribute="bottom" id="9D0-a3-VqR"/>
+                                                        <constraint firstAttribute="trailing" secondItem="nbN-pK-bij" secondAttribute="trailing" id="DDa-pt-gB2"/>
+                                                        <constraint firstItem="nbN-pK-bij" firstAttribute="leading" secondItem="Yb6-al-Xyp" secondAttribute="leading" id="fLK-75-UAT"/>
+                                                    </constraints>
+                                                </collectionViewCellContentView>
+                                                <connections>
+                                                    <outlet property="numberWithUnitView" destination="nbN-pK-bij" id="y15-Fc-k4s"/>
+                                                </connections>
+                                            </collectionViewCell>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="ptK-XE-E7e" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                                <rect key="frame" x="120.5" y="0.0" width="50" height="50"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="xzN-cv-zaG">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4OD-eM-Eln" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                        </view>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="4OD-eM-Eln" firstAttribute="leading" secondItem="xzN-cv-zaG" secondAttribute="leading" id="2gE-4Z-WY3"/>
+                                                        <constraint firstItem="4OD-eM-Eln" firstAttribute="top" secondItem="xzN-cv-zaG" secondAttribute="top" id="Oig-gC-Wn8"/>
+                                                        <constraint firstAttribute="trailing" secondItem="4OD-eM-Eln" secondAttribute="trailing" id="bid-eE-DWM"/>
+                                                        <constraint firstAttribute="bottom" secondItem="4OD-eM-Eln" secondAttribute="bottom" id="e8C-pJ-bXW"/>
+                                                    </constraints>
+                                                </collectionViewCellContentView>
+                                                <connections>
+                                                    <outlet property="measurementView" destination="4OD-eM-Eln" id="jmA-z8-zmj"/>
+                                                </connections>
+                                            </collectionViewCell>
+                                        </cells>
+                                    </collectionView>
+                                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mee-fG-3c6" userLabel="Fuel Collection View">
+                                        <rect key="frame" x="412" y="0.0" width="412" height="100"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <collectionViewLayout key="collectionViewLayout" id="rhw-Mu-gap" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
+                                        <cells>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="J22-fR-Qj1" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="FDz-jQ-IZ8">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UPy-Qe-KvO">
+                                                            <rect key="frame" x="4.5" y="15" width="41.5" height="20.5"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="UPy-Qe-KvO" firstAttribute="centerY" secondItem="FDz-jQ-IZ8" secondAttribute="centerY" id="am4-ht-7qf"/>
+                                                        <constraint firstItem="UPy-Qe-KvO" firstAttribute="centerX" secondItem="FDz-jQ-IZ8" secondAttribute="centerX" id="jpH-Ow-BPC"/>
+                                                    </constraints>
+                                                </collectionViewCellContentView>
+                                                <connections>
+                                                    <outlet property="label" destination="UPy-Qe-KvO" id="LJt-OJ-iG1"/>
+                                                </connections>
+                                            </collectionViewCell>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="paF-PK-qkC" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                                <rect key="frame" x="60.5" y="0.0" width="50" height="50"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="HWf-3q-Qzz">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aeQ-Lh-78q" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                        </view>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="aeQ-Lh-78q" firstAttribute="top" secondItem="HWf-3q-Qzz" secondAttribute="top" id="0Ea-sm-HFK"/>
+                                                        <constraint firstItem="aeQ-Lh-78q" firstAttribute="leading" secondItem="HWf-3q-Qzz" secondAttribute="leading" id="Bmv-AW-6iA"/>
+                                                        <constraint firstAttribute="bottom" secondItem="aeQ-Lh-78q" secondAttribute="bottom" id="RTM-c5-6M3"/>
+                                                        <constraint firstAttribute="trailing" secondItem="aeQ-Lh-78q" secondAttribute="trailing" id="pHx-Ms-1HG"/>
+                                                    </constraints>
+                                                </collectionViewCellContentView>
+                                                <connections>
+                                                    <outlet property="numberWithUnitView" destination="aeQ-Lh-78q" id="x5e-od-JLH"/>
+                                                </connections>
+                                            </collectionViewCell>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="TKJ-0h-X6c" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                                <rect key="frame" x="120.5" y="0.0" width="50" height="50"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="NOh-gq-LSo">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <subviews>
+                                                        <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gkn-sg-eby" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                        </view>
+                                                    </subviews>
+                                                    <constraints>
+                                                        <constraint firstAttribute="trailing" secondItem="gkn-sg-eby" secondAttribute="trailing" id="Mzb-ID-aTH"/>
+                                                        <constraint firstItem="gkn-sg-eby" firstAttribute="top" secondItem="NOh-gq-LSo" secondAttribute="top" id="NL0-NC-zEg"/>
+                                                        <constraint firstItem="gkn-sg-eby" firstAttribute="leading" secondItem="NOh-gq-LSo" secondAttribute="leading" id="cT9-4o-8Ui"/>
+                                                        <constraint firstAttribute="bottom" secondItem="gkn-sg-eby" secondAttribute="bottom" id="lnV-PC-xu9"/>
+                                                    </constraints>
+                                                </collectionViewCellContentView>
+                                                <connections>
+                                                    <outlet property="measurementView" destination="gkn-sg-eby" id="qBN-h0-6Qg"/>
+                                                </connections>
+                                            </collectionViewCell>
+                                        </cells>
+                                    </collectionView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="100" id="hb2-kI-4Jk"/>
+                                </constraints>
+                            </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="s50-2U-Cvg" userLabel="TimeSummary Collection View">
-                                <rect key="frame" x="5" y="84" width="824" height="160"/>
+                                <rect key="frame" x="5" y="179" width="834" height="160"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="160" id="KDg-SL-kLK"/>
+                                    <constraint firstAttribute="height" constant="160" id="RyV-Su-F0q"/>
                                 </constraints>
                                 <collectionViewLayout key="collectionViewLayout" id="IIK-bc-UxE" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
@@ -103,7 +259,7 @@
                                         </connections>
                                     </collectionViewCell>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="UjI-Vi-SDS" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
-                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
+                                        <rect key="frame" x="60.5" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Mfa-8e-QBM">
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
@@ -126,85 +282,8 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="mee-fG-3c6" userLabel="Fuel Collection View">
-                                <rect key="frame" x="5" y="249" width="824" height="100"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="100" id="uJR-ao-is8"/>
-                                </constraints>
-                                <collectionViewLayout key="collectionViewLayout" id="rhw-Mu-gap" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="TableCollectionViewCell" id="J22-fR-Qj1" userLabel="SummaryInfoCell" customClass="TableCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="FDz-jQ-IZ8">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UPy-Qe-KvO">
-                                                    <rect key="frame" x="4.5" y="15" width="41.5" height="20.5"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="UPy-Qe-KvO" firstAttribute="centerY" secondItem="FDz-jQ-IZ8" secondAttribute="centerY" id="am4-ht-7qf"/>
-                                                <constraint firstItem="UPy-Qe-KvO" firstAttribute="centerX" secondItem="FDz-jQ-IZ8" secondAttribute="centerX" id="jpH-Ow-BPC"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="label" destination="UPy-Qe-KvO" id="LJt-OJ-iG1"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="NumberWithUnitCollectionViewCell" id="paF-PK-qkC" userLabel="NumberWithUnitCell" customClass="RZNumberWithUnitCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
-                                        <rect key="frame" x="64.5" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="HWf-3q-Qzz">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aeQ-Lh-78q" userLabel="NumberUnitView" customClass="RZNumberWithUnitView" customModule="FlightLogStats" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                                </view>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="aeQ-Lh-78q" firstAttribute="top" secondItem="HWf-3q-Qzz" secondAttribute="top" id="0Ea-sm-HFK"/>
-                                                <constraint firstItem="aeQ-Lh-78q" firstAttribute="leading" secondItem="HWf-3q-Qzz" secondAttribute="leading" id="Bmv-AW-6iA"/>
-                                                <constraint firstAttribute="bottom" secondItem="aeQ-Lh-78q" secondAttribute="bottom" id="RTM-c5-6M3"/>
-                                                <constraint firstAttribute="trailing" secondItem="aeQ-Lh-78q" secondAttribute="trailing" id="pHx-Ms-1HG"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="numberWithUnitView" destination="aeQ-Lh-78q" id="x5e-od-JLH"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MeasurementCollectionViewCell" id="TKJ-0h-X6c" customClass="MeasurementCollectionViewCell" customModule="FlightLogStats" customModuleProvider="target">
-                                        <rect key="frame" x="129" y="0.0" width="50" height="50"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="NOh-gq-LSo">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gkn-sg-eby" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                                                </view>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="gkn-sg-eby" secondAttribute="trailing" id="Mzb-ID-aTH"/>
-                                                <constraint firstItem="gkn-sg-eby" firstAttribute="top" secondItem="NOh-gq-LSo" secondAttribute="top" id="NL0-NC-zEg"/>
-                                                <constraint firstItem="gkn-sg-eby" firstAttribute="leading" secondItem="NOh-gq-LSo" secondAttribute="leading" id="cT9-4o-8Ui"/>
-                                                <constraint firstAttribute="bottom" secondItem="gkn-sg-eby" secondAttribute="bottom" id="lnV-PC-xu9"/>
-                                            </constraints>
-                                        </collectionViewCellContentView>
-                                        <connections>
-                                            <outlet property="measurementView" destination="gkn-sg-eby" id="qBN-h0-6Qg"/>
-                                        </connections>
-                                    </collectionViewCell>
-                                </cells>
-                            </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="aKL-fC-i7y" userLabel="Legs Collection View">
-                                <rect key="frame" x="5" y="354" width="824" height="766"/>
+                                <rect key="frame" x="5" y="344" width="824" height="776"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="oSQ-lx-eW3" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
@@ -288,25 +367,26 @@
                         <viewLayoutGuide key="safeArea" id="S3q-Cy-ALO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="mee-fG-3c6" secondAttribute="trailing" constant="5" id="7LI-kd-Xre"/>
+                            <constraint firstItem="bpy-ox-lYh" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="0rt-AX-WPp"/>
+                            <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="s50-2U-Cvg" secondAttribute="bottom" constant="5" id="29p-1G-BYz"/>
                             <constraint firstItem="i78-1P-54X" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" constant="-5" id="Ei4-Mk-Ken"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="bottom" secondItem="cyP-Hg-ndb" secondAttribute="bottom" constant="5" id="FzA-Yu-gIn"/>
-                            <constraint firstItem="s50-2U-Cvg" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="PlE-ff-Pmr"/>
                             <constraint firstItem="cyP-Hg-ndb" firstAttribute="top" secondItem="aKL-fC-i7y" secondAttribute="bottom" id="RXi-sH-vsO"/>
                             <constraint firstItem="i78-1P-54X" firstAttribute="top" secondItem="S3q-Cy-ALO" secondAttribute="top" id="TJC-33-FyI"/>
+                            <constraint firstItem="bpy-ox-lYh" firstAttribute="top" secondItem="i78-1P-54X" secondAttribute="bottom" constant="5" id="Xs1-7s-msH"/>
                             <constraint firstItem="aKL-fC-i7y" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="Y1g-wh-syl"/>
                             <constraint firstItem="i78-1P-54X" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="YWb-a3-edh"/>
-                            <constraint firstItem="mee-fG-3c6" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="dsP-jK-esU"/>
-                            <constraint firstItem="s50-2U-Cvg" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" constant="-5" id="fwH-MJ-3C7"/>
-                            <constraint firstItem="s50-2U-Cvg" firstAttribute="top" secondItem="i78-1P-54X" secondAttribute="bottom" constant="5" id="iUh-rj-mTh"/>
+                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="s50-2U-Cvg" secondAttribute="trailing" constant="-5" id="bxD-yw-8sw"/>
+                            <constraint firstItem="bpy-ox-lYh" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" constant="-5" id="esU-Ik-uy4"/>
+                            <constraint firstItem="s50-2U-Cvg" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="k9H-CE-6bF"/>
+                            <constraint firstItem="bpy-ox-lYh" firstAttribute="bottom" secondItem="s50-2U-Cvg" secondAttribute="top" constant="5" id="nt5-Dq-60q"/>
                             <constraint firstItem="cyP-Hg-ndb" firstAttribute="centerX" secondItem="S3q-Cy-ALO" secondAttribute="centerX" id="uCO-dL-3lO"/>
-                            <constraint firstItem="mee-fG-3c6" firstAttribute="top" secondItem="s50-2U-Cvg" secondAttribute="bottom" constant="5" id="xC1-Os-cMZ"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="aKL-fC-i7y" secondAttribute="trailing" constant="5" id="y4Z-zG-2za"/>
-                            <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="mee-fG-3c6" secondAttribute="bottom" constant="5" id="y5c-0i-9X6"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Summary" image="tablecells" catalog="system" id="77u-9R-Es2"/>
                     <connections>
+                        <outlet property="aircraftCollectionView" destination="eVk-Et-Ymk" id="PVw-Mo-cVa"/>
                         <outlet property="date" destination="6bN-rh-gIs" id="sL8-AX-MI1"/>
                         <outlet property="flystoButton" destination="knZ-aj-EVf" id="dIH-Kx-0jT"/>
                         <outlet property="flystoStatus" destination="qRM-2i-xo5" id="5H8-s0-J8Q"/>
@@ -1231,13 +1311,13 @@
                                                 <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jOR-W7-Yxi">
                                                     <rect key="frame" x="0.0" y="0.0" width="95.5" height="16.5"/>
                                                     <subviews>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dGn-BM-a9i" userLabel="Airports">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dGn-BM-a9i" userLabel="Airports">
                                                             <rect key="frame" x="0.0" y="0.0" width="54" height="16.5"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y12-SJ-bD9" userLabel="Identifier">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y12-SJ-bD9" userLabel="Identifier">
                                                             <rect key="frame" x="54" y="0.0" width="41.5" height="16.5"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <nil key="textColor"/>

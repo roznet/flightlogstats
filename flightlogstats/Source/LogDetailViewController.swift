@@ -22,11 +22,13 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     @IBOutlet weak var timeCollectionView: UICollectionView!
     @IBOutlet weak var fuelCollectionView: UICollectionView!
     @IBOutlet weak var legsCollectionView: UICollectionView!
+    @IBOutlet weak var aircraftCollectionView: UICollectionView!
     
     var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileInfo }
     var legsDataSource : FlightLegsDataSource? = nil
     var fuelDataSource : FlightSummaryFuelDataSource? = nil
     var timeDataSource : FlightSummaryTimeDataSource? = nil
+    var aircraftDataSource : AircraftSummaryDataSource? = nil
     
     var flightLogViewModel : FlightLogViewModel? = nil
     
@@ -98,6 +100,7 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
             self.timeCollectionView.isHidden = true
             self.fuelCollectionView.isHidden = true
             self.legsCollectionView.isHidden = true
+            self.aircraftCollectionView.isHidden = true
         }
     }
 
@@ -109,6 +112,7 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
                         self.timeCollectionView.isHidden = false
                         self.fuelCollectionView.isHidden = false
                         self.legsCollectionView.isHidden = false
+                        self.aircraftCollectionView.isHidden = false
 
                         self.flystoStatus.attributedText = NSAttributedString(string: self.flightLogViewModel?.flystoStatusText ?? "Ready", attributes: ViewConfig.shared.subTextAttributes)
                         self.flystoStatus.textColor = UIColor.systemGray
@@ -142,6 +146,15 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
                         self.timeCollectionView.delegate = self.timeDataSource
                         if let tableCollectionLayout = self.timeCollectionView.collectionViewLayout as? TableCollectionViewLayout {
                             tableCollectionLayout.tableCollectionDelegate = self.timeDataSource
+                        }else{
+                            Logger.app.error("Internal error: Inconsistent layout ")
+                        }
+                        
+                        self.aircraftDataSource = self.flightLogViewModel?.aircraftDataSource
+                        self.aircraftCollectionView.dataSource = self.aircraftDataSource
+                        self.aircraftCollectionView.delegate = self.aircraftDataSource
+                        if let tableCollectionLayout = self.aircraftCollectionView.collectionViewLayout as? TableCollectionViewLayout {
+                            tableCollectionLayout.tableCollectionDelegate = self.aircraftDataSource
                         }else{
                             Logger.app.error("Internal error: Inconsistent layout ")
                         }

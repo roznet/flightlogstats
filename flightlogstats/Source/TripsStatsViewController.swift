@@ -20,8 +20,9 @@ class TripsStatsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-
-        self.flightListDataSource = FlightListDataSource(displayContext: DisplayContext(), aggregation: .trips)
+        let infos = FlightLogOrganizer.shared.actualFlightLogFileInfos
+        self.flightListDataSource = FlightListDataSource(logInfos: infos, displayContext: DisplayContext(), aggregation: .trips)
+        
         self.logListCollectionView.dataSource = self.flightListDataSource
         self.logListCollectionView.delegate = self.flightListDataSource
         if let tableCollectionLayout = self.logListCollectionView.collectionViewLayout as? TableCollectionViewLayout {
@@ -31,5 +32,4 @@ class TripsStatsViewController: UIViewController {
         }
 
     }
-
 }

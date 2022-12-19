@@ -12,7 +12,6 @@ import RZUtilsSwift
 
 class FlightListDataSource: TableDataSource  {
     var logInfos : [FlightLogFileRecord]
-    var logFileOrganizer = FlightLogOrganizer.shared
     
     var trips : Trips
     let displayContext : DisplayContext
@@ -25,11 +24,13 @@ class FlightListDataSource: TableDataSource  {
     //    End
     //    Remaining
     
-    init(displayContext : DisplayContext = DisplayContext(), aggregation : Trips.Aggregation = .trips){
+    init(logInfos: [FlightLogFileRecord],
+         displayContext : DisplayContext = DisplayContext(),
+         aggregation : Trips.Aggregation = .trips){
         self.fields = [.Hobbs, .Flying,  .Distance, .GroundSpeed, .Altitude, .GpH, .NmpG,  .FuelTotalizer, .FuelUsed, .FuelStart, .FuelEnd ]
         self.headers = [ "Date", "From", "To", "Start", "End"]
-        self.logInfos = self.logFileOrganizer.actualFlightLogFileInfos
         self.displayContext = displayContext
+        self.logInfos = logInfos
         self.trips = Trips(infos: self.logInfos, aggregation: aggregation)
         self.trips.compute()
         // rows is only a first guess, will really know once trips are computed
