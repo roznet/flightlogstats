@@ -286,10 +286,23 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertTrue(false)
             return
         }
+        logfile.quickParse()
+        let quicksummary = logfile.flightSummary
+        let meta = logfile.meta(key: .system_id)
+        XCTAssertNotNil(meta)
+        let quickCount = logfile.count
+        
         logfile.parse()
         
         let legs = logfile.legs
         let summary = logfile.flightSummary
+        
+        let count = logfile.count
+        
+        XCTAssertGreaterThan(count, quickCount)
+        XCTAssertEqual(quicksummary?.startAirport, summary?.startAirport)
+        // quick parse within 5min of normal
+        XCTAssertLessThan(fabs(quicksummary!.flying!.elapsed - summary!.flying!.elapsed), 60.0*5.0)
         
         XCTAssertNotNil(summary)
         XCTAssertNotNil(legs.last)

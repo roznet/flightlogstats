@@ -9,8 +9,11 @@ import Foundation
 import OSLog
 
 protocol CsvInterpreter {
+    // optional count of line to read, to only process part of the file
+    var maxLineCount : Int? { get }
+    
     func start()
-    func process(line : [String], readCount : Int)
+    func process(line : [String], readCount : Int, lineCount : Int)
     func finished()
 }
 
@@ -21,7 +24,6 @@ class CsvParser {
     private enum State {
         case beginningOfDocument
         case endOfDocument
-        
         
         case beginningOfLine
         case maybeEndOfLine
@@ -50,9 +52,7 @@ class CsvParser {
         case invalidStateForOtherChar
     }
     
-    static let AllLines : Int = -1
-    
-    static func parse(bufferedStreamReader : BufferedStreamReader, interpreter : CsvInterpreter, maxLinesCount : Int = AllLines) throws {
+    static func parse(bufferedStreamReader : BufferedStreamReader, interpreter : CsvInterpreter) throws {
         interpreter.start()
         
         var state : State = .beginningOfDocument
@@ -163,11 +163,11 @@ class CsvParser {
                 }
                 fieldBuffer.removeAll(keepingCapacity: true)
                 if state != .endOfField {
-                    interpreter.process(line: line, readCount: bufferedStreamReader.readCount)
+                    interpreter.process(line: line, readCount: bufferedStreamReader.readCount, lineCount: lineCount)
                     line.removeAll(keepingCapacity: true)
                     lineCount += 1
-                    if maxLinesCount != Self.AllLines && lineCount >= maxLinesCount {
-                        // finish after maxLinesCount
+                    if let maxLinesCount = interpreter.maxLineCount, lineCount >= maxLinesCount {
+                        // finish after maxLinesCount if defined
                         state = .endOfDocument
                     }
                 }

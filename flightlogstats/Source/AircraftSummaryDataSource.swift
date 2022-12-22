@@ -72,7 +72,7 @@ class AircraftSummaryDataSource: TableDataSource {
             self.geometries.append(geometry)
         }
         
-        self.addLine(title: "Identifier", string: self.aircraftRecord.aircraftIdentifier)
+        self.addLine(title: "Identifier", string: self.aircraftRecord.displayIdentifier)
         self.addLine(title: "Airframe", string: self.aircraftRecord.airframeName)
         self.addLine(title: "Last", date: self.aircraftRecord.lastestFlightDate)
     }

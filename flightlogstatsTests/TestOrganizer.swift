@@ -81,7 +81,7 @@ class TestOrganizer: XCTestCase {
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-
+    
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
@@ -173,14 +173,14 @@ class TestOrganizer: XCTestCase {
         
         // +1 because should have one aircraft file
         XCTAssertEqual(startUrls.count+1, localUrls.count)
-
+        
         var cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
         XCTAssertEqual(cloudUrls.count, 0)// start with nothing
         organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
         cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
-            
+        
         XCTAssertEqual(localUrls.count, cloudUrls.count)
-            
+        
         // now remove one from localUrls, and assuming local is cloud, make sure syncCloud will copy missing over
         
         if let last = localUrls.last {
@@ -206,7 +206,7 @@ class TestOrganizer: XCTestCase {
         }else{
             XCTAssertTrue(false)
         }
-
+        
         Logger.test.info("Cleaning test folders")
         for writeableUrl in [writeableCloudUrl, writeableLocalUrl] {
             guard self.prepareAndClearFolder(url: writeableUrl) else {

@@ -21,6 +21,10 @@ class AircraftRecord: NSManagedObject {
     var aircraftIdentifier : AircraftIdentifier { return self.aircraft_identifier ?? "" }
     var airframeName : String { return self.airframe_name ?? "" }
     
+    var displayIdentifier : String {
+        return self.aircraft_identifier ?? self.systemId
+    }
+    
     var avionicsSystem : AvionicsSystem? {
         get {
             guard let i = self.aircraft_identifier, let n = self.airframe_name, let s = self.system_id else { return nil }

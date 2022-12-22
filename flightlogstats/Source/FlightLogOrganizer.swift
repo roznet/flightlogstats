@@ -165,15 +165,17 @@ class FlightLogOrganizer {
 
     lazy var persistentContainer : NSPersistentContainer = {
         let container = NSPersistentContainer(name: "FlightLogModel")
-        container.loadPersistentStores() {
-            (storeDescription,error) in
-            if let error = error {
-                Logger.app.error("Failed to load \(error.localizedDescription)")
-            }else{
-                let path = storeDescription.url?.path ?? ""
-                Logger.app.info("Loaded store \(storeDescription.type) \(path)")
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                self.checkForUpdates()
+        DispatchQueue.synchronized(self){
+            container.loadPersistentStores() {
+                (storeDescription,error) in
+                if let error = error {
+                    Logger.app.error("Failed to load \(error.localizedDescription)")
+                }else{
+                    let path = storeDescription.url?.path ?? ""
+                    Logger.app.info("Loaded store \(storeDescription.type) \(path)")
+                    container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                    self.checkForUpdates()
+                }
             }
         }
         return container
@@ -214,22 +216,28 @@ class FlightLogOrganizer {
     func saveContext() {
         let context = persistentContainer.viewContext
         if context.hasChanges {
-            do {
-                try context.save()
-            }catch{
-                let nserror = error as NSError
-                Logger.app.error("Failed to save context \(nserror)")
+            DispatchQueue.synchronized(self){
+                do {
+                    try context.save()
+                }catch{
+                    let nserror = error as NSError
+                    Logger.app.error("Failed to save context \(nserror)")
+                }
             }
         }
         if let cloudContext = persistentCloudContainer?.viewContext,
-            cloudContext.hasChanges {
-            do {
-                try cloudContext.save()
-            }catch{
-                let nserror = error as NSError
-                Logger.app.error("Failed to save cloud contexts \(nserror)")
+           cloudContext.hasChanges {
+            DispatchQueue.synchronized(self){
+                do {
+                    try cloudContext.save()
+                    
+                }catch{
+                    let nserror = error as NSError
+                    Logger.app.error("Failed to save cloud contexts \(nserror)")
+                }
             }
         }
+        
     }
     
     func checkForUpdates() {
@@ -408,7 +416,7 @@ class FlightLogOrganizer {
                 let logs = FlightLogFileList(urls: urls)
                 self.add(aircrafts: urls)
                 self.add(flightLogFileList: logs)
-                self.updateInfo(count: 1)
+                self.updateInfo(count: 2)
             }
         }
     }
@@ -447,14 +455,15 @@ class FlightLogOrganizer {
     
     
     
-    func add(flightLogFileList : FlightLogFileList){
+    /// Add list of flights to the organizer if they are missing. will only updat eth elist, won't parse any data, so pretty quick
+    /// - Parameter flightLogFileList: list of file to add
+    /// - Returns: number of new flights added (0 if all already there)
+    @discardableResult
+    func add(flightLogFileList : FlightLogFileList) -> Int{
         var someNew : Int = 0
         self.progress?.update(state: .start, message: .addingFiles)
         var index : Double = 0.0
         let indexTotal : Double = Double(flightLogFileList.count)
-        
-        let group = DispatchGroup()
-        let queue = DispatchQueue(label: "Parsing")
         
         for flightLog in flightLogFileList.flightLogFiles {
             
@@ -467,32 +476,30 @@ class FlightLogOrganizer {
                     }
                     index += 1.0
                 }else{
-                    group.enter()
-                    queue.async {
-                        let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
-                        fileInfo.organizer = self
-                        flightLog.updateFlightLogFileInfo(info: fileInfo)
-                        DispatchQueue.synchronized(self){
-                            self.managedFlightLogs[ filename ] = fileInfo
-                            someNew += 1
-                            index += 1.0
-                        }
-                        self.progress?.update(state: .progressing(index / indexTotal), message: .addingFiles)
-                        group.leave()
+                    let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
+                    fileInfo.organizer = self
+                    fileInfo.log_file_name = filename
+                    fileInfo.flightLog = flightLog
+                    fileInfo.parseAndUpdate(quick: true)
+                    fileInfo.ensureDependentRecords()
+                    DispatchQueue.synchronized(self){
+                        self.managedFlightLogs[ filename ] = fileInfo
+                        someNew += 1
+                        index += 1.0
                     }
+                    self.progress?.update(state: .progressing(index / indexTotal), message: .addingFiles)
                 }
             }
         }
-        group.notify(queue: AppDelegate.worker){
-            self.progress?.update(state: .complete, message: .addingFiles)
-            if someNew > 0 {
-                Logger.app.info("Found \(someNew) local files to add")
-                self.saveContext()
-                NotificationCenter.default.post(name: .localFileListChanged, object: self)
-            }else{
-                Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
-            }
+        self.progress?.update(state: .complete, message: .addingFiles)
+        if someNew > 0 {
+            Logger.app.info("Found \(someNew) local files to add")
+            self.saveContext()
+            NotificationCenter.default.post(name: .localFileListChanged, object: self)
+        }else{
+            Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
         }
+        return someNew
     }
     
     func delete(info : FlightLogFileRecord){
@@ -748,29 +755,34 @@ class FlightLogOrganizer {
             case .failure(let error):
                 Logger.sync.error("Failed to find files \(error.localizedDescription)")
             case .success(let urls):
-                self.syncCloud(with: FlightLogFileList(urls: urls))
+                DispatchQueue.main.async {
+                    // this needs to run on the main thread
+                    self.syncCloud(with: FlightLogFileList(urls: urls))
+                }
             }
         }
     }
     
     private func syncCloud(with local : FlightLogFileList ) {
-        // look in cloud what we are missing locally
-        if self.cachedQuery != nil {
-            self.cachedQuery?.stop()
-        }
         self.cachedLocalFlightLogList = local
         
         if let already = self.cachedQuery?.isGathering, already {
             Logger.sync.info("Query already gathering")
+            return
+        }else {
+            Logger.sync.info("Query starting")
         }
-        
+
         self.cachedQuery = NSMetadataQuery()
         if let query = self.cachedQuery {
             NotificationCenter.default.addObserver(self, selector: #selector(didFinishGathering), name: .NSMetadataQueryDidFinishGathering, object: nil)
             
             query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
             query.predicate = NSPredicate(format: "%K LIKE '*'", NSMetadataItemPathKey)
-            query.start()
+            
+            if query.start() == false {
+                Logger.sync.error("Failed to start query for cloud files")
+            }
         }
         self.loadFromCloudContainer()
     }
@@ -785,6 +797,11 @@ class FlightLogOrganizer {
                     cloudUrls.append(url)
                 }
             }
+            
+            Logger.sync.info("Found \(cloudUrls.count) files on iCloud")
+            
+            self.progress?.update(state: .complete, message: .iCloudSync)
+            
             Self.search(in: [self.localFolder]){
                 result in
                 switch result{

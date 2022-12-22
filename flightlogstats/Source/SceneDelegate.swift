@@ -35,7 +35,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         Logger.app.info("active")
         ViewConfig.shared.setDefaultAttributes()
 
-        FlightLogOrganizer.shared.syncCloud()
+        AppDelegate.worker.async {
+            FlightLogOrganizer.shared.syncCloud()
+        }
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     }

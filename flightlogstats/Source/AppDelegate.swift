@@ -30,8 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Settings.registerDefaults()
 
-        FlightLogOrganizer.shared.loadFromContainer()
         AppDelegate.worker.async {
+            //FlightLogOrganizer.shared.deleteAndResetDatabase()
+            FlightLogOrganizer.shared.loadFromContainer()
             FlightLogOrganizer.shared.addMissingFromLocal()
         }
         

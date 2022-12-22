@@ -84,7 +84,7 @@ class FlightLogFileRecord: NSManagedObject {
         }
     }
     
-    func parseAndUpdate(progress : ProgressReport? = nil) {
+    func parseAndUpdate(quick: Bool = false, progress : ProgressReport? = nil) {
         if flightLog == nil {
             guard let container = self.organizer,
                   let log_file_name = self.log_file_name
@@ -93,9 +93,13 @@ class FlightLogFileRecord: NSManagedObject {
         }
         
         if let flightLog = flightLog {
-            flightLog.parse(progress:progress)
+            if quick {
+                flightLog.quickParse(progress: progress)
+            }else{
+                flightLog.parse(progress:progress)
+            }
             do {
-                try self.updateFromFlightLog(flightLog: flightLog)
+                try self.updateFromFlightLog(flightLog: flightLog, quick: true)
                 self.saveContext()
             }catch{
                 Logger.app.error("Failed to update \(error.localizedDescription)")
@@ -108,7 +112,11 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     //MARK: - get require data from files
-    func updateFromFlightLog(flightLog : FlightLogFile) throws {
+    /// Update record from flight log, if quick will just do minimum it can but mark as not done yet
+    /// - Parameters:
+    ///   - flightLog: file
+    ///   - quick: if true assume not complete, will just get max info it can
+    func updateFromFlightLog(flightLog : FlightLogFile, quick: Bool = false) throws {
         self.flightLog = flightLog
 
         self.log_file_name = flightLog.name
@@ -169,6 +177,9 @@ class FlightLogFileRecord: NSManagedObject {
             self.recordStatus = .notParsed
         }
         
+        if quick {
+            self.recordStatus = .notParsed
+        }
         self.version = FlightLogFileRecord.currentVersion
         
     }
@@ -205,7 +216,7 @@ class FlightLogFileRecord: NSManagedObject {
     
     //MARK: - Ensure dependent object
 
-    func ensureDependentRecords() {
+    func ensureDependentRecords(delaySave : Bool = false) {
         var save = false
         
         if self.ensureFlyStoStatus() {
@@ -218,7 +229,7 @@ class FlightLogFileRecord: NSManagedObject {
             save = true
         }
         
-        if save {
+        if save && !delaySave {
             self.saveContext()
         }
     }
@@ -226,9 +237,13 @@ class FlightLogFileRecord: NSManagedObject {
     
     @discardableResult
     private func ensureAircraftRecord() -> Bool {
-        if self.aircraft_record == nil, let container = self.organizer, let sysid = self.system_id {
-            self .aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
-            return true
+        if self.aircraft_record == nil, let container = self.organizer {
+            if let sysid = self.system_id {
+                self.aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
+                return true
+            }else{
+                Logger.app.warning("Unable to create aircraft record as not system_id found")
+            }
         }
         return false
     }

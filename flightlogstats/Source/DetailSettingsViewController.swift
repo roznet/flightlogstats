@@ -126,7 +126,7 @@ class DetailSettingsViewController: UIViewController {
         self.update(segment: self.targetUnitSegment, for: Settings.shared.unitTargetFuel)
         
         if let flightLogViewModel = self.flightLogViewModel {
-            self.aircraftIdentifier.text = flightLogViewModel.aircraftIdentifier
+            self.aircraftIdentifier.text = flightLogViewModel.displayIdentifier
             self.airframeName.text = flightLogViewModel.airframeName
             self.aircraftIdentifier.isHidden = false
             self.airframeName.isHidden = false

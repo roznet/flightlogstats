@@ -60,7 +60,7 @@ class FlightFuelRecord: NSManagedObject {
     /// setup default from settings
     func setupFromSettings() {
         self.targetFuel = Settings.shared.targetFuel
-        self.addedFuel = Settings.shared.addedFuel
+        self.addedFuel = .zero
         self.totalizerStartFuel = Settings.shared.totalizerStartFuel
     }
     

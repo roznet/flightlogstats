@@ -26,7 +26,6 @@ class FlightData {
     private var categoricalDataFrame : DataFrame<Date,CategoricalValue,Field> = DataFrame<Date,String,Field>()
     private var doubleDataFrame : DataFrame<Date,Double,Field> = DataFrame<Date,Double,Field>()
     private var coordinateDataFrame : DataFrame<Date,CLLocationCoordinate2D,Field> = DataFrame<Date,CLLocationCoordinate2D,Field>()
-    
 
     private(set) var meta : [MetaField:String] = [:]
     private(set) var doubleFields : [Field] = []
@@ -72,7 +71,7 @@ class FlightData {
     
     private init() {}
     
-    convenience init?(url: URL, progress : ProgressReport? = nil){
+    convenience init?(url: URL, maxLineCount: Int? = nil, lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil){
         self.init()
         
         var inputSize = 0
@@ -87,18 +86,17 @@ class FlightData {
         
         guard let inputStream = InputStream(url: url) else { return nil }
         do {
-            try self.parse(inputStream: inputStream, totalSize: inputSize, progress: progress)
+            try self.parse(inputStream: inputStream, totalSize: inputSize, maxLineCount: maxLineCount, lineSamplingFrequency: lineSamplingFrequency, progress: progress)
         }catch{
             return nil
         }
     }
         
-    convenience init(inputStream : InputStream,progress : ProgressReport? = nil) throws {
+    convenience init(inputStream : InputStream, maxLineCount: Int? = nil,
+                     lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil) throws {
         self.init()
-        try self.parse(inputStream: inputStream)
+        try self.parse(inputStream: inputStream, maxLineCount: maxLineCount, lineSamplingFrequency: lineSamplingFrequency)
     }
-    
-
 
     //MARK: - external and derived info
     func fetchAirports(completion : @escaping ([Airport]) -> Void){
@@ -264,8 +262,11 @@ extension FlightData {
             case ignore
         }
         
+        var maxLineCount: Int?
+        
         var lastReportTime = Date()
         var totalSize : Int
+        var lineSamplingFrequency : Int
         
         var fields : [Field] = []
         var columnIsDouble : [ColumnType] = []
@@ -297,11 +298,13 @@ extension FlightData {
         var doubleInputs : [Field:[Double]] = [:]
         var doubleInputsCount : Int = 0
         
-        init(data : FlightData, totalSize : Int, progress : ProgressReport? = nil){
+        init(data : FlightData, totalSize : Int, maxLineCount: Int? = nil, lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil){
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
             self.data = data
             self.progress = progress
             self.totalSize = totalSize
+            self.lineSamplingFrequency = lineSamplingFrequency
+            self.maxLineCount = maxLineCount
             for calcField in FieldCalculation.calculatedFields {
                 if calcField.requiredObservationCount > 0 {
                     self.doubleInputsCount = max(self.doubleInputsCount,calcField.requiredObservationCount)
@@ -323,13 +326,17 @@ extension FlightData {
             if totalSize > 0 {
                 let formatter = ByteCountFormatter()
                 if let interpretStartTime = self.interpretStartTime {
-                    Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize))) in \(Date().timeIntervalSince(interpretStartTime)) secs")
+                    if lineSamplingFrequency != 1 {
+                        Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize)))[1/\(lineSamplingFrequency)] in \(Date().timeIntervalSince(interpretStartTime)) secs")
+                    }else{
+                        Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize))) in \(Date().timeIntervalSince(interpretStartTime)) secs")
+                    }
                 }else{
                     Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize)))")
                 }
             }
         }
-        func process(line : [String], readCount : Int){
+        func process(line : [String], readCount : Int, lineCount : Int){
             guard let first = line.first else { return }
             
             if totalSize > 0 {
@@ -426,9 +433,13 @@ extension FlightData {
                     }
                 }
             }else if line.count == columnIsDouble.count {
+                if lineCount % self.lineSamplingFrequency != 0 {
+                    return
+                }
+                
                 // Usually date are +1, +2 or same, saves a lot of time vs date parsing to try to guess...
                 var dateProxied = false
-                if let lastDate = data.dates.last {
+                if self.lineSamplingFrequency == 1, let lastDate = data.dates.last {
                     let lastDigit = Int(lastDate.timeIntervalSinceReferenceDate)
                     let suffix = line[timeIndex].suffix(1)
                     if suffix == "\( (lastDigit + 1) % 10)" {
@@ -594,9 +605,11 @@ extension FlightData {
     
     //MARK: - parse stream
         
-    func parse(inputStream : InputStream, totalSize : Int = 0, progress : ProgressReport? = nil) throws {
+    func parse(inputStream : InputStream, totalSize : Int = 0, maxLineCount: Int? = nil,
+               lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil) throws {
 
-        let parsingState = ParsingState(data: self, totalSize: totalSize, progress: progress)
+        let parsingState = ParsingState(data: self, totalSize: totalSize, maxLineCount: maxLineCount,
+                                        lineSamplingFrequency: lineSamplingFrequency, progress: progress)
         let bufferedStreamReader = BufferedStreamReader(inputStream: inputStream)
         try CsvParser.parse(bufferedStreamReader: bufferedStreamReader, interpreter: parsingState)
     }

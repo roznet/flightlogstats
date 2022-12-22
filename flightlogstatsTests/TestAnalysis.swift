@@ -27,7 +27,7 @@ final class TestAnalysis: XCTestCase {
                                              addedfuel: FuelTanks(left: 29.0, right: 31.0, unit: UnitVolume.liters),
                                              totalizerStartFuel: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon))
         
-        let fuelAnalysis = FuelAnalysis(aircraft: aircraft,
+        let fuelAnalysis = FuelAnalysis(aircraftPerformance: aircraft,
                                         current: FuelTanks(left: 30.5, right: 32.2, unit: UnitVolume.aviationGallon),
                                         totalizer: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon),
                                         inputs: fuelInputs)
@@ -48,7 +48,7 @@ final class TestAnalysis: XCTestCase {
         let fuelInputs = FuelAnalysis.Inputs(targetFuel: FuelTanks(total: 60.0, unit: UnitVolume.aviationGallon),
                                              addedfuel: FuelTanks(left: 25.0, right: 25.0, unit: UnitVolume.aviationGallon),
                                              totalizerStartFuel: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon))
-        var fuelAnalysis = FuelAnalysis(aircraft: aircraft,
+        var fuelAnalysis = FuelAnalysis(aircraftPerformance: aircraft,
                                         current: FuelTanks(left: 29.0, right: 31.0, unit: UnitVolume.aviationGallon),
                                         totalizer: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon),
                                         inputs: fuelInputs)
@@ -58,7 +58,7 @@ final class TestAnalysis: XCTestCase {
 
         // second case: current.total below target.total but current.right > target.right, only add to left
         
-        fuelAnalysis = FuelAnalysis(aircraft: aircraft,
+        fuelAnalysis = FuelAnalysis(aircraftPerformance: aircraft,
                                    current: FuelTanks(left: 28.0, right: 31.0, unit: UnitVolume.aviationGallon),
                                     totalizer: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon),
                                    inputs: fuelInputs)

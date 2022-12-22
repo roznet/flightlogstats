@@ -72,13 +72,7 @@ class FlightLogViewModel {
         }
     }
     
-    var aircraftIdentifier : String {
-        var rv = self.flightLogFileInfo.aircraftRecord.aircraftIdentifier
-        if rv == "" {
-            rv = self.flightLogFileInfo.aircraftRecord.systemId
-        }
-        return rv
-    }
+    var displayIdentifier : String { return self.flightLogFileInfo.aircraftRecord.displayIdentifier }
     
     var airframeName : String {
         return self.flightLogFileInfo.aircraftRecord.airframeName

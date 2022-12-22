@@ -28,6 +28,8 @@ public class FlightLogFile {
     let url : URL 
     var name : String { return url.lastPathComponent }
     
+    var count : Int { return self.data?.count ?? 0 }
+    
     var description : String { return "<FlightLog:\(name)>" }
     
     var requiresParsing : Bool { return self.logType == .notParsed }
@@ -57,7 +59,24 @@ public class FlightLogFile {
             throw FlightLogFileError.fileDoesNotExist
         }
     }
-        
+    
+    func quickParse(progress : ProgressReport? = nil) {
+        if self.logType == .notParsed {
+            // read and process every 5 min
+            if let data = FlightData(url: self.url, maxLineCount: nil, lineSamplingFrequency: 60*5, progress: progress) {
+                do {
+                    self.data = data
+                    self.flightSummary = try FlightSummary(data: data)                    
+                }catch{
+                    self.logType = .error(.parsingError)
+                    Logger.app.error("Failed to parse log file \(self.url.lastPathComponent)")
+                }
+            }else{
+                self.logType = .empty
+            }
+        }
+    }
+    
     func parse(progress : ProgressReport? = nil) {
         if self.logType == .notParsed {
             self.data = FlightData(url: self.url, progress: progress)
@@ -95,7 +114,6 @@ extension FlightLogFile {
     }
     
     func meta(key : MetaField) -> String? {
-        self.parse()
         return self.data?.meta[key]
     }
     
@@ -118,10 +136,6 @@ extension FlightLogFile {
             rv = FlightLeg.legs(from: data, byfields:  byfields, start: flyingStart, end: data.lastDate)
         }
         return rv
-    }
-    
-    func updateFlightLogFileInfo(info : FlightLogFileRecord){
-        try? info.updateFromFlightLog(flightLog: self)
     }
     
     func route(start : Date? = nil) -> [ FlightLeg ] {
