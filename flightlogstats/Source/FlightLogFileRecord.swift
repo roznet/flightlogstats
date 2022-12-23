@@ -22,6 +22,7 @@ class FlightLogFileRecord: NSManagedObject {
     enum RecordStatus : String {
         case notParsed
         case parsed
+        case quickParsed
         case empty
         case error
     }
@@ -30,9 +31,16 @@ class FlightLogFileRecord: NSManagedObject {
     
     var flightLog : FlightLogFile? = nil {
         didSet {
-            if let fromLog = self.flightLog?.flightSummary {
+            if  let flightLog = self.flightLog, let fromLog = flightLog.flightSummary {
                 self.flightSummary = fromLog
-                self.recordStatus = .parsed
+                switch flightLog.logType {
+                case .quickParsed:
+                    self.recordStatus = .quickParsed
+                case .parsed:
+                    self.recordStatus = .parsed
+                case .error,.empty,.notParsed:
+                    break
+                }
             }
         }
     }
@@ -51,7 +59,9 @@ class FlightLogFileRecord: NSManagedObject {
                 return .notParsed
             }
         }
-        set { self.info_status = newValue.rawValue }
+        set {
+            self.info_status = newValue.rawValue
+        }
     }
     
     lazy var flightSummary : FlightSummary? = FlightSummary(info: self)
@@ -69,7 +79,19 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     var requiresVersionUpdate : Bool { return self.version < Self.currentVersion }
-    var requiresParsing : Bool { return self.requiresVersionUpdate || self.recordStatus == .notParsed }
+    var requiresParsing : Bool {
+        if self.requiresVersionUpdate {
+            return true
+        }
+        switch self.recordStatus {
+        case .notParsed,.quickParsed:
+            return true
+        case .empty,.error:
+            return false
+        case .parsed:
+            return false
+        }
+    }
     
     //MARK: - database utilities
     func delete() {
@@ -117,11 +139,17 @@ class FlightLogFileRecord: NSManagedObject {
     ///   - flightLog: file
     ///   - quick: if true assume not complete, will just get max info it can
     func updateFromFlightLog(flightLog : FlightLogFile, quick: Bool = false) throws {
+        // don't do quick parsing if was already parsed
+        if quick && self.recordStatus == .parsed {
+            return
+        }
+        
         self.flightLog = flightLog
 
         self.log_file_name = flightLog.name
         
-        // start empty
+        let startingStatus = self.recordStatus
+        
         self.recordStatus = .empty
         
         if let system_id = flightLog.meta(key: .system_id) {
@@ -138,7 +166,7 @@ class FlightLogFileRecord: NSManagedObject {
                 self.start_time = hobbs.start
                 self.end_time = hobbs.end
                 // if we have some times, then consider it parsed
-                self.recordStatus = .parsed
+                self.recordStatus = quick ? .quickParsed : .parsed
             }
             
             if let moving = flightSummary.moving {
@@ -177,10 +205,11 @@ class FlightLogFileRecord: NSManagedObject {
             self.recordStatus = .notParsed
         }
         
-        if quick {
-            self.recordStatus = .notParsed
-        }
         self.version = FlightLogFileRecord.currentVersion
+        
+        if self.recordStatus != startingStatus, let logname = self.log_file_name {
+            Logger.app.info("Record for \(logname) changed status \(startingStatus) -> \(self.recordStatus)")
+        }
         
     }
 

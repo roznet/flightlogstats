@@ -226,10 +226,14 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             if let cell = cell as? LogListTableViewCell,
                let info = self.flightInfo(at: indexPath) {
                 cell.update(minimum: info)
-                AppDelegate.worker.async {
-                    let _ = info.flightSummary
-                    DispatchQueue.main.async {
-                        cell.update(with: info)
+                if info.recordStatus == .parsed || info.recordStatus == .quickParsed {
+                    cell.update(with: info)
+                }else{
+                    AppDelegate.worker.async {
+                        let _ = info.flightSummary
+                        DispatchQueue.main.async {
+                            cell.update(with: info)
+                        }
                     }
                 }
             }

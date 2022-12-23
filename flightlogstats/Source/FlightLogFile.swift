@@ -18,6 +18,7 @@ public class FlightLogFile {
     
     enum LogType : Comparable {
         case notParsed
+        case quickParsed
         case parsed
         case empty
         case error(FlightLogFileError)
@@ -32,8 +33,22 @@ public class FlightLogFile {
     
     var description : String { return "<FlightLog:\(name)>" }
     
-    var requiresParsing : Bool { return self.logType == .notParsed }
-    var isParsed : Bool { return self.logType != .notParsed }
+    var requiresParsing : Bool {
+        switch self.logType {
+        case .notParsed,.quickParsed:
+            return true
+        case .parsed,.empty,.error:
+            return false
+        }
+    }
+    var isParsed : Bool {
+        switch self.logType {
+        case .notParsed,.quickParsed:
+            return false
+        case .parsed,.empty,.error:
+            return true
+        }
+    }
     
     var flightSummary : FlightSummary? = nil
     // legs populated in parse
@@ -66,7 +81,8 @@ public class FlightLogFile {
             if let data = FlightData(url: self.url, maxLineCount: nil, lineSamplingFrequency: 60*5, progress: progress) {
                 do {
                     self.data = data
-                    self.flightSummary = try FlightSummary(data: data)                    
+                    self.flightSummary = try FlightSummary(data: data)
+                    self.logType = .quickParsed
                 }catch{
                     self.logType = .error(.parsingError)
                     Logger.app.error("Failed to parse log file \(self.url.lastPathComponent)")

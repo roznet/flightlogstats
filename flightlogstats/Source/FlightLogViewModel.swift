@@ -191,7 +191,6 @@ class FlightLogViewModel {
             self.didBuild()
         }
         self.progress?.update(state: .complete)
-        
     }
     
     func graphDataSerie(field : FlightLogFile.Field) -> GCStatsDataSerie? {

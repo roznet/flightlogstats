@@ -21,6 +21,7 @@ class FlightFuelRecord: NSManagedObject {
             self.targetFuel = newValue.targetFuel
             self.addedFuel = newValue.addedfuel
             self.totalizerStartFuel = newValue.totalizerStartFuel
+            self.last_entered = Date()
         }
     }
     
@@ -28,7 +29,7 @@ class FlightFuelRecord: NSManagedObject {
         return self.totalizer_fuel_start == 0.0
     }
     
-    var totalizerStartFuel : FuelQuantity {
+    private(set) var totalizerStartFuel : FuelQuantity {
         get {
             let start = (self.totalizer_fuel_start == 0.0 ? self.target_fuel : self.totalizer_fuel_start)
             return FuelQuantity(total: start, unit: Settings.fuelStoreUnit)
@@ -39,7 +40,7 @@ class FlightFuelRecord: NSManagedObject {
         }
     }
     
-    var addedFuel : FuelQuantity {
+    private(set) var addedFuel : FuelQuantity {
         get { return FuelQuantity(left: self.added_fuel_left, right: self.added_fuel_right, unit: Settings.fuelStoreUnit) }
         set {
             let ingallons = newValue.converted(to: Settings.fuelStoreUnit)
@@ -48,7 +49,7 @@ class FlightFuelRecord: NSManagedObject {
         }
     }
 
-    var targetFuel : FuelQuantity {
+    private(set) var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.target_fuel, unit: Settings.fuelStoreUnit) }
         set { let ingallons = newValue.converted(to: Settings.fuelStoreUnit); self.target_fuel = ingallons.total }
     }
@@ -59,9 +60,11 @@ class FlightFuelRecord: NSManagedObject {
     
     /// setup default from settings
     func setupFromSettings() {
-        self.targetFuel = Settings.shared.targetFuel
-        self.addedFuel = .zero
-        self.totalizerStartFuel = Settings.shared.totalizerStartFuel
+        if self.last_entered == nil {
+            self.targetFuel = Settings.shared.targetFuel
+            self.addedFuel = .zero
+            self.totalizerStartFuel = Settings.shared.totalizerStartFuel
+        }
     }
     
     /// save latest to settings so next new one is same default
