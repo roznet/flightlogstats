@@ -121,7 +121,7 @@ class FlightLogFileRecord: NSManagedObject {
                 flightLog.parse(progress:progress)
             }
             do {
-                try self.updateFromFlightLog(flightLog: flightLog, quick: true)
+                try self.updateFromFlightLog(flightLog: flightLog, quick: quick)
                 self.saveContext()
             }catch{
                 Logger.app.error("Failed to update \(error.localizedDescription)")
@@ -266,15 +266,24 @@ class FlightLogFileRecord: NSManagedObject {
     
     @discardableResult
     private func ensureAircraftRecord() -> Bool {
+        var rv : Bool = false
         if self.aircraft_record == nil, let container = self.organizer {
             if let sysid = self.system_id {
                 self.aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
-                return true
+                rv = true
             }else{
                 Logger.app.warning("Unable to create aircraft record as not system_id found")
             }
         }
-        return false
+        
+        if let sysid = self.system_id, let container = self.organizer, let recordId = self.aircraft_record?.system_id, recordId != sysid {
+            // update
+            let ac = container.aircraft(systemId: sysid)
+            self.aircraft_record = ac
+            rv = true
+        
+        }
+        return rv
     }
     
     private func ensureFlyStoStatus() -> Bool {
