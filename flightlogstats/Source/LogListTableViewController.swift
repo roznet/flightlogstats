@@ -60,6 +60,17 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.buildList()
                 self.tableView.reloadData()
             },
+            UIAction(title: "Delete/Restore Logs", image: UIImage(systemName: "minus.circle")){
+                _ in
+                self.buildList()
+                if self.tableView.isEditing {
+                    self.tableView.setEditing(false, animated: true)
+                }else{
+                    self.tableView.setEditing(true, animated: true)
+                }
+                self.updateButtons()
+            },
+
             UIAction(title: self.filterEmpty ? "Show non-flights" : "Show flights only", image: UIImage(systemName: "minus.circle")){
                 _ in
                 self.filterEmpty = !self.filterEmpty
@@ -131,14 +142,18 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         let addButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(addLog(button:)))
         let moreFunctionButton = UIBarButtonItem(title: "More", image: UIImage(systemName: "ellipsis.circle"), menu: self.moreFunctionMenu())
         
+        let donebutton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(done(button:)))
+        
+        let rightButton = self.tableView.isEditing ? donebutton : moreFunctionButton
+        
         self.navigationItem.leftBarButtonItem = addButton
         
         if self.userInterfaceModeManager?.userInterfaceMode == .stats {
             let planeButton = UIBarButtonItem(image: UIImage(systemName: "airplane.circle"), style: .plain, target: self, action: #selector(sum(button:)))
-            self.navigationItem.rightBarButtonItems = [moreFunctionButton, planeButton]
+            self.navigationItem.rightBarButtonItems = [rightButton, planeButton]
         }else{ // this include the case userInterfaceModeManager is nil
             let sumButton = UIBarButtonItem(image: UIImage(systemName: "sum"), style: .plain, target: self, action: #selector(sum(button:)))
-            self.navigationItem.rightBarButtonItems = [moreFunctionButton, sumButton]
+            self.navigationItem.rightBarButtonItems = [rightButton, sumButton]
         }
 
     }
@@ -268,6 +283,9 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         switch TableSection(indexPath: indexPath) {
         case .flights:
             if let info = self.flightInfo(at: indexPath){
+                if self.isEditing == true {
+                    Logger.ui.info("Is editing")
+                }
                 self.ensureDelegate()
                 self.delegate?.selectlogInfo(info)
                 self.userInterfaceModeManager?.userInterfaceMode = .detail
@@ -305,6 +323,40 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
     }
     
+    //MARK: - UITableView Editing
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        switch TableSection(indexPath: indexPath) {
+        case .flights:
+            return true
+        case .statistics:
+            return false
+        case .none:
+            return false
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .insert
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "Ignore"
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        switch TableSection(indexPath: indexPath) {
+        case .flights:
+            if let info = self.flightInfo(at: indexPath){
+                Logger.app.info("Delete \(info)")
+            }
+
+            
+        case .statistics,.none:
+            break
+        }
+
+    }
     
     //MARK: - build list functionality
     
@@ -355,6 +407,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }else{
             self.userInterfaceModeManager?.userInterfaceMode = .detail
         }
+        self.updateButtons()
+    }
+    
+    @objc func done(button: UIBarButtonItem){
+        self.tableView.setEditing(false, animated: true)
         self.updateButtons()
     }
     

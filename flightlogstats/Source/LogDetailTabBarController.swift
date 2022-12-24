@@ -26,7 +26,7 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
         }
         
         // Delay a bit so rest of the UI/list if applicable is drawn
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.2){
+        AppDelegate.worker.async {
             self.selectOneIfEmpty(organizer: FlightLogOrganizer.shared)
         }
         
@@ -75,11 +75,13 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
                 self.progressReportOverlay?.update(for: progress)
             }
         }
-        self.progressReportOverlay?.prepareOverlay(message: .parsingInfo)
         let viewModel = FlightLogViewModel(fileInfo: info, displayContext: DisplayContext(), progress: self.progress)
         self.logViewModel = viewModel
         // notifiy it change but may not be complete
-        self.viewModelHasChanged(viewModel: viewModel)
+        DispatchQueue.main.async {
+            self.progressReportOverlay?.prepareOverlay(message: .parsingInfo)
+            self.viewModelHasChanged(viewModel: viewModel)
+        }
         AppDelegate.worker.async {
             self.logViewModel?.build()
         }

@@ -147,6 +147,7 @@ class TestOrganizer: XCTestCase {
                 XCTAssertTrue(false)
                 return
             }
+            Logger.test.info("Cleaned and prepared \(writeableUrl.path)")
         }
         
         let container = NSPersistentContainer(name: "FlightLogModel")
