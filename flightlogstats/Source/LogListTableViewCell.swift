@@ -122,8 +122,8 @@ class LogListTableViewCell: UITableViewCell {
             }
             self.airports.attributedText = NSAttributedString(string: airports.joined(separator: "-"), attributes: titleAttribute)
             
-            if info.aircraftRecord.aircraftIdentifier != "" {
-                self.identifier.attributedText = NSAttributedString(string: info.aircraftRecord.aircraftIdentifier,attributes: cellAttribute)
+            if let record = info.aircraftRecord, record.aircraftIdentifier != "" {
+                self.identifier.attributedText = NSAttributedString(string: record.aircraftIdentifier,attributes: cellAttribute)
                 self.identifier.isHidden = false
             }else{
                 self.identifier.isHidden = true

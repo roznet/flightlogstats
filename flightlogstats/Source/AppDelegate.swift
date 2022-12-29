@@ -13,6 +13,7 @@ import OSLog
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     public static let worker = DispatchQueue(label: "net.ro-z.flightlog1000.worker")
+    public static let uiWorker = DispatchQueue(label: "net.ro-z.flightlog1000.uiworker")
     private let keepOrganizer = FlightLogOrganizer.shared
     public static var db : FMDatabase = FMDatabase()
     public static var knownAirports : KnownAirports? = nil
@@ -31,9 +32,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Settings.registerDefaults()
 
         AppDelegate.worker.async {
+            //#warning("Don't checkin")
             //FlightLogOrganizer.shared.deleteAndResetDatabase()
             FlightLogOrganizer.shared.loadFromContainer()
-            FlightLogOrganizer.shared.addMissingFromLocal()
+            FlightLogOrganizer.shared.addMissingRecordsFromLocal()
         }
         
         return true

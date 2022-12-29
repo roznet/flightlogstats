@@ -20,7 +20,7 @@ class TripsStatsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let infos = FlightLogOrganizer.shared.actualFlightLogFileInfos
+        let infos = FlightLogOrganizer.shared.flightLogFileInfos(request: .flightsOnly)
         self.flightListDataSource = FlightListDataSource(logInfos: infos, displayContext: DisplayContext(), aggregation: .trips)
         
         self.logListCollectionView.dataSource = self.flightListDataSource

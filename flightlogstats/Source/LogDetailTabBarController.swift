@@ -88,7 +88,7 @@ class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
     }
     
     func selectOneIfEmpty(organizer : FlightLogOrganizer) {
-        if self.logViewModel == nil, let first = organizer.firstNonEmpty {
+        if self.logViewModel == nil, let first = organizer.first(request: .flightsOnly) {
             self.selectlogInfo(first)
         }
     }

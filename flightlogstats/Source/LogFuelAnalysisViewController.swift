@@ -80,6 +80,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.flightLogViewModel?.displayContext.horizontalSizeClass = self.traitCollection.horizontalSizeClass
+
         self.setupViewFromModel()
         self.updateUI()
     }
@@ -175,7 +176,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     
     //MARK: - sync view and model
     
-    private func updateFromSettings() {
+    private func updateAircraftData() {
         // this should be sync'd with the view
         if let maxTextLabel = self.flightLogViewModel?.fuelMaxTextLabel {
             self.maxFuelSubLabel.text = maxTextLabel
@@ -191,7 +192,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }
     
     private func pushViewToModel() {
-        self.updateFromSettings()
+        self.updateAircraftData()
         
         let inputs = FuelAnalysis.Inputs(targetFuel: self.enteredFuelTarget, addedfuel: self.enteredFuelAdded, totalizerStartFuel: self.enteredtotalizerStart)
         self.flightLogViewModel?.fuelAnalysisInputs = inputs
@@ -200,7 +201,7 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
     }
         
     private func pushModelToView() {
-        self.updateFromSettings()
+        self.updateAircraftData()
         
         if let inputs = self.flightLogViewModel?.fuelAnalysisInputs {
             self.enteredFuelAdded = inputs.addedfuel
@@ -236,9 +237,9 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         // Make sure UI ready
         guard self.fuelTargetField != nil else { return }
         
-        self.flightLogFileInfo?.ensureDependentRecords()
+        self.flightLogFileInfo?.ensureFuelRecord()
         
-        self.updateFromSettings()
+        self.updateAircraftData()
         
         if let record = self.flightLogFileInfo?.fuel_record {
             self.enteredFuelAdded = record.addedFuel

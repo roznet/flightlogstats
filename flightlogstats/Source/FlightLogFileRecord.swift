@@ -69,13 +69,12 @@ class FlightLogFileRecord: NSManagedObject {
     static let currentVersion : Int32 = 1
     
     var fuelRecord : FlightFuelRecord {
-        self.ensureDependentRecords()
+        self.ensureFuelRecord()
         return self.fuel_record!
     }
     
-    var aircraftRecord : AircraftRecord {
-        self.ensureDependentRecords()
-        return self.aircraft_record!
+    var aircraftRecord : AircraftRecord? {
+        return self.aircraft_record
     }
     
     var requiresVersionUpdate : Bool { return self.version < Self.currentVersion }
@@ -245,6 +244,7 @@ class FlightLogFileRecord: NSManagedObject {
     
     //MARK: - Ensure dependent object
 
+    @available(*, deprecated, message: "Use specific dependent record creation")
     func ensureDependentRecords(delaySave : Bool = false) {
         var save = false
         
@@ -265,14 +265,14 @@ class FlightLogFileRecord: NSManagedObject {
     
     
     @discardableResult
-    private func ensureAircraftRecord() -> Bool {
+    func ensureAircraftRecord() -> Bool {
         var rv : Bool = false
         if self.aircraft_record == nil, let container = self.organizer {
             if let sysid = self.system_id {
                 self.aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
                 rv = true
             }else{
-                Logger.app.warning("Unable to create aircraft record as not system_id found")
+                Logger.app.warning("Unable to create aircraft record as no system_id found")
             }
         }
         
@@ -286,21 +286,28 @@ class FlightLogFileRecord: NSManagedObject {
         return rv
     }
     
-    private func ensureFlyStoStatus() -> Bool {
+    @discardableResult
+    func ensureFlyStoStatus() -> Bool {
+        
         if self.flysto_record == nil,
            let container = self.organizer {
+            dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
             let context = container.persistentContainer.viewContext
             let status = FlightFlyStoRecord(context: context)
             status.status = .ready
+            status.log_file_name = self.log_file_name
             self.flysto_record = status
             return true
         }
         return false
     }
     
-    private func ensureFuelRecord() -> Bool {
+    @discardableResult
+    func ensureFuelRecord() -> Bool {
+        
         if self.fuel_record == nil,
            let container = self.organizer {
+            dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
             let context = container.persistentContainer.viewContext
             let record = FlightFuelRecord(context: context)
             // initialise with default
@@ -321,7 +328,7 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     var nextTotalizerStart : FuelQuantity? {
-        self.ensureDependentRecords()
+        self.ensureFuelRecord()
         if let record = self.fuel_record {
             return record.nextTotalizerStart(for: FuelQuantity(total: self.fuel_totalizer_total, unit: Settings.fuelStoreUnit))
         }
@@ -393,7 +400,7 @@ class FlightLogFileRecord: NSManagedObject {
         if log_file_name?.contains(searchText) ?? false {
             return true
         }
-        if self.aircraftRecord.contains(searchText) {
+        if let record = self.aircraftRecord, record.contains(searchText) {
             return true
         }
         return false

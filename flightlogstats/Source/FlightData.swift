@@ -53,6 +53,8 @@ class FlightData {
     var firstDate : Date? { return self.dates.first }
     var lastDate : Date? { return self.dates.last }
     
+    private var sourceName : String? = nil
+    
     private var doubleFieldToIndex : [Field:Int] {
         var rv : [Field:Int] = [:]
         for (idx,field) in doubleFields.enumerated() {
@@ -73,6 +75,7 @@ class FlightData {
     
     convenience init?(url: URL, maxLineCount: Int? = nil, lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil){
         self.init()
+        self.sourceName = url.lastPathComponent
         
         var inputSize = 0
         do {
@@ -95,6 +98,7 @@ class FlightData {
     convenience init(inputStream : InputStream, maxLineCount: Int? = nil,
                      lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil) throws {
         self.init()
+        self.sourceName = "InputStream"
         try self.parse(inputStream: inputStream, maxLineCount: maxLineCount, lineSamplingFrequency: lineSamplingFrequency)
     }
 
@@ -326,10 +330,11 @@ extension FlightData {
             if totalSize > 0 {
                 let formatter = ByteCountFormatter()
                 if let interpretStartTime = self.interpretStartTime {
+                    let name = self.data.sourceName ?? ""
                     if lineSamplingFrequency != 1 {
-                        Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize)))[1/\(lineSamplingFrequency)] in \(Date().timeIntervalSince(interpretStartTime)) secs")
+                        Logger.app.info("\(name) Parsed \(formatter.string(fromByteCount: Int64(totalSize)))[1/\(lineSamplingFrequency)] in \(Date().timeIntervalSince(interpretStartTime)) secs")
                     }else{
-                        Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize))) in \(Date().timeIntervalSince(interpretStartTime)) secs")
+                        Logger.app.info("\(name) Parsed \(formatter.string(fromByteCount: Int64(totalSize))) in \(Date().timeIntervalSince(interpretStartTime)) secs")
                     }
                 }else{
                     Logger.app.info("Parsed \(formatter.string(fromByteCount: Int64(totalSize)))")

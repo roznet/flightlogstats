@@ -98,7 +98,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         menuItems.append(contentsOf: [
             UIAction(title: "Delete last", image: UIImage(systemName: "minus.circle")){
                 _ in
-                if let info = self.logFileOrganizer.firstNonEmpty, let log_file_name = info.log_file_name {
+                if let info = self.logFileOrganizer.first(request: .flightsOnly), let log_file_name = info.log_file_name {
                     Logger.ui.info("Deleting \(log_file_name)")
                     self.logFileOrganizer.delete(info: info)
                 }
@@ -364,16 +364,14 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         Logger.ui.info( "aircrafts \(self.logFileOrganizer.aircraftSystemIds)")
         
         if self.filterEmpty {
-            AppDelegate.worker.async {
-                self.fullLogInfoList = self.logFileOrganizer.nonEmptyLogFileInfos
-                DispatchQueue.main.async {
-                    self.updateSearchedList()
-                    self.tableView.reloadData()
-                    self.ensureOneDetailDisplayed()
-                }
+            self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos(request: .flightsOnly)
+            DispatchQueue.main.async {
+                self.updateSearchedList()
+                self.tableView.reloadData()
+                self.ensureOneDetailDisplayed()
             }
         }else{
-            self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos
+            self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos(request: .all)
             self.updateSearchedList()
             self.tableView.reloadData()
             self.ensureOneDetailDisplayed()
@@ -384,7 +382,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         if let delegate = self.delegate, !delegate.logInfoIsSelected {
             if let info = self.logInfoList.first  {
                 delegate.selectlogInfo(info)
-            }else if let info = self.logFileOrganizer.first {
+            }else if let info = self.logFileOrganizer.first(request: .flightsOnly) {
                 delegate.selectlogInfo(info)
             }
         }
@@ -434,7 +432,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         self.progressReportOverlay?.prepareOverlay(message: .addingFiles)
-        self.logFileOrganizer.copyMissingToLocal(urls: urls)
+        self.logFileOrganizer.copyMissingFilesToLocal(urls: urls)
         
         controller.dismiss(animated: true)
     }
