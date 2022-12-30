@@ -23,6 +23,10 @@ class FlightLogFileList {
     
     var count : Int { return urls.count }
     
+    func dropFirst() {
+        self.flightLogFiles = Array(self.flightLogFiles.dropFirst())
+    }
+    
     init(logs : [FlightLogFile] ) {
         self.flightLogFiles = logs
         self.flightLogFiles.sort { $0.name > $1.name }

@@ -196,12 +196,13 @@ class TestOrganizer: XCTestCase {
                     _ in
                     localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
                     XCTAssertEqual(localUrls.count, cloudUrls.count)
-                    XCTAssertEqual(cloudUrls.count, organizer.count)
-                    XCTAssertEqual(cloudUrls.count, organizer.flightLogFileInfos(request: .flightsOnly).count+1) // +1 because one file is not a log but avionics system file
+                    // +1 because should have one aircraft file
+                    XCTAssertEqual(cloudUrls.count, organizer.count+1)
+                    XCTAssertEqual(cloudUrls.count, organizer.flightLogFileInfos(request: .all).count+1) // +1 because one file is not a log but avionics system file
                     expectation.fulfill()
                 }
                 organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
-                self.wait(for: [expectation], timeout: 60.0)
+                self.wait(for: [expectation], timeout: 50*60.0)
             }catch{
                 XCTAssertTrue(false)
             }
@@ -218,7 +219,19 @@ class TestOrganizer: XCTestCase {
         }
     }
     
-    func testOrganizer() throws {
+    func testOrganizer() {
+        let expectation = self.expectation(description: "run organizer test")
+        AppDelegate.worker.async {
+            do {
+                try self.runTestOrganizer()
+            }catch{
+                XCTAssertNil(error)
+            }
+            expectation.fulfill()
+        }
+        self.wait(for: [expectation], timeout: 5.0)
+    }
+    func runTestOrganizer() throws {
         let organizer = FlightLogOrganizer()
         
         let container = NSPersistentContainer(name: "FlightLogModel")

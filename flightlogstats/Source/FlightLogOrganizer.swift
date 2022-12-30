@@ -69,6 +69,7 @@ class FlightLogOrganizer {
     }
 
     var count : Int { return managedFlightLogs.count }
+    var aircraftCount : Int { return self.managedAircrafts.count }
     
     subscript(_ name : String) -> FlightLogFileRecord? {
         return self.managedFlightLogs[name]
@@ -166,11 +167,6 @@ class FlightLogOrganizer {
     typealias SystemId = AvionicsSystem.SystemId
     private var managedAircrafts : [SystemId:AircraftRecord] = [:]
     
-    private var flightLogFileList : FlightLogFileList {
-        let list = FlightLogFileList(logs: self.managedFlightLogs.values.compactMap { $0.flightLog }.sorted { $0.name > $1.name } )
-        return list
-    }
-
     lazy var persistentContainer : NSPersistentContainer = {
         dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
         let container = NSPersistentContainer(name: "FlightLogModel")
@@ -470,7 +466,7 @@ class FlightLogOrganizer {
     /// - Parameter flightLogFileList: list of file to add
     /// - Returns: number of new flights added (0 if all already there)
     @discardableResult
-    func add(flightLogFileList : FlightLogFileList) -> Int{
+    func add(flightLogFileList : FlightLogFileList, completion : @escaping () -> Void = {} ) -> Int{
         var someNew : Int = 0
         self.progress?.update(state: .start, message: .addingFiles)
         var index : Double = 0.0
