@@ -69,12 +69,16 @@ struct FlightLeg {
         return self.extract(from: data, identifiers: identifiers, start: start, end: end)
     }
     
-    static func legs(from data : FlightData, interval : TimeInterval, start : Date? = nil, end : Date? = nil) -> [FlightLeg] {
+    static func legs(from data : FlightData,
+                     interval : TimeInterval,
+                     start : Date? = nil,
+                     end : Date? = nil) -> [FlightLeg] {
         let values = data.doubleDataFrame().sliced(start: start,end: end)
         let schedule = values.indexes.regularShedule(interval: interval)
         let identifiers = DataFrame<Date,String,Field>(indexes: schedule, values: [:])
         return self.extract(from: data, identifiers: identifiers, start : start, end : end)
     }
+    
     private static func extract(from data : FlightData,
                         identifiers : DataFrame<Date,String,Field>,
                      start : Date? = nil,

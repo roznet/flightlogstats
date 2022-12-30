@@ -22,7 +22,7 @@
 		4209D8662861881300B79A07 /* LogMapGraphsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D8652861881300B79A07 /* LogMapGraphsViewController.swift */; };
 		421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */; };
 		421EE5BF290C53E600996EC6 /* AircraftRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5BE290C53E600996EC6 /* AircraftRecord.swift */; };
-		421EE5C12928E01E00996EC6 /* FlightLogFileExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5C02928E01E00996EC6 /* FlightLogFileExport.swift */; };
+		421EE5C12928E01E00996EC6 /* FlightLogFileGroupBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5C02928E01E00996EC6 /* FlightLogFileGroupBy.swift */; };
 		423367A6293BC85F007D2285 /* MeasurementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A5293BC85F007D2285 /* MeasurementView.swift */; };
 		423367A8293BC967007D2285 /* MeasurementCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */; };
 		4239290D2864D08800CD33C0 /* AircraftPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290C2864D08800CD33C0 /* AircraftPerformance.swift */; };
@@ -151,7 +151,7 @@
 		4209D8652861881300B79A07 /* LogMapGraphsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogMapGraphsViewController.swift; path = Source/LogMapGraphsViewController.swift; sourceTree = "<group>"; };
 		421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysisDataSource.swift; path = Source/FuelAnalysisDataSource.swift; sourceTree = "<group>"; };
 		421EE5BE290C53E600996EC6 /* AircraftRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftRecord.swift; path = Source/AircraftRecord.swift; sourceTree = "<group>"; };
-		421EE5C02928E01E00996EC6 /* FlightLogFileExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileExport.swift; path = Source/FlightLogFileExport.swift; sourceTree = "<group>"; };
+		421EE5C02928E01E00996EC6 /* FlightLogFileGroupBy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileGroupBy.swift; path = Source/FlightLogFileGroupBy.swift; sourceTree = "<group>"; };
 		423367A5293BC85F007D2285 /* MeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementView.swift; path = Source/MeasurementView.swift; sourceTree = "<group>"; };
 		423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementCollectionViewCell.swift; path = Source/MeasurementCollectionViewCell.swift; sourceTree = "<group>"; };
 		4239290C2864D08800CD33C0 /* AircraftPerformance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftPerformance.swift; path = Source/AircraftPerformance.swift; sourceTree = "<group>"; };
@@ -509,11 +509,11 @@
 				4280C8C0280D467400A0FB32 /* FlightData.swift */,
 				4280C8BE280D467400A0FB32 /* FlightLogFile.swift */,
 				4280C8BF280D467400A0FB32 /* FlightLogFileList.swift */,
-				421EE5C02928E01E00996EC6 /* FlightLogFileExport.swift */,
 				42A7A0C22815898C00DF4495 /* FlightLogFile+Field.swift */,
 				4264C2392826858700F40436 /* FlightSummary.swift */,
 				42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */,
 				4264C23528267EDC00F40436 /* FlightLeg.swift */,
+				421EE5C02928E01E00996EC6 /* FlightLogFileGroupBy.swift */,
 			);
 			name = Flight;
 			sourceTree = "<group>";
@@ -784,7 +784,7 @@
 				4209D8662861881300B79A07 /* LogMapGraphsViewController.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
 				4264C2342825B58F00F40436 /* Settings.swift in Sources */,
-				421EE5C12928E01E00996EC6 /* FlightLogFileExport.swift in Sources */,
+				421EE5C12928E01E00996EC6 /* FlightLogFileGroupBy.swift in Sources */,
 				42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */,
 				4264C23C282691EF00F40436 /* FuelTanks.swift in Sources */,
 				4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */,

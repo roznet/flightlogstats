@@ -123,16 +123,13 @@ class TestParsingLogFiles: XCTestCase {
         do {
             var timings : [Date] = [Date()]
             
-            let old = try data.extract(dates: identifiers.indexes)
-            timings.append(Date())
             let new = try data.doubleDataFrame(for: []).extractValueStats(indexes: identifiers.indexes)
             timings.append(Date())
             let generic = try data.doubleDataFrame(for: []).extract(indexes: identifiers.indexes,
                                                                  createCollector: createCollector,
                                                                  updateCollector: updateCollector)
             timings.append(Date())
-            XCTAssertEqual(old.count, new.count)
-            XCTAssertEqual(old.count, generic.count)
+            XCTAssertEqual(new.count, generic.count)
             for i in 0..<timings.count-1 {
                 let start = timings[i]
                 let end = timings[i+1]
@@ -143,13 +140,14 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertNil(error)
         }
         
+        //com changes
         let freq = data.categoricalDataFrame(for: [.COM1,.COM2]).dataFrameForValueChange(fields: [.COM1,.COM2])
         print(freq.count)
+        // should loop through data/com1 and see if value same between indexes of freq
         
+
+        // Autopilot changes, we we just change schedule function works
         let ap = data.categoricalDataFrame(for: [.AfcsOn,.RollM,.PitchM]).dataFrameForValueChange(fields: [.AfcsOn,.RollM,.PitchM])
-        let apFixedSchedule = ap.indexes.regularShedule(interval: 60.0)
-        //let values = 
-        
         if let first = ap.indexes.first, let last = ap.indexes.last {
             let interval : TimeInterval = 5.0*60.0
             let range = TimeRange(start: first, end: last)
@@ -314,6 +312,16 @@ class TestParsingLogFiles: XCTestCase {
         if let first = legs.first,
            let flying = summary?.flying {
             XCTAssertEqual(flying.start, first.timeRange.start)
+        }
+        
+        let fixedTime = logfile.legs(interval: 60.0)
+        do {
+            let export = try FlightLogFileGroupBy.defaultExport(legs: fixedTime)
+            let byrows = export.byRows(indexName: "date", identifiers: ["file":"filename.csv","type":"logfile"])
+            print(export)
+            print(byrows.rows.count)
+        }catch{
+            XCTAssertNil(error)
         }
     }
     

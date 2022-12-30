@@ -57,13 +57,14 @@ extension Date {
     }
 }
 
-class FlightLogFileExport  {
+class FlightLogFileGroupBy  {
     enum FlightLogFileExportError : Error {
         case inconsitentIndexesSize
     }
     
     typealias Field = FlightLogFile.Field
     typealias CategoricalValue = FlightLogFile.CategoricalValue
+    typealias ByRows = (fields: [String], rows:[[String]])
 
     typealias ExportedValueType = ValueStats.Metric
     typealias ExportedCategoricalType = CategoricalStats<CategoricalValue>.Metric
@@ -71,11 +72,58 @@ class FlightLogFileExport  {
     struct ExportedValue : Hashable {
         let field : Field
         let type : ExportedValueType
+        
+        var key : String { "\(self.field.rawValue).\(self.type.rawValue)" }
+        
+        init?(key: String) {
+            let split = key.split(separator: ".", maxSplits: 1)
+            guard
+                split.count == 2,
+                let fieldString = split.first,
+                let metricString = split.last,
+                let field = Field(rawValue: String(fieldString)),
+                let type = ExportedValueType(rawValue: String(metricString))
+            else {
+                return nil
+            }
+            
+            self.field = field
+            self.type = type
+        }
+        
+        init(field:Field, type:ExportedValueType){
+            self.field = field
+            self.type = type
+        }
     }
         
     struct ExportedCategorical : Hashable {
         let field : Field
         let type : ExportedCategoricalType
+        
+        var key : String { "\(self.field.rawValue).\(self.type.rawValue)" }
+        
+        init?(key: String) {
+            let split = key.split(separator: ".", maxSplits: 1)
+            guard
+                split.count == 2,
+                let fieldString = split.first,
+                let metricString = split.last,
+                let field = Field(rawValue: String(fieldString)),
+                let type = ExportedCategoricalType(rawValue: String(metricString))
+            else {
+                return nil
+            }
+            
+            self.field = field
+            self.type = type
+        }
+        
+        init(field: Field, type: ExportedCategoricalType){
+            self.field = field
+            self.type = type
+        }
+
     }
     
     var values : DataFrame<Date,Double,ExportedValue>
@@ -104,46 +152,50 @@ class FlightLogFileExport  {
         }
     }
     
-    static func defaultExport(legs : [FlightLeg]) throws -> FlightLogFileExport {
+    static func defaultExport(legs : [FlightLeg]) throws -> FlightLogFileGroupBy {
         let valuesDefs : [Field:[ExportedValueType]] = [.Distance:[.total],
+                                                        .Latitude:[.start],
+                                                        .Longitude:[.start],
                                                   .E1_EGT_Max:[.max,.min],
                                                   .FTotalizerT:[.total]]
         
         let categoricalDefs : [Field:[ExportedCategoricalType]] = [.AfcsOn:[.mostFrequent], .E1_EGT_MaxIdx:[.end]]
         
-        return try FlightLogFileExport(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs)
+        return try FlightLogFileGroupBy(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs)
     }
-    /*
-        // categories by most frequency
-        //  .E1_EGT_MaxIdx (int)
-        //  .FltPhase (str)
-        //let categoricalDefs : [Field:[]
+    
+    func byRows(indexName : String, identifiers : [String:String] = [:]) ->  ByRows {
+        var fields : [String] = []
+        var rows : [[String]] = []
+
+        //fields: idenfitiers, index, categorical, values
+
+        let categoricalFields = self.categoricals.fields
+        let valueFields = self.values.fields
         
-        let values = data.doubleDataFrame(for: Array(valuesDefs.keys))
-        let schedule = values.indexes.regularShedule(interval: interval)
-        let stats = try values.extractValueStats(indexes: schedule)
-                
-        // no fields initially build dynamically later
-        var rv : DataFrame<Date,Double,GroupByField> = DataFrame<Date,Double,GroupByField>(fields: [])
+        fields.append(contentsOf: identifiers.keys)
+        fields.append(indexName)
+        fields.append(contentsOf: categoricalFields.map { $0.key } )
+        fields.append(contentsOf: valueFields.map { $0.key } )
         
-        for (date,row) in stats {
-            for (field,valueStat) in row {
-                var add : [GroupByField:Double] = [:]
-                if let def = valuesDefs[field] {
-                    for type in def {
-                        let groupField = GroupByField(field: field, groupedBy: type)
-                        let element = valueStat.value(for: type)
-                        add[groupField] = element
-                    }
-                }
-                do {
-                    try rv.append(fieldsValues: add, for: date)
-                }catch{
-                    throw error
+        for (idx,date) in self.categoricals.indexes.enumerated() {
+            var row : [String] = []
+            
+            row.append(contentsOf: identifiers.values)
+            row.append(date.ISO8601Format())
+            for field in categoricalFields {
+                row.append(self.categoricals[field]?[idx] ?? "")
+            }
+            for field in valueFields {
+                if let val = self.values[field]?[idx] {
+                    row.append(String(val))
+                }else{
+                    row.append("")
                 }
             }
+            rows.append(row)
         }
-        return rv
+        
+        return ByRows(fields: fields, rows: rows)
     }
-     */
 }
