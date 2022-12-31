@@ -7,6 +7,8 @@
 
 import Foundation
 import RZData
+import FMDB
+import RZUtils
 
 /*
  * Stats
@@ -129,7 +131,7 @@ class FlightLogFileGroupBy  {
     var values : DataFrame<Date,Double,ExportedValue>
     var categoricals : DataFrame<Date,CategoricalValue,ExportedCategorical>
     
-    init(legs : [FlightLeg], valueDefs : [Field:[ExportedValueType]], categoricalDefs : [Field:[ExportedCategoricalType]] ) throws {
+    init(legs : [FlightLeg], valueDefs : [Field:[ExportedValueType]], categoricalDefs : [Field:[ExportedCategoricalType]], constants : [Field:CategoricalValue] = [:] ) throws {
         /*var indexes : [Date] = []
         var values : [ExportedValue:[Double]]
         var categoricals : [ExportedCategorical:[CategoricalValue]]
@@ -149,10 +151,14 @@ class FlightLogFileGroupBy  {
                     try self.categoricals.append(field: ExportedCategorical(field: field, type: type), element: value, for: leg.start)
                 }
             }
+            for (field,constValue) in constants {
+                self.categoricals.add(field: ExportedCategorical(field: field, type: .start),
+                                      column: DataFrame.Column(indexes: self.categoricals.indexes, values: self.categoricals.indexes.map { _ in constValue }))
+            }
         }
     }
     
-    static func defaultExport(legs : [FlightLeg]) throws -> FlightLogFileGroupBy {
+    static func defaultExport(logFileName : String, legs : [FlightLeg]) throws -> FlightLogFileGroupBy {
         let valuesDefs : [Field:[ExportedValueType]] = [.Distance:[.total],
                                                         .Latitude:[.start],
                                                         .Longitude:[.start],
@@ -161,10 +167,10 @@ class FlightLogFileGroupBy  {
         
         let categoricalDefs : [Field:[ExportedCategoricalType]] = [.AfcsOn:[.mostFrequent], .E1_EGT_MaxIdx:[.end]]
         
-        return try FlightLogFileGroupBy(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs)
+        return try FlightLogFileGroupBy(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs, constants: [.LogFileName:logFileName])
     }
     
-    func byRows(indexName : String, identifiers : [String:String] = [:]) ->  ByRows {
+    func byRows(indexName : String = "Date") ->  ByRows {
         var fields : [String] = []
         var rows : [[String]] = []
 
@@ -173,7 +179,6 @@ class FlightLogFileGroupBy  {
         let categoricalFields = self.categoricals.fields
         let valueFields = self.values.fields
         
-        fields.append(contentsOf: identifiers.keys)
         fields.append(indexName)
         fields.append(contentsOf: categoricalFields.map { $0.key } )
         fields.append(contentsOf: valueFields.map { $0.key } )
@@ -181,7 +186,6 @@ class FlightLogFileGroupBy  {
         for (idx,date) in self.categoricals.indexes.enumerated() {
             var row : [String] = []
             
-            row.append(contentsOf: identifiers.values)
             row.append(date.ISO8601Format())
             for field in categoricalFields {
                 row.append(self.categoricals[field]?[idx] ?? "")
@@ -197,5 +201,11 @@ class FlightLogFileGroupBy  {
         }
         
         return ByRows(fields: fields, rows: rows)
+    }
+    
+    func save(to :FMDatabase, table : String) {
+        
+        
+        
     }
 }

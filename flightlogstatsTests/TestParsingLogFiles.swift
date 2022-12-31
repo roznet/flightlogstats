@@ -316,8 +316,8 @@ class TestParsingLogFiles: XCTestCase {
         
         let fixedTime = logfile.legs(interval: 60.0)
         do {
-            let export = try FlightLogFileGroupBy.defaultExport(legs: fixedTime)
-            let byrows = export.byRows(indexName: "date", identifiers: ["file":"filename.csv","type":"logfile"])
+            let export = try FlightLogFileGroupBy.defaultExport(logFileName: logfile.name, legs: fixedTime)
+            let byrows = export.byRows()
             print(export)
             print(byrows.rows.count)
         }catch{

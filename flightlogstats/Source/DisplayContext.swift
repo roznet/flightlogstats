@@ -374,7 +374,9 @@ class DisplayContext {
             return .start
         case .NAV1,.NAV2,.COM1,.COM2:
             return .start
-        case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+        case .UTCOfst,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+            return .start
+        case .LogFileName,.FltPhase:
             return .start
         }
     }
@@ -460,7 +462,9 @@ class DisplayContext {
             return nil
         case .AtvWpt,.NAV1,.NAV2,.COM1,.COM2:
             return nil
-        case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+        case .UTCOfst,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+            return nil
+        case .FltPhase,.LogFileName:
             return nil
         }
     }
@@ -553,7 +557,9 @@ class DisplayContext {
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .AtvWpt,.NAV1,.NAV2,.COM1,.COM2:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
-        case .UTCOfst, .FltPhase,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+        case .UTCOfst,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
+        case .LogFileName,.FltPhase:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         }
     }

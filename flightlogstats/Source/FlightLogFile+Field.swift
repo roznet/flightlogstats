@@ -126,6 +126,7 @@ extension FlightLogFile {
         
         // calculated strings
         case FltPhase = "FltPhase"
+        case LogFileName = "LogFileName"
         
         var displayName : String { return self.rawValue }
         
