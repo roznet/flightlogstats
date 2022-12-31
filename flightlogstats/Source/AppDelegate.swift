@@ -12,8 +12,8 @@ import OSLog
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    public static let worker = DispatchQueue(label: "net.ro-z.flightlog1000.worker")
-    public static let uiWorker = DispatchQueue(label: "net.ro-z.flightlog1000.uiworker")
+    public static let worker = DispatchQueue(label: "net.ro-z.flightlogstats.worker")
+    
     private let keepOrganizer = FlightLogOrganizer.shared
     public static var db : FMDatabase = FMDatabase()
     public static var knownAirports : KnownAirports? = nil

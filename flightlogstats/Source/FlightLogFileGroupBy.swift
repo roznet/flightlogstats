@@ -9,7 +9,7 @@ import Foundation
 import RZData
 import FMDB
 import RZUtils
-
+import OSLog
 /*
  * Stats
  *   per minute:
@@ -76,6 +76,7 @@ class FlightLogFileGroupBy  {
         let type : ExportedValueType
         
         var key : String { "\(self.field.rawValue).\(self.type.rawValue)" }
+        var sqlColumnName : String { "\"\(self.key)\"" }
         
         init?(key: String) {
             let split = key.split(separator: ".", maxSplits: 1)
@@ -104,6 +105,7 @@ class FlightLogFileGroupBy  {
         let type : ExportedCategoricalType
         
         var key : String { "\(self.field.rawValue).\(self.type.rawValue)" }
+        var sqlColumnName : String { "\"\(self.key)\"" }
         
         init?(key: String) {
             let split = key.split(separator: ".", maxSplits: 1)
@@ -130,6 +132,7 @@ class FlightLogFileGroupBy  {
     
     var values : DataFrame<Date,Double,ExportedValue>
     var categoricals : DataFrame<Date,CategoricalValue,ExportedCategorical>
+    var constants : [Field:CategoricalValue]
     
     init(legs : [FlightLeg], valueDefs : [Field:[ExportedValueType]], categoricalDefs : [Field:[ExportedCategoricalType]], constants : [Field:CategoricalValue] = [:] ) throws {
         /*var indexes : [Date] = []
@@ -138,6 +141,7 @@ class FlightLogFileGroupBy  {
         */
         self.values = DataFrame()
         self.categoricals = DataFrame()
+        self.constants = constants
         for leg in legs {
             for (field,types) in valueDefs {
                 for type in types {
@@ -159,13 +163,47 @@ class FlightLogFileGroupBy  {
     }
     
     static func defaultExport(logFileName : String, legs : [FlightLeg]) throws -> FlightLogFileGroupBy {
-        let valuesDefs : [Field:[ExportedValueType]] = [.Distance:[.total],
-                                                        .Latitude:[.start],
-                                                        .Longitude:[.start],
-                                                  .E1_EGT_Max:[.max,.min],
-                                                  .FTotalizerT:[.total]]
+        let valuesDefs : [Field:[ExportedValueType]] = [
+            .Distance:[.total],
+            .Latitude:[.start],
+            .Longitude:[.start],
+            .AltMSL:[.average],
+            .OAT:[.average],
+            .IAS:[.average],
+            .TAS:[.average],
+            .GndSpd:[.average],
+            .volt1:[.average],
+            .volt2:[.average],
+            .amp1:[.max,.min],
+            .FQtyT:[.start],
+            .FTotalizerT:[.total],
+            .E1_FFlow:[.average,.max,.min],
+            .E1_MAP:[.average,.max,.min],
+            .E1_RPM:[.average,.max,.min],
+            .E1_OilP:[.max,.min],
+            .E1_OilT:[.max,.min],
+            .E1_EGT_Max:[.max,.min],
+            .E1_EGT1:[.max,.min],
+            .E1_EGT2:[.max,.min],
+            .E1_EGT3:[.max,.min],
+            .E1_EGT4:[.max,.min],
+            .E1_EGT5:[.max,.min],
+            .E1_EGT6:[.max,.min],
+            .E1_CHT1:[.max,.min],
+            .E1_CHT2:[.max,.min],
+            .E1_CHT3:[.max,.min],
+            .E1_CHT4:[.max,.min],
+            .E1_CHT5:[.max,.min],
+            .E1_CHT6:[.max,.min],
+
+        ]
         
-        let categoricalDefs : [Field:[ExportedCategoricalType]] = [.AfcsOn:[.mostFrequent], .E1_EGT_MaxIdx:[.end]]
+        let categoricalDefs : [Field:[ExportedCategoricalType]] = [
+            .AfcsOn:[.mostFrequent],
+            .RollM:[.mostFrequent],
+            .PitchM:[.mostFrequent],
+            .E1_EGT_MaxIdx:[.end]
+        ]
         
         return try FlightLogFileGroupBy(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs, constants: [.LogFileName:logFileName])
     }
@@ -203,9 +241,75 @@ class FlightLogFileGroupBy  {
         return ByRows(fields: fields, rows: rows)
     }
     
-    func save(to :FMDatabase, table : String) {
+    func save(to db:FMDatabase, table : String) {
+        let indexName = "Date"
         
+        let categoricalFields = self.categoricals.fields
+        let valueFields = self.values.fields
         
+        guard self.categoricals.indexes.count > 0, let logFileName = self.constants[.LogFileName] else {
+            return
+        }
         
+        if !db.tableExists(table) {
+            if !db.executeStatements("CREATE TABLE \(table) (\(indexName) DATETIME, LogFileName TEXT)"){
+                Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+            }
+            if !db.executeStatements("CREATE INDEX \(table)_LogFileName ON \(table) (LogFileName)"){
+                Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+            }
+        }
+        
+        if !db.executeUpdate("DELETE FROM \(table) WHERE \"LogFileName\" = ?", withArgumentsIn: [logFileName]) {
+            Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+        }
+        
+        for field in categoricalFields {
+            if field.field == .LogFileName {
+                // special handling as it's indexed
+                continue
+            }
+            if !db.columnExists(field.key, inTableWithName: table){
+                if !db.executeStatements("ALTER TABLE \(table) ADD \(field.sqlColumnName) TEXT") {
+                    Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+                }
+            }
+        }
+        for field in valueFields {
+            if !db.columnExists(field.key, inTableWithName: table){
+                if !db.executeStatements("ALTER TABLE \(table) ADD \(field.sqlColumnName) REAL") {
+                    Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+                }
+            }
+        }
+        for (idx,date) in self.categoricals.indexes.enumerated() {
+            
+            var columns : [String] = ["Date"]
+            var values : [Any] = [date]
+
+            for field in categoricalFields {
+                if field.field == .LogFileName {
+                    //special case for index, logfilename is the name of the column
+                    columns.append( field.field.rawValue )
+                    values.append( self.categoricals[field]?[idx] ?? "")
+                }else{
+                    columns.append( field.sqlColumnName )
+                    values.append( self.categoricals[field]?[idx] ?? "")
+                }
+            }
+            for field in valueFields {
+                if let val = self.values[field]?[idx] {
+                    columns.append(field.sqlColumnName)
+                    values.append(val)
+                }
+            }
+            let colExpr = columns.joined(separator: ",")
+            let params : [String] = columns.map { _ in "?" }
+            let paramsExpr = params.joined(separator: ",")
+            let sql = "INSERT INTO \(table) (\(colExpr)) VALUES (\(paramsExpr))"
+            if !db.executeUpdate(sql, withArgumentsIn: values) {
+                Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+            }
+        }
     }
 }

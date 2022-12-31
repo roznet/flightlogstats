@@ -32,6 +32,7 @@ class FlightLogOrganizer {
             return list.sorted { $0.isNewer(than: $1) }
         }
     }
+    public static let scheduler = DispatchQueue(label: "net.ro-z.flightlogstats.scheduler")
     
     enum ListRequest {
         case all
@@ -417,7 +418,7 @@ class FlightLogOrganizer {
             case .failure(let error):
                 Logger.app.error("Failed to load local \(error.localizedDescription)")
             case .success(let urls):
-                AppDelegate.worker.async {
+                Self.scheduler.async {
                     let logs = FlightLogFileList(urls: urls)
                     self.add(aircrafts: urls)
                     self.add(flightLogFileList: logs)
@@ -440,12 +441,14 @@ class FlightLogOrganizer {
                             someNew += 1
                         }
                     }else{
-                        Logger.app.info("Registering \(avionics)")
-                        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-                        let aircraft = AircraftRecord(context: self.persistentContainer.viewContext)
-                        aircraft.avionicsSystem = avionics
-                        aircraft.aircraftPerformance = Settings.shared.aircraftPerformance
-                        self.managedAircrafts[avionics.systemId] = aircraft
+                        AppDelegate.worker.sync {
+                            Logger.app.info("Registering \(avionics)")
+                            dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+                            let aircraft = AircraftRecord(context: self.persistentContainer.viewContext)
+                            aircraft.avionicsSystem = avionics
+                            aircraft.aircraftPerformance = Settings.shared.aircraftPerformance
+                            self.managedAircrafts[avionics.systemId] = aircraft
+                        }
                         someNew += 1
                     }
                 }
@@ -453,7 +456,9 @@ class FlightLogOrganizer {
         }
         if someNew > 0 {
             Logger.app.info("Found \(someNew) aircrafts to add")
-            self.saveContext()
+            AppDelegate.worker.sync {
+                self.saveContext()
+            }
             NotificationCenter.default.post(name: .aircraftListChanged, object: self)
         }else{
             Logger.app.info("No missing aircraft in \(checked) checked")
@@ -467,6 +472,7 @@ class FlightLogOrganizer {
     /// - Returns: number of new flights added (0 if all already there)
     @discardableResult
     func add(flightLogFileList : FlightLogFileList, completion : @escaping () -> Void = {} ) -> Int{
+        dispatchPrecondition(condition: .onQueue(Self.scheduler))
         var someNew : Int = 0
         self.progress?.update(state: .start, message: .addingFiles)
         var index : Double = 0.0
@@ -484,26 +490,28 @@ class FlightLogOrganizer {
                     }
                     index += 1.0
                 }else{
-                    dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-                    let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
-                    fileInfo.organizer = self
-                    fileInfo.log_file_name = filename
-                    fileInfo.flightLog = flightLog
-                    fileInfo.parseAndUpdate(quick: true)
-                    if fileInfo.recordStatus == .empty {
-                        Logger.app.info("Saving new empty record \(filename)")
-                    }else{
-                        Logger.app.info("Creating dependend \(fileInfo.recordStatus) record \(filename)")
-                        //fileInfo.ensureDependentRecords(delaySave: true)
-                    }
-                    DispatchQueue.synchronized(self){
-                        self.managedFlightLogs[ filename ] = fileInfo
-                        someNew += 1
-                        index += 1.0
-                    }
-                    if Date().timeIntervalSince(lastTime) > 1.0 {
-                        lastTime = Date()
-                        //NotificationCenter.default.post(name: .localFileListChanged, object: self)
+                    AppDelegate.worker.sync {
+                        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+                        let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
+                        fileInfo.organizer = self
+                        fileInfo.log_file_name = filename
+                        fileInfo.flightLog = flightLog
+                        fileInfo.parseAndUpdate(quick: true)
+                        if fileInfo.recordStatus == .empty {
+                            Logger.app.info("Saving new empty record \(filename)")
+                        }else{
+                            Logger.app.info("Creating dependend \(fileInfo.recordStatus) record \(filename)")
+                            //fileInfo.ensureDependentRecords(delaySave: true)
+                        }
+                        DispatchQueue.synchronized(self){
+                            self.managedFlightLogs[ filename ] = fileInfo
+                            someNew += 1
+                            index += 1.0
+                        }
+                        if Date().timeIntervalSince(lastTime) > 1.0 {
+                            lastTime = Date()
+                            NotificationCenter.default.post(name: .localFileListChanged, object: self)
+                        }
                     }
                     self.progress?.update(state: .progressing(index / indexTotal), message: .addingFiles)
                 }
@@ -511,8 +519,10 @@ class FlightLogOrganizer {
         }
         self.progress?.update(state: .complete, message: .addingFiles)
         if someNew > 0 {
-            Logger.app.info("Added \(someNew) record for new local files")
-            self.saveContext()
+            AppDelegate.worker.sync{
+                Logger.app.info("Added \(someNew) record for new local files")
+                self.saveContext()
+            }
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
         }else{
             Logger.app.info("No missing local file in \(flightLogFileList.count) checked")

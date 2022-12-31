@@ -279,7 +279,9 @@ class TestParsingLogFiles: XCTestCase {
     
     func testFlightLogFile() {
         guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight3.rawValue, withExtension: "csv"),
-              let logfile = FlightLogFile(url: url)
+              let url2 = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight2.rawValue, withExtension: "csv"),
+              let logfile = FlightLogFile(url: url),
+              let logfile2 = FlightLogFile(url: url2)
         else {
             XCTAssertTrue(false)
             return
@@ -291,6 +293,8 @@ class TestParsingLogFiles: XCTestCase {
         let quickCount = logfile.count
         
         logfile.parse()
+        // don't bother wtih more for logfile2, just to test in database
+        logfile2.parse()
         
         let legs = logfile.legs
         let summary = logfile.flightSummary
@@ -315,14 +319,49 @@ class TestParsingLogFiles: XCTestCase {
         }
         
         let fixedTime = logfile.legs(interval: 60.0)
+        let fixedTime2 = logfile2.legs(interval: 60.0)
         do {
             let export = try FlightLogFileGroupBy.defaultExport(logFileName: logfile.name, legs: fixedTime)
             let byrows = export.byRows()
             print(export)
             print(byrows.rows.count)
+            
+            let dbpath = RZFileOrganizer.writeableFilePath("test.db")
+            let db = FMDatabase(path: dbpath)
+            db.open()
+            
+            export.save(to: db, table: "flights")
+            var count = self.countRowsPerLogFileName(db: db, table: "flights")
+            XCTAssertEqual(count[logfile.name], export.values.count)
+            // save twice
+            
+            let export2 = try FlightLogFileGroupBy.defaultExport(logFileName: logfile2.name, legs: fixedTime2)
+            export2.save(to: db, table: "flights")
+            count = self.countRowsPerLogFileName(db: db, table: "flights")
+            XCTAssertEqual(count[logfile2.name], export2.values.count)
+            XCTAssertEqual(count[logfile.name], export.values.count)
+            
+            export.save(to: db, table: "flights")
+            count = self.countRowsPerLogFileName(db: db, table: "flights")
+            XCTAssertEqual(count[logfile2.name], export2.values.count)
+            XCTAssertEqual(count[logfile.name], export.values.count)
+
         }catch{
             XCTAssertNil(error)
         }
+    }
+    
+    func countRowsPerLogFileName(db : FMDatabase, table : String) -> [String:Int] {
+        var rv : [String:Int] = [:]
+        if let res = try? db.executeQuery("SELECT LogFileName,COUNT(*) AS n FROM \(table) GROUP BY LogFileName", values: []) {
+            while( res.next() ){
+                if let name = res.string(forColumn: "LogFileName") {
+                    let n = res.int(forColumn: "n")
+                    rv[name] = Int(n)
+                }
+            }
+        }
+        return rv
     }
     
     func testLogInterpret() throws {
