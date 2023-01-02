@@ -272,7 +272,8 @@ class FlightLogFileRecord: NSManagedObject {
                 self.aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
                 rv = true
             }else{
-                Logger.app.warning("Unable to create aircraft record as no system_id found")
+                let name = self.log_file_name ?? "<nofilename>"
+                Logger.app.warning("Unable to create aircraft record as no system_id found for \(name)")
             }
         }
         
