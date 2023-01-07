@@ -18,6 +18,15 @@ class FuelAnalysis {
         static func ==(lhs: Inputs, rhs: Inputs) -> Bool {
             return lhs.targetFuel == rhs.targetFuel && lhs.addedfuel == rhs.addedfuel && lhs.totalizerStartFuel == rhs.totalizerStartFuel
         }
+        
+        @inlinable
+        public func isAlmostEqual(
+          to other: Self
+        ) -> Bool {
+            return self.targetFuel.isAlmostEqual(to: other.targetFuel)
+            && self.addedfuel.isAlmostEqual(to: other.addedfuel)
+            && self.totalizerStartFuel.isAlmostEqual(to: other.totalizerStartFuel)
+        }
     }
     
     typealias Endurance = AircraftPerformance.Endurance

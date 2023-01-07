@@ -185,7 +185,7 @@ class FlightLogOrganizer {
         return container
     }()
 
-    private static let enableCloudKit : Bool = false
+    private static let enableCloudKit : Bool = true
     
     lazy var persistentCloudContainer : NSPersistentCloudKitContainer? = {
         if !Self.enableCloudKit {
@@ -249,6 +249,7 @@ class FlightLogOrganizer {
     
     func loadFromContainer() {
         self.loadAircraftFromContainer()
+        self.loadAircraftFromCloudContainer()
         self.loadLogsFromContainer()
     }
     

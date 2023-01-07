@@ -34,4 +34,12 @@ struct AircraftPerformance : Equatable {
     static func ==(lhs: AircraftPerformance, rhs: AircraftPerformance) -> Bool {
         return lhs.fuelMax == rhs.fuelMax && lhs.fuelTab == rhs.fuelTab && lhs.gph == rhs.gph
     }
+    
+    @inlinable
+    public func isAlmostEqual(
+      to other: Self,
+      tolerance: Double = Double.ulpOfOne.squareRoot()
+    ) -> Bool {
+        return self.fuelMax.isAlmostEqual(to: other.fuelMax) && self.fuelTab.isAlmostEqual(to: other.fuelTab) && self.gph.isAlmostEqual(to: other.gph)
+    }
 }

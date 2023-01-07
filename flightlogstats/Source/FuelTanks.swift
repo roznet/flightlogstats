@@ -88,8 +88,22 @@ struct FuelTanks<UnitType : Dimension> : Comparable, Codable {
     }
     
     static func == (lhs : FuelTanks, rhs : FuelTanks) -> Bool {
+        
         return lhs.totalMeasurement == rhs.totalMeasurement
     }
+    
+    @inlinable
+    public func isAlmostEqual(
+      to other: Self
+    ) -> Bool {
+        return self.totalMeasurement.converted(to: self.unit).value.isAlmostEqual(to: self.totalMeasurement.value)
+    }
+    
+    @inlinable
+    public func isAlmostZero() -> Bool {
+        return self.total.isAlmostZero()
+    }
+
 }
 
 func -<UnitType>(left: FuelTanks<UnitType>,right:FuelTanks<UnitType>) -> FuelTanks<UnitType>{
