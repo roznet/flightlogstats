@@ -237,27 +237,30 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
         // Make sure UI ready
         guard self.fuelTargetField != nil else { return }
         
-        self.flightLogFileInfo?.ensureFuelRecord()
-        
-        self.updateAircraftData()
-        
-        if let record = self.flightLogFileInfo?.fuel_record {
-            self.enteredFuelAdded = record.addedFuel
-            self.enteredFuelTarget = record.targetFuel
-            self.enteredtotalizerStart = record.totalizerStartFuel
-        }else{
-            let targetUnit = Settings.shared.unitTargetFuel
-            let addedUnit = Settings.shared.unitAddedFuel
-            let newInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel.converted(to: targetUnit),
-                                                addedfuel: FuelQuantity.zero.converted(to: addedUnit),
-                                                totalizerStartFuel: Settings.shared.totalizerStartFuel.converted(to: targetUnit))
-            if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
-                viewModel.fuelAnalysisInputs = newInputs
+        AppDelegate.worker.async {
+            self.flightLogFileInfo?.ensureFuelRecord()
+            DispatchQueue.main.async {
+                self.updateAircraftData()
+                if let record = self.flightLogFileInfo?.fuel_record {
+                    self.enteredFuelAdded = record.addedFuel
+                    self.enteredFuelTarget = record.targetFuel
+                    self.enteredtotalizerStart = record.totalizerStartFuel
+                }else{
+                    let targetUnit = Settings.shared.unitTargetFuel
+                    let addedUnit = Settings.shared.unitAddedFuel
+                    let newInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel.converted(to: targetUnit),
+                                                        addedfuel: FuelQuantity.zero.converted(to: addedUnit),
+                                                        totalizerStartFuel: Settings.shared.totalizerStartFuel.converted(to: targetUnit))
+                    if let viewModel = self.flightLogViewModel, viewModel.isValid(target: newInputs.targetFuel), viewModel.isValid(added: newInputs.addedfuel) {
+                        viewModel.fuelAnalysisInputs = newInputs
+                    }
+                }
+                self.update(segment: self.fuelTargetSegment, for: self.fuelTargetUnit)
+                self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
+                self.checkViewConsistency()
             }
         }
-        self.update(segment: self.fuelTargetSegment, for: self.fuelTargetUnit)
-        self.update(segment: self.fuelAddedUnitSegment, for: self.fuelAddedUnit)
-        self.checkViewConsistency()
+        
     }
 
     
