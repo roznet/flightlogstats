@@ -557,7 +557,10 @@ class DisplayContext {
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .AtvWpt,.NAV1,.NAV2,.COM1,.COM2:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
-        case .UTCOfst,.Coordinate,.Lcl_Date, .Lcl_Time, .E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
+        case .Lcl_Time:
+            // lcl time is used for hobbs format display
+            return DisplayedValue(formatter: .measurement(Self.defaultFormatterOneDigit), value: .measurement(measurement))
+        case .UTCOfst,.Coordinate,.Lcl_Date,.E1_EGT_MaxIdx, .E1_CHT_MaxIdx,.AfcsOn:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .LogFileName,.FltPhase:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
