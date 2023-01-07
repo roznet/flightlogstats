@@ -65,4 +65,7 @@ class ViewConfig {
     var subTextAttributes : [NSAttributedString.Key:Any] = [:]
     
     var progressAttributes : [NSAttributedString.Key:Any] { return self.cellAttributes }
+    
+    var graphPathColor : UIColor = UIColor.systemBlue
+    var graphPathHighlightedColor : UIColor = UIColor.systemYellow
 }

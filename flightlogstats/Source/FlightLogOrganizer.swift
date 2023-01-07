@@ -810,6 +810,9 @@ class FlightLogOrganizer {
     }
     
     private func syncCloud(with local : FlightLogFileList ) {
+        // query for iCloud need to run on main queue
+        dispatchPrecondition(condition: .onQueue(.main))
+        
         self.cachedLocalFlightLogList = local
         
         if let already = self.cachedQuery?.isGathering, already {

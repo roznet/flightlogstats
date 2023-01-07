@@ -220,6 +220,9 @@ class FlightLogViewModel {
            let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)),
            let first = fields.suffix(2).first,
            let last = fields.suffix(2).last {
+            ds.useBackgroundColor = UIColor.systemBackground
+            ds.axisColor = UIColor.label
+            ds.useForegroundColor = UIColor.label
             ds.xUnit = first.unit.gcUnit
             if let firstSerie = self.graphDataSerie(field: first),
                let lastSerie = self.graphDataSerie(field: last){
@@ -242,6 +245,9 @@ class FlightLogViewModel {
         
         if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,
            let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)){
+            ds.useBackgroundColor = UIColor.systemBackground
+            ds.axisColor = UIColor.label
+            ds.useForegroundColor = UIColor.label
             for field in fields {
                 if let serie = self.graphDataSerie(field: field) {
                     let color = colors[colorIdx % colors.count]

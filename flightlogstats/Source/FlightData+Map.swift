@@ -134,18 +134,18 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
                 if let range = mapOverlay.highlightTimeRange {
                     if range.start <= point.index && pathState == .primary {
                         // start new path with new color
-                        context.setStrokeColor(UIColor.systemRed.cgColor)
+                        context.setStrokeColor(ViewConfig.shared.graphPathColor.cgColor)
                         context.strokePath()
                         context.beginPath()
                         context.setLineWidth( 5.0 / zoomScale )
                         pathState = .highlight
                     }
                     if range.end <= point.index && pathState == .highlight{
-                        context.setStrokeColor(UIColor.systemBlue.cgColor)
+                        context.setStrokeColor(ViewConfig.shared.graphPathHighlightedColor.cgColor)
                         context.strokePath()
                         context.beginPath()
                         context.setLineWidth( 5.0 / zoomScale )
-                        context.setStrokeColor(UIColor.systemRed.cgColor)
+                        context.setStrokeColor(ViewConfig.shared.graphPathColor.cgColor)
                         pathState = .primary
                     }
                 }
@@ -157,9 +157,9 @@ class FlightDataMapOverlayView : MKOverlayRenderer {
                 last = current
             }
             if pathState == .highlight {
-                context.setStrokeColor(UIColor.systemBlue.cgColor)
+                context.setStrokeColor(ViewConfig.shared.graphPathHighlightedColor.cgColor)
             }else{
-                context.setStrokeColor(UIColor.systemRed.cgColor)
+                context.setStrokeColor(ViewConfig.shared.graphPathColor.cgColor)
             }
             context.strokePath()
         }
