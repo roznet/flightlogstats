@@ -70,6 +70,27 @@ class AircraftRecord: NSManagedObject {
         return rv.sorted { $0.isNewer(than: $1) }
     }
     
+    //MARK: - setup
+    
+    @inlinable
+    public func isAlmostEqual(
+      to other: AircraftRecord
+    ) -> Bool {
+        guard let sysidself = self.system_id, let sysidother = other.system_id, sysidother == sysidself else { return false }
+        guard let sysself = self.avionicsSystem, let sysother = other.avionicsSystem, sysself == sysother else { return false }
+        return self.aircraftPerformance.isAlmostEqual(to: other.aircraftPerformance)
+    }
+    
+    public func isSameSystem(as other: AircraftRecord) -> Bool {
+        if let sysidself = self.system_id, let sysidother = other.system_id, sysidother == sysidself {
+            return true
+        }else{
+            return false
+        }
+    }
+    
+    //MARK: - flights
+    
     var latestFlight : FlightLogFileRecord? {
         return self.flightRecords.first
     }
