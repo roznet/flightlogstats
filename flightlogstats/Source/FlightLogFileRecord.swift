@@ -221,9 +221,6 @@ class FlightLogFileRecord: NSManagedObject {
                 rv = true
             }
         }
-        if self.ensureAircraftRecord() {
-            rv = true
-        }
         
         return rv
     }
