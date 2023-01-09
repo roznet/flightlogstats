@@ -72,6 +72,14 @@ class AircraftRecord: NSManagedObject {
     
     //MARK: - setup
     
+    func setupAsCopy(of other : AircraftRecord) {
+        self.aircraft_identifier = other.aircraft_identifier
+        self.airframe_name = other.airframe_name
+        self.system_id = other.system_id
+
+        self.aircraftPerformance = other.aircraftPerformance
+    }
+    
     @inlinable
     public func isAlmostEqual(
       to other: AircraftRecord

@@ -34,6 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppDelegate.worker.async {
             //#warning("Don't checkin")
             //FlightLogOrganizer.shared.deleteAndResetDatabase()
+            //FlightLogOrganizer.shared.deleteAndResetCloudDatabase()
             FlightLogOrganizer.shared.loadFromContainer()
             FlightLogOrganizer.shared.addMissingRecordsFromLocal()
         }

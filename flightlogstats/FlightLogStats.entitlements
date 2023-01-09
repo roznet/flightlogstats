@@ -7,6 +7,7 @@
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.net.ro-z.flightlogstats</string>
+		<string>iCloud.net.ro-z.flightlogstats.records</string>
 	</array>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
@@ -16,6 +17,7 @@
 	<key>com.apple.developer.ubiquity-container-identifiers</key>
 	<array>
 		<string>iCloud.net.ro-z.flightlogstats</string>
+		<string>iCloud.net.ro-z.flightlogstats.records</string>
 	</array>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>

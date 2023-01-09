@@ -158,7 +158,6 @@ class FlightLogOrganizer {
     }
     
     /// managed logs keyed of log_file_name
-    private var managedFlightLogs : [String:FlightLogFileRecord] = [:]
     private var currentState : UpdateState = .complete
     private var missingCount : Int = 0
     private var doneCount : Int = 0
@@ -166,9 +165,12 @@ class FlightLogOrganizer {
 
     /// managed aircrafts keyed of system_id
     typealias SystemId = AvionicsSystem.SystemId
+    
+    //MARK: - local records management
+    private var managedFlightLogs : [String:FlightLogFileRecord] = [:]
     private var managedAircrafts : [SystemId:AircraftRecord] = [:]
     
-    lazy var persistentContainer : NSPersistentContainer = {
+    private func createPersistentContainer() -> NSPersistentContainer {
         dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
         let container = NSPersistentContainer(name: "FlightLogModel")
         container.loadPersistentStores() {
@@ -183,39 +185,11 @@ class FlightLogOrganizer {
             }
         }
         return container
-    }()
-
-    private static let enableCloudKit : Bool = true
+    }
     
-    lazy var persistentCloudContainer : NSPersistentCloudKitContainer? = {
-        if !Self.enableCloudKit {
-            return nil
-        }
-        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-        let container = NSPersistentCloudKitContainer(name: "FlightLogModel")
-
-        guard let cloudStoreDescription = container.persistentStoreDescriptions.first,
-              let url = cloudStoreDescription.url else { return nil }
-        
-        var path = url.deletingLastPathComponent().path
-        path.append("/FlightLogModelCloud.sqlite")
-        cloudStoreDescription.url = URL(fileURLWithPath: path)
-        cloudStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "net.ro-z.flightlogstats")
-        
-        container.loadPersistentStores() {
-            (storeDescription,error) in
-            if let error = error {
-                Logger.app.error("Failed to load \(error.localizedDescription)")
-            }else{
-                let path = storeDescription.url?.path ?? ""
-                Logger.app.info("Loaded store \(storeDescription.type) \(path)")
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                self.checkForUpdates()
-            }
-        }
-        return container
+    lazy var persistentContainer : NSPersistentContainer = {
+        return self.createPersistentContainer()
     }()
-
     
     func saveContext() {
         dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
@@ -229,18 +203,6 @@ class FlightLogOrganizer {
                 Logger.app.error("Failed to save context \(nserror)")
             }
         }
-        if let cloudContext = persistentCloudContainer?.viewContext,
-           cloudContext.hasChanges {
-            do {
-                dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-                try cloudContext.save()
-                
-            }catch{
-                let nserror = error as NSError
-                Logger.app.error("Failed to save cloud contexts \(nserror)")
-            }
-        }
-        
     }
     
     func checkForUpdates() {
@@ -541,9 +503,8 @@ class FlightLogOrganizer {
         }
     }
     
-    func deleteAndResetDatabase() {
-        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-        let coordinator = self.persistentContainer.persistentStoreCoordinator
+    private func deletePersistentStores(for container:NSPersistentContainer){
+        let coordinator = container.persistentStoreCoordinator
         for store in coordinator.persistentStores {
             if let url = store.url {
                 do {
@@ -554,19 +515,12 @@ class FlightLogOrganizer {
                 }
             }
         }
-        let container = NSPersistentContainer(name: "FlightLogModel")
-        container.loadPersistentStores() {
-            (storeDescription,error) in
-            if let error = error {
-                Logger.app.error("Failed to load \(error.localizedDescription)")
-            }else{
-                let path = storeDescription.url?.path ?? ""
-                Logger.app.info("Reloaded store \(storeDescription.type) \(path)")
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                self.checkForUpdates()
-            }
-        }
-        self.persistentContainer = container
+    }
+    
+    func deleteAndResetDatabase() {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        self.deletePersistentStores(for: self.persistentContainer)
+        self.persistentContainer = self.createPersistentContainer()
 
         self.managedFlightLogs = [:]
         self.managedAircrafts = [:]
@@ -728,7 +682,59 @@ class FlightLogOrganizer {
         }
     }
     
-    //MARK: - sync with cloudKit Records
+    //MARK: - cloudKit Records management
+    
+    private static let enableCloudKit : Bool = false
+    
+    private func createPersistentCloudContainer() -> NSPersistentCloudKitContainer? {
+        guard Self.enableCloudKit else { return nil }
+        
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        let container = NSPersistentCloudKitContainer(name: "FlightLogModel")
+
+        guard let cloudStoreDescription = container.persistentStoreDescriptions.first,
+              let url = cloudStoreDescription.url else { return nil }
+        
+        var path = url.deletingLastPathComponent().path
+        path.append("/FlightLogModelCloud.sqlite")
+        cloudStoreDescription.url = URL(fileURLWithPath: path)
+        cloudStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "net.ro-z.flightlogstats.records")
+        
+        container.loadPersistentStores() {
+            (storeDescription,error) in
+            if let error = error {
+                Logger.app.error("Failed to load \(error.localizedDescription)")
+            }else{
+                let path = storeDescription.url?.path ?? ""
+                Logger.app.info("Loaded store \(storeDescription.type) \(path)")
+                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                self.checkForUpdates()
+            }
+        }
+        return container
+    }
+    
+    lazy var persistentCloudContainer : NSPersistentCloudKitContainer? = {
+        return self.createPersistentCloudContainer()
+    }()
+
+    func saveCloudContext() {
+        guard Self.enableCloudKit else { return }
+        
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        
+        if let cloudContext = persistentCloudContainer?.viewContext,
+           cloudContext.hasChanges {
+            do {
+                try cloudContext.save()
+                Logger.app.info("Saved cloud context")
+            }catch{
+                let nserror = error as NSError
+                Logger.app.error("Failed to save cloud contexts \(nserror)")
+            }
+        }
+    }
+
     private var managedCloudAircrafts : [SystemId:AircraftRecord] = [:]
     // LogFilename to fuelrecord
     private var managedCloudFuelRecords : [String:FlightFuelRecord] = [:]
@@ -736,6 +742,23 @@ class FlightLogOrganizer {
     private func loadFromCloudContainer() {
         self.loadAircraftFromCloudContainer()
         self.loadFuelRecordsFromCloudContainer()
+        self.saveAircraftsToCloudContainer()
+    }
+    
+    private func saveAircraftsToCloudContainer() {
+        guard let cloudContainer = self.persistentCloudContainer else { return }
+        var needSave = false
+        for (systemId,aircraft) in self.managedAircrafts {
+            if self.managedCloudAircrafts[systemId] == nil {
+                let cloudAircraft = AircraftRecord(context: cloudContainer.viewContext)
+                cloudAircraft.setupAsCopy(of: aircraft)
+                needSave = true
+                self.managedCloudAircrafts[cloudAircraft.systemId] = cloudAircraft
+            }
+        }
+        if needSave {
+            self.saveCloudContext()
+        }
     }
     
     private func loadAircraftFromCloudContainer() {
@@ -782,6 +805,17 @@ class FlightLogOrganizer {
         }catch{
             Logger.app.error("Failed to query for fuelRecord")
         }
+    }
+    func deleteAndResetCloudDatabase() {
+        guard Self.enableCloudKit, let cloudContainer = self.persistentCloudContainer else { return }
+        
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        
+        self.deletePersistentStores(for: cloudContainer)
+        self.persistentCloudContainer = self.createPersistentCloudContainer()
+
+        self.managedFlightLogs = [:]
+        self.managedAircrafts = [:]
     }
 
     //MARK: - sync with cloud drive files
@@ -834,7 +868,9 @@ class FlightLogOrganizer {
                 Logger.sync.error("Failed to start query for cloud files")
             }
         }
-        self.loadFromCloudContainer()
+        AppDelegate.worker.async {
+            self.loadFromCloudContainer()
+        }
     }
 
     @objc func didFinishGathering() {
