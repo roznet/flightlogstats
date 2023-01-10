@@ -171,7 +171,8 @@ class FlightLogFileRecord: NSManagedObject {
                 // if we have some times, then consider it parsed
                 self.recordStatus = quick ? .quickParsed : .parsed
                 if self.system_id == nil {
-                    Logger.app.warning("Found \(self.log_file_name) has time but no system_id")
+                    let name = self.log_file_name ?? "<noname>"
+                    Logger.app.warning("Found \(name) has time but no system_id")
                 }
             }
             
