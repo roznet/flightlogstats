@@ -452,10 +452,10 @@ class FlightLogOrganizer {
         for flightLog in flightLogFileList.flightLogFiles {
             let filename = flightLog.name
             if filename.isLogFile {
-                if let existing = self.managedFlightLogs[filename] {
+                if let existingRecord = self.managedFlightLogs[filename] {
                     // replace if parsed or if flightlog not populated
-                    if flightLog.isParsed || existing.flightLog == nil {
-                        existing.flightLog = flightLog
+                    if flightLog.isParsed || existingRecord.flightLog == nil {
+                        existingRecord.flightLog = flightLog
                     }
                     index += 1.0
                 }else{
@@ -493,6 +493,7 @@ class FlightLogOrganizer {
                 self.saveContext()
             }
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
+            NotificationCenter.default.post(name: .newLocalFilesDiscovered, object: self)
         }else{
             Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
         }
@@ -909,7 +910,7 @@ class FlightLogOrganizer {
         }
     }
     
-    func syncCloudLogic(localUrls : [URL], cloudUrls : [URL]){
+    func syncCloudLogic(localUrls : [URL], cloudUrls : [URL], completion : @escaping () -> Void = {  } ){
         var existingInLocal : Set<String> = []
         var existingInCloud : Set<String> = []
         
@@ -993,9 +994,11 @@ class FlightLogOrganizer {
                         Logger.sync.error("Failed to coordinate \(error.localizedDescription)")
                     }
                 }
+                completion()
             }
         }else{
             Logger.sync.info("Nothing new in cloud to copy to local")
+            completion()
         }
         self.progress?.update(state: .complete, message: .iCloudSync)
     }

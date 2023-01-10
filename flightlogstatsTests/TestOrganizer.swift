@@ -191,18 +191,22 @@ class TestOrganizer: XCTestCase {
                 localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
                 cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
                 XCTAssertEqual(localUrls.count, cloudUrls.count - 1)
-                let expectation = XCTestExpectation(description: "Added the files")
-                NotificationCenter.default.addObserver(forName: .localFileListChanged, object: organizer, queue: nil) {
-                    _ in
+                let fileCopiedExpectation = XCTestExpectation(description: "Added the files")
+                let recordAddedExpectation = XCTestExpectation(description: "Added the records")
+                organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls){
                     localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
                     XCTAssertEqual(localUrls.count, cloudUrls.count)
                     // +1 because should have one aircraft file
+                    fileCopiedExpectation.fulfill()
+                }
+                
+                NotificationCenter.default.addObserver(forName: .newLocalFilesDiscovered, object: organizer, queue: nil) {
+                    _ in
                     XCTAssertEqual(cloudUrls.count, organizer.count+1)
                     XCTAssertEqual(cloudUrls.count, organizer.flightLogFileInfos(request: .all).count+1) // +1 because one file is not a log but avionics system file
-                    expectation.fulfill()
+                    recordAddedExpectation.fulfill()
                 }
-                organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
-                self.wait(for: [expectation], timeout: 50*60.0)
+                self.wait(for: [recordAddedExpectation,fileCopiedExpectation], timeout: 50*60.0)
             }catch{
                 XCTAssertTrue(false)
             }
