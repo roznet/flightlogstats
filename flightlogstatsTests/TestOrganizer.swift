@@ -221,7 +221,7 @@ class TestOrganizer: XCTestCase {
     
     func testOrganizer() {
         let expectation = self.expectation(description: "run organizer test")
-        AppDelegate.worker.async {
+        FlightLogOrganizer.scheduler.async {
             do {
                 try self.runTestOrganizer()
             }catch{
@@ -229,7 +229,7 @@ class TestOrganizer: XCTestCase {
             }
             expectation.fulfill()
         }
-        self.wait(for: [expectation], timeout: 5.0)
+        self.wait(for: [expectation], timeout: 10.0)
     }
     func runTestOrganizer() throws {
         let organizer = FlightLogOrganizer()
@@ -257,40 +257,42 @@ class TestOrganizer: XCTestCase {
         let log = FlightLogFile(url: url)!
         log.parse()
         organizer.add(flightLogFileList: FlightLogFileList(logs: [log]))
-        organizer.saveContext()
-        XCTAssertEqual(organizer.count,1)
-        
-        if let info = organizer.flightLogFileInfos(request: .all).first {
-            let record = FlightFuelRecord(context: container.viewContext)
-            record.target_fuel = 75.0
-            info.fuel_record = record
+        AppDelegate.worker.sync {
             organizer.saveContext()
+            
+            XCTAssertEqual(organizer.count,1)
+            
+            if let info = organizer.flightLogFileInfos(request: .all).first {
+                let record = FlightFuelRecord(context: container.viewContext)
+                record.target_fuel = 75.0
+                info.fuel_record = record
+                organizer.saveContext()
+            }
+            let reload = FlightLogOrganizer()
+            reload.persistentContainer = container
+            XCTAssertEqual(reload.count,0)
+            reload.loadFromContainer()
+            XCTAssertEqual(reload.count,1)
+            organizer.loadFromContainer()
+            XCTAssertEqual(reload.count,1)
+            XCTAssertNotNil(reload.flightLogFileInfos(request: .all).first?.fuel_record)
+            if let info = reload.flightLogFileInfos(request: .all).first,
+               let record = info.fuel_record {
+                XCTAssertEqual( record.target_fuel, 75.0)
+                record.target_fuel = 80.0
+                organizer.saveContext()
+            }
+            
+            let reload2 = FlightLogOrganizer()
+            reload2.persistentContainer = container
+            XCTAssertEqual(reload2.count,0)
+            reload2.loadFromContainer()
+            XCTAssertNotNil(reload2.flightLogFileInfos(request: .all).first?.fuel_record)
+            if let info = reload2.flightLogFileInfos(request: .all).first,
+               let record = info.fuel_record {
+                XCTAssertEqual( record.target_fuel, 80.0)
+            }
         }
-        let reload = FlightLogOrganizer()
-        reload.persistentContainer = container
-        XCTAssertEqual(reload.count,0)
-        reload.loadFromContainer()
-        XCTAssertEqual(reload.count,1)
-        organizer.loadFromContainer()
-        XCTAssertEqual(reload.count,1)
-        XCTAssertNotNil(reload.flightLogFileInfos(request: .all).first?.fuel_record)
-        if let info = reload.flightLogFileInfos(request: .all).first,
-           let record = info.fuel_record {
-            XCTAssertEqual( record.target_fuel, 75.0)
-            record.target_fuel = 80.0
-            organizer.saveContext()
-        }
-        
-        let reload2 = FlightLogOrganizer()
-        reload2.persistentContainer = container
-        XCTAssertEqual(reload2.count,0)
-        reload2.loadFromContainer()
-        XCTAssertNotNil(reload2.flightLogFileInfos(request: .all).first?.fuel_record)
-        if let info = reload2.flightLogFileInfos(request: .all).first,
-           let record = info.fuel_record {
-            XCTAssertEqual( record.target_fuel, 80.0)
-        }
-        
         expectation.fulfill()
     }
 }

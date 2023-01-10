@@ -279,7 +279,7 @@ class FlightLogOrganizer {
                 if force || info.requiresParsing{
                     if firstMissingCheck, let log_file_name = info.log_file_name {
                         if !force {
-                            Logger.app.info("Will update missing info for \(log_file_name)")
+                            Logger.app.info("Will update info for \(log_file_name) status=\(info.recordStatus)")
                         }
                     }
                     missing.append(info)
@@ -313,24 +313,30 @@ class FlightLogOrganizer {
                     
                     if let flightLog = info.flightLog {
                         // if not already parsed, we will clear it
-                        let requiresParsing = flightLog.requiresParsing
+                        let logRequiredParsing = flightLog.requiresParsing
                         // only report parsing progress if few missing, if many, just report overall progress
-                        if requiresParsing {
+                        // Note info may require parsing due to version change, while log may not if already
+                        // parsed
+                        if info.requiresParsing {
                             Logger.app.info("Parsing \(log_file_name)")
+                            
+                            flightLog.parse(progress: reportParsingProgress ? self.progress : nil)
+                            do {
+                                try info.updateFromFlightLog(flightLog: flightLog)
+                            }catch{
+                                info.recordStatus = .error
+                                Logger.app.error("Failed to update log \(error.localizedDescription)")
+                            }
+                            
+                            NotificationCenter.default.post(name: .logFileRecordUpdated, object: info)
+                            //restore the state
+                            if logRequiredParsing {
+                                flightLog.clear()
+                            }
+                            done.append(log_file_name)
+                        }else{
+                            Logger.app.error("Skipping \(log_file_name) status=\(flightLog.logType)")
                         }
-                        flightLog.parse(progress: reportParsingProgress ? self.progress : nil)
-                        do {
-                            try info.updateFromFlightLog(flightLog: flightLog)
-                        }catch{
-                            info.recordStatus = .error
-                            Logger.app.error("Failed to update log \(error.localizedDescription)")
-                        }
-                        
-                        NotificationCenter.default.post(name: .logFileRecordUpdated, object: info)
-                        if requiresParsing {
-                            flightLog.clear()
-                        }
-                        done.append(log_file_name)
                     }else{
                         info.recordStatus = .error
                     }

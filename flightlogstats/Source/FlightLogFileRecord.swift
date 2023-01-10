@@ -79,6 +79,10 @@ class FlightLogFileRecord: NSManagedObject {
     
     var requiresVersionUpdate : Bool { return self.version < Self.currentVersion }
     var requiresParsing : Bool {
+        if self.log_file_name == "log_210617_063632_LOWG.csv" {
+            //return true
+        }
+        
         if self.requiresVersionUpdate {
             return true
         }
@@ -166,6 +170,9 @@ class FlightLogFileRecord: NSManagedObject {
                 self.end_time = hobbs.end
                 // if we have some times, then consider it parsed
                 self.recordStatus = quick ? .quickParsed : .parsed
+                if self.system_id == nil {
+                    Logger.app.warning("Found \(self.log_file_name) has time but no system_id")
+                }
             }
             
             if let moving = flightSummary.moving {
@@ -201,7 +208,7 @@ class FlightLogFileRecord: NSManagedObject {
             
             self.ensureAircraftRecord()
         }else{
-            self.recordStatus = .notParsed
+            self.recordStatus = .empty
         }
         
         self.version = FlightLogFileRecord.currentVersion
