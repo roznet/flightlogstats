@@ -28,6 +28,10 @@ final class TestFileGroupBy: XCTestCase {
 
     func countRowsPerLogFileName(db : FMDatabase, table : String) -> [String:Int] {
         var rv : [String:Int] = [:]
+        if !db.tableExists("flights") {
+            return rv
+        }
+        
         if let res = try? db.executeQuery("SELECT LogFileName,COUNT(*) AS n FROM \(table) GROUP BY LogFileName", values: []) {
             while( res.next() ){
                 if let name = res.string(forColumn: "LogFileName") {
@@ -76,9 +80,9 @@ final class TestFileGroupBy: XCTestCase {
         
         counts = self.countRowsPerLogFileName(db: db, table: "flights")
         
-        groupbys.forEach {
-            if let fn = $0.logFileName, let count = counts[fn] {
-                XCTAssertEqual(count, $0.values.count)
+        for groupby in groupbys {
+            if let fn = groupby.logFileName, let count = counts[fn] {
+                XCTAssertEqual(count, groupby.values.count)
             }else{
                 XCTAssertTrue(false)
             }
@@ -90,9 +94,9 @@ final class TestFileGroupBy: XCTestCase {
         
         counts = self.countRowsPerLogFileName(db: db, table: "flights")
         
-        groupbys.forEach {
-            if let fn = $0.logFileName, let count = counts[fn] {
-                XCTAssertEqual(count, $0.values.count)
+        for groupby in groupbys {
+            if let fn = groupby.logFileName, let count = counts[fn] {
+                XCTAssertEqual(count, groupby.values.count)
             }else{
                 XCTAssertTrue(false)
             }

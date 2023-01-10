@@ -102,28 +102,36 @@ class FlightLogFileGroupBy  {
         
     struct ExportedCategorical : Hashable {
         let field : Field
-        let type : ExportedCategoricalType
+        let type : ExportedCategoricalType?
         
-        var key : String { "\(self.field.rawValue).\(self.type.rawValue)" }
+        var key : String {
+            if let type = self.type {
+                return "\(self.field.rawValue).\(type.rawValue)"
+            } else {
+                return self.field.rawValue
+            }
+        }
         var sqlColumnName : String { "\"\(self.key)\"" }
         
         init?(key: String) {
             let split = key.split(separator: ".", maxSplits: 1)
-            guard
+            if
                 split.count == 2,
                 let fieldString = split.first,
                 let metricString = split.last,
                 let field = Field(rawValue: String(fieldString)),
-                let type = ExportedCategoricalType(rawValue: String(metricString))
-            else {
+                let type = ExportedCategoricalType(rawValue: String(metricString)){
+                self.type = type
+                self.field = field
+            }else if let field = Field(rawValue: String(key)) {
+                self.type = nil
+                self.field = field
+            }else{
                 return nil
             }
-            
-            self.field = field
-            self.type = type
         }
         
-        init(field: Field, type: ExportedCategoricalType){
+        init(field: Field, type: ExportedCategoricalType?){
             self.field = field
             self.type = type
         }
@@ -132,18 +140,29 @@ class FlightLogFileGroupBy  {
     
     var values : DataFrame<Date,Double,ExportedValue>
     var categoricals : DataFrame<Date,CategoricalValue,ExportedCategorical>
-    var constants : [Field:CategoricalValue]
     
-    var logFileName : CategoricalValue? { return self.constants[.LogFileName] }
+    // logFileName if only one there
+    var logFileName : String? {
+        if let fns = self.categoricals[ExportedCategorical(field: .LogFileName, type: nil)]?.uniqueValues, fns.count == 1 {
+            return fns.first
+        }else{
+            return nil
+        }
+    }
+    
+    var logFileNames : [String] {
+        if let fns = self.categoricals[ExportedCategorical(field: .LogFileName, type: nil)]?.uniqueValues {
+            return fns
+        }else{
+            return []
+        }
+
+    }
     
     init(legs : [FlightLeg], valueDefs : [Field:[ExportedValueType]], categoricalDefs : [Field:[ExportedCategoricalType]], constants : [Field:CategoricalValue] = [:] ) throws {
-        /*var indexes : [Date] = []
-        var values : [ExportedValue:[Double]]
-        var categoricals : [ExportedCategorical:[CategoricalValue]]
-        */
         self.values = DataFrame()
         self.categoricals = DataFrame()
-        self.constants = constants
+        
         for leg in legs {
             for (field,types) in valueDefs {
                 for type in types {
@@ -158,7 +177,7 @@ class FlightLogFileGroupBy  {
                 }
             }
             for (field,constValue) in constants {
-                self.categoricals.add(field: ExportedCategorical(field: field, type: .start),
+                self.categoricals.add(field: ExportedCategorical(field: field, type: nil),
                                       column: DataFrame.Column(indexes: self.categoricals.indexes, values: self.categoricals.indexes.map { _ in constValue }))
             }
         }
@@ -249,7 +268,10 @@ class FlightLogFileGroupBy  {
         let categoricalFields = self.categoricals.fields
         let valueFields = self.values.fields
         
-        guard self.categoricals.indexes.count > 0, let logFileName = self.constants[.LogFileName] else {
+        guard
+            let logFileNames = categoricals[ExportedCategorical(field: .LogFileName, type: nil)]?.uniqueValues,
+            logFileNames.count > 0
+        else {
             return
         }
         
@@ -261,9 +283,11 @@ class FlightLogFileGroupBy  {
                 Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
             }
         }
-        
-        if !db.executeUpdate("DELETE FROM \(table) WHERE \"LogFileName\" = ?", withArgumentsIn: [logFileName]) {
-            Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+        logFileNames.forEach {
+            logFileName in
+            if !db.executeUpdate("DELETE FROM \(table) WHERE \"LogFileName\" = ?", withArgumentsIn: [logFileName]) {
+                Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+            }
         }
         
         for field in categoricalFields {
