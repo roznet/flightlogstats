@@ -39,7 +39,11 @@ enum TestLogFileSamples : String, CaseIterable {
     case diamond = "log_220905_064831_LGMG"
     
     static var allSampleNames : [String] { return self.allCases.map { $0.rawValue } }
- }
+    
+    var url : URL? { return Bundle(for: type(of: EmptyClass())).url(forResource: self.rawValue, withExtension: "csv") }
+}
+
+class EmptyClass {}
 
 class TestParsingLogFiles: XCTestCase {
     
@@ -58,7 +62,7 @@ class TestParsingLogFiles: XCTestCase {
     }
     
     func runFlightTestData(sample : TestLogFileSamples) {
-        guard let url = Bundle(for: type(of: self)).url(forResource: sample.rawValue, withExtension: "csv"),
+        guard let url = sample.url,
               let data = FlightData(url: url)
         else {
             XCTAssertTrue(false)
@@ -161,7 +165,7 @@ class TestParsingLogFiles: XCTestCase {
     }
     
     func testTaxiOnly() {
-        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.taxiOnly2.rawValue, withExtension: "csv"),
+        guard let url = TestLogFileSamples.taxiOnly2.url,
               let logfile = FlightLogFile(url: url)
         else {
             XCTAssertTrue(false)
@@ -184,7 +188,7 @@ class TestParsingLogFiles: XCTestCase {
     }
     
     func testFlightLegExtract(){
-        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight3.rawValue, withExtension: "csv"),
+        guard let url = TestLogFileSamples.flight3.url,
               let data = FlightData(url: url)
         else {
             XCTAssertTrue(false)
@@ -278,8 +282,8 @@ class TestParsingLogFiles: XCTestCase {
     }
     
     func testFlightLogFile() {
-        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight3.rawValue, withExtension: "csv"),
-              let url2 = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight2.rawValue, withExtension: "csv"),
+        guard let url = TestLogFileSamples.flight3.url,
+              let url2 = TestLogFileSamples.flight2.url,
               let logfile = FlightLogFile(url: url),
               let logfile2 = FlightLogFile(url: url2)
         else {
@@ -316,56 +320,12 @@ class TestParsingLogFiles: XCTestCase {
         if let first = legs.first,
            let flying = summary?.flying {
             XCTAssertEqual(flying.start, first.timeRange.start)
-        }
-        
-        let fixedTime = logfile.legs(interval: 60.0)
-        let fixedTime2 = logfile2.legs(interval: 60.0)
-        do {
-            let export = try FlightLogFileGroupBy.defaultExport(logFileName: logfile.name, legs: fixedTime)
-            let byrows = export.byRows()
-            print(export)
-            print(byrows.rows.count)
-            
-            let dbpath = RZFileOrganizer.writeableFilePath("test.db")
-            let db = FMDatabase(path: dbpath)
-            db.open()
-            
-            export.save(to: db, table: "flights")
-            var count = self.countRowsPerLogFileName(db: db, table: "flights")
-            XCTAssertEqual(count[logfile.name], export.values.count)
-            // save twice
-            
-            let export2 = try FlightLogFileGroupBy.defaultExport(logFileName: logfile2.name, legs: fixedTime2)
-            export2.save(to: db, table: "flights")
-            count = self.countRowsPerLogFileName(db: db, table: "flights")
-            XCTAssertEqual(count[logfile2.name], export2.values.count)
-            XCTAssertEqual(count[logfile.name], export.values.count)
-            
-            export.save(to: db, table: "flights")
-            count = self.countRowsPerLogFileName(db: db, table: "flights")
-            XCTAssertEqual(count[logfile2.name], export2.values.count)
-            XCTAssertEqual(count[logfile.name], export.values.count)
-
-        }catch{
-            XCTAssertNil(error)
-        }
+        }        
     }
     
-    func countRowsPerLogFileName(db : FMDatabase, table : String) -> [String:Int] {
-        var rv : [String:Int] = [:]
-        if let res = try? db.executeQuery("SELECT LogFileName,COUNT(*) AS n FROM \(table) GROUP BY LogFileName", values: []) {
-            while( res.next() ){
-                if let name = res.string(forColumn: "LogFileName") {
-                    let n = res.int(forColumn: "n")
-                    rv[name] = Int(n)
-                }
-            }
-        }
-        return rv
-    }
     
     func testLogInterpret() throws {
-        guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.flight1.rawValue, withExtension: "csv")
+        guard let url = TestLogFileSamples.flight1.url
         else {
             XCTAssertTrue(false)
             return

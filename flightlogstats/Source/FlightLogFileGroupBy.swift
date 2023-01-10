@@ -134,6 +134,8 @@ class FlightLogFileGroupBy  {
     var categoricals : DataFrame<Date,CategoricalValue,ExportedCategorical>
     var constants : [Field:CategoricalValue]
     
+    var logFileName : CategoricalValue? { return self.constants[.LogFileName] }
+    
     init(legs : [FlightLeg], valueDefs : [Field:[ExportedValueType]], categoricalDefs : [Field:[ExportedCategoricalType]], constants : [Field:CategoricalValue] = [:] ) throws {
         /*var indexes : [Date] = []
         var values : [ExportedValue:[Double]]

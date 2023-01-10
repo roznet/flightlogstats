@@ -77,6 +77,7 @@
 		4280C8D4280D4CA500A0FB32 /* LogDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
 		4290B460294E5DA10089B158 /* CsvParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4290B45F294E5DA10089B158 /* CsvParser.swift */; };
+		4291E195296D672100DE2990 /* TestFileGroupBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4291E194296D672100DE2990 /* TestFileGroupBy.swift */; };
 		429949D7282816A100CA1B89 /* DisplayContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D6282816A100CA1B89 /* DisplayContext.swift */; };
 		429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */; };
 		429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */; };
@@ -206,6 +207,7 @@
 		4280C8D3280D4CA500A0FB32 /* LogDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogDetailViewController.swift; path = Source/LogDetailViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		4290B45F294E5DA10089B158 /* CsvParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CsvParser.swift; path = Source/CsvParser.swift; sourceTree = "<group>"; };
+		4291E194296D672100DE2990 /* TestFileGroupBy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFileGroupBy.swift; sourceTree = "<group>"; };
 		429949D6282816A100CA1B89 /* DisplayContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisplayContext.swift; path = Source/DisplayContext.swift; sourceTree = "<group>"; };
 		429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewCell.swift; path = Source/TableCollectionViewCell.swift; sourceTree = "<group>"; };
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
@@ -400,6 +402,7 @@
 			children = (
 				4280C8C6280D48E700A0FB32 /* TestAssets */,
 				42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */,
+				4291E194296D672100DE2990 /* TestFileGroupBy.swift */,
 				42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */,
 				42F1E84F284A4D2800DB732A /* TestOrganizer.swift */,
 				423929102864D58800CD33C0 /* TestAnalysis.swift */,
@@ -836,6 +839,7 @@
 				4203FBD32905B0FE005B0530 /* TestAvionics.swift in Sources */,
 				423929112864D58800CD33C0 /* TestAnalysis.swift in Sources */,
 				42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */,
+				4291E195296D672100DE2990 /* TestFileGroupBy.swift in Sources */,
 				42F1E848284A3C2E00DB732A /* TestParsingCsv.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
