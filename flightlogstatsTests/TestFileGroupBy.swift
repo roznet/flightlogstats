@@ -101,7 +101,9 @@ final class TestFileGroupBy: XCTestCase {
                 XCTAssertTrue(false)
             }
         }
-        
+
+        let reload = FlightLogFileGroupBy(from: db, table: "flights")
+        print( reload )
     }
     
 }

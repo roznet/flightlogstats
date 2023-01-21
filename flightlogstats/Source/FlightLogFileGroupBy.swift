@@ -92,6 +92,10 @@ class FlightLogFileGroupBy  {
             
             self.field = field
             self.type = type
+
+            if self.field.valueType != .value {
+                return nil
+            }
         }
         
         init(field:Field, type:ExportedValueType){
@@ -127,6 +131,9 @@ class FlightLogFileGroupBy  {
                 self.type = nil
                 self.field = field
             }else{
+                return nil
+            }
+            if self.field.valueType != .categorical {
                 return nil
             }
         }
@@ -262,6 +269,55 @@ class FlightLogFileGroupBy  {
         return ByRows(fields: fields, rows: rows)
     }
     
+   init(from db:FMDatabase, table : String) {
+       self.values = DataFrame()
+       self.categoricals = DataFrame()
+       
+        let indexName = "Date"
+        
+        //Get list of columns in table
+        var sql = "PRAGMA table_info(\(table))"
+        if let rs = db.executeQuery(sql, withArgumentsIn: []) {
+            while rs.next() {
+                let name = rs.string(forColumn: "name")!
+                let type = rs.string(forColumn: "type")!
+                if name == indexName {
+                    continue
+                }
+                if name == "LogFileName" {
+                    self.categoricals.add(field: ExportedCategorical(field: .LogFileName, type: nil),
+                                          column: DataFrame.Column(indexes: [], values: []))
+
+                }else if let exportedCategorical = ExportedCategorical(key: name) {
+                    self.categoricals.add(field: exportedCategorical, column: DataFrame.Column(indexes: [], values: []))
+                }else if let exportedValue = ExportedValue(key: name) {
+                    self.values.add(field: exportedValue, column: DataFrame.Column(indexes: [], values: []))
+                }
+            }
+        }else{
+            Logger.app.error("Failed to execute sql \(sql)")
+        }
+       let categoricalFields = self.categoricals.fields
+       let valueFields = self.values.fields
+       
+       sql = "SELECT \(indexName),\(categoricalFields.map { $0.sqlColumnName }.joined(separator: ",")),\(valueFields.map { $0.sqlColumnName }.joined(separator: ",")) FROM \(table)"
+        if let rs = db.executeQuery(sql, withArgumentsIn: []) {
+            while rs.next() {
+                let date = rs.date(forColumn: indexName)!
+                for field in categoricalFields {
+                    let value = rs.string(forColumn: field.key) ?? ""
+                    try? self.categoricals.append(field: field, element: value, for: date)
+                }
+                for field in valueFields {
+                    let value = rs.double(forColumn: field.key)
+                    try? self.values.append(field: field, element: value, for: date)
+                }
+            }
+        }else{
+            Logger.app.error("Failed to execute sql \(db.lastErrorMessage()) \(sql)")
+        }
+    }
+    // save to db
     func save(to db:FMDatabase, table : String) {
         let indexName = "Date"
         
