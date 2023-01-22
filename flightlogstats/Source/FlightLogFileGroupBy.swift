@@ -280,7 +280,6 @@ class FlightLogFileGroupBy  {
         if let rs = db.executeQuery(sql, withArgumentsIn: []) {
             while rs.next() {
                 let name = rs.string(forColumn: "name")!
-                let type = rs.string(forColumn: "type")!
                 if name == indexName {
                     continue
                 }
@@ -318,9 +317,13 @@ class FlightLogFileGroupBy  {
         }
     }
 
+    //
     func merge(with other: FlightLogFileGroupBy) {
-        self.values.merge(with: other.values)
-        self.categoricals.merge(with: other.categoricals)
+        // merge other first so the value for existing indexes comes from other
+        let mergedValues = other.values.merged(with: self.values)
+        let mergedCategoricals = other.categoricals.merged(with: self.categoricals)
+        self.values = mergedValues
+        self.categoricals = mergedCategoricals
     }
     // save to db
     func save(to db:FMDatabase, table : String) {
