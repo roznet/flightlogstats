@@ -300,22 +300,27 @@ class FlightLogFileGroupBy  {
        let categoricalFields = self.categoricals.fields
        let valueFields = self.values.fields
        
-       sql = "SELECT \(indexName),\(categoricalFields.map { $0.sqlColumnName }.joined(separator: ",")),\(valueFields.map { $0.sqlColumnName }.joined(separator: ",")) FROM \(table)"
+       sql = "SELECT \(indexName),\(categoricalFields.map { $0.sqlColumnName }.joined(separator: ",")),\(valueFields.map { $0.sqlColumnName }.joined(separator: ",")) FROM \(table) ORDER BY Date"
         if let rs = db.executeQuery(sql, withArgumentsIn: []) {
             while rs.next() {
                 let date = rs.date(forColumn: indexName)!
                 for field in categoricalFields {
                     let value = rs.string(forColumn: field.key) ?? ""
-                    try? self.categoricals.append(field: field, element: value, for: date)
+                    try? self.categoricals.unsafeFastAppend(field: field, element: value, for: date)
                 }
                 for field in valueFields {
                     let value = rs.double(forColumn: field.key)
-                    try? self.values.append(field: field, element: value, for: date)
+                    try? self.values.unsafeFastAppend(field: field, element: value, for: date)
                 }
             }
         }else{
             Logger.app.error("Failed to execute sql \(db.lastErrorMessage()) \(sql)")
         }
+    }
+
+    func merge(with other: FlightLogFileGroupBy) {
+        self.values.merge(with: other.values)
+        self.categoricals.merge(with: other.categoricals)
     }
     // save to db
     func save(to db:FMDatabase, table : String) {

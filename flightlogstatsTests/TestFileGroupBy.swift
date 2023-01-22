@@ -93,9 +93,11 @@ final class TestFileGroupBy: XCTestCase {
         }
         
         counts = self.countRowsPerLogFileName(db: db, table: "flights")
+        var totalCount = 0
         
         for groupby in groupbys {
             if let fn = groupby.logFileName, let count = counts[fn] {
+                totalCount += count
                 XCTAssertEqual(count, groupby.values.count)
             }else{
                 XCTAssertTrue(false)
@@ -103,7 +105,8 @@ final class TestFileGroupBy: XCTestCase {
         }
 
         let reload = FlightLogFileGroupBy(from: db, table: "flights")
-        print( reload )
+        XCTAssertEqual(reload.categoricals.count, totalCount)
+        XCTAssertEqual(reload.values.count, totalCount)
     }
     
 }
