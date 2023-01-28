@@ -274,7 +274,7 @@ class FlightLogFileGroupBy  {
        self.categoricals = DataFrame()
        
         let indexName = "Date"
-        
+       
         //Get list of columns in table
         var sql = "PRAGMA table_info(\(table))"
         if let rs = db.executeQuery(sql, withArgumentsIn: []) {
