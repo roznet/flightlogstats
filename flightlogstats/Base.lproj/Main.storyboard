@@ -12,10 +12,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Summary-->
+        <!--Summary View Controller-->
         <scene sceneID="aUE-ts-Q69">
             <objects>
-                <viewController storyboardIdentifier="LogDetailViewController" id="jUv-0p-pFh" customClass="LogDetailViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LogDetailViewController" id="jUv-0p-pFh" userLabel="Summary View Controller" customClass="LogDetailViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="05n-vR-e7N">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -49,6 +49,7 @@
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="knZ-aj-EVf">
                                                         <rect key="frame" x="0.0" y="0.0" width="363.5" height="34.5"/>
+                                                        <gestureRecognizers/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" image="square.and.arrow.up" catalog="system" title="Upload"/>
                                                         <connections>
@@ -1641,6 +1642,33 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2YV-Xu-TP9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="850.35971223021591" y="2408.5427135678392"/>
+        </scene>
+        <!--Upload Setting View Controller-->
+        <scene sceneID="y82-cs-Xcd">
+            <objects>
+                <viewController storyboardIdentifier="uploadSettingViewController" id="OaX-rL-Yog" userLabel="Upload Setting View Controller" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="95T-9P-pbD">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Vx-hN-AXT">
+                                <rect key="frame" x="396" y="588.5" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="9rb-Gp-LFV"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="5Vx-hN-AXT" firstAttribute="centerX" secondItem="9rb-Gp-LFV" secondAttribute="centerX" id="anx-o6-Nt2"/>
+                            <constraint firstItem="5Vx-hN-AXT" firstAttribute="centerY" secondItem="9rb-Gp-LFV" secondAttribute="centerY" id="nIZ-Vb-01Q"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mFH-gY-tSf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1165" y="840"/>
         </scene>
     </scenes>
     <resources>

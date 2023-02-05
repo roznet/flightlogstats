@@ -52,7 +52,13 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
 
     
     @objc func longPress(_ sender : Any) {
-        self.flystoButton.menu
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: "uploadSettingViewController")
+        vc.modalPresentationStyle = .popover
+        vc.popoverPresentationController?.sourceView = self.flystoButton
+        vc.popoverPresentationController?.sourceRect = self.flystoButton.bounds
+        
+        self.present(vc, animated: true, completion: nil)
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
