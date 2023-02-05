@@ -1,6 +1,6 @@
 # ![icon](https://raw.githubusercontent.com/roznet/flightlogstats/main/flightlogstats/Assets.xcassets/AppIcon.appiconset/icon-72.png) Flight Log Stats
 
-This app is currently in development and a work in progress.
+This [app first version](https://apps.apple.com/us/app/flightlogstats/id1643324618) is currently on the app store, but still a work in progress.
 
 ## Goal
 
