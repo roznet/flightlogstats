@@ -111,9 +111,9 @@ class FlightLogViewModel {
             return self.flightLogFileInfo.savvy_record?.status ?? .ready
         }
         set {
-            self.flightLogFileInfo.ensureFlyStoStatus()
-            self.flightLogFileInfo.flysto_record?.status = newValue
-            self.flightLogFileInfo.flysto_record?.status_date = Date()
+            self.flightLogFileInfo.ensureSavvyStatus()
+            self.flightLogFileInfo.savvy_record?.status = newValue
+            self.flightLogFileInfo.savvy_record?.status_date = Date()
         }
     }
     var flystoStatusText : String {
@@ -348,7 +348,7 @@ class FlightLogViewModel {
                             return
                         case .success,.already:
                             self.savvyStatus = .uploaded
-                        case .error,.denied,.inconsistentAircraft:
+                        case .error,.denied,.tokenExpired:
                             self.savvyStatus = .failed
                         }
                         NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)

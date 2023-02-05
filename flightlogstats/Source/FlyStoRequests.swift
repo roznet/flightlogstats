@@ -19,7 +19,7 @@ class FlyStoRequests {
     enum Status : Equatable {
         case success
         case already
-        case error
+        case error(String)
         case progressing(Double)
         case tokenExpired
         case denied
@@ -78,8 +78,7 @@ class FlyStoRequests {
     
     func start(attempt : Int = 0){
         guard attempt < 2 else {
-            Logger.net.error("More than 2 attempts failed, aborting")
-            self.end(status: .error)
+            self.end(status: .error("More than 2 attemps failed, aborting"))
             return
         }
         Logger.net.info("start upload[\(attempt)] \(self.url.lastPathComponent)")
@@ -95,8 +94,7 @@ class FlyStoRequests {
                     self.saveCredential()
                     self.makeRequest(attempt: attempt)
                 case .failure(let error):
-                    Logger.net.error("Failed \(error.localizedDescription)")
-                    self.end(status: .error)
+                    self.end(status: .error("Failed \(error.localizedDescription)"))
                 }
             }
         }else{
@@ -105,6 +103,9 @@ class FlyStoRequests {
     }
     
     func end(status : Status){
+        if case .error(let message) = status {
+            Logger.net.error(message)
+        }
         if let cb = self.completionHandler {
             cb(status)
         }
@@ -128,7 +129,7 @@ class FlyStoRequests {
                     Self.clearCredential()
                     self.start(attempt: attempt + 1)
                 }else{
-                    self.end(status: .error)
+                    self.end(status: .error("Failed \(error.localizedDescription)"))
                 }
             }
         }
@@ -136,8 +137,7 @@ class FlyStoRequests {
 
     func makeRequest(attempt : Int = 0){
         guard !self.oauth.client.credential.isTokenExpired() else {
-            Logger.net.error("Token should have been renewed but has expired")
-            self.end(status: .error)
+            self.end(status: .error("Token should have been renewed but has expired"))
             return
         }
         
@@ -159,14 +159,14 @@ class FlyStoRequests {
                         Self.clearCredential()
                         self.start(attempt: attempt + 1)
                     case .error:
-                        self.end(status: .error)
+                        self.end(status: .error("Failed \(queryError.localizedDescription)"))
                     case .success,.progressing(_),.already:
                         self.end(status: .success)
                     }
                 }
             }
         }else{
-            self.end(status: .error)
+            self.end(status: .error("Failed to build file for upload"))
         }
     }
     
@@ -187,7 +187,7 @@ class FlyStoRequests {
                 return .denied
             }else{
                 Logger.net.info("Underlying request error: \(code)")
-                return .error
+                return .error("Underlying request error: \(code)")
             }
         case .accessDenied(let underlyingError, _ /*request:*/):
             let code = (underlyingError as NSError).code
@@ -200,7 +200,7 @@ class FlyStoRequests {
             return .tokenExpired
         default:
             Logger.net.error("Other error \(error.localizedDescription)")
-            return .error
+            return .error("Other error \(error.localizedDescription)")
         }
     }
     

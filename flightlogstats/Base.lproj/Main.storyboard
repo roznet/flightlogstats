@@ -1253,29 +1253,95 @@
         <!--Upload Setting View Controller-->
         <scene sceneID="y82-cs-Xcd">
             <objects>
-                <viewController storyboardIdentifier="uploadSettingViewController" id="OaX-rL-Yog" userLabel="Upload Setting View Controller" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="uploadSettingViewController" id="OaX-rL-Yog" userLabel="Upload Setting View Controller" customClass="UploadSettingsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="95T-9P-pbD">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Vx-hN-AXT">
-                                <rect key="frame" x="396" y="588.5" width="42" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="EVb-qc-OLK">
+                                <rect key="frame" x="322" y="532.5" width="190.5" height="133.5"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleAspectFit" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="X5Q-2l-ioZ">
+                                        <rect key="frame" x="0.0" y="0.0" width="190.5" height="34.5"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="FlySto" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Fi-LW-987">
+                                                <rect key="frame" x="0.0" y="7" width="48" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cgg-fz-lfM">
+                                                <rect key="frame" x="56" y="1.5" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="uiControlChanged:" destination="OaX-rL-Yog" eventType="valueChanged" id="bgI-D1-yHc"/>
+                                                </connections>
+                                            </switch>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dd9-7U-Zy4">
+                                                <rect key="frame" x="113" y="0.0" width="77.5" height="34.5"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Logout"/>
+                                                <connections>
+                                                    <action selector="logoutFlysto:" destination="OaX-rL-Yog" eventType="touchUpInside" id="NLW-vM-GQ0"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleAspectFit" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="tNx-37-g1M">
+                                        <rect key="frame" x="0.0" y="49.5" width="190.5" height="34.5"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Savvy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CTV-3J-SEl">
+                                                <rect key="frame" x="0.0" y="7" width="45.5" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rjz-zJ-NyY">
+                                                <rect key="frame" x="53.5" y="1.5" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="uiControlChanged:" destination="OaX-rL-Yog" eventType="valueChanged" id="PfC-19-hrX"/>
+                                                </connections>
+                                            </switch>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iBc-pd-1WC">
+                                                <rect key="frame" x="110.5" y="0.0" width="80" height="34.5"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Logout"/>
+                                                <connections>
+                                                    <action selector="logoutSavvy:" destination="OaX-rL-Yog" eventType="touchUpInside" id="WQ0-ct-xZ7"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v7E-US-Vqt">
+                                        <rect key="frame" x="0.0" y="99" width="190.5" height="34.5"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o90-ck-BL3" userLabel="Force Upload Again">
+                                                <rect key="frame" x="0.0" y="0.0" width="190.5" height="34.5"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Force Upload"/>
+                                                <connections>
+                                                    <action selector="forceUpload:" destination="OaX-rL-Yog" eventType="touchUpInside" id="Luy-Ad-dsR"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="9rb-Gp-LFV"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="5Vx-hN-AXT" firstAttribute="centerX" secondItem="9rb-Gp-LFV" secondAttribute="centerX" id="anx-o6-Nt2"/>
-                            <constraint firstItem="5Vx-hN-AXT" firstAttribute="centerY" secondItem="9rb-Gp-LFV" secondAttribute="centerY" id="nIZ-Vb-01Q"/>
+                            <constraint firstItem="EVb-qc-OLK" firstAttribute="centerX" secondItem="9rb-Gp-LFV" secondAttribute="centerX" id="3qU-KX-43V"/>
+                            <constraint firstItem="EVb-qc-OLK" firstAttribute="centerY" secondItem="9rb-Gp-LFV" secondAttribute="centerY" id="Clf-Iw-VB6"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="flystoSwitch" destination="cgg-fz-lfM" id="eCP-Oz-dC8"/>
+                        <outlet property="savvySwitch" destination="rjz-zJ-NyY" id="RPE-bL-fYf"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mFH-gY-tSf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1165" y="840"/>
+            <point key="canvasLocation" x="1206" y="867"/>
         </scene>
         <!--Service Login View Controller-->
         <scene sceneID="O9Y-mA-AYV">

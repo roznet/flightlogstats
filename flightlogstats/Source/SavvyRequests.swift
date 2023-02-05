@@ -82,14 +82,8 @@ class SavvyRequests {
         let details : String?
         let id : Int
     }
-    enum Status {
-        case success
-        case already
-        case error(String)
-        case progressing(Double)
-        case inconsistentAircraft
-        case denied
-    }
+    typealias Status = FlyStoRequests.Status
+    
     let viewController : UIViewController
     let url : URL
     let aircraftIdentifier : AircraftIdentifier
@@ -115,7 +109,6 @@ class SavvyRequests {
     func start(attempt : Int = 0) {
         
         guard attempt < 2 else {
-            Logger.net.error("Savvy: Too many attempts")
             self.end(status: .error("Too many attempts"))
             return
         }
@@ -129,8 +122,7 @@ class SavvyRequests {
                     Settings.shared.savvyToken = token
                     self.startRequest(token: token)
                 case .failed(let error):
-                    Logger.net.error("Savvy: Failed to get token \(error)")
-                    self.end(status: .error("Failed to get token"))
+                    self.end(status: .error("Failed to get token \(error)"))
                 case .canceled:
                     Logger.net.error("Savvy: Canceled")
                     self.end(status: .denied)
@@ -157,21 +149,27 @@ class SavvyRequests {
             let  builder = MultipartRequestBuilder(url: aircraftUrl)
             builder.addField(name: "token", value: token)
             let request = builder.request()
+            
+            if let cb = self.completionHandler {
+                cb(FlyStoRequests.Status.progressing(0.3))
+            }
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    Logger.net.error("Savvy: Failed to get aircraft \(error)")
-                    self.end(status: .error("Failed to get aircraft"))
+                    self.end(status: .error("Failed to get aircraft \(error)"))
                 }else if let data = data {
                     do {
                         let decoder = JSONDecoder()
                         let aircrafts = try decoder.decode([SavvyAircraft].self, from: data)
                         Logger.net.info("Savvy: Got \(aircrafts.count) aircraft")
+                        if let cb = self.completionHandler {
+                            cb(FlyStoRequests.Status.progressing(0.6))
+                        }
                         self.startUploadForMatchinAircraft(aircrafts: aircrafts)
                     }catch let error {
                         if let txt = String(data: data, encoding: .utf8) {
                             Logger.net.info("Response: \(txt)")
                         }
-                        Logger.net.error("Savvy: Failed to decode aircraft \(error)")
+                        Logger.web.error("Decoder error \(error)")
                         self.end(status: .error("Failed to decode aircraft"))
                     }
                 }
@@ -187,7 +185,6 @@ class SavvyRequests {
                 return
             }
         }
-        Logger.net.error("Savvy: No matching aircraft")
         self.end(status: .error("No Matching aircraft"))
     }
     func startUploadRequest(aircraftId : Int) {
@@ -201,8 +198,7 @@ class SavvyRequests {
             let request = builder.request()
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    Logger.net.error("Savvy: Failed to upload \(error)")
-                    self.end(status: .error("Failed to upload"))
+                    self.end(status: .error("Failed to upload \(error)"))
                 }else if let data = data {
                     do {
                         let decoder = JSONDecoder()
@@ -215,14 +211,12 @@ class SavvyRequests {
                             self.end(status: .already)
                         }else{
                             let details = result.details ?? ""
-                            Logger.net.error("Savvy: Failed to upload \(filename) status \(result.status) \(details)")
                             self.end(status: .error("Failed to upload \(filename) status \(result.status) \(details)"))
                         }
                     }catch let error {
                         if let txt = String(data: data, encoding: .utf8) {
                             Logger.net.info("Response: \(txt)")
                         }
-                        Logger.net.error("Savvy: Failed to decode aircraft \(error)")
                         self.end(status: .error("Failed to decode aircraft"))
                     }
                 }
@@ -232,6 +226,9 @@ class SavvyRequests {
     }
                 
     func end(status : Status) {
+        if case .error(let message) = status {
+            Logger.net.error(message)
+        }
         if let cb = self.completionHandler {
             cb(status)
         }
