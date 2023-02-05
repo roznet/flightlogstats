@@ -4,6 +4,8 @@
 //
 //  Created by Brice Rosenzweig on 19/11/2022.
 //
+// MIT License
+//
 
 import Foundation
 import RZData

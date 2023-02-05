@@ -85,17 +85,18 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: true)
             },
-            UIAction(title: "Savvy Test", image: UIImage(systemName: "questionmark.circle")){
-                _ in
-                let vc = SavvyRequests(nibName: nil, bundle: nil)
-                vc.modalPresentationStyle = .fullScreen
-                self.present(vc, animated: true)
-            },
             ]
         if FlyStoRequests.hasCredential {
             menuItems.append(UIAction(title: "Logout of FlySto", image: UIImage(systemName: "minus.circle")) {
                 _ in
                 FlyStoRequests.clearCredential()
+                self.updateButtons()
+            })
+        }
+        if SavvyRequests.hasCredential {
+            menuItems.append(UIAction(title: "Logout of Savvy", image: UIImage(systemName: "minus.circle")) {
+                _ in
+                SavvyRequests.clearCredential()
                 self.updateButtons()
             })
         }

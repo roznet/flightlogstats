@@ -138,6 +138,7 @@ struct Settings {
         case totalizer_start_fuel = "totalizer_start_fuel"
         case fuel_config_first_use_acknowledged = "fuel_config_first_use_acknowledged"
         case flysto_credentials = "flysto.credentials"
+        case savvy_token = "savvy.token"
         
         case database_version = "database_version"
     }
@@ -188,7 +189,10 @@ struct Settings {
     
     @CodableStorage(key: .flysto_credentials)
     var flystoCredentials : OAuthSwiftCredential?
-    
+
+    @CodableStorage(key: .savvy_token)
+    var savvyToken : String?
+
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }
         set { self.targetFuelTotal = newValue.converted(to: Settings.fuelStoreUnit).total }

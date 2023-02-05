@@ -1554,6 +1554,50 @@
             </objects>
             <point key="canvasLocation" x="-221.58273381294967" y="867.3366834170854"/>
         </scene>
+        <!--Service Login View Controller-->
+        <scene sceneID="O9Y-mA-AYV">
+            <objects>
+                <viewController storyboardIdentifier="serviceLoginViewController" id="HXm-wo-LHW" userLabel="Service Login View Controller" customClass="SavvyAuthenticateViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="gU6-6w-BN4">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hJj-Qu-sP7">
+                                <rect key="frame" x="749" y="24" width="64.5" height="34.5"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Done"/>
+                                <connections>
+                                    <action selector="doneButton:" destination="HXm-wo-LHW" eventType="touchUpInside" id="SLS-ty-o1R"/>
+                                    <action selector="doneButton:" destination="npJ-vZ-DSg" eventType="touchUpInside" id="ybC-Jr-K8K"/>
+                                </connections>
+                            </button>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pJv-Jc-7v0">
+                                <rect key="frame" x="0.0" y="76" width="834" height="1118"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="htg-wI-0Rt"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="pJv-Jc-7v0" firstAttribute="top" secondItem="hJj-Qu-sP7" secondAttribute="bottom" constant="17.5" id="0pH-LL-DNM"/>
+                            <constraint firstItem="pJv-Jc-7v0" firstAttribute="leading" secondItem="htg-wI-0Rt" secondAttribute="leading" id="8cK-3h-oYJ"/>
+                            <constraint firstItem="htg-wI-0Rt" firstAttribute="trailing" secondItem="hJj-Qu-sP7" secondAttribute="trailing" constant="20.5" id="Gia-Ku-6ha"/>
+                            <constraint firstItem="pJv-Jc-7v0" firstAttribute="bottom" secondItem="htg-wI-0Rt" secondAttribute="bottom" constant="20" id="Oao-Hw-oDA"/>
+                            <constraint firstItem="htg-wI-0Rt" firstAttribute="trailing" secondItem="pJv-Jc-7v0" secondAttribute="trailing" id="Vmh-zS-ANX"/>
+                            <constraint firstItem="hJj-Qu-sP7" firstAttribute="top" secondItem="htg-wI-0Rt" secondAttribute="top" id="wzx-0Z-lmz"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="pJv-Jc-7v0" id="jrk-Q7-65F"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="2YV-Xu-TP9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="850.35971223021591" y="2408.5427135678392"/>
+        </scene>
     </scenes>
     <resources>
         <image name="airplane.departure" catalog="system" width="128" height="84"/>
