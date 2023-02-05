@@ -35,10 +35,25 @@ class LogDetailViewController: UIViewController,ViewModelDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        let menuActions : [UIAction] = [
+            UIAction(title: "Force Upload", image: nil, attributes: .destructive, handler: { action in
+                Logger.web.info("Force Upload")
+            }),
+            UIAction(title: "Settings", image: nil, attributes: .destructive, handler: { action in
+                Logger.web.info("Settings")
+            })
+            ]
+        let menu = UIMenu(title: "Menu", image: nil, identifier: nil, options: .displayInline, children: menuActions)
+        self.flystoButton.menu = menu
+        self.flystoButton.showsMenuAsPrimaryAction = false
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+        self.flystoButton.addGestureRecognizer(longPress)
     }
 
     
+    @objc func longPress(_ sender : Any) {
+        self.flystoButton.menu
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if self.flightLogViewModel?.shouldBuild ?? true {

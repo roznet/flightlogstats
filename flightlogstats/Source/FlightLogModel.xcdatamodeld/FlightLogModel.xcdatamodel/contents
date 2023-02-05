@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21279" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22D49" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="AircraftRecord" representedClassName=".AircraftRecord" syncable="YES" codeGenerationType="category">
         <attribute name="aircraft_identifier" optional="YES" attributeType="String"/>
         <attribute name="airframe_name" optional="YES" attributeType="String"/>
@@ -49,5 +49,12 @@
         <relationship name="aircraft_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AircraftRecord" inverseName="log_file_records" inverseEntity="AircraftRecord"/>
         <relationship name="flysto_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFlyStoRecord" inverseName="log_file_record" inverseEntity="FlightFlyStoRecord"/>
         <relationship name="fuel_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightFuelRecord" inverseName="log_file_record" inverseEntity="FlightFuelRecord"/>
+        <relationship name="savvy_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightSavvyRecord" inverseName="log_file_record" inverseEntity="FlightSavvyRecord"/>
+    </entity>
+    <entity name="FlightSavvyRecord" representedClassName=".FlightSavvyRecord" syncable="YES" codeGenerationType="category">
+        <attribute name="log_file_name" optional="YES" attributeType="String"/>
+        <attribute name="status_date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="upload_status" optional="YES" attributeType="String"/>
+        <relationship name="log_file_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileRecord" inverseName="savvy_record" inverseEntity="FlightLogFileRecord"/>
     </entity>
 </model>

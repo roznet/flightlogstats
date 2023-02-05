@@ -309,6 +309,21 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     @discardableResult
+    func ensureSavvyStatus() -> Bool {
+        
+        if self.savvy_record == nil,
+           let container = self.organizer {
+            dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+            let context = container.persistentContainer.viewContext
+            let status = FlightSavvyRecord(context: context)
+            status.status = .ready
+            status.log_file_name = self.log_file_name
+            self.savvy_record = status
+            return true
+        }
+        return false
+    }
+    @discardableResult
     func ensureFuelRecord() -> Bool {
         
         if self.fuel_record == nil,

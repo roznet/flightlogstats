@@ -79,10 +79,12 @@ class SavvyRequests {
     struct SavvyUploadResponse : Codable {
         let status : String
         let logs: String
+        let details : String?
         let id : Int
     }
     enum Status {
         case success
+        case already
         case error(String)
         case progressing(Double)
         case inconsistentAircraft
@@ -91,6 +93,7 @@ class SavvyRequests {
     let viewController : UIViewController
     let url : URL
     let aircraftIdentifier : AircraftIdentifier
+    var completionHandler : CompletionHandler? = nil
 
     init(viewController : UIViewController, url : URL, aircraftIdentifier : AircraftIdentifier) {
         self.viewController = viewController
@@ -98,9 +101,6 @@ class SavvyRequests {
         self.aircraftIdentifier = aircraftIdentifier
     }
 
-    func execute(completion : @escaping CompletionHandler){
-        self.start()
-    }
     static var hasCredential : Bool {
         return Settings.shared.savvyToken != nil
     }
@@ -108,6 +108,10 @@ class SavvyRequests {
         Settings.shared.savvyToken = nil
     }
 
+    func execute(completion : @escaping CompletionHandler) {
+        self.completionHandler = completion
+        self.start(attempt: 0)
+    }
     func start(attempt : Int = 0) {
         
         guard attempt < 2 else {
@@ -206,9 +210,13 @@ class SavvyRequests {
                         if result.status == "OK" {
                             Logger.net.info("Savvy: Uploaded \(filename)")
                             self.end(status: .success)
+                        }else if result.status == "Error", let details = result.details, details == "duplicate" {
+                            Logger.net.info("Savvy: Duplicate \(filename)")
+                            self.end(status: .already)
                         }else{
-                            Logger.net.error("Savvy: Failed to upload \(filename) status \(result.status)")
-                            self.end(status: .error("Failed to upload \(filename) status \(result.status)"))
+                            let details = result.details ?? ""
+                            Logger.net.error("Savvy: Failed to upload \(filename) status \(result.status) \(details)")
+                            self.end(status: .error("Failed to upload \(filename) status \(result.status) \(details)"))
                         }
                     }catch let error {
                         if let txt = String(data: data, encoding: .utf8) {
@@ -224,6 +232,11 @@ class SavvyRequests {
     }
                 
     func end(status : Status) {
+        if let cb = self.completionHandler {
+            cb(status)
+        }
+        
+        self.completionHandler = nil
     }
 }
 
