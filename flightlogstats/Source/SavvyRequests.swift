@@ -217,6 +217,7 @@ class SavvyRequests {
                         if let txt = String(data: data, encoding: .utf8) {
                             Logger.net.info("Response: \(txt)")
                         }
+                        Logger.web.error("Decoder error \(error)")
                         self.end(status: .error("Failed to decode aircraft"))
                     }
                 }
