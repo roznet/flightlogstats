@@ -20,7 +20,7 @@ protocol UserInterfaceModeManager : AnyObject {
 class MainSplitViewController : UISplitViewController,UISplitViewControllerDelegate,UserInterfaceModeManager {
 
     var logListController : LogListTableViewController? = nil
-    var logDetailTabBarController : LogDetailTabBarController? = nil
+    var logDetailTabBarController : LogTabBarController? = nil
     var statsTabBarController : StatsTabBarController? = nil
     
     override func viewDidLoad() {
@@ -31,7 +31,7 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
         guard
             let leftNavController = self.viewControllers.first as? UINavigationController,
             let logListController = leftNavController.viewControllers.first as? LogListTableViewController,
-            let rightTabbarController = self.viewControllers.last as? LogDetailTabBarController
+            let rightTabbarController = self.viewControllers.last as? LogTabBarController
         else { fatalError() }
         
         self.logListController = logListController

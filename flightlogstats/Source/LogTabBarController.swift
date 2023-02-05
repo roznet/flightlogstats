@@ -13,7 +13,7 @@ protocol ViewModelDelegate : AnyObject {
     func viewModelHasChanged(viewModel: FlightLogViewModel)
 }
 
-class LogDetailTabBarController: UITabBarController, LogSelectionDelegate {
+class LogTabBarController: UITabBarController, LogSelectionDelegate {
     var logViewModel : FlightLogViewModel? = nil
     var progress : ProgressReport? = nil
     var progressReportOverlay : ProgressReportOverlay? = nil

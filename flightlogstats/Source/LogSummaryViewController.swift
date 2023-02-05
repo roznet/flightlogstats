@@ -9,7 +9,7 @@ import UIKit
 import OSLog
 import RZUtils
 
-class LogDetailViewController: UIViewController,ViewModelDelegate {
+class LogSummaryViewController: UIViewController,ViewModelDelegate {
     var logFileOrganizer = FlightLogOrganizer.shared
     
     @IBOutlet weak var progressView: UIProgressView!

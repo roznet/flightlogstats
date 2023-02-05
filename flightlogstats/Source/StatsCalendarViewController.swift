@@ -1,27 +1,27 @@
 //
-//  TripsStatsViewController.swift
+//  CalendarStatsViewController.swift
 //  FlightLog1000
 //
-//  Created by Brice Rosenzweig on 28/07/2022.
+//  Created by Brice Rosenzweig on 14/08/2022.
 //
 
 import UIKit
 import OSLog
 
-class TripsStatsViewController: UIViewController {
+class StatsCalendarViewController: UIViewController {
     @IBOutlet weak var logListCollectionView: UICollectionView!
     var flightListDataSource : FlightListDataSource? = nil
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         let infos = FlightLogOrganizer.shared.flightLogFileInfos(request: .flightsOnly)
-        self.flightListDataSource = FlightListDataSource(logInfos: infos, displayContext: DisplayContext(), aggregation: .trips)
+        self.flightListDataSource = FlightListDataSource(logInfos: infos, displayContext: DisplayContext(), aggregation: .months)
         
         self.logListCollectionView.dataSource = self.flightListDataSource
         self.logListCollectionView.delegate = self.flightListDataSource
@@ -32,4 +32,6 @@ class TripsStatsViewController: UIViewController {
         }
 
     }
+
+
 }

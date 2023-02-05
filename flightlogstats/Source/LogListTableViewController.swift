@@ -39,7 +39,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     // for iphone, or start in list more delegate may not be instantiated yet
     func ensureDelegate(){
         if self.delegate == nil {
-            if let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailTabBarController") as? LogDetailTabBarController {
+            if let detailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LogDetailTabBarController") as? LogTabBarController {
              self.delegate = detailViewController
             }else{
                 Logger.app.error("Could not create detailViewController from storyboard")
