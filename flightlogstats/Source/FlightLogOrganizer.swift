@@ -317,7 +317,7 @@ class FlightLogOrganizer {
                         // only report parsing progress if few missing, if many, just report overall progress
                         // Note info may require parsing due to version change, while log may not if already
                         // parsed
-                        if info.requiresParsing {
+                        if info.requiresParsing || force{
                             Logger.app.info("Parsing \(log_file_name)")
                             
                             flightLog.parse(progress: reportParsingProgress ? self.progress : nil)

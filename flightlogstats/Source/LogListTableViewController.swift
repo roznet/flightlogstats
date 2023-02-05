@@ -85,6 +85,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: true)
             },
+            /*
+            UIAction(title: "Rebuild Info", image: UIImage(systemName: "plus.circle")){
+                _ in
+                Logger.app.info("Rebuild info")
+                self.logFileOrganizer.updateInfo(count: 1000, force: true)
+            },*/
             ]
         if FlyStoRequests.hasCredential {
             menuItems.append(UIAction(title: "Logout of FlySto", image: UIImage(systemName: "minus.circle")) {
