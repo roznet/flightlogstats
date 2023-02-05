@@ -122,7 +122,11 @@ struct Settings {
         case folder = "folder"
         case csv = "csv"
     }
-    
+    enum ImportMethod : String {
+        case automatic
+        case fromDate
+        case fromFile
+    }
     enum Key : String {
         case open_file_mode = "open-file-mode"
         case aircraft_max_fuel = "aicraft-max-fuel"
@@ -137,8 +141,14 @@ struct Settings {
         case added_fuel_right = "added_fuel_right"
         case totalizer_start_fuel = "totalizer_start_fuel"
         case fuel_config_first_use_acknowledged = "fuel_config_first_use_acknowledged"
+        
         case flysto_credentials = "flysto.credentials"
+        case flysto_enabled = "flysto.enabled"
         case savvy_token = "savvy.token"
+        case savvy_enabled = "savvy.enabled"
+        
+        case import_method = "import.method"
+        case import_startdate = "import.startdate"
         
         case database_version = "database_version"
     }
@@ -187,11 +197,21 @@ struct Settings {
     @UserStorage(key: .fuel_config_first_use_acknowledged, defaultValue: false)
     var fuelConfigFirstUseAcknowledged : Bool
     
+    @UserStorage(key: .flysto_enabled, defaultValue: false)
+    var flystoEnabled : Bool
     @CodableStorage(key: .flysto_credentials)
     var flystoCredentials : OAuthSwiftCredential?
 
+    @UserStorage(key: .savvy_enabled, defaultValue: false)
+    var savvyEnabled : Bool
     @CodableStorage(key: .savvy_token)
     var savvyToken : String?
+
+    @EnumStorage(key: .import_method, defaultValue: .automatic)
+    var importMethod : ImportMethod
+
+    @UserStorage(key: .import_startdate, defaultValue: Date())
+    var importStartDate : Date
 
     var targetFuel : FuelQuantity {
         get { return FuelQuantity(total: self.targetFuelTotal, unit: Settings.fuelStoreUnit ) }

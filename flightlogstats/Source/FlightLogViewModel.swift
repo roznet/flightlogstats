@@ -291,8 +291,8 @@ class FlightLogViewModel {
     private var savvyRequest : SavvyRequests? = nil
     
     func startServiceSynchronization(viewController : UIViewController) {
-       let flySto = true
-        let savvy = true
+        let flySto = Settings.shared.flystoEnabled
+        let savvy = Settings.shared.savvyEnabled
         
         if let url = self.flightLogFileInfo.flightLog?.url {
             self.progress?.update(state: .start, message: .uploadingFiles)
