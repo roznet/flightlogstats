@@ -1,0 +1,18 @@
+
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@main
+    - name: Pre Build
+      run: |
+        pwd
+        ls
+    - name: Build
+      run: xcodebuild -sdk iphonesimulator -workspace flightlogstats.xcodeproj -scheme FlightLogStats -destination 'platform=iOS Simulator,name=iPhone 11' build CODE_SIGNING_REQUIRED=NO
