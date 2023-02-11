@@ -52,14 +52,17 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
 
     
     @objc func longPress(_ sender : Any) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let vc = storyboard.instantiateViewController(withIdentifier: "uploadSettingViewController") as? UploadSettingsViewController {
-            vc.modalPresentationStyle = .popover
-            vc.popoverPresentationController?.sourceView = self.flystoButton
-            vc.popoverPresentationController?.sourceRect = self.flystoButton.bounds
-            vc.summaryViewController = self
-            vc.flightLogViewModel = self.flightLogViewModel
-            self.present(vc, animated: true, completion: nil)
+        // check if long press started
+        if let longPress = sender as? UILongPressGestureRecognizer, longPress.state == .began {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            if let vc = storyboard.instantiateViewController(withIdentifier: "uploadSettingViewController") as? UploadSettingsViewController {
+                vc.modalPresentationStyle = .popover
+                vc.popoverPresentationController?.sourceView = self.flystoButton
+                vc.popoverPresentationController?.sourceRect = self.flystoButton.bounds
+                vc.summaryViewController = self
+                vc.flightLogViewModel = self.flightLogViewModel
+                self.present(vc, animated: true, completion: nil)
+            }
         }
     }
     override func viewWillAppear(_ animated: Bool) {

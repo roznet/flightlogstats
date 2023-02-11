@@ -78,9 +78,9 @@ class SavvyRequests {
     //sample: {"status": "OK", "id": 550, "logs": "/file_parse_log/550”}
     struct SavvyUploadResponse : Codable {
         let status : String
-        let logs: String
+        let logs: String?
         let details : String?
-        let id : Int
+        let id : Int?
     }
     typealias Status = FlyStoRequests.Status
     

@@ -26,7 +26,7 @@ class UploadSettingsViewController: UIViewController {
     @IBAction func forceUpload(_ sender: Any) {
         self.dismiss(animated: true)
         if let parent = self.summaryViewController {
-            self.flightLogViewModel?.startServiceSynchronization(viewController: parent)
+            self.flightLogViewModel?.startServiceSynchronization(viewController: parent,force: true)
         }
     }
     override func viewDidLoad() {
