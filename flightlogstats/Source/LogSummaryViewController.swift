@@ -71,6 +71,12 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.updateUI()
             }
         }
+        NotificationCenter.default.addObserver(forName: .settingsViewControllerUpdate, object: nil, queue: nil){
+            notification in
+            DispatchQueue.main.async{
+                self.updateUI()
+            }
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {

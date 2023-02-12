@@ -17,10 +17,12 @@ class UploadSettingsViewController: UIViewController {
     
     @IBAction func logoutSavvy(_ sender: Any) {
         SavvyRequests.clearCredential()
+        NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     @IBAction func logoutFlysto(_ sender: Any) {
         FlyStoRequests.clearCredential()
+        NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     @IBAction func forceUpload(_ sender: Any) {
@@ -44,6 +46,7 @@ class UploadSettingsViewController: UIViewController {
         }else if (sender as? UISwitch) == self.flystoSwitch {
             Settings.shared.flystoEnabled = self.flystoSwitch.isOn
         }
+        NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     func viewFromSettings(){

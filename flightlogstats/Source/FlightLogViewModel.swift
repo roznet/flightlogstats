@@ -339,7 +339,7 @@ class FlightLogViewModel {
                     }
                 }
             }
-            if savvy && (force && self.savvyStatus != .uploaded) {
+            if savvy && (force || self.savvyStatus != .uploaded) {
                 if let identifier = self.flightLogFileInfo.aircraftRecord?.aircraftIdentifier {
                     self.savvyRequest = SavvyRequests(viewController: viewController, url: url, aircraftIdentifier: identifier)
                     started = true

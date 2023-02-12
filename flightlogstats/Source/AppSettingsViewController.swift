@@ -48,6 +48,8 @@ class AppSettingsViewController: UIViewController {
         }else if (sender as? UIDatePicker) == self.datePicker {
             Settings.shared.importStartDate = self.datePicker.date
         }
+        
+        NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     func viewFromSettings(){
