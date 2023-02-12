@@ -126,6 +126,35 @@ class TestOrganizer: XCTestCase {
         self.wait(for: [expectation], timeout: TimeInterval(10.0))
     }
     
+    func testLogFileNameGuesses(){
+        guard let url = Bundle(for: type(of: self)).resourceURL
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+        let files = self.findLocalLogFiles(url: url, types: [.log,.rpt])
+        let reconstructFormatter = DateFormatter()
+        reconstructFormatter.dateFormat = "yyMMdd_HHmm"
+        for file in files {
+            let name = file.lastPathComponent
+            // special case, not a date
+            if name.hasPrefix("log_small") {
+                continue
+            }
+            if let date = name.logFileGuessedDated {
+                if name.logFileType == .log {
+                    let rebuildPrefix = "log_\(reconstructFormatter.string(from: date))"
+                    XCTAssertTrue(name.hasPrefix(rebuildPrefix))
+                }else if name.logFileType == .rpt {
+                    let rebuildPrefix = "rpt_\(reconstructFormatter.string(from: date))"
+                    XCTAssertTrue(name.hasPrefix(rebuildPrefix))
+                }
+            }else{
+                XCTAssertTrue(false, "bad date for \(name)")
+            }
+        }
+    }
+    
     func testOrganizerSyncCloud() throws {
         // This will test that
         //   1. logic of copying missing from from cloud works: cloud proxied by bundle path, and local by a testLocal folder initially empty
@@ -167,7 +196,7 @@ class TestOrganizer: XCTestCase {
         organizer.cloudFolder = writeableCloudUrl
         
         // first try to copy to local what is missing
-        organizer.copyMissingFilesToLocal(urls: [bundleUrl], process: false)
+        organizer.copyMissingFilesToLocal(urls: [bundleUrl], method: .allMissingFromFolder, process: false)
         
         let startUrls = self.findLocalLogFiles(url: bundleUrl, types: [.log])
         var localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])

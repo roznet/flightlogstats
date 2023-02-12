@@ -444,7 +444,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         self.progressReportOverlay?.prepareOverlay(message: .addingFiles)
-        self.logFileOrganizer.copyMissingFilesToLocal(urls: urls)
+        self.logFileOrganizer.copyMissingFilesToLocal(urls: urls, method: .allMissingFromFolder)
         
         controller.dismiss(animated: true)
     }

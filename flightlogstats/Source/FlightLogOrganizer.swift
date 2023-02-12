@@ -652,30 +652,25 @@ class FlightLogOrganizer {
         return someNew
     }
     
-    /// Main logic to identify which files to import and copy, typically an SD Card
+    enum LogSelectionMethod {
+        case allMissingFromFolder // Automatically look for files missing in a folder 
+        case sinceLatestImportedFile // Only import files after the latest imported file
+        case selectedFile([URL]) // Only import specified files
+        case afterDate(Date) // Only import files after the specified date
+    }
+
+    /// Main entry point to find files to import and copy them locally, typically an SD Card
+    /// optionally will process and create records in the database for new files
     /// - Parameters:
     ///   - urls: url to look for new file.
     ///   - process: if true will also sync cloud and add to the database new files, use false for testing
-    func copyMissingFilesToLocal(urls : [URL], process : Bool = true) {
-        let destFolder = self.localFolder
+    func copyMissingFilesToLocal(urls : [URL], method : LogSelectionMethod, process : Bool = true) {
         
         Self.search(in: urls ){
             result in
             switch result {
             case .success(let logurls):
-                var someNew : Bool = false
-                for url in logurls {
-                    if url.logFileType == .rpt {
-                        if self.copyRptFile(file: url,destFolder: destFolder) {
-                            someNew = true
-                        }
-                    }else{
-                        let dest = destFolder.appendingPathComponent(url.lastPathComponent)
-                        if self.copyLogFile(file: url, dest: dest) {
-                            someNew = true
-                        }
-                    }
-                }
+                let someNew : Bool = self.importFiles(urls: logurls, method: method)
                 if someNew {
                     if process {
                         Logger.app.info("Local File list has update")
@@ -687,6 +682,29 @@ class FlightLogOrganizer {
                 Logger.app.error("Failed to find url \(error.localizedDescription)")
             }
         }
+    }
+    
+    /// Import (copy to local container) files missing according to selection Method
+    /// - Parameters:
+    ///   - urls: list of files to import
+    ///   - method: selection method
+    func importFiles(urls : [URL], method : LogSelectionMethod) -> Bool {
+        let destFolder = self.localFolder
+        var someNew : Bool = false
+        
+        for url in urls {
+            if url.logFileType == .rpt {
+                if self.copyRptFile(file: url,destFolder: destFolder) {
+                    someNew = true
+                }
+            }else{
+                let dest = destFolder.appendingPathComponent(url.lastPathComponent)
+                if self.copyLogFile(file: url, dest: dest) {
+                    someNew = true
+                }
+            }
+        }
+        return someNew
     }
     
     //MARK: - cloudKit Records management
@@ -1035,6 +1053,24 @@ extension String {
             let d = (self as NSString).deletingPathExtension
             if let guess = d.components(separatedBy: "_").last {
                 return guess
+            }
+        }
+        return nil
+    }
+
+    var logFileGuessedDated : Date? {
+        if self.isLogFile || self.isRptFile {
+            let d = (self as NSString).deletingPathExtension
+            let components = d.components(separatedBy: "_")
+            if components.count > 2 {
+                let date = "20" + components[1] + components[2]
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyyMMddHHmmss"
+                let rv = formatter.date(from: date)
+                if rv == nil {
+                    //
+                }
+                return rv
             }
         }
         return nil
