@@ -105,6 +105,9 @@ class FlightLogViewModel {
             self.flightLogFileInfo.flysto_record?.status_date = Date()
         }
     }
+    var flystoUpdateDate : Date? {
+        return self.flightLogFileInfo.flysto_record?.status_date
+    }
     
     var savvyStatus : FlightSavvyRecord.Status {
         get {
@@ -115,6 +118,9 @@ class FlightLogViewModel {
             self.flightLogFileInfo.savvy_record?.status = newValue
             self.flightLogFileInfo.savvy_record?.status_date = Date()
         }
+    }
+    var savvyUpdateDate : Date? {
+        return self.flightLogFileInfo.savvy_record?.status_date
     }
     var flystoStatusText : String {
         var messages : [String] = []

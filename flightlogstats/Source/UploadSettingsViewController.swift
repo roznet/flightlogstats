@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import OSLog
 
 class UploadSettingsViewController: UIViewController {
     weak var flightLogViewModel : FlightLogViewModel? = nil
@@ -52,5 +53,22 @@ class UploadSettingsViewController: UIViewController {
     func viewFromSettings(){
         self.savvySwitch.isOn = Settings.shared.savvyEnabled
         self.flystoSwitch.isOn = Settings.shared.flystoEnabled
+        
+        if let savvyStatus = self.flightLogViewModel?.savvyStatus {
+            if let date = self.flightLogViewModel?.savvyUpdateDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .short
+                formatter.timeStyle = .short
+                Logger.ui.info("Savvy: \(savvyStatus) Last upload \(formatter.string(from: date))")
+            }
+        }
+        if let flystoStatus = self.flightLogViewModel?.flystoStatus{
+            if let date = self.flightLogViewModel?.flystoUpdateDate {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .short
+                formatter.timeStyle = .short
+                Logger.ui.info("Flysto: \(flystoStatus) Last upload \(formatter.string(from: date))")
+            }
+        }
     }
 }
