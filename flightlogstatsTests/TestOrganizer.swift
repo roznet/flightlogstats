@@ -85,21 +85,91 @@ class TestOrganizer: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-    
+   
+    // order array of URL by guessed date if possible
+    func orderLogsByDate(urls : [URL]) -> [URL] {
+        var ordered : [URL] = []
+        for url in urls {
+            if url.isLogFileTestFileToSkip {
+                continue
+            }
+            if url.logFileGuessedDate != nil {
+                ordered.append(url)
+            }
+        }
+        ordered.sort {
+            $0.logFileGuessedDate! < $1.logFileGuessedDate!
+        }
+        return ordered
+    }
+    func runImportTest(organizer: FlightLogOrganizer, urls : [URL], bundeUrl : URL){
+        let writeableLocalUrl = organizer.localFolder
+        let startUrls = self.findLocalLogFiles(url: bundeUrl, types: [.log])
+        //var localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
+       
+        var orderedLogs = self.orderLogsByDate(urls: urls)
+        var one : URL? = nil
+        for url in orderedLogs {
+            if url.isLogFileTestFileToSkip{
+                continue
+            }
+            if url.isLogFile {
+                one = url
+                break
+            }
+        }
+        guard let url = one else {
+            XCTAssertTrue(false)
+            return
+        }
+       
+        // Import one file only
+        var someNew = organizer.importFiles(urls: urls, method: .selectedFile([url]))
+        XCTAssertTrue(someNew)
+        var localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
+        XCTAssertTrue(localUrls.count == 1)
+        XCTAssertEqual(localUrls.first!.lastPathComponent,url.lastPathComponent)
+        
+        // now import everything since 2022
+        //unix time for 2022-01-01 00:00:00 is 1640995200
+        let date2022 = Date(timeIntervalSince1970: 1640995200)
+        someNew = organizer.importFiles(urls: urls, method: .afterDate(date2022))
+        XCTAssertTrue(someNew)
+        localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.rpt])
+        orderedLogs = self.orderLogsByDate(urls: localUrls)
+        XCTAssertEqual(orderedLogs.count, localUrls.count)
+        //Note we don't test sinceLatestImportedFile because here we don't update
+        //Records, so won't know which is latest date, we will test that case in syncCloud
+        
+        // Now import everything else
+        someNew = organizer.importFiles(urls: urls, method: .allMissingFromFolder)
+        XCTAssertTrue(someNew)
+        localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.rpt])
+        XCTAssertTrue(localUrls.count == startUrls.count)
+        
+    }
     
     func testLogFileDiscovery() throws {
         // This will test that:
         //   1. we find list of files in local directory
         //   2. logic if we remove one file from known ones that it identifies missing one
         
-        guard let url = Bundle(for: type(of: self)).resourceURL
+        guard let bundleUrl : URL = Bundle(for: type(of: self)).resourceURL
         else {
             XCTAssertTrue(false)
             return
         }
         
+        guard let organizer = self.createOrganizerWithMemoryContainer(localFolderName: "testDiscovery", cloudFolderName: nil)
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+        
+        
         let expectation = XCTestExpectation(description: "found files")
-        FlightLogOrganizer.search(in: [url]){
+        FlightLogOrganizer.search(in: [bundleUrl],
+                                  completion:  {
             result in
             switch result {
                 
@@ -107,22 +177,10 @@ class TestOrganizer: XCTestCase {
                 Logger.test.error("failed to search \(error.localizedDescription)")
                 XCTAssertTrue(false)
             case .success(let urls):
-                let loglist = FlightLogFileList(urls: urls)
-                XCTAssertGreaterThan(loglist.flightLogFiles.count, 0)
-                
-                XCTAssertNotNil(urls.last)
-                if let last = urls.last {
-                    let urlsMinusLast = [URL](urls.dropLast())
-                    let incompleteLogList = FlightLogFileList(urls: urlsMinusLast)
-                    let missingLogList = incompleteLogList.missing(from: loglist)
-                    XCTAssertEqual(missingLogList.flightLogFiles.count, 1)
-                    if let missingLog = missingLogList.flightLogFiles.last {
-                        XCTAssertEqual(last.lastPathComponent, missingLog.name)
-                    }
-                }
+                self.runImportTest(organizer: organizer, urls: urls, bundeUrl: bundleUrl)
             }
             expectation.fulfill()
-        }
+        })
         self.wait(for: [expectation], timeout: TimeInterval(10.0))
     }
     
@@ -141,7 +199,7 @@ class TestOrganizer: XCTestCase {
             if name.hasPrefix("log_small") {
                 continue
             }
-            if let date = name.logFileGuessedDated {
+            if let date = name.logFileGuessedDate {
                 if name.logFileType == .log {
                     let rebuildPrefix = "log_\(reconstructFormatter.string(from: date))"
                     XCTAssertTrue(name.hasPrefix(rebuildPrefix))
@@ -154,27 +212,21 @@ class TestOrganizer: XCTestCase {
             }
         }
     }
-    
-    func testOrganizerSyncCloud() throws {
-        // This will test that
-        //   1. logic of copying missing from from cloud works: cloud proxied by bundle path, and local by a testLocal folder initially empty
-        //   2. after copying form cloud (bundle path) the coredata container updated
-        
-        guard let bundleUrl = Bundle(for: type(of: self)).resourceURL
-        else {
-            XCTAssertTrue(false)
-            return
-        }
-        
+    func createOrganizerWithMemoryContainer(localFolderName : String, cloudFolderName : String?) -> FlightLogOrganizer? {
         let organizer = FlightLogOrganizer()
-        let writeableLocalUrl = organizer.localFolder.appendingPathComponent("testLocal")
-        let writeableCloudUrl = organizer.localFolder.appendingPathComponent("testCloud")
-        
+        let writeableBase =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let writeableLocalUrl = writeableBase.appendingPathComponent(localFolderName)
+        organizer.localFolder = writeableLocalUrl
+        var toClean : [URL] = [writeableLocalUrl]
+        if let cloudFolderName = cloudFolderName {
+            let writeableCloudUrl = writeableBase.appendingPathComponent(cloudFolderName)
+            toClean.append(writeableCloudUrl)
+            organizer.cloudFolder = writeableCloudUrl
+        }
         Logger.test.info("Cleaning test folders")
-        for writeableUrl in [writeableCloudUrl, writeableLocalUrl] {
+        for writeableUrl in toClean {
             guard self.prepareAndClearFolder(url: writeableUrl) else {
-                XCTAssertTrue(false)
-                return
+                return nil
             }
             Logger.test.info("Cleaned and prepared \(writeableUrl.path)")
         }
@@ -187,14 +239,33 @@ class TestOrganizer: XCTestCase {
             (storeDescription,error) in
             if let error = error {
                 Logger.test.error("Failed to load \(error.localizedDescription)")
+                return
             }
         }
         organizer.persistentContainer = container
+        return organizer
+    }
+    func testOrganizerSyncCloud() throws {
+        // This will test that
+        //   1. logic of copying missing from from cloud works: cloud proxied by bundle path, and local by a testLocal folder initially empty
+        //   2. after copying form cloud (bundle path) the coredata container updated
+        
+        guard let bundleUrl = Bundle(for: type(of: self)).resourceURL
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+        
+        guard let organizer = self.createOrganizerWithMemoryContainer(localFolderName: "testLocal", cloudFolderName: "testCloud"),
+              let writeableCloudUrl = organizer.cloudFolder
+        else {
+            XCTAssertTrue(false)
+            return
+        }
         
         // set up cloud folder to be bundle, should copy eveyrthing locally
-        organizer.localFolder = writeableLocalUrl
-        organizer.cloudFolder = writeableCloudUrl
-        
+        let writeableLocalUrl = organizer.localFolder
+            
         // first try to copy to local what is missing
         organizer.copyMissingFilesToLocal(urls: [bundleUrl], method: .allMissingFromFolder, process: false)
         
@@ -327,5 +398,11 @@ class TestOrganizer: XCTestCase {
             }
         }
         expectation.fulfill()
+    }
+}
+
+extension URL {
+    var isLogFileTestFileToSkip : Bool {
+        return self.isLogFile && self.lastPathComponent.hasPrefix("log_small")
     }
 }

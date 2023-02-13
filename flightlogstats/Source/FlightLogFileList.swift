@@ -37,6 +37,7 @@ class FlightLogFileList {
         self.flightLogFiles.sort { $0.name > $1.name }
     }
     
+    @available(*, deprecated, message: "Use logic in organizer")
     func missing(from : FlightLogFileList) -> FlightLogFileList {
         let thisSet = Set<String>(self.flightLogFiles.map { return $0.name })
         var done = Set<String>()
@@ -55,6 +56,7 @@ class FlightLogFileList {
         return FlightLogFileList(logs: logs)
     }
     
+    @available(*, deprecated, message: "Use logic in organizer")
     func copyMissing(to destFolder : URL) -> Bool {
         var someNew : Bool = false
         for log in self.flightLogFiles {

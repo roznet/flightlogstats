@@ -44,7 +44,7 @@ class FlightLogFileRecord: NSManagedObject {
             }
         }
     }
-    
+    var guessedDate : Date? { return self.log_file_name?.logFileGuessedDate }
     var legs : [FlightLeg] { return self.flightLog?.legs ?? [] }
     
     var recordStatus : RecordStatus {

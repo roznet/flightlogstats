@@ -23,16 +23,17 @@ class FlightLogOrganizer {
         case failedToReadFolder
     }
     public static var shared = FlightLogOrganizer()
+    public static let scheduler = DispatchQueue(label: "net.ro-z.flightlogstats.scheduler")
     
     //MARK: - List management
-    
+   
+    /// flight log records sorted most recent first
     private var flightLogFileInfos : [FlightLogFileRecord] {
         DispatchQueue.synchronized(self) {
             let list = Array(self.managedFlightLogs.values)
             return list.sorted { $0.isNewer(than: $1) }
         }
     }
-    public static let scheduler = DispatchQueue(label: "net.ro-z.flightlogstats.scheduler")
     
     enum ListRequest {
         case all
@@ -40,7 +41,8 @@ class FlightLogOrganizer {
         case filtered
     }
     typealias ListFilter = (FlightLogFileRecord) -> Bool
-
+    
+    /// most recent flight log record
     func first(request : ListRequest,  filter : ListFilter? = nil) -> FlightLogFileRecord? {
         return self.flightLogFileInfos(request: request, filter: filter).first
     }
@@ -693,14 +695,40 @@ class FlightLogOrganizer {
         var someNew : Bool = false
         
         for url in urls {
-            if url.logFileType == .rpt {
-                if self.copyRptFile(file: url,destFolder: destFolder) {
-                    someNew = true
+            var shouldInclude = false
+            switch method {
+            case .afterDate(let from):
+                if let guessedDate = url.logFileGuessedDate,
+                   guessedDate >= from {
+                    shouldInclude = true
                 }
-            }else{
-                let dest = destFolder.appendingPathComponent(url.lastPathComponent)
-                if self.copyLogFile(file: url, dest: dest) {
-                    someNew = true
+            case .allMissingFromFolder:
+                shouldInclude = true
+            case .selectedFile(let selectedUrls):
+                if selectedUrls.contains(url) {
+                    shouldInclude = true
+                }
+            case .sinceLatestImportedFile:
+                if let first = self.first(request: .all) {
+                    if let guessedDate = url.logFileGuessedDate,
+                       let firstGuessedDate = first.guessedDate{
+                        shouldInclude = (guessedDate >= firstGuessedDate)
+                    }
+                }else{
+                    // If no log at all, import all
+                    shouldInclude = true
+                }
+            }
+            if shouldInclude {
+                if url.logFileType == .rpt {
+                    if self.copyRptFile(file: url,destFolder: destFolder) {
+                        someNew = true
+                    }
+                }else{
+                    let dest = destFolder.appendingPathComponent(url.lastPathComponent)
+                    if self.copyLogFile(file: url, dest: dest) {
+                        someNew = true
+                    }
                 }
             }
         }
@@ -1058,7 +1086,7 @@ extension String {
         return nil
     }
 
-    var logFileGuessedDated : Date? {
+    var logFileGuessedDate : Date? {
         if self.isLogFile || self.isRptFile {
             let d = (self as NSString).deletingPathExtension
             let components = d.components(separatedBy: "_")
@@ -1081,5 +1109,6 @@ extension URL {
     typealias LogFileType = String.LogFileType
     var logFileType : LogFileType { return self.lastPathComponent.logFileType }
     var isLogFile : Bool { return self.lastPathComponent.isLogFile }
+    var logFileGuessedDate : Date? { return self.lastPathComponent.logFileGuessedDate }
 }
 
