@@ -9,24 +9,21 @@ import UIKit
 
 class AppSettingsViewController: UIViewController {
 
+    private let importMenuConfig : [(Settings.ImportMethod,String)] = [ (.automatic, "Automatic"),
+                                                              (.fromDate, "From Date"),
+                                                              (.selectedFile, "Selected File"),
+                                                              (.sinceLastImport, "Since Last Import") ]
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-        let menuAction : [UIAction] = [
-        UIAction(title: "Automatic", image: nil, identifier: nil, discoverabilityTitle: nil, attributes: [], state: .off, handler: { _ in
-            Settings.shared.importMethod = .automatic
-            self.viewFromSettings()
-        }),
-        UIAction(title: "From Date", image: nil, identifier: nil, discoverabilityTitle: nil, attributes: [], state: .off, handler: { _ in
-            Settings.shared.importMethod = .fromDate
-            self.viewFromSettings()
-        }),
-        UIAction(title: "From File", image: nil, identifier: nil, discoverabilityTitle: nil, attributes: [], state: .off, handler: { _ in
-            Settings.shared.importMethod = .fromFile
-            self.viewFromSettings()
-        })
-        ]
+        var menuAction : [UIAction] = []
+        for (method,title) in importMenuConfig {
+            menuAction.append(UIAction(title: title, image: nil, identifier: nil, discoverabilityTitle: nil, attributes: [], state: .off, handler: { _ in
+                Settings.shared.importMethod = method
+                self.viewFromSettings()
+            }))
+        }
+        
         self.importMethodButton.menu = UIMenu(title: "Import Method", image: nil, identifier: nil, options: [], children: menuAction)
     }
     
@@ -56,14 +53,20 @@ class AppSettingsViewController: UIViewController {
         self.savvySwitch.isOn = Settings.shared.savvyEnabled
         self.flyStoSwitch.isOn = Settings.shared.flystoEnabled
         self.datePicker.date = Settings.shared.importStartDate
-        switch Settings.shared.importMethod {
-            case .automatic:
-                self.importMethodButton.setTitle("Automatic", for: .normal)
-                case .fromDate:
-                    self.importMethodButton.setTitle("From Date", for: .normal)
-                case .fromFile:
-                    self.importMethodButton.setTitle("From File", for: .normal)
+        
+        for (method,title) in self.importMenuConfig {
+            if Settings.shared.importMethod == method {
+                self.importMethodButton.setTitle(title, for: .normal)
+                for child in self.importMethodButton.menu!.children {
+                    guard let action = child as? UIAction else {
+                        continue
+                    }
+                    action.state = action.title == title ? .on : .off
+                }
+                break
+            }
         }
+        
     }
 
     

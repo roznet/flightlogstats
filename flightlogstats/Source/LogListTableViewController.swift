@@ -427,24 +427,32 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     @objc func addLog(button : UIBarButtonItem){
         // mac should select files, ios just import folder
-#if targetEnvironment(macCatalyst)
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [
-            .commaSeparatedText, .folder
-        ])
-        documentPicker.allowsMultipleSelection = true
-#else
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [
-            .folder
-        ])
-#endif
+        var uttypes : [UTType] = [ .folder ]
+        var multipleSelection : Bool = false
+        if Settings.shared.importMethod == .selectedFile {
+            uttypes = [ .commaSeparatedText,.folder]
+            multipleSelection = true
+        }
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: uttypes)
+        documentPicker.allowsMultipleSelection = multipleSelection
         documentPicker.delegate = self
         present(documentPicker, animated: true)
     }
-
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         self.progressReportOverlay?.prepareOverlay(message: .addingFiles)
-        self.logFileOrganizer.copyMissingFilesToLocal(urls: urls, method: .allMissingFromFolder)
+        var method : FlightLogOrganizer.LogSelectionMethod = .allMissingFromFolder
+        switch Settings.shared.importMethod {
+        case .selectedFile:
+            method = .selectedFile(urls)
+        case .sinceLastImport:
+            method = .sinceLatestImportedFile
+        case .fromDate:
+            method = .afterDate(Settings.shared.importStartDate)
+        case .automatic:
+            method = .allMissingFromFolder
+        }
+        self.logFileOrganizer.copyMissingFilesToLocal(urls: urls, method: method)
         
         controller.dismiss(animated: true)
     }

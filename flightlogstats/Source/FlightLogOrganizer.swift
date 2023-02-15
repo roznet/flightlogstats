@@ -667,7 +667,7 @@ class FlightLogOrganizer {
     ///   - urls: url to look for new file.
     ///   - process: if true will also sync cloud and add to the database new files, use false for testing
     func copyMissingFilesToLocal(urls : [URL], method : LogSelectionMethod, process : Bool = true) {
-        
+        Logger.app.info("Starting import \(method)")
         Self.search(in: urls ){
             result in
             switch result {

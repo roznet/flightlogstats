@@ -125,7 +125,8 @@ struct Settings {
     enum ImportMethod : String {
         case automatic
         case fromDate
-        case fromFile
+        case sinceLastImport
+        case selectedFile
     }
     enum Key : String {
         case open_file_mode = "open-file-mode"
@@ -206,9 +207,16 @@ struct Settings {
     var savvyEnabled : Bool
     @CodableStorage(key: .savvy_token)
     var savvyToken : String?
-
+   
+    //Default on macos is selected file, on iOS automatic
+#if targetEnvironment(macCatalyst)
+    @EnumStorage(key: .import_method, defaultValue: .selectedFile)
+    var importMethod : ImportMethod
+#else
     @EnumStorage(key: .import_method, defaultValue: .automatic)
     var importMethod : ImportMethod
+#endif
+    
 
     @UserStorage(key: .import_startdate, defaultValue: Date())
     var importStartDate : Date
