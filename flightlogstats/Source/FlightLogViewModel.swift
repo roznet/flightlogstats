@@ -111,7 +111,7 @@ class FlightLogViewModel {
     
     var savvyStatus : FlightSavvyRecord.Status {
         get {
-            return self.flightLogFileInfo.savvy_record?.status ?? .ready
+            return self.flightLogFileInfo.savvy_record?.status ?? .pending
         }
         set {
             self.flightLogFileInfo.ensureSavvyStatus()

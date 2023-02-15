@@ -16,8 +16,8 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var date: UILabel!
     
-    @IBOutlet weak var flystoButton: UIButton!
-    @IBOutlet weak var flystoStatus: UILabel!
+    @IBOutlet weak var remoteServiceButton: UIButton!
+    @IBOutlet weak var remoteServiceStatus: UILabel!
     
     @IBOutlet weak var timeCollectionView: UICollectionView!
     @IBOutlet weak var fuelCollectionView: UICollectionView!
@@ -36,24 +36,10 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
         super.viewDidLoad()
 
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
-        self.flystoButton.addGestureRecognizer(longPress)
+        self.remoteServiceButton.addGestureRecognizer(longPress)
     }
 
     
-    @objc func longPress(_ sender : Any) {
-        // check if long press started
-        if let longPress = sender as? UILongPressGestureRecognizer, longPress.state == .began {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            if let vc = storyboard.instantiateViewController(withIdentifier: "uploadSettingViewController") as? UploadSettingsViewController {
-                vc.modalPresentationStyle = .popover
-                vc.popoverPresentationController?.sourceView = self.flystoButton
-                vc.popoverPresentationController?.sourceRect = self.flystoButton.bounds
-                vc.summaryViewController = self
-                vc.flightLogViewModel = self.flightLogViewModel
-                self.present(vc, animated: true, completion: nil)
-            }
-        }
-    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if self.flightLogViewModel?.shouldBuild ?? true {
@@ -87,9 +73,30 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
     // MARK: - Actions
     
     @IBAction func exportButton(_ sender: Any) {
-        self.flightLogViewModel?.startServiceSynchronization(viewController: self)
+        if Settings.shared.savvyEnabled || Settings.shared.flystoEnabled {
+            self.flightLogViewModel?.startServiceSynchronization(viewController: self)
+        }else{
+            self.showServiceConfigurationPopup()
+        }
     }
     
+    @objc func longPress(_ sender : Any) {
+        // check if long press started
+        if let longPress = sender as? UILongPressGestureRecognizer, longPress.state == .began {
+            self.showServiceConfigurationPopup()
+        }
+    }
+    func showServiceConfigurationPopup() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let vc = storyboard.instantiateViewController(withIdentifier: "uploadSettingViewController") as? UploadSettingsViewController {
+            vc.modalPresentationStyle = .popover
+            vc.popoverPresentationController?.sourceView = self.remoteServiceButton
+            vc.popoverPresentationController?.sourceRect = self.remoteServiceButton.bounds
+            vc.summaryViewController = self
+            vc.flightLogViewModel = self.flightLogViewModel
+            self.present(vc, animated: true, completion: nil)
+        }
+    }
     
     /*
     // MARK: - Navigation
@@ -107,16 +114,16 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
                 self.name.textColor = UIColor.systemGray
                 
-                self.flystoStatus.attributedText = NSAttributedString(string: "Ready",attributes: ViewConfig.shared.subTextAttributes)
-                self.flystoStatus.textColor = UIColor.systemGray
-                self.flystoButton.isEnabled = true
+                self.remoteServiceStatus.attributedText = NSAttributedString(string: self.serviceStatusDescription, attributes: ViewConfig.shared.subTextAttributes)
+                self.remoteServiceStatus.textColor = UIColor.systemGray
+                self.remoteServiceButton.isEnabled = true
             }else{
-                self.date.attributedText = NSAttributedString(string: "Pending", attributes: ViewConfig.shared.cellAttributes)
+                self.date.attributedText = NSAttributedString(string: self.serviceStatusDescription, attributes: ViewConfig.shared.cellAttributes)
                 self.name.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.cellAttributes)
-                self.flystoStatus.attributedText = NSAttributedString(string: "Pending",attributes: ViewConfig.shared.subTextAttributes)
+                self.remoteServiceStatus.attributedText = NSAttributedString(string: "Pending",attributes: ViewConfig.shared.subTextAttributes)
                 self.name.textColor = UIColor.systemGray
-                self.flystoStatus.textColor = UIColor.systemGray
-                self.flystoButton.isEnabled = false
+                self.remoteServiceStatus.textColor = UIColor.systemGray
+                self.remoteServiceButton.isEnabled = false
             }
             self.timeCollectionView.isHidden = true
             self.fuelCollectionView.isHidden = true
@@ -124,7 +131,9 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
             self.aircraftCollectionView.isHidden = true
         }
     }
-
+    var serviceStatusDescription : String {
+        return self.flightLogViewModel?.flystoStatusText ?? "Pending"
+    }
     func updateUI(){
         AppDelegate.worker.async {
             if self.flightLogFileInfo?.flightSummary != nil {
@@ -135,9 +144,9 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                         self.legsCollectionView.isHidden = false
                         self.aircraftCollectionView.isHidden = false
 
-                        self.flystoStatus.attributedText = NSAttributedString(string: self.flightLogViewModel?.flystoStatusText ?? "Ready", attributes: ViewConfig.shared.subTextAttributes)
-                        self.flystoStatus.textColor = UIColor.systemGray
-                        self.flystoButton.isEnabled = true
+                        self.remoteServiceStatus.attributedText = NSAttributedString(string: self.serviceStatusDescription,  attributes: ViewConfig.shared.subTextAttributes)
+                        self.remoteServiceStatus.textColor = UIColor.systemGray
+                        self.remoteServiceButton.isEnabled = true
 
                         if let logname = self.flightLogFileInfo?.log_file_name {
                             self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)
