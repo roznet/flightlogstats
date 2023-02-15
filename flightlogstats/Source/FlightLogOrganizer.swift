@@ -25,7 +25,7 @@ class FlightLogOrganizer {
     public static var shared = FlightLogOrganizer()
     public static let scheduler = DispatchQueue(label: "net.ro-z.flightlogstats.scheduler")
     
-    //MARK: - List management
+    //MARK: - Flight Log List management
    
     /// flight log records sorted most recent first
     private var flightLogFileInfos : [FlightLogFileRecord] {
@@ -41,6 +41,17 @@ class FlightLogOrganizer {
         case filtered
     }
     typealias ListFilter = (FlightLogFileRecord) -> Bool
+    
+    func listFilter(aircrafts : [AircraftRecord]) -> ListFilter {
+        typealias SystemId = AircraftRecord.SystemId
+        let systemIds : [String] = aircrafts.map { $0.systemId }
+        let set = Set(systemIds)
+        return { record in
+            guard let aircraft = record.aircraftRecord else { return false }
+            
+            return aircraft.systemId != "" && set.contains(aircraft.systemId)
+        }
+    }
     
     /// most recent flight log record
     func first(request : ListRequest,  filter : ListFilter? = nil) -> FlightLogFileRecord? {
@@ -72,7 +83,6 @@ class FlightLogOrganizer {
     }
 
     var count : Int { return managedFlightLogs.count }
-    var aircraftCount : Int { return self.managedAircrafts.count }
     
     subscript(_ name : String) -> FlightLogFileRecord? {
         return self.managedFlightLogs[name]
@@ -125,6 +135,8 @@ class FlightLogOrganizer {
 
     //MARK: - Aircraft management
     
+    var aircraftCount : Int { return self.managedAircrafts.count }
+    var aircraftRecords : [AircraftRecord] { return Array(self.managedAircrafts.values) }
     func aircraft(systemId : SystemId, airframeName : String? = nil) -> AircraftRecord {
         if let rv = self.managedAircrafts[systemId] {
             return rv

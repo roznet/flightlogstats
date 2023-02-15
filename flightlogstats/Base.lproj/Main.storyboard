@@ -1570,6 +1570,47 @@
                                     <outlet property="totalTime" destination="y30-6u-gfG" id="lE2-aO-C9q"/>
                                 </connections>
                             </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="aircraftcell" id="rfM-rQ-7of" userLabel="aircraftcell" customClass="AircraftTableViewCell" customModule="FlightLogStats" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="154.5" width="420" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rfM-rQ-7of" id="k0p-do-RGh">
+                                    <rect key="frame" x="100" y="0.0" width="320" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="hVN-XR-3t9">
+                                            <rect key="frame" x="105" y="-78.5" width="240" height="297"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XNV-wC-mHL" userLabel="Identifier">
+                                                    <rect key="frame" x="0.0" y="0.0" width="240" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Msv-Ry-Zch" userLabel="Airframe">
+                                                    <rect key="frame" x="0.0" y="20.5" width="240" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1YC-N2-FGT" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="41" width="240" height="128"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
+                                                <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4fd-NO-2d5" customClass="MeasurementView" customModule="FlightLogStats" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="169" width="240" height="128"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                </view>
+                                            </subviews>
+                                        </stackView>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="airframeLabel" destination="Msv-Ry-Zch" id="M17-Sp-952"/>
+                                    <outlet property="distanceMeasurementView" destination="4fd-NO-2d5" id="loT-BL-nQD"/>
+                                    <outlet property="identifierLabel" destination="XNV-wC-mHL" id="h40-0D-IDG"/>
+                                    <outlet property="timeMeasurementView" destination="1YC-N2-FGT" id="dsQ-a1-AWe"/>
+                                </connections>
+                            </tableViewCell>
                         </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="JdO-DO-Gh9" id="Kv5-5P-V01"/>

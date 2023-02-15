@@ -23,6 +23,7 @@ struct Trip {
     enum Aggregation {
         case awayFromBase(Airport)
         case calendarUnit(GCStatsDateBuckets)
+        case list
     }
     
     var label : String
@@ -32,6 +33,14 @@ struct Trip {
     init(base: Airport) {
         self.aggregation = .awayFromBase(base)
         self.label = "Trip"
+    }
+    
+    init(flightRecords : [FlightLogFileRecord], label : String) {
+        self.label = label
+        self.aggregation = .list
+        for record in flightRecords {
+            self.add(info: record)
+        }
     }
     
     init(unit : NSCalendar.Unit, referenceDate : Date? = nil){
@@ -143,6 +152,8 @@ struct Trip {
             return self.check(base: base, info: info)
         case .calendarUnit(let bucket):
             return self.check(bucket: bucket, info: info)
+        case .list:
+            return .sameTrip
         }
     }
 
@@ -157,6 +168,8 @@ struct Trip {
                 return Trip(bucket: bucket)
             }
             return Trip(unit: bucket.calendarUnit, referenceDate: bucket.refOrNil)
+        case .list:
+            return nil
         }
     }
     
@@ -164,8 +177,18 @@ struct Trip {
         if let stats = self.stats[field] {
             switch field {
             case .FuelStart:
+                for flight in self.flightLogFileInfos.reversed() {
+                    if let summary = flight.flightSummary {
+                        return summary.measurement(for: .FuelStart)
+                    }
+                }
                 return nil
             case .FuelEnd:
+                for flight in self.flightLogFileInfos {
+                    if let summary = flight.flightSummary {
+                        return summary.measurement(for: .FuelEnd)
+                    }
+                }
                 return nil
             case .FuelUsed,.FuelTotalizer:
                 return stats.sumMeasurement

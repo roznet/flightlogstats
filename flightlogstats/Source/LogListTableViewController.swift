@@ -21,6 +21,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
 
     var logInfoList : [FlightLogFileRecord] = []
     var fullLogInfoList : [FlightLogFileRecord] = []
+    var aircraftsList : [AircraftRecord] = []
     
     var logFileOrganizer = FlightLogOrganizer.shared
     
@@ -30,10 +31,19 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     var searchController : UISearchController = UISearchController()
     var isSearchBarEmpty : Bool { return searchController.searchBar.text?.isEmpty ?? true }
     
+    enum DisplayMode {
+        case flights
+        case aircrafts
+    }
     var filterEmpty = true
+    var displayMode : DisplayMode = .flights
     
     func flightInfo(at indexPath : IndexPath) -> FlightLogFileRecord? {
         return self.logInfoList[indexPath.row]
+    }
+    
+    func aircraft(at indexPath : IndexPath) -> AircraftRecord? {
+        return self.aircraftsList[indexPath.row]
     }
     
     // for iphone, or start in list more delegate may not be instantiated yet
@@ -70,7 +80,14 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 }
                 self.updateButtons()
             },
-
+            UIAction(title: self.displayMode == .flights ? "Show Aircrafts" : "Show Flights",
+                     image: UIImage(systemName: self.displayMode == .aircrafts ? "airplane" :  "point.topleft.down.curvedto.point.filled.bottomright.up")){
+                _ in
+                self.displayMode = self.displayMode == .aircrafts ? .flights : .aircrafts
+                self.buildList()
+                self.tableView.reloadData()
+                self.updateButtons()
+            },
             UIAction(title: self.filterEmpty ? "Show non-flights" : "Show flights only", image: UIImage(systemName: "minus.circle")){
                 _ in
                 self.filterEmpty = !self.filterEmpty
@@ -224,7 +241,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     //MARK: - TableViewController
     
     enum TableSection : Int, CaseIterable {
-        case statistics = 0, flights
+        case statistics = 0, flights, aircrafts
         
         init?(indexPath : IndexPath) {
             self.init(rawValue: indexPath.section)
@@ -238,14 +255,28 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch TableSection(rawValue: section) {
         case .flights:
-            return self.logInfoList.count
+            switch self.displayMode {
+            case .flights:
+                return self.logInfoList.count
+            case .aircrafts:
+                return 0
+            }
         case .statistics:
             return 1
+        case .aircrafts:
+            switch self.displayMode {
+            case .flights:
+                return 0
+            case .aircrafts:
+                return self.aircraftsList.count
+            }
         case .none:
             return 0
         }
     }
-    
+    // aircraft:
+    // Id, Last Flight date, last light airport
+    // number of flights, last flight fuel
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch TableSection(indexPath: indexPath) {
         case .flights:
@@ -263,6 +294,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                         }
                     }
                 }
+            }
+            return cell
+        case .aircrafts:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "aircraftcell", for: indexPath)
+            if let cell = cell as? AircraftTableViewCell,
+               let aircraft = self.aircraft(at: indexPath){
+                cell.update(aircraft: aircraft, trip: self.aircraftTrips[aircraft.systemId])
             }
             return cell
         case .statistics:
@@ -288,6 +326,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             return 100.0
         case .none:
             return 0.0
+        case .aircrafts:
+            return 100.0
         }
     }
 
@@ -306,6 +346,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         case .statistics:
             self.userInterfaceModeManager?.userInterfaceMode = .stats
             self.updateButtons()
+        case .aircrafts:
+            return
         case .none:
             return
         }
@@ -341,6 +383,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         switch TableSection(indexPath: indexPath) {
         case .flights:
             return true
+        case .aircrafts:
+            return false
         case .statistics:
             return false
         case .none:
@@ -363,7 +407,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 Logger.app.info("Delete \(info)")
             }
 
-            
+        case .aircrafts:
+            break
         case .statistics,.none:
             break
         }
@@ -373,21 +418,31 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     //MARK: - build list functionality
     
     func buildList() {
-        Logger.ui.info( "aircrafts \(self.logFileOrganizer.aircraftSystemIds)")
-        
         if self.filterEmpty {
             self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos(request: .flightsOnly)
             DispatchQueue.main.async {
                 self.updateSearchedList()
+                self.buildAircraftList()
                 self.tableView.reloadData()
                 self.ensureOneDetailDisplayed()
             }
         }else{
             self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos(request: .all)
             self.updateSearchedList()
+            self.buildAircraftList()
             self.tableView.reloadData()
             self.ensureOneDetailDisplayed()
         }
+    }
+    private var aircraftTrips : [AircraftRecord.SystemId : Trip] = [:]
+    private func buildAircraftList() {
+        self.aircraftsList = self.logFileOrganizer.aircraftRecords
+        self.aircraftTrips = [:]
+        for aircraft in self.aircraftsList {
+            let records = self.logFileOrganizer.flightLogFileInfos(request: .flightsOnly, filter: self.logFileOrganizer.listFilter(aircrafts: [aircraft]))
+            self.aircraftTrips[aircraft.systemId] = Trip(flightRecords: records, label: aircraft.aircraftIdentifier)
+        }
+        Logger.app.info("Build aircraft list")
     }
 
     private func ensureOneDetailDisplayed() {

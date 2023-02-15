@@ -103,7 +103,24 @@ struct DisplayedValue {
         }
     }
     
-    
+    func setup(measurementView : MeasurementView, geometry : RZNumberWithUnitGeometry){
+        guard case let .measurement(measurement) = self.value else { return }
+        switch self.formatter {
+        case .measurement(let fmt):
+            measurementView.formatter = MeasurementView.Formatter.measurement(fmt)
+            measurementView.measurement = measurement
+            measurementView.geometry = geometry
+            measurementView.attributes = geometry.defaultNumberAttribute
+            
+        case .compound(let comp):
+            measurementView.formatter = MeasurementView.Formatter.compound(comp)
+            measurementView.measurement = measurement
+            measurementView.geometry = geometry
+            measurementView.attributes = geometry.defaultNumberAttribute
+        case .date:
+            break
+        }
+    }
 }
 
 class DisplayContext {
