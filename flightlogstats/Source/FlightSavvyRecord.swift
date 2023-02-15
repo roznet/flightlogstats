@@ -9,7 +9,8 @@ import Foundation
 import CoreData
 
 class FlightSavvyRecord : NSManagedObject {
-    typealias Status = FlightFlyStoRecord.Status
+    typealias Status = RemoteServiceRecord.Status
+    
     
     var status : Status {
         get {

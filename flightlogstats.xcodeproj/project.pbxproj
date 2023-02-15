@@ -81,6 +81,8 @@
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
 		4290B460294E5DA10089B158 /* CsvParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4290B45F294E5DA10089B158 /* CsvParser.swift */; };
 		4291E195296D672100DE2990 /* TestFileGroupBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4291E194296D672100DE2990 /* TestFileGroupBy.swift */; };
+		42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */; };
+		42943B7D299D0133003B7E2A /* RemoteServiceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7C299D0133003B7E2A /* RemoteServiceRecord.swift */; };
 		429949D7282816A100CA1B89 /* DisplayContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D6282816A100CA1B89 /* DisplayContext.swift */; };
 		429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */; };
 		429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */; };
@@ -214,6 +216,8 @@
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		4290B45F294E5DA10089B158 /* CsvParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CsvParser.swift; path = Source/CsvParser.swift; sourceTree = "<group>"; };
 		4291E194296D672100DE2990 /* TestFileGroupBy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFileGroupBy.swift; sourceTree = "<group>"; };
+		42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRequest.swift; path = Source/RemoteServiceRequest.swift; sourceTree = "<group>"; };
+		42943B7C299D0133003B7E2A /* RemoteServiceRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRecord.swift; path = Source/RemoteServiceRecord.swift; sourceTree = "<group>"; };
 		429949D6282816A100CA1B89 /* DisplayContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisplayContext.swift; path = Source/DisplayContext.swift; sourceTree = "<group>"; };
 		429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewCell.swift; path = Source/TableCollectionViewCell.swift; sourceTree = "<group>"; };
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
@@ -516,6 +520,7 @@
 			children = (
 				42A11EA228E883190031D209 /* FlyStoRequests.swift */,
 				423731612985CA3E001A99CA /* SavvyRequests.swift */,
+				42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */,
 			);
 			name = Communications;
 			sourceTree = "<group>";
@@ -576,6 +581,7 @@
 				421EE5BE290C53E600996EC6 /* AircraftRecord.swift */,
 				42A11EA928FAFD7C0031D209 /* FlightFlyStoRecord.swift */,
 				4252A84B298FF088009D7180 /* FlightSavvyRecord.swift */,
+				42943B7C299D0133003B7E2A /* RemoteServiceRecord.swift */,
 			);
 			name = Storage;
 			sourceTree = "<group>";
@@ -797,6 +803,7 @@
 				4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */,
 				423731622985CA3E001A99CA /* SavvyRequests.swift in Sources */,
 				423367A8293BC967007D2285 /* MeasurementCollectionViewCell.swift in Sources */,
+				42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */,
 				425A8DE2287094BD002DCB0C /* FlightFuelRecord.swift in Sources */,
 				42606A20288DE0A300AE858C /* FlightListDataSource.swift in Sources */,
 				4239290D2864D08800CD33C0 /* AircraftPerformance.swift in Sources */,
@@ -805,6 +812,7 @@
 				4264C2342825B58F00F40436 /* Settings.swift in Sources */,
 				421EE5C12928E01E00996EC6 /* FlightLogFileGroupBy.swift in Sources */,
 				42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */,
+				42943B7D299D0133003B7E2A /* RemoteServiceRecord.swift in Sources */,
 				4264C23C282691EF00F40436 /* FuelTanks.swift in Sources */,
 				4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */,
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,

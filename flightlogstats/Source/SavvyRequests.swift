@@ -67,7 +67,9 @@ class SavvyAuthenticateViewController : UIViewController, WKNavigationDelegate {
 }
 
 class SavvyRequests {
-    typealias CompletionHandler = (Status) -> Void
+    typealias Status = RemoteServiceRequest.Status
+    typealias CompletionHandler = RemoteServiceRequest.CompletionHandler
+    
     typealias AircraftIdentifier = AircraftRecord.AircraftIdentifier
     
     struct SavvyAircraft : Codable {
@@ -82,7 +84,6 @@ class SavvyRequests {
         let details : String?
         let id : Int?
     }
-    typealias Status = FlyStoRequests.Status
     
     let viewController : UIViewController
     let url : URL

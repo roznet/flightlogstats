@@ -9,17 +9,7 @@ import Foundation
 import CoreData
 
 class FlightFlyStoRecord : NSManagedObject {
-    enum Status : String {
-        /// files with status pending should be uploaded when opportunity occurs in background upload
-        case pending
-        /// ready is default, and nothing should happen automatically, but can be manually uploaded
-        case ready
-        /// already uploaded, nothing to do
-        case uploaded
-        /// failed
-        case failed
-    }
-
+    typealias Status = RemoteServiceRecord.Status
     var status : Status {
         get {
             if let raw = self.upload_status,

@@ -14,16 +14,8 @@ import ZIPFoundation
 
 class FlyStoRequests {
     
-    typealias CompletionHandler = (Status) -> Void
-    
-    enum Status : Equatable {
-        case success
-        case already
-        case error(String)
-        case progressing(Double)
-        case tokenExpired
-        case denied
-    }
+    typealias Status = RemoteServiceRequest.Status
+    typealias CompletionHandler = RemoteServiceRequest.CompletionHandler
     
     let oauth : OAuth2Swift
     let viewController : UIViewController
