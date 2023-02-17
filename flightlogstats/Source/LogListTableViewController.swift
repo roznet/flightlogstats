@@ -81,7 +81,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.updateButtons()
             },
             UIAction(title: self.displayMode == .flights ? "Show Aircrafts" : "Show Flights",
-                     image: UIImage(systemName: self.displayMode == .aircrafts ? "airplane" :  "point.topleft.down.curvedto.point.filled.bottomright.up")){
+                     image: UIImage(systemName: self.displayMode == .flights ? "airplane" :  "point.topleft.down.curvedto.point.filled.bottomright.up")){
                 _ in
                 self.displayMode = self.displayMode == .aircrafts ? .flights : .aircrafts
                 self.buildList()
@@ -441,6 +441,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         for aircraft in self.aircraftsList {
             let records = self.logFileOrganizer.flightLogFileInfos(request: .flightsOnly, filter: self.logFileOrganizer.listFilter(aircrafts: [aircraft]))
             self.aircraftTrips[aircraft.systemId] = Trip(flightRecords: records, label: aircraft.aircraftIdentifier)
+        }
+        self.aircraftsList.sort() {
+            l,r in
+            if let ldate = l.lastestFlightDate, let rdate = r.lastestFlightDate {
+                return ldate > rdate
+            }
+            return l.aircraftIdentifier < r.aircraftIdentifier
         }
         Logger.app.info("Build aircraft list")
     }

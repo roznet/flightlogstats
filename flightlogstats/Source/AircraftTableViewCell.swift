@@ -19,8 +19,12 @@ class AircraftTableViewCell: UITableViewCell {
     @IBOutlet weak var airframeLabel: UILabel!
     @IBOutlet weak var identifierLabel: UILabel!
     
-    @IBOutlet weak var distanceMeasurementView: MeasurementView!
-    @IBOutlet weak var timeMeasurementView: MeasurementView!
+    @IBOutlet weak var lastRouteLabel: UILabel!
+    @IBOutlet weak var lastFlightLabel: UILabel!
+    @IBOutlet weak var fuelLabel: UILabel!
+    @IBOutlet weak var distanceLabel: UILabel!
+    @IBOutlet weak var timeLabel: UILabel!
+    @IBOutlet weak var flightCountLabel: UILabel!
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
@@ -35,34 +39,46 @@ class AircraftTableViewCell: UITableViewCell {
         
         self.identifierLabel.attributedText = NSAttributedString(string: aircraft.aircraftIdentifier, attributes: titleAttribute)
         self.airframeLabel.attributedText = NSAttributedString(string: aircraft.airframeName, attributes: cellAttribute)
-        
+        if let lastFlight = trip?.endingFlight {
+            var date = lastFlight.guessedDate
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .short
+            if let start_time = lastFlight.start_time {
+                date = start_time
+            }
+            if let date = date {
+                self.lastFlightLabel.attributedText = NSAttributedString(string: formatter.string(from: date), attributes: cellAttribute)
+            }else{
+                self.lastFlightLabel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+            }
+            if let airport = lastFlight.flightSummary?.endAirport?.name {
+                self.lastRouteLabel.attributedText = NSAttributedString(string: airport, attributes: cellAttribute)
+            }else{
+                self.lastRouteLabel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+            }
+        }else{
+            self.lastRouteLabel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+            self.lastFlightLabel.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
+        }
         if let trip = trip {
-            let distance = trip.measurement(field: .Distance)
-            let last = trip.measurement(field: .FuelEnd)
-            let time = trip.measurement(field: .Moving)
-            
-            let geometry = RZNumberWithUnitGeometry()
-            geometry.defaultUnitAttribute = ViewConfig.shared.cellAttributes
-            geometry.defaultNumberAttribute = ViewConfig.shared.cellAttributes
-            geometry.numberAlignment = .decimalSeparator
-            geometry.unitAlignment = .left
-            geometry.alignment = .center
-            
-            let config : [Trip.Field: MeasurementView] = [
-                .Distance : distanceMeasurementView,
-                .Moving : timeMeasurementView
-            ]
-            var measurements : [Trip.Field:DisplayedValue] = [:]
-            for (field,_) in config {
+            self.flightCountLabel.attributedText = NSAttributedString(string: "\(trip.count) flights",attributes: cellAttribute)
+        }else{
+            self.flightCountLabel.attributedText = NSAttributedString(string: "",attributes: cellAttribute)
+        }
+        
+        let config : [Trip.Field: UILabel] = [
+            .Distance : distanceLabel,
+            .Moving : timeLabel,
+            .FuelEnd: fuelLabel
+        ]
+        if let trip = trip {
+            for (field,label) in config {
                 if let m = trip.measurement(field: field) {
                     let dv = self.displayContext.displayedValue(field: field.equivalentLogField, measurement: m)
-                    dv.adjust(geometry: geometry)
-                    measurements[field] = dv
-                }
-                for (field,measurementView) in config {
-                    if let dv = measurements[field] {
-                        dv.setup(measurementView: measurementView, geometry: geometry)
-                    }
+                    label.attributedText = NSAttributedString(string: dv.string, attributes: cellAttribute)
+                }else{
+                    label.attributedText = NSAttributedString(string: "", attributes: cellAttribute)
                 }
             }
         }
