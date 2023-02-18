@@ -15,4 +15,4 @@ jobs:
         pwd
         ls
     - name: Build
-      run: xcodebuild -sdk iphonesimulator -workspace flightlogstats.xcodeproj -scheme FlightLogStats -destination 'platform=iOS Simulator,name=iPhone 11' build CODE_SIGNING_REQUIRED=NO
+      run: xcodebuild -sdk iphonesimulator -project flightlogstats.xcodeproj -scheme FlightLogStats -destination 'platform=iOS Simulator,name=iPhone 11' build CODE_SIGNING_REQUIRED=NO
