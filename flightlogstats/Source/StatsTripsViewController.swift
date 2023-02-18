@@ -12,6 +12,8 @@ class StatsTripsViewController: UIViewController {
     @IBOutlet weak var logListCollectionView: UICollectionView!
     var flightListDataSource : FlightListDataSource? = nil
     
+    var aggregation : Trips.Aggregation = .trips
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,7 +23,7 @@ class StatsTripsViewController: UIViewController {
         super.viewWillAppear(animated)
         
         let infos = FlightLogOrganizer.shared.flightLogFileRecords(request: .flightsOnly)
-        self.flightListDataSource = FlightListDataSource(logInfos: infos, displayContext: DisplayContext(), aggregation: .trips)
+        self.flightListDataSource = FlightListDataSource(logFileRecords: infos, displayContext: DisplayContext(), aggregation: self.aggregation)
         
         self.logListCollectionView.dataSource = self.flightListDataSource
         self.logListCollectionView.delegate = self.flightListDataSource

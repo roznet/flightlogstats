@@ -856,7 +856,7 @@
         <!--Calendar Stats-->
         <scene sceneID="Gii-1t-ydh">
             <objects>
-                <viewController id="le0-J7-zW3" userLabel="Calendar Stats" customClass="StatsCalendarViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="le0-J7-zW3" userLabel="Calendar Stats" customClass="StatsTripsViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="hiS-AS-56c">
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -954,7 +954,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Calendar" image="calendar" catalog="system" id="fQo-7t-sfx"/>
                     <connections>
-                        <outlet property="logListCollectionView" destination="C8C-Qy-cZt" id="WFz-O3-Pf9"/>
+                        <outlet property="logListCollectionView" destination="C8C-Qy-cZt" id="MAS-v7-YF7"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fOc-RZ-0gg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1055,7 +1055,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Trips" image="tablecells" catalog="system" id="gvR-GP-vzb"/>
                     <connections>
-                        <outlet property="logListCollectionView" destination="8Xl-gc-ZSL" id="kCQ-MP-bhc"/>
+                        <outlet property="logListCollectionView" destination="8Xl-gc-ZSL" id="7MS-QB-VGL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kK2-AM-Zyw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

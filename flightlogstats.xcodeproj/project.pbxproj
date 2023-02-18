@@ -31,7 +31,6 @@
 		423929112864D58800CD33C0 /* TestAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423929102864D58800CD33C0 /* TestAnalysis.swift */; };
 		423A718C295060530047C643 /* TableCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423A718B295060530047C643 /* TableCollectionView.swift */; };
 		423EF3532872E78900EA7415 /* DetailSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423EF3522872E78900EA7415 /* DetailSettingsViewController.swift */; };
-		4240B6BB28A94E7C004D4F40 /* StatsCalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4240B6BA28A94E7C004D4F40 /* StatsCalendarViewController.swift */; };
 		42478A5128153EF300212BF2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42478A5028153EF300212BF2 /* Log.swift */; };
 		4252A84C298FF088009D7180 /* FlightSavvyRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4252A84B298FF088009D7180 /* FlightSavvyRecord.swift */; };
 		4252A84F29903BFC009D7180 /* UploadSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4252A84E29903BFC009D7180 /* UploadSettingsViewController.swift */; };
@@ -167,7 +166,6 @@
 		423929102864D58800CD33C0 /* TestAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAnalysis.swift; sourceTree = "<group>"; };
 		423A718B295060530047C643 /* TableCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionView.swift; path = Source/TableCollectionView.swift; sourceTree = "<group>"; };
 		423EF3522872E78900EA7415 /* DetailSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DetailSettingsViewController.swift; path = Source/DetailSettingsViewController.swift; sourceTree = "<group>"; };
-		4240B6BA28A94E7C004D4F40 /* StatsCalendarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatsCalendarViewController.swift; path = Source/StatsCalendarViewController.swift; sourceTree = "<group>"; };
 		42478A5028153EF300212BF2 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Log.swift; path = Source/Log.swift; sourceTree = "<group>"; };
 		4252A84B298FF088009D7180 /* FlightSavvyRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightSavvyRecord.swift; path = Source/FlightSavvyRecord.swift; sourceTree = "<group>"; };
 		4252A84E29903BFC009D7180 /* UploadSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UploadSettingsViewController.swift; path = Source/UploadSettingsViewController.swift; sourceTree = "<group>"; };
@@ -375,7 +373,6 @@
 			children = (
 				425F4EDA2893288A00F691BD /* StatsTabBarController.swift */,
 				425F4EDC289328DC00F691BD /* StatsTripsViewController.swift */,
-				4240B6BA28A94E7C004D4F40 /* StatsCalendarViewController.swift */,
 			);
 			name = StatsViews;
 			sourceTree = "<group>";
@@ -823,7 +820,6 @@
 				429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */,
 				4290B460294E5DA10089B158 /* CsvParser.swift in Sources */,
 				425B345B2894140800548557 /* ViewConfig.swift in Sources */,
-				4240B6BB28A94E7C004D4F40 /* StatsCalendarViewController.swift in Sources */,
 				42A20B522896F0CF00439880 /* Trips.swift in Sources */,
 				425B3459289408D500548557 /* TableDataSource.swift in Sources */,
 				42606A22288DE2FC00AE858C /* FlightSummary+Field.swift in Sources */,

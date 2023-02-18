@@ -9,5 +9,12 @@ import UIKit
 
 class StatsTabBarController: UITabBarController {
 
-
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        if let calendar = self.viewControllers?[1] as? StatsTripsViewController {
+            calendar.aggregation = .months
+        }
+    }
+    
 }
