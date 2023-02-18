@@ -303,7 +303,7 @@ class TestOrganizer: XCTestCase {
                 NotificationCenter.default.addObserver(forName: .newLocalFilesDiscovered, object: organizer, queue: nil) {
                     _ in
                     XCTAssertEqual(cloudUrls.count, organizer.count+1)
-                    XCTAssertEqual(cloudUrls.count, organizer.flightLogFileInfos(request: .all).count+1) // +1 because one file is not a log but avionics system file
+                    XCTAssertEqual(cloudUrls.count, organizer.flightLogFileRecords(request: .all).count+1) // +1 because one file is not a log but avionics system file
                     recordAddedExpectation.fulfill()
                 }
                 self.wait(for: [recordAddedExpectation,fileCopiedExpectation], timeout: 50*60.0)
@@ -366,7 +366,7 @@ class TestOrganizer: XCTestCase {
             
             XCTAssertEqual(organizer.count,1)
             
-            if let info = organizer.flightLogFileInfos(request: .all).first {
+            if let info = organizer.flightLogFileRecords(request: .all).first {
                 let record = FlightFuelRecord(context: container.viewContext)
                 record.target_fuel = 75.0
                 info.fuel_record = record
@@ -379,8 +379,8 @@ class TestOrganizer: XCTestCase {
             XCTAssertEqual(reload.count,1)
             organizer.loadFromContainer()
             XCTAssertEqual(reload.count,1)
-            XCTAssertNotNil(reload.flightLogFileInfos(request: .all).first?.fuel_record)
-            if let info = reload.flightLogFileInfos(request: .all).first,
+            XCTAssertNotNil(reload.flightLogFileRecords(request: .all).first?.fuel_record)
+            if let info = reload.flightLogFileRecords(request: .all).first,
                let record = info.fuel_record {
                 XCTAssertEqual( record.target_fuel, 75.0)
                 record.target_fuel = 80.0
@@ -391,8 +391,8 @@ class TestOrganizer: XCTestCase {
             reload2.persistentContainer = container
             XCTAssertEqual(reload2.count,0)
             reload2.loadFromContainer()
-            XCTAssertNotNil(reload2.flightLogFileInfos(request: .all).first?.fuel_record)
-            if let info = reload2.flightLogFileInfos(request: .all).first,
+            XCTAssertNotNil(reload2.flightLogFileRecords(request: .all).first?.fuel_record)
+            if let info = reload2.flightLogFileRecords(request: .all).first,
                let record = info.fuel_record {
                 XCTAssertEqual( record.target_fuel, 80.0)
             }

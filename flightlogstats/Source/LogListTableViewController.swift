@@ -65,7 +65,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     func moreFunctionMenu() -> UIMenu {
         var menuItems : [UIAction] = [
-            UIAction(title: "Force Refresh", image: UIImage(systemName: "minus.circle")){
+            UIAction(title: "Force Refresh", image: UIImage(systemName: "arrow.clockwise")){
                 _ in
                 self.buildList()
                 self.tableView.reloadData()
@@ -88,7 +88,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.tableView.reloadData()
                 self.updateButtons()
             },
-            UIAction(title: self.filterEmpty ? "Show non-flights" : "Show flights only", image: UIImage(systemName: "minus.circle")){
+            UIAction(title: self.filterEmpty ? "Show non-flights" : "Show flights only",
+                     image: UIImage(systemName: self.filterEmpty ? "eye" : "eye.slash")){
                 _ in
                 self.filterEmpty = !self.filterEmpty
                 self.buildList()
@@ -419,7 +420,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     func buildList() {
         if self.filterEmpty {
-            self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos(request: .flightsOnly)
+            self.fullLogInfoList = self.logFileOrganizer.flightLogFileRecords(request: .flightsOnly)
             DispatchQueue.main.async {
                 self.updateSearchedList()
                 self.buildAircraftList()
@@ -427,7 +428,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.ensureOneDetailDisplayed()
             }
         }else{
-            self.fullLogInfoList = self.logFileOrganizer.flightLogFileInfos(request: .all)
+            self.fullLogInfoList = self.logFileOrganizer.flightLogFileRecords(request: .all)
             self.updateSearchedList()
             self.buildAircraftList()
             self.tableView.reloadData()
@@ -439,7 +440,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         self.aircraftsList = self.logFileOrganizer.aircraftRecords
         self.aircraftTrips = [:]
         for aircraft in self.aircraftsList {
-            let records = self.logFileOrganizer.flightLogFileInfos(request: .flightsOnly, filter: self.logFileOrganizer.listFilter(aircrafts: [aircraft]))
+            let records = self.logFileOrganizer.flightLogFileRecords(request: .flightsOnly, filter: self.logFileOrganizer.listFilter(aircrafts: [aircraft]))
             self.aircraftTrips[aircraft.systemId] = Trip(flightRecords: records, label: aircraft.aircraftIdentifier)
         }
         self.aircraftsList.sort() {

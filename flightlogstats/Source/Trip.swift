@@ -14,11 +14,11 @@ import RZUtilsSwift
 struct Trip {
     typealias Field = FlightSummary.Field
     /// infos in the trips sorted from newest to oldest
-    var flightLogFileInfos : [FlightLogFileRecord] = []
-    var count : Int { return self.flightLogFileInfos.count }
+    var flightLogFileRecords : [FlightLogFileRecord] = []
+    var count : Int { return self.flightLogFileRecords.count }
     var stats : [Field:ValueStats] = [:]
     
-    var empty : Bool { return self.flightLogFileInfos.count == 0 }
+    var empty : Bool { return self.flightLogFileRecords.count == 0 }
     
     enum Aggregation {
         case awayFromBase(Airport)
@@ -53,8 +53,8 @@ struct Trip {
         self.label = bucket.description
     }
     
-    var startingFlight : FlightLogFileRecord? { return self.flightLogFileInfos.last }
-    var endingFlight : FlightLogFileRecord? { return self.flightLogFileInfos.first }
+    var startingFlight : FlightLogFileRecord? { return self.flightLogFileRecords.last }
+    var endingFlight : FlightLogFileRecord? { return self.flightLogFileRecords.first }
     
     func isNewer(than other: Trip) -> Bool {
         guard let otherstart = other.startingFlight else { return false }
@@ -78,8 +78,8 @@ struct Trip {
                 }
             }
 
-            self.flightLogFileInfos.append(info)
-            self.flightLogFileInfos.sort {
+            self.flightLogFileRecords.append(info)
+            self.flightLogFileRecords.sort {
                 $0.isNewer(than: $1)
             }
         }
@@ -177,14 +177,14 @@ struct Trip {
         if let stats = self.stats[field] {
             switch field {
             case .FuelStart:
-                for flight in self.flightLogFileInfos.reversed() {
+                for flight in self.flightLogFileRecords.reversed() {
                     if let summary = flight.flightSummary {
                         return summary.measurement(for: .FuelStart)
                     }
                 }
                 return nil
             case .FuelEnd:
-                for flight in self.flightLogFileInfos {
+                for flight in self.flightLogFileRecords {
                     if let summary = flight.flightSummary {
                         return summary.measurement(for: .FuelEnd)
                     }
@@ -237,12 +237,12 @@ struct Trip {
 extension Trip : CustomStringConvertible {
     var description: String {
         var strs : [String] = [ "\(self.count) legs" ]
-        strs.append(contentsOf: self.flightLogFileInfos.compactMap( { $0.start_airport_icao} ).reversed() )
-        if let end = self.flightLogFileInfos.first?.end_airport_icao {
+        strs.append(contentsOf: self.flightLogFileRecords.compactMap( { $0.start_airport_icao} ).reversed() )
+        if let end = self.flightLogFileRecords.first?.end_airport_icao {
             strs.append(end)
         }
             
-        if let date = self.flightLogFileInfos.last?.start_time {
+        if let date = self.flightLogFileRecords.last?.start_time {
             strs.append(date.formatted(date: .abbreviated, time: .omitted))
         }
         if let time = self.measurement(field: .Hobbs) {

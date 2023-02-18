@@ -20,7 +20,7 @@ class StatsCalendarViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let infos = FlightLogOrganizer.shared.flightLogFileInfos(request: .flightsOnly)
+        let infos = FlightLogOrganizer.shared.flightLogFileRecords(request: .flightsOnly)
         self.flightListDataSource = FlightListDataSource(logInfos: infos, displayContext: DisplayContext(), aggregation: .months)
         
         self.logListCollectionView.dataSource = self.flightListDataSource

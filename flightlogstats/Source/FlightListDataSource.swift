@@ -78,7 +78,7 @@ class FlightListDataSource: TableDataSource  {
         row += 1
         var tripIndex : Int = 0
         for trip in trips.trips {
-            for info in trip.flightLogFileInfos {
+            for info in trip.flightLogFileRecords {
                 if let summary = info.flightSummary, let hobbs = summary.hobbs {
                     self.cellHolders.append(CellHolder(string:  self.displayContext.format(date: hobbs.start), attributes: titleAttributes))
                     self.cellHolders.append(CellHolder(string:  self.displayContext.format(airport: summary.startAirport, style: .icaoOnly), attributes: titleAttributes))

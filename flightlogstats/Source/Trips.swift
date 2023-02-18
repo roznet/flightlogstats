@@ -17,7 +17,7 @@ class Trips {
         case trips
         case months
     }
-    private let flightFileInfos : [FlightLogFileRecord]
+    private let flightFileRecords : [FlightLogFileRecord]
     
     private(set) var base : Airport? = nil
     private(set) var airportVisits : [Airport:[Visit]] = [:]
@@ -25,7 +25,7 @@ class Trips {
     
     var aggregation : Aggregation
     init(infos : [FlightLogFileRecord], aggregation : Aggregation = .trips){
-        self.flightFileInfos = infos
+        self.flightFileRecords = infos
         self.aggregation = aggregation
     }
     
@@ -65,9 +65,9 @@ class Trips {
         var trip : Trip = first
         
         // go from first to last trip
-        var infos = self.flightFileInfos.sorted { $0.isOlder(than: $1) }
+        var infos = self.flightFileRecords.sorted { $0.isOlder(than: $1) }
         
-        var countGuard : Int = self.flightFileInfos.count + 1
+        var countGuard : Int = self.flightFileRecords.count + 1
         
         while countGuard > 0 && infos.count > 0 {
             self.countAircrafts(message: "trip start", infos: infos)
@@ -119,7 +119,7 @@ class Trips {
         var rv : [Airport:[Visit]] = [:]
         
         var currentVisit : Visit? = nil
-        for info in self.flightFileInfos.reversed() {
+        for info in self.flightFileRecords.reversed() {
             if let summary = info.flightSummary,
                let startAirport = summary.startAirport,
                let endAirport = summary.endAirport{
@@ -172,7 +172,7 @@ class Trips {
         
         let calendar = Calendar.current
         
-        for info in self.flightFileInfos {
+        for info in self.flightFileRecords {
             if let summary = info.flightSummary,
                let startAirport = summary.startAirport,
                let endAirport = summary.endAirport,

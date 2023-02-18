@@ -28,7 +28,7 @@ class FlightLogOrganizer {
     //MARK: - Flight Log List management
    
     /// flight log records sorted most recent first
-    private var flightLogFileInfos : [FlightLogFileRecord] {
+    private var flightLogFileRecords : [FlightLogFileRecord] {
         DispatchQueue.synchronized(self) {
             let list = Array(self.managedFlightLogs.values)
             return list.sorted { $0.isNewer(than: $1) }
@@ -55,11 +55,11 @@ class FlightLogOrganizer {
     
     /// most recent flight log record
     func first(request : ListRequest,  filter : ListFilter? = nil) -> FlightLogFileRecord? {
-        return self.flightLogFileInfos(request: request, filter: filter).first
+        return self.flightLogFileRecords(request: request, filter: filter).first
     }
     
-    func flightLogFileInfos(request : ListRequest, filter : ListFilter? = nil ) -> [FlightLogFileRecord] {
-        let sorted = self.flightLogFileInfos
+    func flightLogFileRecords(request : ListRequest, filter : ListFilter? = nil ) -> [FlightLogFileRecord] {
+        let sorted = self.flightLogFileRecords
         
         switch request {
         case .all:
@@ -96,7 +96,7 @@ class FlightLogOrganizer {
         var rv : FlightLogFileRecord? = nil
         
         var following : FlightLogFileRecord? = nil
-        for candidate in self.flightLogFileInfos.reversed() {
+        for candidate in self.flightLogFileRecords.reversed() {
             if  info == candidate {
                 if let following = following,
                    let end = info.end_airport_icao,
@@ -116,7 +116,7 @@ class FlightLogOrganizer {
         var rv : FlightLogFileRecord? = nil
         
         var following : FlightLogFileRecord? = nil
-        for candidate in self.flightLogFileInfos(request: .flightsOnly) {
+        for candidate in self.flightLogFileRecords(request: .flightsOnly) {
             if let following = following,
                info == following {
                 if
