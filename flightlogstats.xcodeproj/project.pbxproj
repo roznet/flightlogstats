@@ -22,7 +22,7 @@
 		4209D8662861881300B79A07 /* LogMapGraphsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4209D8652861881300B79A07 /* LogMapGraphsViewController.swift */; };
 		421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */; };
 		421EE5BF290C53E600996EC6 /* AircraftRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5BE290C53E600996EC6 /* AircraftRecord.swift */; };
-		421EE5C12928E01E00996EC6 /* FlightLogFileGroupBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5C02928E01E00996EC6 /* FlightLogFileGroupBy.swift */; };
+		421EE5C12928E01E00996EC6 /* FlightLogFileAggregatedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */; };
 		423367A6293BC85F007D2285 /* MeasurementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A5293BC85F007D2285 /* MeasurementView.swift */; };
 		423367A8293BC967007D2285 /* MeasurementCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */; };
 		423731622985CA3E001A99CA /* SavvyRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423731612985CA3E001A99CA /* SavvyRequests.swift */; };
@@ -80,7 +80,7 @@
 		4280C8D4280D4CA500A0FB32 /* LogSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogSummaryViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
 		4290B460294E5DA10089B158 /* CsvParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4290B45F294E5DA10089B158 /* CsvParser.swift */; };
-		4291E195296D672100DE2990 /* TestFileGroupBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4291E194296D672100DE2990 /* TestFileGroupBy.swift */; };
+		4291E195296D672100DE2990 /* TestFileAggregatedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4291E194296D672100DE2990 /* TestFileAggregatedData.swift */; };
 		42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */; };
 		42943B7D299D0133003B7E2A /* RemoteServiceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7C299D0133003B7E2A /* RemoteServiceRecord.swift */; };
 		42943B7F299D19A9003B7E2A /* AircraftTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7E299D19A9003B7E2A /* AircraftTableViewCell.swift */; };
@@ -158,7 +158,7 @@
 		4209D8652861881300B79A07 /* LogMapGraphsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogMapGraphsViewController.swift; path = Source/LogMapGraphsViewController.swift; sourceTree = "<group>"; };
 		421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysisDataSource.swift; path = Source/FuelAnalysisDataSource.swift; sourceTree = "<group>"; };
 		421EE5BE290C53E600996EC6 /* AircraftRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftRecord.swift; path = Source/AircraftRecord.swift; sourceTree = "<group>"; };
-		421EE5C02928E01E00996EC6 /* FlightLogFileGroupBy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileGroupBy.swift; path = Source/FlightLogFileGroupBy.swift; sourceTree = "<group>"; };
+		421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileAggregatedData.swift; path = Source/FlightLogFileAggregatedData.swift; sourceTree = "<group>"; };
 		423367A5293BC85F007D2285 /* MeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementView.swift; path = Source/MeasurementView.swift; sourceTree = "<group>"; };
 		423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementCollectionViewCell.swift; path = Source/MeasurementCollectionViewCell.swift; sourceTree = "<group>"; };
 		423731612985CA3E001A99CA /* SavvyRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SavvyRequests.swift; path = Source/SavvyRequests.swift; sourceTree = "<group>"; };
@@ -216,7 +216,7 @@
 		4280C8D3280D4CA500A0FB32 /* LogSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogSummaryViewController.swift; path = Source/LogSummaryViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		4290B45F294E5DA10089B158 /* CsvParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CsvParser.swift; path = Source/CsvParser.swift; sourceTree = "<group>"; };
-		4291E194296D672100DE2990 /* TestFileGroupBy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFileGroupBy.swift; sourceTree = "<group>"; };
+		4291E194296D672100DE2990 /* TestFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFileAggregatedData.swift; sourceTree = "<group>"; };
 		42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRequest.swift; path = Source/RemoteServiceRequest.swift; sourceTree = "<group>"; };
 		42943B7C299D0133003B7E2A /* RemoteServiceRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRecord.swift; path = Source/RemoteServiceRecord.swift; sourceTree = "<group>"; };
 		42943B7E299D19A9003B7E2A /* AircraftTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftTableViewCell.swift; path = Source/AircraftTableViewCell.swift; sourceTree = "<group>"; };
@@ -421,7 +421,7 @@
 			children = (
 				4280C8C6280D48E700A0FB32 /* TestAssets */,
 				42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */,
-				4291E194296D672100DE2990 /* TestFileGroupBy.swift */,
+				4291E194296D672100DE2990 /* TestFileAggregatedData.swift */,
 				42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */,
 				42F1E84F284A4D2800DB732A /* TestOrganizer.swift */,
 				423929102864D58800CD33C0 /* TestAnalysis.swift */,
@@ -538,7 +538,7 @@
 				4264C2392826858700F40436 /* FlightSummary.swift */,
 				42606A21288DE2FC00AE858C /* FlightSummary+Field.swift */,
 				4264C23528267EDC00F40436 /* FlightLeg.swift */,
-				421EE5C02928E01E00996EC6 /* FlightLogFileGroupBy.swift */,
+				421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */,
 			);
 			name = Flight;
 			sourceTree = "<group>";
@@ -815,7 +815,7 @@
 				4209D8662861881300B79A07 /* LogMapGraphsViewController.swift in Sources */,
 				42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */,
 				4264C2342825B58F00F40436 /* Settings.swift in Sources */,
-				421EE5C12928E01E00996EC6 /* FlightLogFileGroupBy.swift in Sources */,
+				421EE5C12928E01E00996EC6 /* FlightLogFileAggregatedData.swift in Sources */,
 				42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */,
 				42943B7D299D0133003B7E2A /* RemoteServiceRecord.swift in Sources */,
 				4264C23C282691EF00F40436 /* FuelTanks.swift in Sources */,
@@ -869,7 +869,7 @@
 				4203FBD32905B0FE005B0530 /* TestAvionics.swift in Sources */,
 				423929112864D58800CD33C0 /* TestAnalysis.swift in Sources */,
 				42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */,
-				4291E195296D672100DE2990 /* TestFileGroupBy.swift in Sources */,
+				4291E195296D672100DE2990 /* TestFileAggregatedData.swift in Sources */,
 				42F1E848284A3C2E00DB732A /* TestParsingCsv.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -130,7 +130,7 @@ class FlightData {
     
     //MARK: - raw extracts
         
-    /// doubles values with nan removed
+    /// doubles values for every field with data and with nan removed
     /// - Parameter doubleFields: fields to check for not a value
     /// - Parameter includeAllFields: true return all field, false only return felds checked for na
     /// - Returns: indexed for value  that are valid (will call dropna)

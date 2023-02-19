@@ -16,7 +16,7 @@ import RZUtils
 import RZData
 import RZFlight
 
-final class TestFileGroupBy: XCTestCase {
+final class TestFileAggregatedData: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -43,7 +43,7 @@ final class TestFileGroupBy: XCTestCase {
         return rv
     }
 
-    func testFlightLogGroupBy() {
+    func testFlightLogAggregatedData() {
         let urls : [TestLogFileSamples] = [.flight3,.flight2]
         let files : [FlightLogFile] = urls.compactMap {
             guard let url = $0.url, let file = FlightLogFile(url: url) else { return nil }
@@ -58,12 +58,11 @@ final class TestFileGroupBy: XCTestCase {
         
         let interval : TimeInterval = 60.0
         
-        let groupbys : [FlightLogFileGroupBy] = files.compactMap {
+        let groupbys : [FlightLogFileAggregatedData] = files.compactMap {
             let fixedTime = $0.legs(interval: interval)
-            let export = try? FlightLogFileGroupBy.defaultExport(logFileName: $0.name, legs: fixedTime)
+            let export = try? FlightLogFileAggregatedData.defaultExport(logFileName: $0.name, legs: fixedTime)
             return export
         }
-        
         
         RZFileOrganizer.removeEditableFile("test.db")
         let dbpath = RZFileOrganizer.writeableFilePath("test.db")
@@ -104,7 +103,7 @@ final class TestFileGroupBy: XCTestCase {
             }
         }
 
-        let reload = FlightLogFileGroupBy(from: db, table: "flights")
+        let reload = FlightLogFileAggregatedData(from: db, table: "flights")
         XCTAssertEqual(reload.categoricals.count, totalCount)
         XCTAssertEqual(reload.values.count, totalCount)
     }

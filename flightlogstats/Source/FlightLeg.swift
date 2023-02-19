@@ -10,6 +10,15 @@ import CoreLocation
 import OSLog
 import RZData
 
+/**
+ A leg will contain the statistics `ValueStats` and `CategoricalValueStats` for a set of entries in the logfile between two times
+ They can be created either by specifying the times of the split for the entries or when the values of some categorical field changes in the data
+ The stats will be calculated for all the `Field` found in the `DataFrame` constituing the original data
+
+ If the `FlightLeg` is created by specifying the times of the split, the `categoricalValues` will be empty
+ If the `FlightLeg` is created by specifying the values of the categorical fields, the `categoricalValues` will contain the values of the fields
+ that where constant for that leg
+ */
 struct FlightLeg {
     typealias Field = FlightLogFile.Field
     typealias CategoricalValue = FlightLogFile.CategoricalValue
@@ -34,22 +43,38 @@ struct FlightLeg {
         return (Array(valueStats.keys) + Array(categoricalStats.keys)).sorted { $0.order < $1.order }
     }
     
-    init(timeRange: TimeRange, categoricalValues : [Field : CategoricalValue], valueStats: [Field : ValueStats], categoricalStats: [Field : CategoricalValueStats] ) {
+    /**
+     contructor for internal use, that takes the precomputed `ValueStats` and `CategoricalData`
+     this function is private, and the only way to create a `FlightLeg` is through the static `legs` function
+     */
+    private init(timeRange: TimeRange, categoricalValues : [Field : CategoricalValue], valueStats: [Field : ValueStats], categoricalStats: [Field : CategoricalValueStats] ) {
         self.categoricalValues = categoricalValues
         self.timeRange = timeRange
         self.valueStats = valueStats
         self.categoricalStats = categoricalStats
     }
     
+    /**
+    ValueStats for a given field representing the stats over the points of the leg
+    */
     func valueStats(field : Field) -> ValueStats? {
         return self.valueStats[field]
     }
-    
-    func categoricalValue(field: Field) -> CategoricalValue? {
-        return self.categoricalValues[field]
-    }
+    /**
+     CategoricalValueStats for a given field representing the stats over the points of the leg
+     */
     func categoricalValueStats(field: Field) -> CategoricalValueStats? {
         return self.categoricalStats[field]
+    }
+    
+    /**
+     CategoricalValue that were constant over the time range of the leg when the leg was created
+     by looking at the changes in specific categorical fields
+
+     if the leg was created by specifying the time range, this will be empty
+     */
+    func categoricalValue(field: Field) -> CategoricalValue? {
+        return self.categoricalValues[field]
     }
 
     func format(which : LegInfo, displayContext : DisplayContext = DisplayContext(), reference : Date? = nil) -> String {
@@ -61,6 +86,13 @@ struct FlightLeg {
         }
     }
 
+    /**
+    main function to create legs from a `FlightData` object by specifying the fields that should be constant over the leg
+    - parameter data: the `FlightData` object to extract the legs from
+    - parameter byfields: the fields that should be constant over the leg, if the value of any of these fields changes, a new leg will be created
+    - parameter start: the start of the time range to extract the legs from, if nil, the start of the data will be used
+    - parameter end: the end of the time range to extract the legs from, if nil, the end of the data will be used
+    */
     static func legs(from data : FlightData,
                      byfields : [Field],
                      start : Date? = nil,
@@ -69,6 +101,13 @@ struct FlightLeg {
         return self.extract(from: data, identifiers: identifiers, start: start, end: end)
     }
     
+    /**
+    function to create legs from a `FlightData` object by specifying the time interval between each leg
+    - parameter data: the `FlightData` object to extract the legs from
+    - parameter interval: the time interval that each leg should cover
+    - parameter start: the start of the time range to extract the legs from, if nil, the start of the data will be used
+    - parameter end: the end of the time range to extract the legs from, if nil, the end of the data will be used
+    */
     static func legs(from data : FlightData,
                      interval : TimeInterval,
                      start : Date? = nil,
@@ -79,9 +118,20 @@ struct FlightLeg {
         return self.extract(from: data, identifiers: identifiers, start : start, end : end)
     }
     
+    /**
+    The main extract function that takes the `DataFrame` of identifiers and extracts the legs from the data
+
+    Both the time based and the field based functions call this function. They construct the `DataFrame` of identifiers differently, but the rest of the logic is the same.
+
+    The logic is as follows:
+    - for each identifier, extract the `ValueStats` and `CategoricalValueStats` for the time range of the leg
+    - if the leg is the first leg, or the identifier is different from the previous leg, create a new leg
+    - if the leg is not the first leg, and the identifier is the same as the previous leg, add the `ValueStats` and `CategoricalValueStats` to the previous leg
+    */
     private static func extract(from data : FlightData,
                         identifiers : DataFrame<Date,String,Field>,
                      start : Date? = nil,
+
                      end : Date? = nil) -> [FlightLeg] {
         var rv : [FlightLeg] = []
         

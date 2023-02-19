@@ -12,56 +12,22 @@ import RZData
 import FMDB
 import RZUtils
 import OSLog
-/*
- * Stats
- *   per minute:
- *      time start
- *      distance total
- *      long/lat start
- 
- *      engine on/off maxfreq
- *      phase climb/descent/cruise/ground maxfreq
- 
- *      AltMSL min/max/start/end
- *      AltGPS min/max/start/end
- 
- *      fuel used  total
- *      fuel       imbalance
- 
- *      TAS/IAS/GS  min/max/avg
- *      fuel flow  min/max/avg
- *      OilT/OilP avg
- *      MAP max/min/avg
- *      RPM max/min/avg
- *      %pwd max/min/avg
- *      OAT min/max/avg
- *      volt1/2  start/end/avg
- *      amp      start/end/avg
- 
- *      CHTn max/min/median/maxI,minI
- *      EGTn max/min/median/maxI,minI
- *      TITn max/min/median/maxI,minI
- 
- * calc type:
- *    start/end: first value, last value
- *    min/max/avg/minI/maxI/median
- *    total: last value - first value
- *    maxfreq: value most frequent
- 
- */
 
-extension Date {
-    func roundedToNearest(interval : TimeInterval) -> Date {
-        return Date(timeIntervalSinceReferenceDate: round(self.timeIntervalSinceReferenceDate/interval) * interval )
-    }
-    
-    func withinOneSecond(of : Date) -> Bool {
-        let diff = self.timeIntervalSinceReferenceDate - of.timeIntervalSinceReferenceDate
-        return diff > -0.5 && diff < 0.5
-    }
-}
+// Use
+//   create empty or load from db to start
+//       when loading new file: create new one and merge back in main db
+//
 
-class FlightLogFileGroupBy  {
+/// This class is used to aggregate data from multiple flight logs
+/// It is used to create a single database for all the logs
+/// It is also used to create a single database for a single log
+/// It leverages `FlightLeg` to extract and aggregate the data, but unlike `FlightLeg`
+/// It does not keep `ValueStats` or `CategoricalStats` but rather the actual values of specific metrics
+/// and stores them in a `DataFrame` for easy export to csv or sql
+/// The metrics are keyed by `FlightLogFileAggregatedData.ExportedValue` and `FlightLogFileAggregatedData.ExportedCategorical`
+/// which contains the `Field` and the Metric (e.g. `mean`, `min`, `max`, `count`, `unique`)
+
+class FlightLogFileAggregatedData  {
     enum FlightLogFileExportError : Error {
         case inconsitentIndexesSize
     }
@@ -70,12 +36,15 @@ class FlightLogFileGroupBy  {
     typealias CategoricalValue = FlightLogFile.CategoricalValue
     typealias ByRows = (fields: [String], rows:[[String]])
 
-    typealias ExportedValueType = ValueStats.Metric
-    typealias ExportedCategoricalType = CategoricalStats<CategoricalValue>.Metric
+    typealias AggregatedValueMetric = ValueStats.Metric
+    typealias AggregatedCategoricalMetric = CategoricalStats<CategoricalValue>.Metric
     
-    struct ExportedValue : Hashable {
+    /**
+
+    */
+    struct AggregatedValueColumn : Hashable {
         let field : Field
-        let type : ExportedValueType
+        let type : AggregatedValueMetric
         
         var key : String { "\(self.field.rawValue).\(self.type.rawValue)" }
         var sqlColumnName : String { "\"\(self.key)\"" }
@@ -87,7 +56,7 @@ class FlightLogFileGroupBy  {
                 let fieldString = split.first,
                 let metricString = split.last,
                 let field = Field(rawValue: String(fieldString)),
-                let type = ExportedValueType(rawValue: String(metricString))
+                let type = AggregatedValueMetric(rawValue: String(metricString))
             else {
                 return nil
             }
@@ -100,15 +69,15 @@ class FlightLogFileGroupBy  {
             }
         }
         
-        init(field:Field, type:ExportedValueType){
+        init(field:Field, type:AggregatedValueMetric){
             self.field = field
             self.type = type
         }
     }
         
-    struct ExportedCategorical : Hashable {
+    struct AggregatedCategoricalColumn : Hashable {
         let field : Field
-        let type : ExportedCategoricalType?
+        let type : AggregatedCategoricalMetric?
         
         var key : String {
             if let type = self.type {
@@ -126,7 +95,7 @@ class FlightLogFileGroupBy  {
                 let fieldString = split.first,
                 let metricString = split.last,
                 let field = Field(rawValue: String(fieldString)),
-                let type = ExportedCategoricalType(rawValue: String(metricString)){
+                let type = AggregatedCategoricalMetric(rawValue: String(metricString)){
                 self.type = type
                 self.field = field
             }else if let field = Field(rawValue: String(key)) {
@@ -140,19 +109,19 @@ class FlightLogFileGroupBy  {
             }
         }
         
-        init(field: Field, type: ExportedCategoricalType?){
+        init(field: Field, type: AggregatedCategoricalMetric?){
             self.field = field
             self.type = type
         }
 
     }
     
-    var values : DataFrame<Date,Double,ExportedValue>
-    var categoricals : DataFrame<Date,CategoricalValue,ExportedCategorical>
+    var values : DataFrame<Date,Double,AggregatedValueColumn>
+    var categoricals : DataFrame<Date,CategoricalValue,AggregatedCategoricalColumn>
     
-    // logFileName if only one there
+    /// logFileName if only one there or nil if multiple
     var logFileName : String? {
-        if let fns = self.categoricals[ExportedCategorical(field: .LogFileName, type: nil)]?.uniqueValues, fns.count == 1 {
+        if let fns = self.categoricals[AggregatedCategoricalColumn(field: .LogFileName, type: nil)]?.uniqueValues, fns.count == 1 {
             return fns.first
         }else{
             return nil
@@ -160,7 +129,7 @@ class FlightLogFileGroupBy  {
     }
     
     var logFileNames : [String] {
-        if let fns = self.categoricals[ExportedCategorical(field: .LogFileName, type: nil)]?.uniqueValues {
+        if let fns = self.categoricals[AggregatedCategoricalColumn(field: .LogFileName, type: nil)]?.uniqueValues {
             return fns
         }else{
             return []
@@ -168,7 +137,20 @@ class FlightLogFileGroupBy  {
 
     }
     
-    init(legs : [FlightLeg], valueDefs : [Field:[ExportedValueType]], categoricalDefs : [Field:[ExportedCategoricalType]], constants : [Field:CategoricalValue] = [:] ) throws {
+    /**
+    Create an aggregated data object from a list of legs. The aggregated data will contains one row per leg
+    and for each field all the metrics specified in `valueDefs` and `categoricalDefs`
+
+    - Parameters:
+        - legs: list of legs to aggregate
+        - valueDefs: dictionary of value field to list of metrics to add to the aggregated data
+        - categoricalDefs: dictionary of categorical field to list of metrics to add to the aggregated data
+        - constants: dictionary of field to constant categorical to add to each row
+    */
+    init(legs : [FlightLeg],
+         valueDefs : [Field:[AggregatedValueMetric]],
+         categoricalDefs : [Field:[AggregatedCategoricalMetric]],
+         constants : [Field:CategoricalValue] = [:] ) throws {
         self.values = DataFrame()
         self.categoricals = DataFrame()
         
@@ -176,68 +158,25 @@ class FlightLogFileGroupBy  {
             for (field,types) in valueDefs {
                 for type in types {
                     let value = leg.valueStats(field: field)?.value(for: type) ?? .nan
-                    try self.values.append(field: ExportedValue(field: field, type: type), element: value, for: leg.start)
+                    try self.values.append(field: AggregatedValueColumn(field: field, type: type), element: value, for: leg.start)
                 }
             }
             for (field,types) in categoricalDefs {
                 for type in types {
                     let value = leg.categoricalValueStats(field: field)?.value(for: type) ?? ""
-                    try self.categoricals.append(field: ExportedCategorical(field: field, type: type), element: value, for: leg.start)
+                    try self.categoricals.append(field: AggregatedCategoricalColumn(field: field, type: type), element: value, for: leg.start)
                 }
             }
             for (field,constValue) in constants {
-                self.categoricals.add(field: ExportedCategorical(field: field, type: nil),
+                self.categoricals.add(field: AggregatedCategoricalColumn(field: field, type: nil),
                                       column: DataFrame.Column(indexes: self.categoricals.indexes, values: self.categoricals.indexes.map { _ in constValue }))
             }
         }
     }
     
-    static func defaultExport(logFileName : String, legs : [FlightLeg]) throws -> FlightLogFileGroupBy {
-        let valuesDefs : [Field:[ExportedValueType]] = [
-            .Distance:[.total],
-            .Latitude:[.start],
-            .Longitude:[.start],
-            .AltMSL:[.average],
-            .OAT:[.average],
-            .IAS:[.average],
-            .TAS:[.average],
-            .GndSpd:[.average],
-            .volt1:[.average],
-            .volt2:[.average],
-            .amp1:[.max,.min],
-            .FQtyT:[.start],
-            .FTotalizerT:[.total],
-            .E1_FFlow:[.average,.max,.min],
-            .E1_MAP:[.average,.max,.min],
-            .E1_RPM:[.average,.max,.min],
-            .E1_OilP:[.max,.min],
-            .E1_OilT:[.max,.min],
-            .E1_EGT_Max:[.max,.min],
-            .E1_EGT1:[.max,.min],
-            .E1_EGT2:[.max,.min],
-            .E1_EGT3:[.max,.min],
-            .E1_EGT4:[.max,.min],
-            .E1_EGT5:[.max,.min],
-            .E1_EGT6:[.max,.min],
-            .E1_CHT1:[.max,.min],
-            .E1_CHT2:[.max,.min],
-            .E1_CHT3:[.max,.min],
-            .E1_CHT4:[.max,.min],
-            .E1_CHT5:[.max,.min],
-            .E1_CHT6:[.max,.min],
-
-        ]
-        
-        let categoricalDefs : [Field:[ExportedCategoricalType]] = [
-            .AfcsOn:[.mostFrequent],
-            .RollM:[.mostFrequent],
-            .PitchM:[.mostFrequent],
-            .E1_EGT_MaxIdx:[.end]
-        ]
-        
-        return try FlightLogFileGroupBy(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs, constants: [.LogFileName:logFileName])
-    }
     
+    /// Helper to get the data in a format that can be exported to a csv file
+    /// - Parameter indexName: name of the index column
     func byRows(indexName : String = "Date") ->  ByRows {
         var fields : [String] = []
         var rows : [[String]] = []
@@ -271,6 +210,7 @@ class FlightLogFileGroupBy  {
         return ByRows(fields: fields, rows: rows)
     }
     
+   /// Create from database
    init(from db:FMDatabase, table : String) {
        self.values = DataFrame()
        self.categoricals = DataFrame()
@@ -286,12 +226,12 @@ class FlightLogFileGroupBy  {
                     continue
                 }
                 if name == "LogFileName" {
-                    self.categoricals.add(field: ExportedCategorical(field: .LogFileName, type: nil),
+                    self.categoricals.add(field: AggregatedCategoricalColumn(field: .LogFileName, type: nil),
                                           column: DataFrame.Column(indexes: [], values: []))
 
-                }else if let exportedCategorical = ExportedCategorical(key: name) {
+                }else if let exportedCategorical = AggregatedCategoricalColumn(key: name) {
                     self.categoricals.add(field: exportedCategorical, column: DataFrame.Column(indexes: [], values: []))
-                }else if let exportedValue = ExportedValue(key: name) {
+                }else if let exportedValue = AggregatedValueColumn(key: name) {
                     self.values.add(field: exportedValue, column: DataFrame.Column(indexes: [], values: []))
                 }
             }
@@ -319,15 +259,16 @@ class FlightLogFileGroupBy  {
         }
     }
 
-    //
-    func merge(with other: FlightLogFileGroupBy) {
+    /// Merge two dataframes, keeping the values from the other dataframe if there is a conflict
+    func merge(with other: FlightLogFileAggregatedData) {
         // merge other first so the value for existing indexes comes from other
         let mergedValues = other.values.merged(with: self.values)
         let mergedCategoricals = other.categoricals.merged(with: self.categoricals)
         self.values = mergedValues
         self.categoricals = mergedCategoricals
     }
-    // save to db
+    /// Write the data to a database, if the database contains the same log file name, the data will be replaced in 
+    /// the database with the new data
     func save(to db:FMDatabase, table : String) {
         let indexName = "Date"
         
@@ -335,7 +276,7 @@ class FlightLogFileGroupBy  {
         let valueFields = self.values.fields
         
         guard
-            let logFileNames = categoricals[ExportedCategorical(field: .LogFileName, type: nil)]?.uniqueValues,
+            let logFileNames = categoricals[AggregatedCategoricalColumn(field: .LogFileName, type: nil)]?.uniqueValues,
             logFileNames.count > 0
         else {
             return
@@ -405,3 +346,100 @@ class FlightLogFileGroupBy  {
         }
     }
 }
+
+/*
+ * Stats
+ *   per minute:
+ *      time start
+ *      distance total
+ *      long/lat start
+ 
+ *      engine on/off maxfreq
+ *      phase climb/descent/cruise/ground maxfreq
+ 
+ *      AltMSL min/max/start/end
+ *      AltGPS min/max/start/end
+ 
+ *      fuel used  total
+ *      fuel       imbalance
+ 
+ *      TAS/IAS/GS  min/max/avg
+ *      fuel flow  min/max/avg
+ *      OilT/OilP avg
+ *      MAP max/min/avg
+ *      RPM max/min/avg
+ *      %pwd max/min/avg
+ *      OAT min/max/avg
+ *      volt1/2  start/end/avg
+ *      amp      start/end/avg
+ 
+ *      CHTn max/min/median/maxI,minI
+ *      EGTn max/min/median/maxI,minI
+ *      TITn max/min/median/maxI,minI
+ 
+ * calc type:
+ *    start/end: first value, last value
+ *    min/max/avg/minI/maxI/median
+ *    total: last value - first value
+ *    maxfreq: value most frequent
+ 
+ */
+extension FlightLogFileAggregatedData {
+    static func defaultExport(logFileName : String, legs : [FlightLeg]) throws -> FlightLogFileAggregatedData {
+        let valuesDefs : [Field:[AggregatedValueMetric]] = [
+            .Distance:[.total],
+            .Latitude:[.start],
+            .Longitude:[.start],
+            .AltMSL:[.average],
+            .OAT:[.average],
+            .IAS:[.average],
+            .TAS:[.average],
+            .GndSpd:[.average],
+            .volt1:[.average],
+            .volt2:[.average],
+            .amp1:[.max,.min],
+            .FQtyT:[.start],
+            .FTotalizerT:[.total],
+            .E1_FFlow:[.average,.max,.min],
+            .E1_MAP:[.average,.max,.min],
+            .E1_RPM:[.average,.max,.min],
+            .E1_OilP:[.max,.min],
+            .E1_OilT:[.max,.min],
+            .E1_EGT_Max:[.max,.min],
+            .E1_EGT1:[.max,.min],
+            .E1_EGT2:[.max,.min],
+            .E1_EGT3:[.max,.min],
+            .E1_EGT4:[.max,.min],
+            .E1_EGT5:[.max,.min],
+            .E1_EGT6:[.max,.min],
+            .E1_CHT1:[.max,.min],
+            .E1_CHT2:[.max,.min],
+            .E1_CHT3:[.max,.min],
+            .E1_CHT4:[.max,.min],
+            .E1_CHT5:[.max,.min],
+            .E1_CHT6:[.max,.min],
+
+        ]
+        
+        let categoricalDefs : [Field:[AggregatedCategoricalMetric]] = [
+            .AfcsOn:[.mostFrequent],
+            .RollM:[.mostFrequent],
+            .PitchM:[.mostFrequent],
+            .E1_EGT_MaxIdx:[.end]
+        ]
+        
+        return try FlightLogFileAggregatedData(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs, constants: [.LogFileName:logFileName])
+    }
+}
+
+extension Date {
+    func roundedToNearest(interval : TimeInterval) -> Date {
+        return Date(timeIntervalSinceReferenceDate: round(self.timeIntervalSinceReferenceDate/interval) * interval )
+    }
+    
+    func withinOneSecond(of : Date) -> Bool {
+        let diff = self.timeIntervalSinceReferenceDate - of.timeIntervalSinceReferenceDate
+        return diff > -0.5 && diff < 0.5
+    }
+}
+
