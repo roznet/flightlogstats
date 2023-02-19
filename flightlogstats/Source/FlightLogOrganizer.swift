@@ -255,7 +255,7 @@ class FlightLogOrganizer {
                 Logger.app.info("Found corrections to be done")
             }
             Logger.app.info("Loaded \(fetchedInfo.count) Logs: existing \(existing) added \(added) ")
-            self.updateInfo(count: 1)
+            self.updateRecords(count: 1)
         }catch{
             Logger.app.error("Failed to query for files")
         }
@@ -282,8 +282,15 @@ class FlightLogOrganizer {
             Logger.app.error("Failed to query for aircrafts")
         }
     }
-    
-    func updateInfo(count : Int = 1, force : Bool = false) {
+   
+    /// update record by parsing the log file and extracting summary information from the file
+    /// Will save the summary to the database.
+    /// If aggregatedData is not nil, will also update the aggregated data
+    ///
+    /// - Parameters:
+    ///   - count: maximum number of record to process
+    ///   - force: if true will parse and update logs for record even if already parsed
+    func updateRecords(count : Int = 1, force : Bool = false) {
         guard currentState != .updatingInfoFromData else { return }
         let firstMissingCheck : Bool = (currentState == .complete)
         currentState = .updatingInfoFromData
@@ -337,6 +344,9 @@ class FlightLogOrganizer {
                             flightLog.parse(progress: reportParsingProgress ? self.progress : nil)
                             do {
                                 try info.updateFromFlightLog(flightLog: flightLog)
+                                if let agg = self.aggregatedData {
+                                    agg.insertOrReplace(record: info)
+                                }
                             }catch{
                                 info.recordStatus = .error
                                 Logger.app.error("Failed to update log \(error.localizedDescription)")
@@ -377,7 +387,7 @@ class FlightLogOrganizer {
                     self.progress?.update(state: .complete)
                     self.currentState = .complete
                 }else{
-                    self.updateInfo(count: count, force: false)
+                    self.updateRecords(count: count, force: false)
                     self.currentState = .ready
                 }
             }else{
@@ -404,8 +414,8 @@ class FlightLogOrganizer {
                 Self.scheduler.async {
                     let logs = FlightLogFileList(urls: urls)
                     self.add(aircrafts: urls)
-                    self.add(flightLogFileList: logs)
-                    self.updateInfo(count: 2)
+                    self.addMinimum(flightLogFileList: logs)
+                    self.updateRecords(count: 2)
                 }
             }
         }
@@ -450,11 +460,14 @@ class FlightLogOrganizer {
     
     
     
-    /// Add list of flights to the organizer if they are missing. will only updat eth elist, won't parse any data, so pretty quick
+    /// Add list of flights to the organizer if they are missing.
+    /// update the list of record and do a quick parse to save the minimum of details
+    /// will not update aggregatedData
+    ///
     /// - Parameter flightLogFileList: list of file to add
     /// - Returns: number of new flights added (0 if all already there)
     @discardableResult
-    func add(flightLogFileList : FlightLogFileList, completion : @escaping () -> Void = {} ) -> Int{
+    func addMinimum(flightLogFileList : FlightLogFileList, completion : @escaping () -> Void = {} ) -> Int{
         dispatchPrecondition(condition: .onQueue(Self.scheduler))
         var someNew : Int = 0
         self.progress?.update(state: .start, message: .addingFiles)
@@ -465,7 +478,7 @@ class FlightLogOrganizer {
         
         for flightLog in flightLogFileList.flightLogFiles {
             let filename = flightLog.name
-            if filename.isLogFile {
+            if filename.isFlightLogFile {
                 if let existingRecord = self.managedFlightLogs[filename] {
                     // replace if parsed or if flightlog not populated
                     if flightLog.isParsed || existingRecord.flightLog == nil {
@@ -553,7 +566,7 @@ class FlightLogOrganizer {
             var count = 0
             let files = try FileManager.default.contentsOfDirectory(atPath: self.localFolder.path)
             for file in files{
-                if file.isLogFile {
+                if file.isFlightLogFile {
                     count += 1
                     try FileManager.default.removeItem(at: self.localFolder.appendingPathComponent(file))
                 }
@@ -564,6 +577,10 @@ class FlightLogOrganizer {
         }
         
     }
+    //MARK: - Aggregated Data
+    /// Maintained full history of aggregatedData.
+    /// When records are updated this will be update. Can be nil to disable the aggregation all together
+    var aggregatedData : AggregatedDataOrganizer? = AggregatedDataOrganizer(databaseName: "flights.db", table: "aggregatedData")
     
     //MARK: - Log Files discovery
     var localFolder : URL = { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }()
@@ -1072,7 +1089,7 @@ extension String {
     
     var isAircraftSystemFile : Bool { return self.logFileType == .aircraft }
     var isRptFile : Bool { return self.logFileType == .rpt }
-    var isLogFile : Bool { self.logFileType == .log }
+    var isFlightLogFile : Bool { self.logFileType == .log }
     
     var logFileType : LogFileType {
         if self.hasSuffix(".csv") {
@@ -1089,7 +1106,7 @@ extension String {
         return .none
     }
     var logFileGuessedAirport : String? {
-        if self.isLogFile {
+        if self.isFlightLogFile {
             let d = (self as NSString).deletingPathExtension
             if let guess = d.components(separatedBy: "_").last {
                 return guess
@@ -1099,7 +1116,7 @@ extension String {
     }
 
     var logFileGuessedDate : Date? {
-        if self.isLogFile || self.isRptFile {
+        if self.isFlightLogFile || self.isRptFile {
             let d = (self as NSString).deletingPathExtension
             let components = d.components(separatedBy: "_")
             if components.count > 2 {
@@ -1120,7 +1137,7 @@ extension String {
 extension URL {
     typealias LogFileType = String.LogFileType
     var logFileType : LogFileType { return self.lastPathComponent.logFileType }
-    var isLogFile : Bool { return self.lastPathComponent.isLogFile }
+    var isLogFile : Bool { return self.lastPathComponent.isFlightLogFile }
     var logFileGuessedDate : Date? { return self.lastPathComponent.logFileGuessedDate }
 }
 

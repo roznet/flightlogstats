@@ -22,7 +22,7 @@ class LogMapGraphsViewController: UIViewController, ViewModelDelegate, MKMapView
     @IBOutlet weak var graphTypeSegment: UISegmentedControl!
     @IBOutlet weak var legTypeSegment: UISegmentedControl!
     
-    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileInfo }
+    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileRecord }
     var legsDataSource : FlightLegsDataSource? = nil
     
     var flightLogViewModel : FlightLogViewModel? = nil
@@ -243,7 +243,7 @@ class LogMapGraphsViewController: UIViewController, ViewModelDelegate, MKMapView
     }
     
     func viewModelHasChanged(viewModel: FlightLogViewModel) {
-        let changed : Bool = !(self.flightLogViewModel?.isSameLog(as: viewModel.flightLogFileInfo) ?? false)
+        let changed : Bool = !(self.flightLogViewModel?.isSameLog(as: viewModel.flightLogFileRecord) ?? false)
         self.flightLogViewModel = viewModel
         
         if changed {

@@ -27,6 +27,7 @@ public class FlightLogFile {
     private(set) var logType : LogType
     
     let url : URL 
+    /// name of the file, typically of the form log_YYYYMMDD_HHmmss.csv
     var name : String { return url.lastPathComponent }
     
     var count : Int { return self.data?.count ?? 0 }
@@ -57,7 +58,7 @@ public class FlightLogFile {
     private var data : FlightData? = nil
 
     init?(url : URL) {
-        if url.lastPathComponent.isLogFile {
+        if url.lastPathComponent.isFlightLogFile {
             self.logType = .notParsed
             self.url = url
         }else{
@@ -153,6 +154,7 @@ extension FlightLogFile {
         }
         return rv
     }
+    
     
     func route(start : Date? = nil) -> [ FlightLeg ] {
         var rv : [FlightLeg] = []

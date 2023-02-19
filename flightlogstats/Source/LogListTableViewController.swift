@@ -136,7 +136,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             UIAction(title: "Rebuild Info", image: UIImage(systemName: "plus.circle")){
                 _ in
                 Logger.app.info("Rebuild info")
-                self.logFileOrganizer.updateInfo(count: 1000, force: true)
+                self.logFileOrganizer.updateRecords(count: 1000, force: true)
             },
             UIAction(title: "Reset Database", image: UIImage(systemName: "minus.circle")){
                 _ in

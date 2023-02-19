@@ -109,6 +109,14 @@ class FlightLogFileRecord: NSManagedObject {
         }
     }
     
+    
+    /// Will parse the file and update if necessary:
+    ///     - the record in CoreData
+    ///     - the aggregated data if enabled
+    ///
+    /// - Parameters:
+    ///   - quick: if true will do a quick parse and only save minimum record information, in that case it will not update any aggregatedData
+    ///   - progress: object to report progress
     func parseAndUpdate(quick: Bool = false, progress : ProgressReport? = nil) {
         if flightLog == nil {
             guard let container = self.organizer,
@@ -128,6 +136,9 @@ class FlightLogFileRecord: NSManagedObject {
                 self.saveContext()
             }catch{
                 Logger.app.error("Failed to update \(error.localizedDescription)")
+            }
+            if let aggregatedData = self.organizer?.aggregatedData {
+                aggregatedData.insertOrReplace(record: self)
             }
         }
     }
@@ -233,6 +244,7 @@ class FlightLogFileRecord: NSManagedObject {
         return rv
     }
     
+    @available(*, deprecated, message: "Don't use")
     func populate(for url : URL){
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "log_yyMMMdd_HHmmss_"

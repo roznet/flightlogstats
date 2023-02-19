@@ -116,6 +116,11 @@ class FlightLogFileAggregatedData  {
 
     }
     
+    struct Schema {
+        let valuesDefs : [Field:[AggregatedValueMetric]]
+        let categoricalDefs : [Field:[AggregatedCategoricalMetric]]
+    }
+    
     var values : DataFrame<Date,Double,AggregatedValueColumn>
     var categoricals : DataFrame<Date,CategoricalValue,AggregatedCategoricalColumn>
     
@@ -148,9 +153,11 @@ class FlightLogFileAggregatedData  {
         - constants: dictionary of field to constant categorical to add to each row
     */
     init(legs : [FlightLeg],
-         valueDefs : [Field:[AggregatedValueMetric]],
-         categoricalDefs : [Field:[AggregatedCategoricalMetric]],
+         schema : Schema,
          constants : [Field:CategoricalValue] = [:] ) throws {
+        let valueDefs : [Field:[AggregatedValueMetric]] = schema.valuesDefs
+        let categoricalDefs : [Field:[AggregatedCategoricalMetric]] = schema.categoricalDefs
+
         self.values = DataFrame()
         self.categoricals = DataFrame()
         
@@ -260,7 +267,7 @@ class FlightLogFileAggregatedData  {
     }
 
     /// Merge two dataframes, keeping the values from the other dataframe if there is a conflict
-    func merge(with other: FlightLogFileAggregatedData) {
+    func insertOrReplace(data other: FlightLogFileAggregatedData) {
         // merge other first so the value for existing indexes comes from other
         let mergedValues = other.values.merged(with: self.values)
         let mergedCategoricals = other.categoricals.merged(with: self.categoricals)
@@ -385,51 +392,69 @@ class FlightLogFileAggregatedData  {
  
  */
 extension FlightLogFileAggregatedData {
-    static func defaultExport(logFileName : String, legs : [FlightLeg]) throws -> FlightLogFileAggregatedData {
-        let valuesDefs : [Field:[AggregatedValueMetric]] = [
-            .Distance:[.total],
-            .Latitude:[.start],
-            .Longitude:[.start],
-            .AltMSL:[.average],
-            .OAT:[.average],
-            .IAS:[.average],
-            .TAS:[.average],
-            .GndSpd:[.average],
-            .volt1:[.average],
-            .volt2:[.average],
-            .amp1:[.max,.min],
-            .FQtyT:[.start],
-            .FTotalizerT:[.total],
-            .E1_FFlow:[.average,.max,.min],
-            .E1_MAP:[.average,.max,.min],
-            .E1_RPM:[.average,.max,.min],
-            .E1_OilP:[.max,.min],
-            .E1_OilT:[.max,.min],
-            .E1_EGT_Max:[.max,.min],
-            .E1_EGT1:[.max,.min],
-            .E1_EGT2:[.max,.min],
-            .E1_EGT3:[.max,.min],
-            .E1_EGT4:[.max,.min],
-            .E1_EGT5:[.max,.min],
-            .E1_EGT6:[.max,.min],
-            .E1_CHT1:[.max,.min],
-            .E1_CHT2:[.max,.min],
-            .E1_CHT3:[.max,.min],
-            .E1_CHT4:[.max,.min],
-            .E1_CHT5:[.max,.min],
-            .E1_CHT6:[.max,.min],
-
-        ]
-        
-        let categoricalDefs : [Field:[AggregatedCategoricalMetric]] = [
-            .AfcsOn:[.mostFrequent],
-            .RollM:[.mostFrequent],
-            .PitchM:[.mostFrequent],
-            .E1_EGT_MaxIdx:[.end]
-        ]
-        
-        return try FlightLogFileAggregatedData(legs: legs, valueDefs: valuesDefs, categoricalDefs: categoricalDefs, constants: [.LogFileName:logFileName])
+    enum AggregatedDataError : Error {
+        case incompleteRecord
     }
+    static let defaultSchema = Schema(
+        valuesDefs: [
+            .Distance: [.total],
+            .Latitude: [.start],
+            .Longitude: [.start],
+            .AltMSL: [.average],
+            .OAT: [.average],
+            .IAS: [.average],
+            .TAS: [.average],
+            .GndSpd: [.average],
+            .volt1: [.average],
+            .volt2: [.average],
+            .amp1: [.max,.min],
+            .FQtyT: [.start],
+            .FTotalizerT: [.total],
+            .E1_FFlow: [.average,.max,.min],
+            .E1_MAP: [.average,.max,.min],
+            .E1_RPM: [.average,.max,.min],
+            .E1_OilP: [.max,.min],
+            .E1_OilT: [.max,.min],
+            .E1_EGT_Max: [.max,.min],
+            .E1_EGT1: [.max,.min],
+            .E1_EGT2: [.max,.min],
+            .E1_EGT3: [.max,.min],
+            .E1_EGT4: [.max,.min],
+            .E1_EGT5: [.max,.min],
+            .E1_EGT6: [.max,.min],
+            .E1_CHT1: [.max,.min],
+            .E1_CHT2: [.max,.min],
+            .E1_CHT3: [.max,.min],
+            .E1_CHT4: [.max,.min],
+            .E1_CHT5: [.max,.min],
+            .E1_CHT6: [.max,.min]
+            
+        ],
+        categoricalDefs: [
+            .AfcsOn: [.mostFrequent],
+            .RollM: [.mostFrequent],
+            .PitchM: [.mostFrequent],
+            .E1_EGT_MaxIdx: [.end],
+            .E1_CHT_MaxIdx: [.end]
+            ]
+    )
+    
+    static func defaultExport(logFileName : String, legs : [FlightLeg]) throws -> FlightLogFileAggregatedData {
+        return try FlightLogFileAggregatedData(legs: legs, schema: Self.defaultSchema, constants: [.LogFileName:logFileName])
+    }
+    
+    static func aggregate(flightLog : FlightLogFile, interval : TimeInterval, schema : Schema) throws -> FlightLogFileAggregatedData {
+        let legs = flightLog.legs(interval: interval)
+        let logFileName = flightLog.name
+        return try FlightLogFileAggregatedData(legs: legs, schema: schema, constants: [.LogFileName:logFileName])
+    }
+
+    static func aggregate(record : FlightLogFileRecord, interval : TimeInterval, schema : Schema) throws -> FlightLogFileAggregatedData {
+        guard let flightLog = record.flightLog else { throw AggregatedDataError.incompleteRecord }
+        return try FlightLogFileAggregatedData.aggregate(flightLog: flightLog, interval: interval, schema: schema)
+    }
+
+    
 }
 
 extension Date {

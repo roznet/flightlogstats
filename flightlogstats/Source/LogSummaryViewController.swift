@@ -24,7 +24,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
     @IBOutlet weak var legsCollectionView: UICollectionView!
     @IBOutlet weak var aircraftCollectionView: UICollectionView!
     
-    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileInfo }
+    var flightLogFileInfo : FlightLogFileRecord? { return self.flightLogViewModel?.flightLogFileRecord }
     var legsDataSource : FlightLegsDataSource? = nil
     var fuelDataSource : FlightSummaryFuelDataSource? = nil
     var timeDataSource : FlightSummaryTimeDataSource? = nil
@@ -219,7 +219,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
     }
     
     func viewModelHasChanged(viewModel: FlightLogViewModel) {
-        let changed : Bool = !(self.flightLogViewModel?.isSameLog(as: viewModel.flightLogFileInfo) ?? false)
+        let changed : Bool = !(self.flightLogViewModel?.isSameLog(as: viewModel.flightLogFileRecord) ?? false)
         self.flightLogViewModel = viewModel
         
         if changed {

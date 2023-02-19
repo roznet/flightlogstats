@@ -108,4 +108,27 @@ final class TestFileAggregatedData: XCTestCase {
         XCTAssertEqual(reload.values.count, totalCount)
     }
     
+    func testAggregatedOrganizer() {
+        RZFileOrganizer.removeEditableFile("test_aggregatedData.db")
+        let dbpath = RZFileOrganizer.writeableFilePath("test_aggregatedData.db")
+        let db = FMDatabase(path: dbpath)
+        db.open()
+        var aggregatedData = AggregatedDataOrganizer(db: db)
+    
+        
+        let urls : [TestLogFileSamples] = [.flight3,.flight2]
+        let files : [FlightLogFile] = urls.compactMap {
+            guard let url = $0.url, let file = FlightLogFile(url: url) else { return nil }
+            file.parse()
+            return file
+        }
+        guard files.count == urls.count
+        else {
+            XCTAssertTrue(false)
+            return
+        }
+        
+        aggregatedData?.insertOrReplace(record: <#T##FlightLogFileRecord#>)
+    }
+    
 }

@@ -19,7 +19,7 @@ extension Notification.Name {
 class FlightLogViewModel {
     typealias Field = FlightLogFile.Field
     
-    let flightLogFileInfo : FlightLogFileRecord
+    let flightLogFileRecord : FlightLogFileRecord
    
     // Every change update state
     private var writeState : Int = 0
@@ -37,10 +37,10 @@ class FlightLogViewModel {
     
     private func save() {
         AppDelegate.worker.async {
-            self.flightLogFileInfo.ensureFuelRecord()
-            if let record = self.flightLogFileInfo.fuel_record {
+            self.flightLogFileRecord.ensureFuelRecord()
+            if let record = self.flightLogFileRecord.fuel_record {
                 record.fuelAnalysisInputs = self.fuelAnalysisInputs
-                self.flightLogFileInfo.saveContext()
+                self.flightLogFileRecord.saveContext()
             }
         }
     }
@@ -65,19 +65,19 @@ class FlightLogViewModel {
     
     var aircraftPerformance : AircraftPerformance {
         get {
-            return self.flightLogFileInfo.aircraftRecord?.aircraftPerformance ?? Settings.shared.aircraftPerformance
+            return self.flightLogFileRecord.aircraftRecord?.aircraftPerformance ?? Settings.shared.aircraftPerformance
         }
         set {
-            self.flightLogFileInfo.aircraftRecord?.aircraftPerformance = newValue
+            self.flightLogFileRecord.aircraftRecord?.aircraftPerformance = newValue
         }
     }
     
     var displayIdentifier : String {
-        return self.flightLogFileInfo.aircraftRecord?.displayIdentifier ?? "Unknown"
+        return self.flightLogFileRecord.aircraftRecord?.displayIdentifier ?? "Unknown"
     }
     
     var airframeName : String {
-        return self.flightLogFileInfo.aircraftRecord?.airframeName ?? "Unknown"
+        return self.flightLogFileRecord.aircraftRecord?.airframeName ?? "Unknown"
     }
     
     var fuelMaxTextLabel : String {
@@ -89,7 +89,7 @@ class FlightLogViewModel {
     }
     
     var estimatedTotalizerStart : FuelQuantity? {
-        if let rv = self.flightLogFileInfo.estimatedTotalizerStart {
+        if let rv = self.flightLogFileRecord.estimatedTotalizerStart {
             return min(rv, self.aircraftPerformance.fuelMax)
         }
         return nil
@@ -97,30 +97,30 @@ class FlightLogViewModel {
     
     var flystoStatus : FlightFlyStoRecord.Status {
         get {
-            return self.flightLogFileInfo.flysto_record?.status ?? .ready
+            return self.flightLogFileRecord.flysto_record?.status ?? .ready
         }
         set {
-            self.flightLogFileInfo.ensureFlyStoStatus()
-            self.flightLogFileInfo.flysto_record?.status = newValue
-            self.flightLogFileInfo.flysto_record?.status_date = Date()
+            self.flightLogFileRecord.ensureFlyStoStatus()
+            self.flightLogFileRecord.flysto_record?.status = newValue
+            self.flightLogFileRecord.flysto_record?.status_date = Date()
         }
     }
     var flystoUpdateDate : Date? {
-        return self.flightLogFileInfo.flysto_record?.status_date
+        return self.flightLogFileRecord.flysto_record?.status_date
     }
     
     var savvyStatus : FlightSavvyRecord.Status {
         get {
-            return self.flightLogFileInfo.savvy_record?.status ?? .pending
+            return self.flightLogFileRecord.savvy_record?.status ?? .pending
         }
         set {
-            self.flightLogFileInfo.ensureSavvyStatus()
-            self.flightLogFileInfo.savvy_record?.status = newValue
-            self.flightLogFileInfo.savvy_record?.status_date = Date()
+            self.flightLogFileRecord.ensureSavvyStatus()
+            self.flightLogFileRecord.savvy_record?.status = newValue
+            self.flightLogFileRecord.savvy_record?.status_date = Date()
         }
     }
     var savvyUpdateDate : Date? {
-        return self.flightLogFileInfo.savvy_record?.status_date
+        return self.flightLogFileRecord.savvy_record?.status_date
     }
     var flystoStatusText : String {
         var messages : [String] = []
@@ -140,7 +140,7 @@ class FlightLogViewModel {
     
     // MARK: - Setup
     init(fileInfo : FlightLogFileRecord, displayContext : DisplayContext, progress : ProgressReport? = nil){
-        self.flightLogFileInfo = fileInfo
+        self.flightLogFileRecord = fileInfo
         self.progress = progress
         self.displayContext = displayContext
         self.fuelAnalysisInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel,
@@ -153,8 +153,8 @@ class FlightLogViewModel {
     }
     
     func updateFromRecord() {
-        self.flightLogFileInfo.ensureFuelRecord()
-        if let record = self.flightLogFileInfo.fuel_record {
+        self.flightLogFileRecord.ensureFuelRecord()
+        if let record = self.flightLogFileRecord.fuel_record {
             self.fuelAnalysisInputs = record.fuelAnalysisInputs
         }else{
             self.fuelAnalysisInputs = FuelAnalysis.Inputs(targetFuel: Settings.shared.targetFuel,
@@ -171,7 +171,7 @@ class FlightLogViewModel {
     }
     
     func isSameLog(as other : FlightLogFileRecord) -> Bool {
-        return other.log_file_name == self.flightLogFileInfo.log_file_name
+        return other.log_file_name == self.flightLogFileRecord.log_file_name
     }
     
     func isValid(target : FuelQuantity) -> Bool {
@@ -179,7 +179,7 @@ class FlightLogViewModel {
     }
 
     func isValid(added : FuelQuantity) -> Bool {
-        if let summary = self.flightLogFileInfo.flightSummary {
+        if let summary = self.flightLogFileRecord.flightSummary {
             let target = added + summary.fuelEnd
             return target >= summary.fuelEnd && target < self.aircraftPerformance.fuelMax
         }else{
@@ -190,9 +190,9 @@ class FlightLogViewModel {
     func build() {
         if self.shouldBuild {
             self.progress?.update(state: .start, message: .parsingInfo)
-            self.flightLogFileInfo.parseAndUpdate(progress: self.progress)
+            self.flightLogFileRecord.parseAndUpdate(progress: self.progress)
                         
-            if let summary = self.flightLogFileInfo.flightSummary {
+            if let summary = self.flightLogFileRecord.flightSummary {
                 self.fuelDataSource = FlightSummaryFuelDataSource(flightSummary: summary, displayContext: self.displayContext)
                 self.fuelDataSource?.prepare()
                 
@@ -204,7 +204,7 @@ class FlightLogViewModel {
                 
                 // cheat/special case to save time, use precomputed
                 if self.legsByFields == [.AtvWpt] {
-                    let legs = self.flightLogFileInfo.legs
+                    let legs = self.flightLogFileRecord.legs
                     if legs.count > 0 {
                         let legsDataSource = FlightLegsDataSource(legs: legs, displayContext: self.displayContext)
                         self.legsDataSource = legsDataSource
@@ -212,14 +212,14 @@ class FlightLogViewModel {
                         self.legsDataSource = nil
                     }
                 }else{
-                    if let legs = self.flightLogFileInfo.flightLog?.legs(byfields: self.legsByFields) {
+                    if let legs = self.flightLogFileRecord.flightLog?.legs(byfields: self.legsByFields) {
                         self.legsDataSource = FlightLegsDataSource(legs: legs, displayContext: self.displayContext)
                     }else{
                         self.legsDataSource = nil
                     }
                 }
             }
-            if let aircraftRecord = self.flightLogFileInfo.aircraftRecord {
+            if let aircraftRecord = self.flightLogFileRecord.aircraftRecord {
                 self.aircraftDataSource = AircraftSummaryDataSource(aircaftRecord: aircraftRecord)
             }else{
                 self.aircraftDataSource = nil
@@ -237,14 +237,14 @@ class FlightLogViewModel {
             return nil
         }
         
-        let series = self.flightLogFileInfo.dataSerie(fields: [field])
+        let series = self.flightLogFileRecord.dataSerie(fields: [field])
         return series[field]
     }
     
     let colors : [UIColor] = [UIColor.systemBlue, UIColor.systemRed]
     
     func scatterDataSource(fields : [FlightLogFile.Field], leg : FlightLeg? = nil) -> GCSimpleGraphCachedDataSource? {
-        if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,
+        if let start = self.flightLogFileRecord.flightSummary?.hobbs?.start,
            let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)),
            let first = fields.suffix(2).first,
            let last = fields.suffix(2).last {
@@ -271,7 +271,7 @@ class FlightLogViewModel {
     func graphDataSource(fields : [FlightLogFile.Field], leg : FlightLeg? = nil) -> GCSimpleGraphCachedDataSource? {
         var colorIdx = 0
         
-        if let start = self.flightLogFileInfo.flightSummary?.hobbs?.start,
+        if let start = self.flightLogFileRecord.flightSummary?.hobbs?.start,
            let ds = GCSimpleGraphCachedDataSource.graphDataSource(withTitle: "Plot", andXUnit: GCUnitElapsedSince(start)){
             ds.useBackgroundColor = UIColor.systemBackground
             ds.axisColor = UIColor.label
@@ -322,7 +322,7 @@ class FlightLogViewModel {
         let flySto = Settings.shared.flystoEnabled
         let savvy = Settings.shared.savvyEnabled
         var started : Bool = false
-        if let url = self.flightLogFileInfo.flightLog?.url {
+        if let url = self.flightLogFileRecord.flightLog?.url {
             self.progress?.update(state: .start, message: .uploadingFiles)
             if flySto && (force || self.flystoStatus != .uploaded) {
                 self.flyStoRequest = FlyStoRequests(viewController: viewController, url: url)
@@ -346,7 +346,7 @@ class FlightLogViewModel {
                 }
             }
             if savvy && (force || self.savvyStatus != .uploaded) {
-                if let identifier = self.flightLogFileInfo.aircraftRecord?.aircraftIdentifier {
+                if let identifier = self.flightLogFileRecord.aircraftRecord?.aircraftIdentifier {
                     self.savvyRequest = SavvyRequests(viewController: viewController, url: url, aircraftIdentifier: identifier)
                     started = true
                     self.savvyRequest?.execute(){ status in

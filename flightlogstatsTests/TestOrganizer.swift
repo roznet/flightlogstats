@@ -243,6 +243,12 @@ class TestOrganizer: XCTestCase {
             }
         }
         organizer.persistentContainer = container
+        
+        let dbpath = writeableBase.appending(path: "testAggregatedData.db")
+        let db = FMDatabase(url: dbpath)
+        db.open()
+        organizer.aggregatedData = AggregatedDataOrganizer(db: db)
+        
         return organizer
     }
     func testOrganizerSyncCloud() throws {
@@ -360,7 +366,7 @@ class TestOrganizer: XCTestCase {
         
         let log = FlightLogFile(url: url)!
         log.parse()
-        organizer.add(flightLogFileList: FlightLogFileList(logs: [log]))
+        organizer.addMinimum(flightLogFileList: FlightLogFileList(logs: [log]))
         AppDelegate.worker.sync {
             organizer.saveContext()
             
