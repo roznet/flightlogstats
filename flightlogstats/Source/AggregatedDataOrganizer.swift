@@ -31,8 +31,11 @@ class AggregatedDataOrganizer {
         self.db = db
         self.interval = 60.0
         self.table = table
+        let mem = RZPerformance.start()
         self.aggregatedData = FlightLogFileAggregatedData(from: db, table: table)
-        
+        if let mem = mem {//, mem.significant() {
+            Logger.app.info("Loaded \(self.aggregatedData.count) aggregated rows in \(mem)")
+        }
         guard self.checkOrInitDb() else { return nil }
     }
 

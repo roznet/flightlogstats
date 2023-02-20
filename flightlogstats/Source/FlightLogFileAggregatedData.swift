@@ -121,8 +121,12 @@ class FlightLogFileAggregatedData  {
         let categoricalDefs : [Field:[AggregatedCategoricalMetric]]
     }
     
+    var count : Int { return self.values.count }
+    
     var values : DataFrame<Date,Double,AggregatedValueColumn>
     var categoricals : DataFrame<Date,CategoricalValue,AggregatedCategoricalColumn>
+    
+    private let indexName = "Date"
     
     /// logFileName if only one there or nil if multiple
     var logFileName : String? {
@@ -183,11 +187,12 @@ class FlightLogFileAggregatedData  {
     
     
     /// Helper to get the data in a format that can be exported to a csv file
-    /// - Parameter indexName: name of the index column
-    func byRows(indexName : String = "Date") ->  ByRows {
+    /// - Parameter indexName: name of the index column, if nil will use "Date"
+    func byRows(indexName input: String? = nil) ->  ByRows {
         var fields : [String] = []
         var rows : [[String]] = []
 
+        let indexName = input ?? "Date"
         //fields: idenfitiers, index, categorical, values
 
         let categoricalFields = self.categoricals.fields
@@ -221,8 +226,6 @@ class FlightLogFileAggregatedData  {
    init(from db:FMDatabase, table : String) {
        self.values = DataFrame()
        self.categoricals = DataFrame()
-       
-        let indexName = "Date"
        
         //Get list of columns in table
         var sql = "PRAGMA table_info(\(table))"
@@ -277,7 +280,7 @@ class FlightLogFileAggregatedData  {
     /// Write the data to a database, if the database contains the same log file name, the data will be replaced in 
     /// the database with the new data
     func save(to db:FMDatabase, table : String) {
-        let indexName = "Date"
+        let indexName = self.indexName
         
         let categoricalFields = self.categoricals.fields
         let valueFields = self.values.fields
@@ -294,6 +297,9 @@ class FlightLogFileAggregatedData  {
                 Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
             }
             if !db.executeStatements("CREATE INDEX \(table)_LogFileName ON \(table) (LogFileName)"){
+                Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
+            }
+            if !db.executeStatements("CREATE INDEX \(table)_Date ON \(table) (Date)"){
                 Logger.app.error("Failed to execute sql \(db.lastErrorMessage())")
             }
         }
@@ -324,7 +330,7 @@ class FlightLogFileAggregatedData  {
         }
         for (idx,date) in self.categoricals.indexes.enumerated() {
             
-            var columns : [String] = ["Date"]
+            var columns : [String] = [self.indexName]
             var values : [Any] = [date]
 
             for field in categoricalFields {
