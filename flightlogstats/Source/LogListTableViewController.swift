@@ -103,27 +103,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 vc.modalPresentationStyle = .fullScreen
                 self.present(vc, animated: true)
             },
-            /*
+            /**/
             UIAction(title: "Rebuild Info", image: UIImage(systemName: "plus.circle")){
                 _ in
                 Logger.app.info("Rebuild info")
-                self.logFileOrganizer.updateInfo(count: 1000, force: true)
-            },*/
+                self.logFileOrganizer.updateRecords(count: 1000, force: true)
+            },/**/
             ]
-        if FlyStoRequests.hasCredential {
-            menuItems.append(UIAction(title: "Logout of FlySto", image: UIImage(systemName: "minus.circle")) {
-                _ in
-                FlyStoRequests.clearCredential()
-                self.updateButtons()
-            })
-        }
-        if SavvyRequests.hasCredential {
-            menuItems.append(UIAction(title: "Logout of Savvy", image: UIImage(systemName: "minus.circle")) {
-                _ in
-                SavvyRequests.clearCredential()
-                self.updateButtons()
-            })
-        }
 #if DEBUG
         menuItems.append(contentsOf: [
             UIAction(title: "Delete last", image: UIImage(systemName: "minus.circle")){
