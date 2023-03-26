@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/roznet/rzflight",
       "state" : {
-        "revision" : "29d40f72000e3a09c9063f6de2679759a888e5e3",
-        "version" : "1.0.3"
+        "revision" : "daa918e2413b71034df81bac61153d854b78dae2",
+        "version" : "1.0.4"
       }
     },
     {
@@ -86,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/roznet/rzutils",
       "state" : {
-        "revision" : "8e496e6d69caa2c1792906f380d68feb35d322dd",
-        "version" : "1.0.25"
+        "revision" : "178a6b77a9c2d895d76ac7bed34bdc9719d5d8a0",
+        "version" : "1.0.27"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/roznet/rzutils-touch",
       "state" : {
-        "revision" : "507732e2ad852792a34a9eb561e2a626166bb74e",
-        "version" : "1.0.3"
+        "revision" : "a6951a86b5e8aa9d779b1d4605d444f066e84739",
+        "version" : "1.0.6"
       }
     },
     {

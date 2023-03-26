@@ -580,7 +580,7 @@ class FlightLogOrganizer {
     //MARK: - Aggregated Data
     /// Maintained full history of aggregatedData.
     /// When records are updated this will be update. Can be nil to disable the aggregation all together
-    var aggregatedData : AggregatedDataOrganizer? = AggregatedDataOrganizer(databaseName: "flights.db", table: "aggregatedData")
+    var aggregatedData : AggregatedDataOrganizer? = nil //AggregatedDataOrganizer(databaseName: "flights.db", table: "aggregatedData")
     
     //MARK: - Log Files discovery
     var localFolder : URL = { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }()

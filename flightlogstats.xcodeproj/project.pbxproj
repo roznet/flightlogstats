@@ -412,8 +412,8 @@
 				42E13B8B2813DBA100AF38AC /* Storage */,
 				4280C8C4280D467A00A0FB32 /* Model */,
 				4280C8AE280D458B00A0FB32 /* UserInterface */,
-				4280C8C5280D46C900A0FB32 /* App */,
 				4280C88B280D43E500A0FB32 /* Info.plist */,
+				4280C8C5280D46C900A0FB32 /* App */,
 			);
 			path = flightlogstats;
 			sourceTree = "<group>";
@@ -1252,7 +1252,7 @@
 			repositoryURL = "https://github.com/roznet/rzutils-touch";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.3;
+				minimumVersion = 1.0.6;
 			};
 		};
 		42A11E9E28E882E70031D209 /* XCRemoteSwiftPackageReference "OAuthSwift" */ = {

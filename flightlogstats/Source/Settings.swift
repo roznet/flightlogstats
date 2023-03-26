@@ -8,101 +8,9 @@
 import Foundation
 import RZUtils
 import OAuthSwift
-
-@propertyWrapper
-struct UserStorage<Type> {
-    private let key : String
-    private let defaultValue : Type
-    init(key : Settings.Key, defaultValue : Type){
-        self.key = key.rawValue
-        self.defaultValue = defaultValue
-    }
-    
-    var wrappedValue : Type {
-        get {
-            UserDefaults.standard.object(forKey: key) as? Type ?? defaultValue
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: key)
-        }
-    }
-}
-
-@propertyWrapper
-struct CodableStorage<Type : Codable> {
-    private let key : String
-    
-    init(key : Settings.Key){
-        self.key = key.rawValue
-    }
-    
-    var wrappedValue : Type? {
-        get {
-            if let data = UserDefaults.standard.data(forKey: key),
-               let decoded = try? JSONDecoder().decode(Type.self, from: data) {
-                return decoded
-            }
-            return nil
-        }
-        set {
-            if let data = try? JSONEncoder().encode(newValue) {
-                UserDefaults.standard.set(data, forKey: key)
-            }else{
-                UserDefaults.standard.set(nil, forKey: key)
-            }
-        }
-    }
-}
-@propertyWrapper
-struct UnitStorage<UnitType : Dimension> {
-    private let key : String
-    private let defaultValue : UnitType
-    init(key : Settings.Key, defaultValue : UnitType){
-        self.key = key.rawValue
-        self.defaultValue = defaultValue
-    }
-    
-    var wrappedValue : UnitType {
-        get {
-            if let gcUnitKey = UserDefaults.standard.object(forKey: key) as? String{
-                return (GCUnit(forKey: gcUnitKey)?.foundationUnit as? UnitType) ?? defaultValue
-            }else{
-                return defaultValue
-            }
-        }
-        set {
-            if let gcUnit = newValue.gcUnit {
-                UserDefaults.standard.set(gcUnit.key, forKey: key)
-            }
-        }
-    }
-}
+import RZUtilsSwift
 
 
-@propertyWrapper
-struct EnumStorage< Type : RawRepresentable > {
-    private let key : String
-    private let defaultValue : Type
-
-    init(key : Settings.Key, defaultValue : Type){
-        self.key = key.rawValue
-        self.defaultValue = defaultValue
-    }
-    
-    var wrappedValue : Type {
-        get {
-            if let raw = UserDefaults.standard.object(forKey: key) as? Type.RawValue {
-                return Type(rawValue: raw) ?? defaultValue
-            }else{
-                return defaultValue
-            }
-        }
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: key)
-        }
-    }
-
-}
 
 
 struct Settings {
@@ -162,63 +70,63 @@ struct Settings {
         ])
     }
 
-    @UserStorage(key: .database_version, defaultValue: 1)
+    @UserStorage(key: Key.database_version, defaultValue: 1)
     var databaseVersion : Int
     
-    @EnumStorage(key: .open_file_mode, defaultValue: Self.defaultOpenFileMode)
+    @EnumStorage(key: Key.open_file_mode, defaultValue: Self.defaultOpenFileMode)
     var openFileMode : OpenFileMode
     
-    @UnitStorage(key: .unit_target_fuel, defaultValue: UnitVolume.aviationGallon)
+    @UnitStorage(key: Key.unit_target_fuel, defaultValue: UnitVolume.aviationGallon)
     var unitTargetFuel : UnitVolume
     
-    @UnitStorage(key: .unit_added_fuel, defaultValue: UnitVolume.liters)
+    @UnitStorage(key: Key.unit_added_fuel, defaultValue: UnitVolume.liters)
     var unitAddedFuel : UnitVolume
        
-    @UserStorage(key: .added_fuel_left, defaultValue: 0.0)
+    @UserStorage(key: Key.added_fuel_left, defaultValue: 0.0)
     private var addedFuelLeft : Double
 
-    @UserStorage(key: .added_fuel_right, defaultValue: 0.0)
+    @UserStorage(key: Key.added_fuel_right, defaultValue: 0.0)
     private var addedFuelRight : Double
     
-    @UserStorage(key: .target_fuel, defaultValue: 70.0)
+    @UserStorage(key: Key.target_fuel, defaultValue: 70.0)
     private var targetFuelTotal : Double
 
-    @UserStorage(key: .totalizer_start_fuel, defaultValue: 92.0)
+    @UserStorage(key: Key.totalizer_start_fuel, defaultValue: 92.0)
     private var totalizerStartFuelTotal : Double
 
-    @UserStorage(key: .aircraft_max_fuel, defaultValue: 92.0)
+    @UserStorage(key: Key.aircraft_max_fuel, defaultValue: 92.0)
     private var aircraftMaxFuelTotal : Double
     
-    @UserStorage(key: .aircraft_tab_fuel, defaultValue: 60.0)
+    @UserStorage(key: Key.aircraft_tab_fuel, defaultValue: 60.0)
     private var aircraftTabFuelTotal : Double
 
-    @UserStorage(key: .aircraft_gph, defaultValue: 17.0)
+    @UserStorage(key: Key.aircraft_gph, defaultValue: 17.0)
     private var aircraftGph : Double
 
-    @UserStorage(key: .fuel_config_first_use_acknowledged, defaultValue: false)
+    @UserStorage(key: Key.fuel_config_first_use_acknowledged, defaultValue: false)
     var fuelConfigFirstUseAcknowledged : Bool
     
-    @UserStorage(key: .flysto_enabled, defaultValue: false)
+    @UserStorage(key: Key.flysto_enabled, defaultValue: false)
     var flystoEnabled : Bool
-    @CodableStorage(key: .flysto_credentials)
+    @CodableStorage(key: Key.flysto_credentials)
     var flystoCredentials : OAuthSwiftCredential?
 
-    @UserStorage(key: .savvy_enabled, defaultValue: false)
+    @UserStorage(key: Key.savvy_enabled, defaultValue: false)
     var savvyEnabled : Bool
-    @CodableStorage(key: .savvy_token)
+    @CodableStorage(key: Key.savvy_token)
     var savvyToken : String?
    
     //Default on macos is selected file, on iOS automatic
 #if targetEnvironment(macCatalyst)
-    @EnumStorage(key: .import_method, defaultValue: .selectedFile)
+    @EnumStorage(key: Key.import_method, defaultValue: .selectedFile)
     var importMethod : ImportMethod
 #else
-    @EnumStorage(key: .import_method, defaultValue: .automatic)
+    @EnumStorage(key: Key.import_method, defaultValue: .automatic)
     var importMethod : ImportMethod
 #endif
     
 
-    @UserStorage(key: .import_startdate, defaultValue: Date())
+    @UserStorage(key: Key.import_startdate, defaultValue: Date())
     var importStartDate : Date
 
     var targetFuel : FuelQuantity {

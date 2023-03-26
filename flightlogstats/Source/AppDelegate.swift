@@ -9,6 +9,7 @@ import UIKit
 import RZFlight
 import FMDB
 import OSLog
+import RZUtilsSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
