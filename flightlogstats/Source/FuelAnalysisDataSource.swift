@@ -67,7 +67,7 @@ class FuelAnalysisDataSource: TableDataSource {
         return name
     }
     
-    func addLine<UnitType>(name : String, fuel : FuelTanks<UnitType>, totalizer : FuelTanks<UnitType>, unit : UnitType) {
+    func addLine<UnitType>(name : String, fuel : FuelTanks<UnitType>, totalizer : FuelTanks<UnitType>, unit : UnitType, highlight : Bool = false) {
         
         self.cellHolders.append(CellHolder(string: self.adaptedName(name: name), attributes: self.titleAttributes))
         var geoIndex = 1
@@ -79,9 +79,10 @@ class FuelAnalysisDataSource: TableDataSource {
             if measurement.value == 0.0 {
                 self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
             }else{
+                let attributes : [NSAttributedString.Key:Any]? = highlight ? self.titleAttributes : nil
                 let dv = displayContext.displayedValue(field: .FQtyT, measurement: measurement.measurementDimension, providedUnit: true)
-                dv.adjust(geometry: self.geometries[geoIndex])
-                self.cellHolders.append(dv.cellHolder())
+                dv.adjust(geometry: self.geometries[geoIndex], numberAttribute: attributes)
+                self.cellHolders.append(dv.cellHolder(attributes: attributes))
             }
             geoIndex += 1
         }
@@ -150,12 +151,12 @@ class FuelAnalysisDataSource: TableDataSource {
             self.addLine(name: "Current Endurance", endurance: fuelAnalysis.currentEndurance, totalizer: fuelAnalysis.currentEnduranceTotalizer)
             self.addSeparator()
             
-            for (name,fuel,totalizer,unit) in [
-                ("Target", fuelAnalysis.targetFuel, fuelAnalysis.targetFuel, UnitVolume.aviationGallon),
-                ("Target Required", fuelAnalysis.targetAdd, fuelAnalysis.targetAddTotalizer, fuelAddedUnit),
-                ("Target Save", fuelAnalysis.targetSave, fuelAnalysis.targetSave, UnitVolume.aviationGallon),
+            for (name,fuel,totalizer,unit,highlight) in [
+                ("Target", fuelAnalysis.targetFuel, fuelAnalysis.targetFuel, UnitVolume.aviationGallon, false),
+                ("Target Required", fuelAnalysis.targetAdd, fuelAnalysis.targetAddTotalizer, fuelAddedUnit, true),
+                ("Target Save", fuelAnalysis.targetSave, fuelAnalysis.targetSave, UnitVolume.aviationGallon, false),
             ] {
-                self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
+                self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit, highlight: highlight)
             }
             
             self.addLine(name: "Target Mass Save", fuel: fuelAnalysis.targetSaveMass, totalizer: fuelAnalysis.addedSaveMassTotalizer, unit: UnitMass.kilograms )
@@ -172,11 +173,11 @@ class FuelAnalysisDataSource: TableDataSource {
             }
             
             self.addSeparator()
-            for (name,fuel,totalizer,unit) in [
-                ("New Total", fuelAnalysis.addedTotal, fuelAnalysis.addedTotalTotalizer, UnitVolume.aviationGallon),
-                ("New Save", fuelAnalysis.addedSave, fuelAnalysis.addedSaveTotalizer, UnitVolume.aviationGallon),
+            for (name,fuel,totalizer,unit,highlight) in [
+                ("New Total", fuelAnalysis.addedTotal, fuelAnalysis.addedTotalTotalizer, UnitVolume.aviationGallon, true),
+                ("New Save", fuelAnalysis.addedSave, fuelAnalysis.addedSaveTotalizer, UnitVolume.aviationGallon, false),
             ] {
-                self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit)
+                self.addLine(name: name, fuel: fuel, totalizer: totalizer, unit: unit, highlight: highlight)
             }
             self.addLine(name: "New Mass Save", fuel: fuelAnalysis.addedSaveMass, totalizer: fuelAnalysis.addedSaveMassTotalizer, unit: UnitMass.kilograms )
             self.addLine(name: "New Endurance", endurance: fuelAnalysis.addedTotalEndurance, totalizer: fuelAnalysis.addedTotalEnduranceTotalizer)

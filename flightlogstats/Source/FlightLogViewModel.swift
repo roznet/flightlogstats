@@ -35,7 +35,7 @@ class FlightLogViewModel {
         return self.buildState < self.writeState
     }
     
-    private func save() {
+    func save() {
         AppDelegate.worker.async {
             self.flightLogFileRecord.ensureFuelRecord()
             if let record = self.flightLogFileRecord.fuel_record {
@@ -224,9 +224,10 @@ class FlightLogViewModel {
             }else{
                 self.aircraftDataSource = nil
             }
-            
+            AppDelegate.worker.async {
+                self.flightLogFileRecord.ensureFuelRecord()
+            }
             NotificationCenter.default.post(name: .flightLogViewModelChanged, object: self)
-            self.save()
             self.didBuild()
         }
         self.progress?.update(state: .complete)
