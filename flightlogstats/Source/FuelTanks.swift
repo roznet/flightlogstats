@@ -91,6 +91,11 @@ struct FuelTanks<UnitType : Dimension> : Comparable, Codable {
         
         return lhs.totalMeasurement == rhs.totalMeasurement
     }
+   
+    func rounded(in unit : UnitType? = nil, rule: FloatingPointRoundingRule) -> FuelTanks {
+        let converted = (unit != nil) ? self.converted(to: unit!) : self
+        return FuelTanks(left: converted.left.rounded(rule), right: converted.right.rounded(rule), unit: converted.unit)
+    }
     
     @inlinable
     public func isAlmostEqual(

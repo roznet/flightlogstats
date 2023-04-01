@@ -344,7 +344,8 @@ class FlightLogFileRecord: NSManagedObject {
             let context = container.persistentContainer.viewContext
             let record = FlightFuelRecord(context: context)
             // initialise with default
-            record.setupFromSettings()
+            
+            record.setupFromSettings(with: self.flightSummary)
             record.log_file_name = self.log_file_name
             self.fuel_record = record
             return true

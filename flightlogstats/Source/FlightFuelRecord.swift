@@ -59,11 +59,16 @@ class FlightFuelRecord: NSManagedObject {
     }
     
     /// setup default from settings
-    func setupFromSettings() {
+    func setupFromSettings(with summary: FlightSummary?) {
         if self.last_entered == nil {
-            self.targetFuel = Settings.shared.targetFuel
+            if let start = summary?.fuelStart {
+                self.targetFuel = start.rounded(in: Settings.shared.unitTargetFuel, rule: .up)
+                self.totalizerStartFuel = start.rounded(in: Settings.shared.unitTargetFuel, rule: .up)
+            }else{
+                self.totalizerStartFuel = Settings.shared.totalizerStartFuel
+                self.targetFuel = Settings.shared.targetFuel
+            }
             self.addedFuel = .zero
-            self.totalizerStartFuel = Settings.shared.totalizerStartFuel
         }
     }
     

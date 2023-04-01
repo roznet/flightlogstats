@@ -141,12 +141,6 @@ class FuelAnalysisDataSource: TableDataSource {
             }
             self.rowsCount = 1
             
-            if let estimatedStart = self.flightLogViewModel?.estimatedTotalizerStart {
-                self.addLine(name: "Start (Estimated)", fuel: flightSummary.fuelStart, totalizer: estimatedStart, unit: fuelTargetUnit)
-                self.addSeparator()
-            }
-            
-            
             self.addLine(name: "Current", fuel: fuelAnalysis.currentFuel, totalizer: fuelAnalysis.currentFuelTotalizer, unit: fuelTargetUnit)
             self.addLine(name: "Current Endurance", endurance: fuelAnalysis.currentEndurance, totalizer: fuelAnalysis.currentEnduranceTotalizer)
             self.addSeparator()
