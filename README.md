@@ -5,6 +5,7 @@ This [app first version](https://apps.apple.com/us/app/flightlogstats/id16433246
 ## Goal
 
 This app is about simplifying the workflow around management of Garmin G1000, Perspective and Perspective+ Flight logs.
+You can find more [information here](https://ro-z.net/blog/flightlogstats/)
 
 The usage is:
 
