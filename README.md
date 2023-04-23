@@ -1,28 +1,28 @@
 # ![icon](https://raw.githubusercontent.com/roznet/flightlogstats/main/flightlogstats/Assets.xcassets/AppIcon.appiconset/icon-72.png) Flight Log Stats
 
 This [app first version](https://apps.apple.com/us/app/flightlogstats/id1643324618) is currently on the app store, but still a work in progress.
+You can also find more [information here](https://ro-z.net/blog/flightlogstats/).
 
-## Goal
+## Introduction
 
-This app is about simplifying the workflow around management of Garmin G1000, Perspective and Perspective+ Flight logs.
+Welcome to the first version of our app, which is currently available on the App Store. We are continuously improving it to provide you with the best possible experience.
 
-The usage is:
+## Objective
 
-### Log Synchronisation
+Our app simplifies the management of flight logs for Garmin G1000, Perspective, and Perspective+ systems. With our app, you can easily sync your flight logs and access them on multiple devices, so you can review and analyze them conveniently.
 
-- from an ipad with a simcard dongle, press the + icon and select the simcard from the file browser. All the logs should then be imported, and will be made available and sync'd on your icloud drive.
-- The files will then be available (once your ipad had network available) on your mac and iphone. You can access the logs via the Files app to sync them to your favorite service or via the app on a different device for review.
+## How it Works
 
-### Basics review of the logs
+Log Synchronization: To sync your flight logs, simply connect your iPad to a sim card dongle, press the + icon, and select the sim card from the file browser. All your logs will be imported and synced to your iCloud drive. Once your iPad has network connectivity, the files will be available on your Mac and iPhone. You can also access the logs via the Files app to sync them to your favorite service.
 
-From the app, you can:
+Log Review: With our app, you can view a summary of the imported logs and get information about each log. Additionally, the app has a fuel analysis feature, which allows you to enter a fuel target, and the app will estimate how much fuel you need to add to each tank to match the target. This is especially useful in Europe, where planes use gallons, but fuel needs to be measured in liters. You can also see a summary of your trips and statistics, such as how many miles, total time, and fuel used during your trips away from home.
 
-- see summary of the logs you imported
-- see some information about each log, and a fuel analysis page where you can enter a fuel target and it will estimate how much fuel you may need to add in each tank to match the target. This is especially useful in europe for a plane where the information is in gallons, but you need to decide the quantity in liters
-- see some summary about the trips you made. In the statistics page, the app will try to group the flights away from your home base and give basics stats, for example how many miles, the total times, fuel used etc for the trip away from home.
+## Development
 
-## CAVEATS
+Contributions to our app are welcome! To build the app, you need to fill in the secrets.json file with your own keys for the remote service. Additionally, you need to run the python script airports.py to download the airport database.
 
-- This has so far only been tested with the logs from one aircraft, an SR22 with Garmin Perspective+
-- This should never be used as a primary planning tool, but just as a supplementary tool. Always check independently all the calculation made by the apps
+## Caveat
 
+Please note that our app has only been tested with the logs from one aircraft, an SR22 with Garmin Perspective+. Therefore, we recommend using it as a supplementary tool and not as a primary planning tool. Always independently verify all calculations made by the app.
+
+Thank you for using our app. If you have any feedback or suggestions, please feel free to contact us. We are committed to providing you with the best possible experience.
