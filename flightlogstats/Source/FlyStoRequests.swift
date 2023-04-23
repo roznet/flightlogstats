@@ -143,6 +143,9 @@ class FlyStoRequests {
                 result in
                 switch result {
                 case .success(let response):
+                    if let string = String(data: data, encoding: .utf8) {
+                        Logger.net.info("body: \(string)")
+                    }
                     Logger.net.info("upload of \(self.url.lastPathComponent) successfull \(response.description)")
                     self.end(status: .success)
                 case .failure(let queryError):
@@ -154,6 +157,7 @@ class FlyStoRequests {
                     case .error:
                         self.end(status: .error("Failed \(queryError.localizedDescription)"))
                     case .success,.progressing(_),.already:
+
                         self.end(status: .success)
                     }
                 }
@@ -173,6 +177,12 @@ class FlyStoRequests {
                 Logger.net.info("Token has expired, status: \(code)")
                 return .tokenExpired
             }else if code == 409 {
+                let userInfo = (underlyingError as NSError).userInfo
+                if
+                   let responseString = userInfo["Response-Body"]{
+                    Logger.net.info("body: \(responseString)")
+                }
+                
                 Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
                 return .success
             }else if code == 400 {
