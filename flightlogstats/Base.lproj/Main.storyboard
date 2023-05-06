@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -282,7 +283,7 @@
                                 </cells>
                             </collectionView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="aKL-fC-i7y" userLabel="Legs Collection View">
-                                <rect key="frame" x="5" y="344" width="824" height="776"/>
+                                <rect key="frame" x="5" y="344" width="824" height="771"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="oSQ-lx-eW3" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
@@ -356,7 +357,7 @@
                                 </cells>
                             </collectionView>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="cyP-Hg-ndb">
-                                <rect key="frame" x="342" y="1120" width="150" height="4"/>
+                                <rect key="frame" x="342" y="1115" width="150" height="4"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="Qva-TF-6jV"/>
                                     <constraint firstAttribute="height" constant="4" id="y7G-P6-0Pl"/>
@@ -562,7 +563,7 @@
                                 </variation>
                             </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="hdQ-sd-7Aw" userLabel="Fuel Collection View">
-                                <rect key="frame" x="5" y="254" width="824" height="855"/>
+                                <rect key="frame" x="5" y="254" width="824" height="850"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="MTb-3z-2kN"/>
@@ -705,21 +706,21 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="r8C-3q-fsx" userLabel="Graph Map Stack View">
-                                <rect key="frame" x="0.0" y="24" width="834" height="552.5"/>
+                                <rect key="frame" x="0.0" y="24" width="834" height="550"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4M1-lB-EUH" customClass="GCSimpleGraphView">
-                                        <rect key="frame" x="0.0" y="0.0" width="417" height="552.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="417" height="550"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     </view>
                                     <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oTf-lX-xiU">
-                                        <rect key="frame" x="417" y="0.0" width="417" height="552.5"/>
+                                        <rect key="frame" x="417" y="0.0" width="417" height="550"/>
                                         <standardMapConfiguration key="preferredConfiguration"/>
                                     </mapView>
                                 </subviews>
                                 <variation key="heightClass=regular-widthClass=compact" axis="vertical"/>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="5He-7J-abp" userLabel="Selector Stack View">
-                                <rect key="frame" x="0.0" y="571.5" width="834" height="60"/>
+                                <rect key="frame" x="0.0" y="569" width="834" height="60"/>
                                 <subviews>
                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="5cU-4P-yg2">
                                         <rect key="frame" x="0.0" y="14.5" width="383" height="32"/>
@@ -750,7 +751,7 @@
                                 </constraints>
                             </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="RIe-Tr-gEa" userLabel="Legs Collection View">
-                                <rect key="frame" x="0.0" y="631.5" width="834" height="497.5"/>
+                                <rect key="frame" x="0.0" y="629" width="834" height="495"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="Ouf-s9-dep" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
@@ -862,7 +863,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="C8C-Qy-cZt" userLabel="Log List View">
-                                <rect key="frame" x="5" y="137" width="824" height="992"/>
+                                <rect key="frame" x="5" y="137" width="824" height="987"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="2x8-SZ-QS5" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
@@ -997,7 +998,7 @@
                                 </constraints>
                             </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="8Xl-gc-ZSL" userLabel="Log List View">
-                                <rect key="frame" x="5" y="134" width="824" height="1000"/>
+                                <rect key="frame" x="5" y="134" width="824" height="995"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewLayout key="collectionViewLayout" id="6w5-OM-45w" customClass="TableCollectionViewLayout" customModule="FlightLogStats" customModuleProvider="target"/>
                                 <cells>
@@ -1290,7 +1291,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="EVb-qc-OLK">
-                                <rect key="frame" x="282" y="530.5" width="270" height="137.5"/>
+                                <rect key="frame" x="282" y="505.5" width="270" height="187"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleAspectFit" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="X5Q-2l-ioZ">
                                         <rect key="frame" x="0.0" y="0.0" width="270" height="36.5"/>
@@ -1302,7 +1303,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cgg-fz-lfM">
-                                                <rect key="frame" x="56" y="2.5" width="51" height="31"/>
+                                                <rect key="frame" x="56" y="3" width="51" height="31"/>
                                                 <connections>
                                                     <action selector="uiControlChanged:" destination="OaX-rL-Yog" eventType="valueChanged" id="bgI-D1-yHc"/>
                                                 </connections>
@@ -1344,7 +1345,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rjz-zJ-NyY">
-                                                <rect key="frame" x="53.5" y="2.5" width="51" height="31"/>
+                                                <rect key="frame" x="53.5" y="3" width="51" height="31"/>
                                                 <connections>
                                                     <action selector="uiControlChanged:" destination="OaX-rL-Yog" eventType="valueChanged" id="PfC-19-hrX"/>
                                                 </connections>
@@ -1376,8 +1377,21 @@
                                             </button>
                                         </subviews>
                                     </stackView>
-                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v7E-US-Vqt">
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hjq-Vs-XcR">
                                         <rect key="frame" x="0.0" y="103" width="270" height="34.5"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rww-HF-pTl">
+                                                <rect key="frame" x="0.0" y="0.0" width="270" height="34.5"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Open In FlySto"/>
+                                                <connections>
+                                                    <action selector="openInFlysto:" destination="OaX-rL-Yog" eventType="touchUpInside" id="3OD-RI-Ohc"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v7E-US-Vqt">
+                                        <rect key="frame" x="0.0" y="152.5" width="270" height="34.5"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o90-ck-BL3" userLabel="Force Upload Again">
                                                 <rect key="frame" x="0.0" y="0.0" width="270" height="34.5"/>

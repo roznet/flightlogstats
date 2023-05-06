@@ -68,7 +68,7 @@ class FlyStoUploadRequest : FlyStoRequest {
         var fileId : String
     }
     
-    func interpretResponse(response : String?) -> UploadResponse? {
+    static func interpretResponse(response : String?) -> UploadResponse? {
         if let data = response?.data(using: .utf8),
            let res = try? JSONDecoder().decode(UploadResponse.self, from: data) {
             return res
@@ -77,7 +77,7 @@ class FlyStoUploadRequest : FlyStoRequest {
     }
 
     func extractFileId(from response : String) {
-        if self.interpretResponse(response: response) != nil {
+        if Self.interpretResponse(response: response) != nil {
             self.uploadResponse = response
         }else{
             self.uploadResponse = nil

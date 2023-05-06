@@ -81,6 +81,7 @@
 		4280C8D4280D4CA500A0FB32 /* LogSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogSummaryViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
 		428F52F42A0655EE00124CDD /* FlyStoUploadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428F52F32A0655EE00124CDD /* FlyStoUploadRequest.swift */; };
+		428F52F62A06A89800124CDD /* FlyStoLogFilesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428F52F52A06A89800124CDD /* FlyStoLogFilesRequest.swift */; };
 		4290B460294E5DA10089B158 /* CsvParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4290B45F294E5DA10089B158 /* CsvParser.swift */; };
 		4291E195296D672100DE2990 /* TestFileAggregatedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4291E194296D672100DE2990 /* TestFileAggregatedData.swift */; };
 		42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */; };
@@ -219,6 +220,7 @@
 		4280C8D3280D4CA500A0FB32 /* LogSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogSummaryViewController.swift; path = Source/LogSummaryViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		428F52F32A0655EE00124CDD /* FlyStoUploadRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoUploadRequest.swift; path = Source/FlyStoUploadRequest.swift; sourceTree = "<group>"; };
+		428F52F52A06A89800124CDD /* FlyStoLogFilesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoLogFilesRequest.swift; path = Source/FlyStoLogFilesRequest.swift; sourceTree = "<group>"; };
 		4290B45F294E5DA10089B158 /* CsvParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CsvParser.swift; path = Source/CsvParser.swift; sourceTree = "<group>"; };
 		4291E194296D672100DE2990 /* TestFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFileAggregatedData.swift; sourceTree = "<group>"; };
 		42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRequest.swift; path = Source/RemoteServiceRequest.swift; sourceTree = "<group>"; };
@@ -528,6 +530,7 @@
 				42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */,
 				42A11EA228E883190031D209 /* FlyStoRequest.swift */,
 				428F52F32A0655EE00124CDD /* FlyStoUploadRequest.swift */,
+				428F52F52A06A89800124CDD /* FlyStoLogFilesRequest.swift */,
 				423731612985CA3E001A99CA /* SavvyRequest.swift */,
 			);
 			name = Communications;
@@ -826,6 +829,7 @@
 				421EE5C12928E01E00996EC6 /* FlightLogFileAggregatedData.swift in Sources */,
 				42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */,
 				42943B7D299D0133003B7E2A /* RemoteServiceRecord.swift in Sources */,
+				428F52F62A06A89800124CDD /* FlyStoLogFilesRequest.swift in Sources */,
 				4264C23C282691EF00F40436 /* FuelTanks.swift in Sources */,
 				4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */,
 				4264C23A2826858700F40436 /* FlightSummary.swift in Sources */,

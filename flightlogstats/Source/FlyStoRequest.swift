@@ -59,13 +59,21 @@ extension FlightLogFileRecord {
         self.flystoStatus = checkflyStoStatus
         if let uploadRequest = request as? FlyStoUploadRequest {
             if let resp = uploadRequest.uploadResponse,
-               uploadRequest.interpretResponse(response: resp) != nil {
+               FlyStoUploadRequest.interpretResponse(response: resp) != nil {
                 Logger.net.info("Got valid upload Response \(resp)")
                 self.flysto_record?.upload_response = resp
             }
         }
-
     }
+    
+    func flyStoLogFilesRequest(viewController : UIViewController) -> FlyStoLogFilesRequest?{
+        if let res = FlyStoUploadRequest.interpretResponse(response: self.flysto_record?.upload_response) {
+            let req = FlyStoLogFilesRequest(viewController: viewController, fileId: res.fileId)
+            return req
+        }
+        return nil
+    }
+    
 }
 
 class FlyStoRequest : RemoteServiceRequest{

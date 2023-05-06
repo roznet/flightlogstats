@@ -38,6 +38,14 @@ class UploadSettingsViewController: UIViewController {
             self.flightLogViewModel?.startServiceSynchronization(viewController: parent,force: true)
         }
     }
+    
+    @IBAction func openInFlysto(_ sender: Any) {
+        self.dismiss(animated: true)
+        if let parent = self.summaryViewController {
+            self.flightLogViewModel?.startFlyStoLogFileUrl(viewController: parent)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }

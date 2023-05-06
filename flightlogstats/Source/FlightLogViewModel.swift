@@ -353,6 +353,20 @@ class FlightLogViewModel {
         if !started {
             self.progress?.update(state: .complete, message: .uploadingFiles)
         }
-        
+    }
+    private var flyStoLogFileRequest : FlyStoLogFilesRequest? = nil
+    
+    func startFlyStoLogFileUrl(viewController : UIViewController) {
+        if let req = self.flightLogFileRecord.flyStoLogFilesRequest(viewController: viewController) {
+            req.execute() { status, req in
+                if let req = req as? FlyStoLogFilesRequest,
+                   let url = req.url {
+                    Logger.ui.info("got flysto url: \(url)")
+                    DispatchQueue.main.async {
+                        UIApplication.shared.open(url)
+                    }
+                }
+            }
+        }
     }
 }
