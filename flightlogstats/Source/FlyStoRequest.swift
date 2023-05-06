@@ -4,6 +4,12 @@
 //
 //  Created by Brice Rosenzweig on 01/10/2022.
 //
+// GET https://www.flysto.net/public-api/log-files/<file-id>
+// to obtain current information about the file:
+// {
+//    "processed": "true",
+//    "logs": ["<log-id"]
+// }
 
 import Foundation
 import OAuthSwift
@@ -13,7 +19,7 @@ import OSLog
 import ZIPFoundation
 import RZUtilsSwift
 
-class FlyStoRequests {
+class FlyStoRequest : RemoteServiceRequest{
     
     typealias Status = RemoteServiceRequest.Status
     typealias CompletionHandler = RemoteServiceRequest.CompletionHandler
@@ -21,12 +27,9 @@ class FlyStoRequests {
     let oauth : OAuth2Swift
     let viewController : UIViewController
     
-    let url : URL
-    var uploadFileUrl : URL { return self.url.appendingPathExtension("zip") }
     var completionHandler : CompletionHandler? = nil
 
-    init(viewController : UIViewController, url : URL) {
-        self.url = url
+    init(viewController : UIViewController) {
         self.viewController = viewController
         self.oauth = OAuth2Swift(consumerKey: Secrets.shared.value(for: "flysto.consumerKey"),
                             consumerSecret: Secrets.shared.value(for: "flysto.consumerSecret"),
@@ -39,7 +42,6 @@ class FlyStoRequests {
         #else
         self.oauth.authorizeURLHandler = SafariURLHandler(viewController: self.viewController, oauthSwift: self.oauth)
         #endif
-        
     }
     
     @discardableResult func retrieveCredential() -> Bool {
@@ -74,7 +76,6 @@ class FlyStoRequests {
             self.end(status: .error("More than 2 attemps failed, aborting"))
             return
         }
-        Logger.net.info("start upload[\(attempt)] \(self.url.lastPathComponent)")
         if !self.retrieveCredential() {
             let callback = URL(string: Secrets.shared.value(for: "flysto.callbackUrl"))
             Logger.net.info("starting full authorize process")
@@ -100,7 +101,7 @@ class FlyStoRequests {
             Logger.net.error(message)
         }
         if let cb = self.completionHandler {
-            cb(status)
+            cb(status,self)
         }
         
         self.completionHandler = nil
@@ -129,48 +130,7 @@ class FlyStoRequests {
     }
 
     func makeRequest(attempt : Int = 0){
-        guard !self.oauth.client.credential.isTokenExpired() else {
-            self.end(status: .error("Token should have been renewed but has expired"))
-            return
-        }
-        
-        if let data = self.buildUploadFile(),
-           let upload = URL(string: Secrets.shared.value(for: "flysto.uploadLogUrl")) {
-            if let cb = self.completionHandler {
-                cb(FlyStoRequests.Status.progressing(0.5))
-            }
-            self.oauth.client.post(upload, body: data) {
-                result in
-                switch result {
-                case .success(let response):
-                    if let string = String(data: data, encoding: .utf8) {
-                        self.extractFileId(from: string)
-                    }
-                    Logger.net.info("upload of \(self.url.lastPathComponent) successfull \(response.description)")
-                    self.end(status: .success)
-                case .failure(let queryError):
-                    let status = self.processSwiftOAuthError(error: queryError)
-                    switch status {
-                    case .tokenExpired,.denied:
-                        Self.clearCredential()
-                        self.start(attempt: attempt + 1)
-                    case .error:
-                        self.end(status: .error("Failed \(queryError.localizedDescription)"))
-                    case .success,.progressing(_):
-                        self.end(status: .success)
-                    case .already(let responseString):
-                        self.extractFileId(from: responseString)
-                        self.end(status: .success)
-                    }
-                }
-            }
-        }else{
-            self.end(status: .error("Failed to build file for upload"))
-        }
-    }
-    
-    func extractFileId(from response : String) {
-        Logger.net.info("Extract file id from \(response)")
+        return self.end(status: .success)
     }
     
     @discardableResult func processSwiftOAuthError(error : OAuthSwiftError) -> Status {
@@ -183,7 +143,6 @@ class FlyStoRequests {
                 Logger.net.info("Token has expired, status: \(code)")
                 return .tokenExpired
             }else if code == 409 {
-                Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
                 let userInfo = (underlyingError as NSError).userInfo
                 if
                    let responseString = userInfo["Response-Body"] as? String{
@@ -193,7 +152,6 @@ class FlyStoRequests {
                 }
                 
             }else if code == 400 {
-                Logger.net.info("File \(self.url.lastPathComponent) application error (code \(code))")
                 return .denied
             }else{
                 Logger.net.info("Underlying request error: \(code)")
@@ -212,30 +170,6 @@ class FlyStoRequests {
             Logger.net.error("Other error \(error.localizedDescription)")
             return .error("Other error \(error.localizedDescription)")
         }
-    }
-    
-    //MARK: - Upload file
-    func clearUploadFile() {
-        if FileManager.default.fileExists(atPath: self.uploadFileUrl.path) {
-            do {
-                try FileManager.default.removeItem(at: self.uploadFileUrl)
-            }catch{
-                Logger.net.error("Failed to remove archive \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    func buildUploadFile() -> Data? {
-        self.clearUploadFile()
-        if let archive = Archive(url: self.uploadFileUrl, accessMode: .create){
-            do {
-                try archive.addEntry(with: self.url.lastPathComponent, fileURL: self.url, compressionMethod: .deflate)
-                return try Data(contentsOf: self.uploadFileUrl)
-            }catch{
-                Logger.net.error("Failed to create zip file \(error.localizedDescription)")
-            }
-        }
-        return nil
     }
     
 }

@@ -25,7 +25,7 @@
 		421EE5C12928E01E00996EC6 /* FlightLogFileAggregatedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */; };
 		423367A6293BC85F007D2285 /* MeasurementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A5293BC85F007D2285 /* MeasurementView.swift */; };
 		423367A8293BC967007D2285 /* MeasurementCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */; };
-		423731622985CA3E001A99CA /* SavvyRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423731612985CA3E001A99CA /* SavvyRequests.swift */; };
+		423731622985CA3E001A99CA /* SavvyRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423731612985CA3E001A99CA /* SavvyRequest.swift */; };
 		4239290D2864D08800CD33C0 /* AircraftPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290C2864D08800CD33C0 /* AircraftPerformance.swift */; };
 		4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */; };
 		423929112864D58800CD33C0 /* TestAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423929102864D58800CD33C0 /* TestAnalysis.swift */; };
@@ -80,6 +80,7 @@
 		4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */ = {isa = PBXBuildFile; productRef = 4280C8D1280D4BE400A0FB32 /* RZUtilsTouch */; };
 		4280C8D4280D4CA500A0FB32 /* LogSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4280C8D3280D4CA500A0FB32 /* LogSummaryViewController.swift */; };
 		4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4280C8D6280D70CB00A0FB32 /* CloudKit.framework */; };
+		428F52F42A0655EE00124CDD /* FlyStoUploadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428F52F32A0655EE00124CDD /* FlyStoUploadRequest.swift */; };
 		4290B460294E5DA10089B158 /* CsvParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4290B45F294E5DA10089B158 /* CsvParser.swift */; };
 		4291E195296D672100DE2990 /* TestFileAggregatedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4291E194296D672100DE2990 /* TestFileAggregatedData.swift */; };
 		42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */; };
@@ -90,7 +91,7 @@
 		429949DB282B40B300CA1B89 /* GCUnit+Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */; };
 		429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */; };
 		42A11EA028E882E70031D209 /* OAuthSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 42A11E9F28E882E70031D209 /* OAuthSwift */; };
-		42A11EA328E883190031D209 /* FlyStoRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A11EA228E883190031D209 /* FlyStoRequests.swift */; };
+		42A11EA328E883190031D209 /* FlyStoRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A11EA228E883190031D209 /* FlyStoRequest.swift */; };
 		42A11EA828FACD2C0031D209 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 42A11EA728FACD2C0031D209 /* ZIPFoundation */; };
 		42A11EAA28FAFD7C0031D209 /* FlightFlyStoRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A11EA928FAFD7C0031D209 /* FlightFlyStoRecord.swift */; };
 		42A20B522896F0CF00439880 /* Trips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42A20B512896F0CF00439880 /* Trips.swift */; };
@@ -162,7 +163,7 @@
 		421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileAggregatedData.swift; path = Source/FlightLogFileAggregatedData.swift; sourceTree = "<group>"; };
 		423367A5293BC85F007D2285 /* MeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementView.swift; path = Source/MeasurementView.swift; sourceTree = "<group>"; };
 		423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementCollectionViewCell.swift; path = Source/MeasurementCollectionViewCell.swift; sourceTree = "<group>"; };
-		423731612985CA3E001A99CA /* SavvyRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SavvyRequests.swift; path = Source/SavvyRequests.swift; sourceTree = "<group>"; };
+		423731612985CA3E001A99CA /* SavvyRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SavvyRequest.swift; path = Source/SavvyRequest.swift; sourceTree = "<group>"; };
 		4239290C2864D08800CD33C0 /* AircraftPerformance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftPerformance.swift; path = Source/AircraftPerformance.swift; sourceTree = "<group>"; };
 		4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysis.swift; path = Source/FuelAnalysis.swift; sourceTree = "<group>"; };
 		423929102864D58800CD33C0 /* TestAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAnalysis.swift; sourceTree = "<group>"; };
@@ -217,6 +218,7 @@
 		4280C8C7280D48E700A0FB32 /* log_210623_141501_TEST1.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_210623_141501_TEST1.csv; sourceTree = "<group>"; };
 		4280C8D3280D4CA500A0FB32 /* LogSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogSummaryViewController.swift; path = Source/LogSummaryViewController.swift; sourceTree = "<group>"; };
 		4280C8D6280D70CB00A0FB32 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		428F52F32A0655EE00124CDD /* FlyStoUploadRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoUploadRequest.swift; path = Source/FlyStoUploadRequest.swift; sourceTree = "<group>"; };
 		4290B45F294E5DA10089B158 /* CsvParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CsvParser.swift; path = Source/CsvParser.swift; sourceTree = "<group>"; };
 		4291E194296D672100DE2990 /* TestFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFileAggregatedData.swift; sourceTree = "<group>"; };
 		42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRequest.swift; path = Source/RemoteServiceRequest.swift; sourceTree = "<group>"; };
@@ -226,7 +228,7 @@
 		429949D8282A9F7C00CA1B89 /* TableCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewCell.swift; path = Source/TableCollectionViewCell.swift; sourceTree = "<group>"; };
 		429949DA282B40B300CA1B89 /* GCUnit+Logfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GCUnit+Logfile.swift"; path = "Source/GCUnit+Logfile.swift"; sourceTree = "<group>"; };
 		429949DD282C6AD300CA1B89 /* TableCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableCollectionViewLayout.swift; path = Source/TableCollectionViewLayout.swift; sourceTree = "<group>"; };
-		42A11EA228E883190031D209 /* FlyStoRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoRequests.swift; path = Source/FlyStoRequests.swift; sourceTree = "<group>"; };
+		42A11EA228E883190031D209 /* FlyStoRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoRequest.swift; path = Source/FlyStoRequest.swift; sourceTree = "<group>"; };
 		42A11EA928FAFD7C0031D209 /* FlightFlyStoRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightFlyStoRecord.swift; path = Source/FlightFlyStoRecord.swift; sourceTree = "<group>"; };
 		42A20B512896F0CF00439880 /* Trips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trips.swift; path = Source/Trips.swift; sourceTree = "<group>"; };
 		42A20B54289C577F00439880 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Trip.swift; path = Source/Trip.swift; sourceTree = "<group>"; };
@@ -523,9 +525,10 @@
 		42A11EA128E882F90031D209 /* Communications */ = {
 			isa = PBXGroup;
 			children = (
-				42A11EA228E883190031D209 /* FlyStoRequests.swift */,
-				423731612985CA3E001A99CA /* SavvyRequests.swift */,
 				42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */,
+				42A11EA228E883190031D209 /* FlyStoRequest.swift */,
+				428F52F32A0655EE00124CDD /* FlyStoUploadRequest.swift */,
+				423731612985CA3E001A99CA /* SavvyRequest.swift */,
 			);
 			name = Communications;
 			sourceTree = "<group>";
@@ -807,9 +810,10 @@
 				4203FBC92905A503005B0530 /* ErrorManager.swift in Sources */,
 				4264C230281D830000F40436 /* MainSplitViewController.swift in Sources */,
 				4264C23628267EDC00F40436 /* FlightLeg.swift in Sources */,
+				428F52F42A0655EE00124CDD /* FlyStoUploadRequest.swift in Sources */,
 				423367A6293BC85F007D2285 /* MeasurementView.swift in Sources */,
 				4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */,
-				423731622985CA3E001A99CA /* SavvyRequests.swift in Sources */,
+				423731622985CA3E001A99CA /* SavvyRequest.swift in Sources */,
 				423367A8293BC967007D2285 /* MeasurementCollectionViewCell.swift in Sources */,
 				42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */,
 				425A8DE2287094BD002DCB0C /* FlightFuelRecord.swift in Sources */,
@@ -833,7 +837,7 @@
 				42606A22288DE2FC00AE858C /* FlightSummary+Field.swift in Sources */,
 				42A20B5C28A09F1100439880 /* ProgressReportOverlay.swift in Sources */,
 				42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */,
-				42A11EA328E883190031D209 /* FlyStoRequests.swift in Sources */,
+				42A11EA328E883190031D209 /* FlyStoRequest.swift in Sources */,
 				421E086A2864455000D7D174 /* FuelAnalysisDataSource.swift in Sources */,
 				42A11EAA28FAFD7C0031D209 /* FlightFlyStoRecord.swift in Sources */,
 				42606A1E288DC5A500AE858C /* RZNumberWithUnitView.swift in Sources */,

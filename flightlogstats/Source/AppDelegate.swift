@@ -14,6 +14,7 @@ import RZUtilsSwift
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     public static let worker = DispatchQueue(label: "net.ro-z.flightlogstats.worker")
+    public static let queue = OperationQueue()
     
     private let keepOrganizer = FlightLogOrganizer.shared
     public static var db : FMDatabase = FMDatabase()
@@ -22,6 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        AppDelegate.queue.maxConcurrentOperationCount = 2
+        AppDelegate.queue.name = "net.ro-z.flightlogstats.queue"
         Secrets.shared = Secrets(url: Bundle.main.url(forResource: "secrets", withExtension: "json") )
         AppDelegate.db =  FMDatabase(url: Bundle.main.url(forResource: "airports", withExtension: "db"))
         AppDelegate.db.open()

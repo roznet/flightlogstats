@@ -7,9 +7,43 @@
 
 import Foundation
 
+class AsyncOperation : Operation {
+    override open var isAsynchronous: Bool {
+        return true
+    }
+    
+    private var _isExecuting : Bool = false
+    override open private(set) var isExecuting: Bool {
+        get {
+            return _isExecuting
+        }
+        set {
+            willChangeValue(forKey: "isExecuting")
+            _isExecuting = newValue
+            didChangeValue(forKey: "isExecuting")
+        }
+    }
+    
+    private var _isFinished: Bool = false
+    override open private(set) var isFinished: Bool {
+        get {
+            return _isFinished
+        }
+        set {
+            willChangeValue(forKey: "isFinished")
+            _isFinished = newValue
+            didChangeValue(forKey: "isFinished")
+        }
+    }
+    
+    
+
+}
+
 class RemoteServiceRequest {
     
-    typealias CompletionHandler = (Status) -> Void
+    
+    typealias CompletionHandler = (Status,RemoteServiceRequest) -> Void
     
     enum Status : Equatable {
         case success

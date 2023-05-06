@@ -23,12 +23,12 @@ class UploadSettingsViewController: UIViewController {
     @IBOutlet weak var savvySubStatusLabel: UILabel!
     
     @IBAction func logoutSavvy(_ sender: Any) {
-        SavvyRequests.clearCredential()
+        SavvyRequest.clearCredential()
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     @IBAction func logoutFlysto(_ sender: Any) {
-        FlyStoRequests.clearCredential()
+        FlyStoRequest.clearCredential()
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     

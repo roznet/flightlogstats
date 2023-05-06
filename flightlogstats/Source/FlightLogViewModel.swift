@@ -316,8 +316,8 @@ class FlightLogViewModel {
     
     //MARK: - Servive Synchronization
     
-    private var flyStoRequest : FlyStoRequests? = nil
-    private var savvyRequest : SavvyRequests? = nil
+    private var flyStoRequest : FlyStoRequest? = nil
+    private var savvyRequest : SavvyRequest? = nil
     
     func startServiceSynchronization(viewController : UIViewController, force : Bool = false) {
         let flySto = Settings.shared.flystoEnabled
@@ -326,10 +326,10 @@ class FlightLogViewModel {
         if let url = self.flightLogFileRecord.flightLog?.url {
             self.progress?.update(state: .start, message: .uploadingFiles)
             if flySto && (force || self.flystoStatus != .uploaded) {
-                self.flyStoRequest = FlyStoRequests(viewController: viewController, url: url)
+                self.flyStoRequest = FlyStoUploadRequest(viewController: viewController, url: url)
                 started = true
                 self.flyStoRequest?.execute() {
-                    status in
+                    status,_ in
                     AppDelegate.worker.async {
                         switch status {
                         case .progressing(let pct):
@@ -348,9 +348,9 @@ class FlightLogViewModel {
             }
             if savvy && (force || self.savvyStatus != .uploaded) {
                 if let identifier = self.flightLogFileRecord.aircraftRecord?.aircraftIdentifier {
-                    self.savvyRequest = SavvyRequests(viewController: viewController, url: url, aircraftIdentifier: identifier)
+                    self.savvyRequest = SavvyRequest(viewController: viewController, url: url, aircraftIdentifier: identifier)
                     started = true
-                    self.savvyRequest?.execute(){ status in
+                    self.savvyRequest?.execute(){ status,_ in
                         AppDelegate.worker.async {
                             switch status {
                             case .progressing(let pct):

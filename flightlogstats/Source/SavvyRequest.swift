@@ -1,5 +1,5 @@
 //
-//  SavvyRequests.swift
+//  SavvyRequest.swift
 //  FlightLogStats
 //
 //  Created by Brice Rosenzweig on 28/01/2023.
@@ -66,7 +66,7 @@ class SavvyAuthenticateViewController : UIViewController, WKNavigationDelegate {
     }
 }
 
-class SavvyRequests {
+class SavvyRequest : RemoteServiceRequest {
     typealias Status = RemoteServiceRequest.Status
     typealias CompletionHandler = RemoteServiceRequest.CompletionHandler
     
@@ -152,7 +152,7 @@ class SavvyRequests {
             let request = builder.request()
             
             if let cb = self.completionHandler {
-                cb(FlyStoRequests.Status.progressing(0.3))
+                cb(FlyStoRequest.Status.progressing(0.3),self)
             }
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
@@ -163,7 +163,7 @@ class SavvyRequests {
                         let aircrafts = try decoder.decode([SavvyAircraft].self, from: data)
                         Logger.net.info("Savvy: Got \(aircrafts.count) aircraft")
                         if let cb = self.completionHandler {
-                            cb(FlyStoRequests.Status.progressing(0.6))
+                            cb(FlyStoRequest.Status.progressing(0.6),self)
                         }
                         self.startUploadForMatchinAircraft(aircrafts: aircrafts)
                     }catch let error {
@@ -233,7 +233,7 @@ class SavvyRequests {
             Logger.net.error(message)
         }
         if let cb = self.completionHandler {
-            cb(status)
+            cb(status,self)
         }
         
         self.completionHandler = nil
