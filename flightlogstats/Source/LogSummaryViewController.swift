@@ -12,6 +12,7 @@ import RZUtils
 class LogSummaryViewController: UIViewController,ViewModelDelegate {
     var logFileOrganizer = FlightLogOrganizer.shared
     
+    @IBOutlet weak var openFlyStoButton: UIButton!
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var date: UILabel!
@@ -98,6 +99,12 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
         }
     }
     
+    @IBAction func openFlySto(_ sender: Any) {
+        if Settings.shared.flystoEnabled {
+            self.flightLogViewModel?.startFlyStoLogFileUrl(viewController: self)
+        }
+    }
+    
     /*
     // MARK: - Navigation
 
@@ -117,6 +124,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.remoteServiceStatus.attributedText = NSAttributedString(string: self.serviceStatusDescription, attributes: ViewConfig.shared.subTextAttributes)
                 self.remoteServiceStatus.textColor = UIColor.systemGray
                 self.remoteServiceButton.isEnabled = true
+                self.openFlyStoButton.isHidden = !Settings.shared.flystoEnabled
             }else{
                 self.date.attributedText = NSAttributedString(string: self.serviceStatusDescription, attributes: ViewConfig.shared.cellAttributes)
                 self.name.attributedText = NSAttributedString(string: "", attributes: ViewConfig.shared.cellAttributes)
@@ -124,6 +132,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.name.textColor = UIColor.systemGray
                 self.remoteServiceStatus.textColor = UIColor.systemGray
                 self.remoteServiceButton.isEnabled = false
+                self.openFlyStoButton.isHidden = false
             }
             self.timeCollectionView.isHidden = true
             self.fuelCollectionView.isHidden = true
@@ -147,6 +156,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                         self.remoteServiceStatus.attributedText = NSAttributedString(string: self.serviceStatusDescription,  attributes: ViewConfig.shared.subTextAttributes)
                         self.remoteServiceStatus.textColor = UIColor.systemGray
                         self.remoteServiceButton.isEnabled = true
+                        self.openFlyStoButton.isHidden = !Settings.shared.flystoEnabled
 
                         if let logname = self.flightLogFileInfo?.log_file_name {
                             self.name.attributedText = NSAttributedString(string: logname, attributes: ViewConfig.shared.cellAttributes)

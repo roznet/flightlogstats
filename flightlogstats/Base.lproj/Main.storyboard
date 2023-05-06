@@ -28,16 +28,16 @@
                                         <rect key="frame" x="0.0" y="0.0" width="824" height="55"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
-                                                <rect key="frame" x="0.0" y="0.0" width="460.5" height="55"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="291.5" height="55"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="251" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
-                                                        <rect key="frame" x="0.0" y="0.0" width="393" height="55"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="224" height="55"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
-                                                        <rect key="frame" x="398" y="0.0" width="62.5" height="55"/>
+                                                        <rect key="frame" x="229" y="0.0" width="62.5" height="55"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -46,10 +46,10 @@
                                                 <variation key="widthClass=compact" axis="vertical"/>
                                             </stackView>
                                             <stackView opaque="NO" contentMode="center" horizontalHuggingPriority="750" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HR9-9W-drY">
-                                                <rect key="frame" x="460.5" y="0.0" width="363.5" height="55"/>
+                                                <rect key="frame" x="291.5" y="0.0" width="397.5" height="55"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="knZ-aj-EVf">
-                                                        <rect key="frame" x="0.0" y="0.0" width="363.5" height="34.5"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="397.5" height="34.5"/>
                                                         <gestureRecognizers/>
                                                         <state key="normal" title="Button"/>
                                                         <buttonConfiguration key="configuration" style="plain" image="square.and.arrow.up" catalog="system" title="Upload"/>
@@ -58,7 +58,7 @@
                                                         </connections>
                                                     </button>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pending" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qRM-2i-xo5" userLabel="Status">
-                                                        <rect key="frame" x="0.0" y="34.5" width="363.5" height="20.5"/>
+                                                        <rect key="frame" x="0.0" y="34.5" width="397.5" height="20.5"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
@@ -66,6 +66,14 @@
                                                 </subviews>
                                                 <variation key="widthClass=compact" axis="horizontal"/>
                                             </stackView>
+                                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E9C-I9-Bg4">
+                                                <rect key="frame" x="689" y="0.0" width="135" height="55"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Open in FlySto"/>
+                                                <connections>
+                                                    <action selector="openFlySto:" destination="jUv-0p-pFh" eventType="touchUpInside" id="t24-ah-epf"/>
+                                                </connections>
+                                            </button>
                                         </subviews>
                                         <variation key="widthClass=compact" axis="vertical"/>
                                     </stackView>
@@ -391,6 +399,7 @@
                         <outlet property="fuelCollectionView" destination="mee-fG-3c6" id="ASf-Nf-8NE"/>
                         <outlet property="legsCollectionView" destination="aKL-fC-i7y" id="B4G-8r-hwp"/>
                         <outlet property="name" destination="h5i-bu-Kfn" id="H0Q-jq-D8o"/>
+                        <outlet property="openFlyStoButton" destination="E9C-I9-Bg4" id="zNZ-r5-0fM"/>
                         <outlet property="progressView" destination="cyP-Hg-ndb" id="10g-C4-FYE"/>
                         <outlet property="remoteServiceButton" destination="knZ-aj-EVf" id="dIH-Kx-0jT"/>
                         <outlet property="remoteServiceStatus" destination="qRM-2i-xo5" id="5H8-s0-J8Q"/>
