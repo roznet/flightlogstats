@@ -209,7 +209,8 @@ class SavvyRequests {
                             self.end(status: .success)
                         }else if result.status == "Error", let details = result.details, details == "duplicate" {
                             Logger.net.info("Savvy: Duplicate \(filename)")
-                            self.end(status: .already)
+                            let encoding = response?.stringEncoding ?? .utf8
+                            self.end(status: .already(String(data: data, encoding: encoding) ?? "null"))
                         }else{
                             let details = result.details ?? ""
                             self.end(status: .error("Failed to upload \(filename) status \(result.status) \(details)"))

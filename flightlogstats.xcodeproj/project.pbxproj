@@ -1243,8 +1243,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/roznet/rzutils";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.25;
+				branch = master;
+				kind = branch;
 			};
 		};
 		4280C8D0280D4BE400A0FB32 /* XCRemoteSwiftPackageReference "rzutils-touch" */ = {

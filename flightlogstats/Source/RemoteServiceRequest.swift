@@ -13,7 +13,7 @@ class RemoteServiceRequest {
     
     enum Status : Equatable {
         case success
-        case already
+        case already(String)
         case error(String)
         case progressing(Double)
         case tokenExpired
@@ -34,6 +34,6 @@ class RemoteServiceRequest {
             }
         }
     }
-    
+
     
 }

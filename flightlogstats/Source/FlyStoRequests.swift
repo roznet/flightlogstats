@@ -144,7 +144,7 @@ class FlyStoRequests {
                 switch result {
                 case .success(let response):
                     if let string = String(data: data, encoding: .utf8) {
-                        Logger.net.info("body: \(string)")
+                        self.extractFileId(from: string)
                     }
                     Logger.net.info("upload of \(self.url.lastPathComponent) successfull \(response.description)")
                     self.end(status: .success)
@@ -156,8 +156,10 @@ class FlyStoRequests {
                         self.start(attempt: attempt + 1)
                     case .error:
                         self.end(status: .error("Failed \(queryError.localizedDescription)"))
-                    case .success,.progressing(_),.already:
-
+                    case .success,.progressing(_):
+                        self.end(status: .success)
+                    case .already(let responseString):
+                        self.extractFileId(from: responseString)
                         self.end(status: .success)
                     }
                 }
@@ -165,6 +167,10 @@ class FlyStoRequests {
         }else{
             self.end(status: .error("Failed to build file for upload"))
         }
+    }
+    
+    func extractFileId(from response : String) {
+        Logger.net.info("Extract file id from \(response)")
     }
     
     @discardableResult func processSwiftOAuthError(error : OAuthSwiftError) -> Status {
@@ -177,14 +183,15 @@ class FlyStoRequests {
                 Logger.net.info("Token has expired, status: \(code)")
                 return .tokenExpired
             }else if code == 409 {
+                Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
                 let userInfo = (underlyingError as NSError).userInfo
                 if
-                   let responseString = userInfo["Response-Body"]{
-                    Logger.net.info("body: \(responseString)")
+                   let responseString = userInfo["Response-Body"] as? String{
+                    return .already(responseString)
+                }else{
+                    return .success
                 }
                 
-                Logger.net.info("File \(self.url.lastPathComponent) was already uploaded (code \(code))")
-                return .success
             }else if code == 400 {
                 Logger.net.info("File \(self.url.lastPathComponent) application error (code \(code))")
                 return .denied
@@ -222,7 +229,7 @@ class FlyStoRequests {
         self.clearUploadFile()
         if let archive = Archive(url: self.uploadFileUrl, accessMode: .create){
             do {
-                try archive.addEntry(with: self.url.lastPathComponent, fileURL: self.url)
+                try archive.addEntry(with: self.url.lastPathComponent, fileURL: self.url, compressionMethod: .deflate)
                 return try Data(contentsOf: self.uploadFileUrl)
             }catch{
                 Logger.net.error("Failed to create zip file \(error.localizedDescription)")
