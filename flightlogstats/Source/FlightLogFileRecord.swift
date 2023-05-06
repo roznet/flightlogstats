@@ -44,6 +44,9 @@ class FlightLogFileRecord: NSManagedObject {
             }
         }
     }
+    
+    var url : URL? { return self.flightLog?.url }
+    
     var guessedDate : Date? { return self.log_file_name?.logFileGuessedDate }
     var legs : [FlightLeg] { return self.flightLog?.legs ?? [] }
     

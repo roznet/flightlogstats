@@ -19,6 +19,55 @@ import OSLog
 import ZIPFoundation
 import RZUtilsSwift
 
+extension FlightLogFileRecord {
+    
+    var flystoStatus : FlightFlyStoRecord.Status {
+        get {
+            return self.flysto_record?.status ?? .ready
+        }
+        set {
+            self.ensureFlyStoStatus()
+            self.flysto_record?.status = newValue
+            self.flysto_record?.status_date = Date()
+        }
+    }
+    var flystoUpdateDate : Date? {
+        return self.flysto_record?.status_date
+    }
+    
+    func flyStoUploadRequest(viewController : UIViewController) -> FlyStoUploadRequest? {
+        if let url = self.url {
+            let req = FlyStoUploadRequest(viewController: viewController, url: url)
+            return req
+        }
+        return nil
+    }
+    
+    func flyStoUploadCompletion(status : FlyStoRequest.Status, request : RemoteServiceRequest) {
+        var checkflyStoStatus : FlightFlyStoRecord.Status = .ready
+        switch status {
+        case .progressing:
+            return
+        case .success,.already:
+            checkflyStoStatus = .uploaded
+        case .error,.tokenExpired,.denied:
+            checkflyStoStatus = .failed
+        }
+        
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        
+        self.flystoStatus = checkflyStoStatus
+        if let uploadRequest = request as? FlyStoUploadRequest {
+            if let resp = uploadRequest.uploadResponse,
+               uploadRequest.interpretResponse(response: resp) != nil {
+                Logger.net.info("Got valid upload Response \(resp)")
+                self.flysto_record?.upload_response = resp
+            }
+        }
+
+    }
+}
+
 class FlyStoRequest : RemoteServiceRequest{
     
     typealias Status = RemoteServiceRequest.Status

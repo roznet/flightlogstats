@@ -12,8 +12,8 @@
     <entity name="FlightFlyStoRecord" representedClassName=".FlightFlyStoRecord" syncable="YES" codeGenerationType="category">
         <attribute name="log_file_name" optional="YES" attributeType="String"/>
         <attribute name="status_date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="upload_response" optional="YES" attributeType="String"/>
         <attribute name="upload_status" optional="YES" attributeType="String"/>
-        <attribute name="uploadResponse" optional="YES" attributeType="String"/>
         <relationship name="log_file_record" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FlightLogFileRecord" inverseName="flysto_record" inverseEntity="FlightLogFileRecord"/>
     </entity>
     <entity name="FlightFuelRecord" representedClassName=".FlightFuelRecord" syncable="YES" codeGenerationType="category">

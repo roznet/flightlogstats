@@ -42,6 +42,7 @@ class AsyncOperation : Operation {
 
 class RemoteServiceRequest {
     
+    var progress : ProgressReport? = nil
     
     typealias CompletionHandler = (Status,RemoteServiceRequest) -> Void
     

@@ -18,6 +18,7 @@ class FlyStoUploadRequest : FlyStoRequest {
     let url : URL
     var uploadFileUrl : URL { return self.url.appendingPathExtension("zip") }
     
+    var uploadResponse : String? = nil
     
     init(viewController : UIViewController, url : URL) {
         self.url = url
@@ -29,12 +30,10 @@ class FlyStoUploadRequest : FlyStoRequest {
             self.end(status: .error("Token should have been renewed but has expired"))
             return
         }
-        
+        self.progress?.update(state: .progressing(0.3), message: .uploadingFiles)
         if let data = self.buildUploadFile(),
            let upload = URL(string: Secrets.shared.value(for: "flysto.uploadLogUrl")) {
-            if let cb = self.completionHandler {
-                cb(FlyStoRequest.Status.progressing(0.5),self)
-            }
+            self.progress?.update(state: .progressing(0.5), message: .uploadingFiles)
             self.oauth.client.post(upload, body: data) {
                 result in
                 switch result {
@@ -65,8 +64,24 @@ class FlyStoUploadRequest : FlyStoRequest {
         }
     }
     
+    struct UploadResponse : Codable {
+        var fileId : String
+    }
+    
+    func interpretResponse(response : String?) -> UploadResponse? {
+        if let data = response?.data(using: .utf8),
+           let res = try? JSONDecoder().decode(UploadResponse.self, from: data) {
+            return res
+        }
+        return nil
+    }
+
     func extractFileId(from response : String) {
-        Logger.net.info("Extract file id from \(response)")
+        if self.interpretResponse(response: response) != nil {
+            self.uploadResponse = response
+        }else{
+            self.uploadResponse = nil
+        }
     }
     
     //MARK: - Upload file

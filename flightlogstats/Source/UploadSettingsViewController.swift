@@ -58,7 +58,9 @@ class UploadSettingsViewController: UIViewController {
     }
     func updateStatus(status : RemoteServiceRecord.Status?,
                       on : Bool,
-                      date : Date?, label : UILabel, sublabel : UILabel,
+                      date : Date?,
+                      label : UILabel,
+                      sublabel : UILabel,
                       message : String){
         label.textColor = UIColor.label
         sublabel.textColor = UIColor.systemGray

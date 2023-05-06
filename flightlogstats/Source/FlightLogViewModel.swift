@@ -95,20 +95,6 @@ class FlightLogViewModel {
         return nil
     }
     
-    var flystoStatus : FlightFlyStoRecord.Status {
-        get {
-            return self.flightLogFileRecord.flysto_record?.status ?? .ready
-        }
-        set {
-            self.flightLogFileRecord.ensureFlyStoStatus()
-            self.flightLogFileRecord.flysto_record?.status = newValue
-            self.flightLogFileRecord.flysto_record?.status_date = Date()
-        }
-    }
-    var flystoUpdateDate : Date? {
-        return self.flightLogFileRecord.flysto_record?.status_date
-    }
-    
     var savvyStatus : FlightSavvyRecord.Status {
         get {
             return self.flightLogFileRecord.savvy_record?.status ?? .pending
@@ -316,30 +302,25 @@ class FlightLogViewModel {
     
     //MARK: - Servive Synchronization
     
-    private var flyStoRequest : FlyStoRequest? = nil
+    private var flyStoRequest : FlyStoUploadRequest? = nil
     private var savvyRequest : SavvyRequest? = nil
+    var flystoStatus : FlightFlyStoRecord.Status  { return self.flightLogFileRecord.flystoStatus }
+    var flystoUpdateDate : Date? { return self.flightLogFileRecord.flystoUpdateDate }
     
     func startServiceSynchronization(viewController : UIViewController, force : Bool = false) {
         let flySto = Settings.shared.flystoEnabled
         let savvy = Settings.shared.savvyEnabled
         var started : Bool = false
-        if let url = self.flightLogFileRecord.flightLog?.url {
+        if let url = self.flightLogFileRecord.url {
             self.progress?.update(state: .start, message: .uploadingFiles)
             if flySto && (force || self.flystoStatus != .uploaded) {
                 self.flyStoRequest = FlyStoUploadRequest(viewController: viewController, url: url)
+                self.flyStoRequest?.progress = self.progress
                 started = true
                 self.flyStoRequest?.execute() {
-                    status,_ in
+                    status,req in
                     AppDelegate.worker.async {
-                        switch status {
-                        case .progressing(let pct):
-                            self.progress?.update(state: .progressing(pct), message: .uploadingFiles)
-                            return
-                        case .success,.already:
-                            self.flystoStatus = .uploaded
-                        case .error,.tokenExpired,.denied:
-                            self.flystoStatus = .failed
-                        }
+                        self.flightLogFileRecord.flyStoUploadCompletion(status: status, request: req)
                         NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)
                         self.save()
                         self.progress?.update(state: .complete, message: .uploadingFiles)
