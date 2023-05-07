@@ -64,13 +64,17 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.updateUI()
             }
         }
+        // need to cehck if we still need that, had sometime the UI not setup right
+        // when coming back from background
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil){
             notification in
             DispatchQueue.main.async {
                 self.view.layoutIfNeeded()
             }
         }
+        
     }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self)
@@ -109,7 +113,14 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
             self.flightLogViewModel?.startFlyStoLogFileUrl(viewController: self)
         }
     }
-    
+    func startAutomaticUploadIfNeeded() {
+        if Settings.shared.uploadMethod == .automatic, let viewModel = self.flightLogViewModel {
+            if viewModel.flightLogFileRecord.recordStatus == .parsed {
+                viewModel.startServiceSynchronization(viewController: self)
+            }
+        }
+    }
+
     /*
     // MARK: - Navigation
 
@@ -146,7 +157,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
         }
     }
     var serviceStatusDescription : String {
-        return self.flightLogViewModel?.flystoStatusText ?? "Pending"
+        return self.flightLogViewModel?.uploadStatusText ?? "Pending"
     }
     func updateUI(){
         AppDelegate.worker.async {
@@ -258,6 +269,8 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.progressView.setProgress(0.0, animated: false)
                 self.progressView.isHidden = false
             }
+            self.startAutomaticUploadIfNeeded()
         }
     }
+    
 }

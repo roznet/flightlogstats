@@ -108,15 +108,15 @@ class FlightLogViewModel {
     var savvyUpdateDate : Date? {
         return self.flightLogFileRecord.savvy_record?.status_date
     }
-    var flystoStatusText : String {
+    var uploadStatusText : String {
         var messages : [String] = []
-        if Settings.shared.savvyEnabled {
-            let status = self.savvyStatus.rawValue.capitalized
-            messages.append("Savvy: \(status)")
-        }
         if Settings.shared.flystoEnabled {
             let status = self.flystoStatus.rawValue.capitalized
             messages.append("FlySto: \(status)")
+        }
+        if Settings.shared.savvyEnabled {
+            let status = self.savvyStatus.rawValue.capitalized
+            messages.append("Savvy: \(status)")
         }
         if messages.count == 0 {
             messages.append("disabled")
@@ -308,15 +308,21 @@ class FlightLogViewModel {
     var flystoUpdateDate : Date? { return self.flightLogFileRecord.flystoUpdateDate }
     
     func startServiceSynchronization(viewController : UIViewController, force : Bool = false) {
+        // don't bother if no network
+        guard RZSystemInfo.networkAvailable() else {
+            Logger.net.info("No network available, skipping uploads")
+            return
+        }
         let flySto = Settings.shared.flystoEnabled
         let savvy = Settings.shared.savvyEnabled
         var started : Bool = false
         if let url = self.flightLogFileRecord.url {
-            self.progress?.update(state: .start, message: .uploadingFiles)
             if flySto && (force || self.flystoStatus != .uploaded) {
+                Logger.ui.info("Starting flySto upload ")
                 self.flyStoRequest = FlyStoUploadRequest(viewController: viewController, url: url)
                 self.flyStoRequest?.progress = self.progress
                 started = true
+                self.progress?.update(state: .start, message: .uploadingFiles)
                 self.flyStoRequest?.execute() {
                     status,req in
                     AppDelegate.worker.async {
@@ -330,6 +336,9 @@ class FlightLogViewModel {
             if savvy && (force || self.savvyStatus != .uploaded) {
                 if let identifier = self.flightLogFileRecord.aircraftRecord?.aircraftIdentifier {
                     self.savvyRequest = SavvyRequest(viewController: viewController, url: url, aircraftIdentifier: identifier)
+                    if !started { // if not already started
+                        self.progress?.update(state: .start, message: .uploadingFiles)
+                    }
                     started = true
                     self.savvyRequest?.execute(){ status,_ in
                         AppDelegate.worker.async {
