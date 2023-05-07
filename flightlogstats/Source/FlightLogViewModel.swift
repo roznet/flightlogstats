@@ -356,8 +356,26 @@ class FlightLogViewModel {
     }
     private var flyStoLogFileRequest : FlyStoLogFilesRequest? = nil
     
-    func startFlyStoLogFileUrl(viewController : UIViewController) {
-        if let req = self.flightLogFileRecord.flyStoLogFilesRequest(viewController: viewController) {
+    func startFlyStoLogFileUrl(viewController : UIViewController, first : Bool = true) {
+        if (self.flystoStatus == .uploaded && !self.flightLogFileRecord.flystoLogFilesInformationAvailable) || self.flystoStatus == .ready {
+            guard first else { return };
+            if let url = self.flightLogFileRecord.url {
+                Logger.ui.info("Missing flySto fileId, uploading")
+                self.flyStoRequest = FlyStoUploadRequest(viewController: viewController, url: url)
+                self.flyStoRequest?.execute() {
+                    status,req in
+                    AppDelegate.worker.async {
+                        self.flightLogFileRecord.flyStoUploadCompletion(status: status, request: req)
+                        NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)
+                        self.save()
+                        Logger.ui.info("should have flySto fileId, trying again")
+                        self.startFlyStoLogFileUrl(viewController: viewController, first: false)
+                    }
+                }
+            }
+        }
+        if (self.flystoStatus == .uploaded && self.flightLogFileRecord.flystoLogFilesInformationAvailable),
+           let req = self.flightLogFileRecord.flyStoLogFilesRequest(viewController: viewController) {
             req.execute() { status, req in
                 if let req = req as? FlyStoLogFilesRequest,
                    let url = req.url {

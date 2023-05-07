@@ -34,6 +34,9 @@ extension FlightLogFileRecord {
     var flystoUpdateDate : Date? {
         return self.flysto_record?.status_date
     }
+    var flystoLogFilesInformationAvailable : Bool {
+        return self.flysto_record?.upload_response != nil
+    }
     
     func flyStoUploadRequest(viewController : UIViewController) -> FlyStoUploadRequest? {
         if let url = self.url {
