@@ -64,8 +64,13 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.updateUI()
             }
         }
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil){
+            notification in
+            DispatchQueue.main.async {
+                self.view.layoutIfNeeded()
+            }
+        }
     }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self)

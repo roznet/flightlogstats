@@ -21,63 +21,58 @@
                         <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="i78-1P-54X">
-                                <rect key="frame" x="5" y="24" width="824" height="55"/>
+                            <stackView opaque="NO" contentMode="left" verticalHuggingPriority="750" verticalCompressionResistancePriority="250" distribution="fillProportionally" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="udC-tB-FcV">
+                                <rect key="frame" x="5" y="24" width="834" height="55"/>
                                 <subviews>
-                                    <stackView opaque="NO" contentMode="left" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="udC-tB-FcV">
-                                        <rect key="frame" x="0.0" y="0.0" width="824" height="55"/>
+                                    <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
+                                        <rect key="frame" x="0.0" y="17.5" width="295" height="20.5"/>
                                         <subviews>
-                                            <stackView opaque="NO" contentMode="left" horizontalHuggingPriority="251" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Tu2-Q0-Wl2">
-                                                <rect key="frame" x="0.0" y="0.0" width="291.5" height="55"/>
-                                                <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
-                                                        <rect key="frame" x="0.0" y="0.0" width="224" height="55"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
-                                                        <rect key="frame" x="229" y="0.0" width="62.5" height="55"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
-                                                <variation key="widthClass=compact" axis="vertical"/>
-                                            </stackView>
-                                            <stackView opaque="NO" contentMode="center" horizontalHuggingPriority="750" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HR9-9W-drY">
-                                                <rect key="frame" x="291.5" y="0.0" width="397.5" height="55"/>
-                                                <subviews>
-                                                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="knZ-aj-EVf">
-                                                        <rect key="frame" x="0.0" y="0.0" width="397.5" height="34.5"/>
-                                                        <gestureRecognizers/>
-                                                        <state key="normal" title="Button"/>
-                                                        <buttonConfiguration key="configuration" style="plain" image="square.and.arrow.up" catalog="system" title="Upload"/>
-                                                        <connections>
-                                                            <action selector="exportButton:" destination="jUv-0p-pFh" eventType="touchUpInside" id="Aeq-Xa-LCb"/>
-                                                        </connections>
-                                                    </button>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pending" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qRM-2i-xo5" userLabel="Status">
-                                                        <rect key="frame" x="0.0" y="34.5" width="397.5" height="20.5"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
-                                                <variation key="widthClass=compact" axis="horizontal"/>
-                                            </stackView>
-                                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E9C-I9-Bg4">
-                                                <rect key="frame" x="689" y="0.0" width="135" height="55"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Open in FlySto"/>
-                                                <connections>
-                                                    <action selector="openFlySto:" destination="jUv-0p-pFh" eventType="touchUpInside" id="t24-ah-epf"/>
-                                                </connections>
-                                            </button>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6bN-rh-gIs">
+                                                <rect key="frame" x="0.0" y="0.0" width="227.5" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Pending" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h5i-bu-Kfn">
+                                                <rect key="frame" x="232.5" y="0.0" width="62.5" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
                                         </subviews>
                                         <variation key="widthClass=compact" axis="vertical"/>
                                     </stackView>
+                                    <stackView opaque="NO" contentMode="center" horizontalHuggingPriority="750" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HR9-9W-drY">
+                                        <rect key="frame" x="295" y="0.0" width="404" height="55"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="knZ-aj-EVf">
+                                                <rect key="frame" x="0.0" y="0.0" width="404" height="34.5"/>
+                                                <gestureRecognizers/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" image="square.and.arrow.up" catalog="system" title="Upload"/>
+                                                <connections>
+                                                    <action selector="exportButton:" destination="jUv-0p-pFh" eventType="touchUpInside" id="Aeq-Xa-LCb"/>
+                                                </connections>
+                                            </button>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pending" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qRM-2i-xo5" userLabel="Status">
+                                                <rect key="frame" x="0.0" y="34.5" width="404" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <variation key="widthClass=compact" axis="horizontal"/>
+                                    </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E9C-I9-Bg4">
+                                        <rect key="frame" x="699" y="10.5" width="135" height="34.5"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Open in FlySto"/>
+                                        <connections>
+                                            <action selector="openFlySto:" destination="jUv-0p-pFh" eventType="touchUpInside" id="t24-ah-epf"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
+                                <variation key="widthClass=compact" axis="vertical"/>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="bpy-ox-lYh" userLabel="Aircraft Time Stack View">
                                 <rect key="frame" x="5" y="84" width="824" height="100"/>
@@ -377,17 +372,17 @@
                         <constraints>
                             <constraint firstItem="bpy-ox-lYh" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="0rt-AX-WPp"/>
                             <constraint firstItem="aKL-fC-i7y" firstAttribute="top" secondItem="s50-2U-Cvg" secondAttribute="bottom" constant="5" id="29p-1G-BYz"/>
-                            <constraint firstItem="i78-1P-54X" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" constant="-5" id="Ei4-Mk-Ken"/>
+                            <constraint firstItem="udC-tB-FcV" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="AV2-Hw-jmu"/>
+                            <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="udC-tB-FcV" secondAttribute="trailing" constant="-5" id="CY0-HY-cHv"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="bottom" secondItem="cyP-Hg-ndb" secondAttribute="bottom" constant="5" id="FzA-Yu-gIn"/>
                             <constraint firstItem="cyP-Hg-ndb" firstAttribute="top" secondItem="aKL-fC-i7y" secondAttribute="bottom" id="RXi-sH-vsO"/>
-                            <constraint firstItem="i78-1P-54X" firstAttribute="top" secondItem="S3q-Cy-ALO" secondAttribute="top" id="TJC-33-FyI"/>
-                            <constraint firstItem="bpy-ox-lYh" firstAttribute="top" secondItem="i78-1P-54X" secondAttribute="bottom" constant="5" id="Xs1-7s-msH"/>
                             <constraint firstItem="aKL-fC-i7y" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="Y1g-wh-syl"/>
-                            <constraint firstItem="i78-1P-54X" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="YWb-a3-edh"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="s50-2U-Cvg" secondAttribute="trailing" constant="-5" id="bxD-yw-8sw"/>
                             <constraint firstItem="bpy-ox-lYh" firstAttribute="trailing" secondItem="S3q-Cy-ALO" secondAttribute="trailing" constant="-5" id="esU-Ik-uy4"/>
                             <constraint firstItem="s50-2U-Cvg" firstAttribute="leading" secondItem="S3q-Cy-ALO" secondAttribute="leading" constant="5" id="k9H-CE-6bF"/>
+                            <constraint firstItem="udC-tB-FcV" firstAttribute="bottom" secondItem="bpy-ox-lYh" secondAttribute="top" constant="-5" id="l3z-2B-XEF"/>
                             <constraint firstItem="bpy-ox-lYh" firstAttribute="bottom" secondItem="s50-2U-Cvg" secondAttribute="top" constant="5" id="nt5-Dq-60q"/>
+                            <constraint firstItem="udC-tB-FcV" firstAttribute="top" secondItem="S3q-Cy-ALO" secondAttribute="top" id="sUv-bC-lUS"/>
                             <constraint firstItem="cyP-Hg-ndb" firstAttribute="centerX" secondItem="S3q-Cy-ALO" secondAttribute="centerX" id="uCO-dL-3lO"/>
                             <constraint firstItem="S3q-Cy-ALO" firstAttribute="trailing" secondItem="aKL-fC-i7y" secondAttribute="trailing" constant="5" id="y4Z-zG-2za"/>
                         </constraints>
