@@ -632,7 +632,7 @@ class FlightLogOrganizer {
                             }
                         }
                     }else{
-                        if dirurl.isLogFile {
+                        if dirurl.logFileType != .none {
                             found.append(dirurl)
                         }
                     }
@@ -701,16 +701,20 @@ class FlightLogOrganizer {
             result in
             switch result {
             case .success(let logurls):
-                let someNew : Bool = self.importFiles(urls: logurls, method: method)
-                if someNew {
-                    if process {
-                        Logger.app.info("Local File list has update")
-                        self.addMissingRecordsFromLocal()
-                        self.syncCloud()
-                    }
-                }
+                self.importAndAddRecordsForFiles(urls: logurls, method: method, process: process)
             case .failure(let error):
                 Logger.app.error("Failed to find url \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func importAndAddRecordsForFiles(urls: [URL], method: LogSelectionMethod, process : Bool = true){
+        let someNew : Bool = self.importFiles(urls: urls, method: method)
+        if someNew {
+            if process {
+                Logger.app.info("Local File list has update")
+                self.addMissingRecordsFromLocal()
+                self.syncCloud()
             }
         }
     }

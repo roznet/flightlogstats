@@ -501,13 +501,49 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         case .automatic:
             method = .allMissingFromFolder
         }
-        self.logFileOrganizer.copyMissingFilesToLocal(urls: urls, method: method)
+        FlightLogOrganizer.search(in: urls) {
+            result in
+            switch result {
+            case .success(let logurls):
+                if logurls.count > 50 {
+                    self.importLargeNumberOfLogs(urls: logurls, method: method)
+                }else{
+                    self.logFileOrganizer.importAndAddRecordsForFiles(urls: logurls, method: method)
+                }
+            case .failure(let error):
+                Logger.app.error("Failed to find url \(error.localizedDescription)")
+            }
+        }
         
         controller.dismiss(animated: true)
     }
     
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
         controller.dismiss(animated: true)
+    }
+    
+    func importLargeNumberOfLogs(urls: [URL], method: FlightLogOrganizer.LogSelectionMethod) {
+        let importAll = UIAlertAction(title: "Import All", style: .default) {
+            action in
+            self.logFileOrganizer.importAndAddRecordsForFiles(urls: urls, method: method)
+        }
+        let settings = UIAlertAction(title: "Edit Import Method", style: .default) {
+            action in
+            let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(identifier: "appSettingsViewController")
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
+        }
+        let cancel = UIAlertAction(title: "Abort", style: .cancel) {
+            action in
+            //
+        }
+        let alert = UIAlertController(title: "Large Number of Files",
+                                      message: "There is a large number of files to import (\(urls.count)). This may take a while. Please confirm before proceeding?", preferredStyle: .alert)
+        alert.addAction(importAll)
+        alert.addAction(settings)
+        alert.addAction(cancel)
+        self.present(alert, animated: true)
     }
 
 }

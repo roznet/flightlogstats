@@ -36,11 +36,18 @@ struct Settings {
         case sinceLastImport
         case selectedFile
     }
+    enum UploadMethod : String {
+        case manual
+        case automatic
+    }
+    
     enum Key : String {
         case open_file_mode = "open-file-mode"
         case aircraft_max_fuel = "aicraft-max-fuel"
         case aircraft_tab_fuel = "aicraft-tab-fuel"
         case aircraft_gph = "aicraft-gph"
+        
+        
         
         case unit_target_fuel = "unit_target_fuel"
         case unit_added_fuel = "unit_added_fuel"
@@ -55,6 +62,8 @@ struct Settings {
         case flysto_enabled = "flysto.enabled"
         case savvy_token = "savvy.token"
         case savvy_enabled = "savvy.enabled"
+        
+        case upload_method = "upload.method"
         
         case import_method = "import.method"
         case import_startdate = "import.startdate"
@@ -116,6 +125,10 @@ struct Settings {
     @CodableStorage(key: Key.savvy_token)
     var savvyToken : String?
    
+    
+    @UserStorage(key: Key.upload_method, defaultValue: .manual)
+    var uploadMethod : UploadMethod
+    
     //Default on macos is selected file, on iOS automatic
 #if targetEnvironment(macCatalyst)
     @EnumStorage(key: Key.import_method, defaultValue: .selectedFile)
