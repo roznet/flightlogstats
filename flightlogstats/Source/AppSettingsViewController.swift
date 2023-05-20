@@ -118,6 +118,9 @@ class AppSettingsViewController: UIViewController {
         <li><b>Since Last Import</b> the first time will import all the files on the card, but subsequently will only import files that are more recent than the last import. So for example if you then insert an SD Card with older files, they will be ignored</li>
         <li><b>Selected File</b> will only import the files that are explicitely selected, and will not do any recursive search. If you select this option in the open dialog box you need to select the specific files you want to import</li>
         </ul>
+        <h2>Upload Automatically</h2>
+        <p>If this is enabled, the app will attempt to upload automatically any file currently displayed that wasn't yet uploaded. If it is not selected you need to press the upload button to start the upload of the current file to the remote service.</p>
+        <p>Note that if the file was already successfully uploaded, the app will not attempt to upload again. You can do a long press on the upload button, which will bring up a menu with the option to force the upload</p>
         </body>
         </html>
         """
