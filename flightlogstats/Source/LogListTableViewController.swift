@@ -206,6 +206,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             Logger.ui.info("local file list changed, updating log list")
             self.buildList()
         }
+        NotificationCenter.default.addObserver(forName: .newFileUploaded, object: nil, queue: nil){
+            _ in
+            Logger.ui.info("New file uploaded, updating log list")
+            self.buildList()
+
+        }
         
         NotificationCenter.default.addObserver(forName: .ErrorOccured, object: AppDelegate.errorManager, queue: nil) {
             _ in

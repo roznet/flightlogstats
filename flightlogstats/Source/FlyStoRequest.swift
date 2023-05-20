@@ -163,6 +163,12 @@ class FlyStoRequest : RemoteServiceRequest{
         if let cb = self.completionHandler {
             cb(status,self)
         }
+        switch status {
+        case .success,.already:
+            NotificationCenter.default.post(name: .newFileUploaded, object: nil)
+        default:
+            break
+        }
         
         self.completionHandler = nil
     }

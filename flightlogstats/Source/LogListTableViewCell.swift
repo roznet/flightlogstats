@@ -22,6 +22,7 @@ class LogListTableViewCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var fileName: UILabel!
     
+    @IBOutlet weak var fileNameIcon: UIImageView!
     @IBOutlet weak var identifier: UILabel!
     
     func shouldRefresh(for info : FlightLogFileRecord) -> Bool {
@@ -62,6 +63,7 @@ class LogListTableViewCell: UITableViewCell {
         self.flightIcon.isHidden = true
         self.flightTime.isHidden = true
         self.identifier.isHidden = true
+        self.fileNameIcon.isHidden = true
 
     }
     
@@ -127,6 +129,18 @@ class LogListTableViewCell: UITableViewCell {
                 self.identifier.isHidden = false
             }else{
                 self.identifier.isHidden = true
+            }
+            var uploaded : Bool = false
+            if let record = info.flysto_record, record.status == .uploaded {
+                uploaded = true
+            }
+            if let record = info.savvy_record, record.status == .uploaded {
+                uploaded = true
+            }
+            if uploaded {
+                self.fileNameIcon.isHidden = false
+            }else{
+                self.fileNameIcon.isHidden = true
             }
             
         }else{

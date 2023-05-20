@@ -1526,15 +1526,23 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="knq-lT-6lR">
+                                                <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gpJ-Eq-byf">
                                                     <rect key="frame" x="0.0" y="73" width="95.5" height="16"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
-                                                    <color key="textColor" systemColor="secondaryLabelColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="knq-lT-6lR">
+                                                            <rect key="frame" x="0.0" y="0.0" width="33" height="16"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" image="checkmark.icloud" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="nys-Jl-eo9">
+                                                            <rect key="frame" x="33" y="1" width="62.5" height="12.5"/>
+                                                            <color key="tintColor" systemColor="secondaryLabelColor"/>
+                                                        </imageView>
+                                                    </subviews>
+                                                </stackView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="knq-lT-6lR" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="dpo-0a-pVr"/>
                                                 <constraint firstItem="BsR-3f-wqd" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="ho5-f9-UUP"/>
                                                 <constraint firstItem="fnr-Qm-BJe" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="leading" id="lq3-XF-g3P"/>
                                             </constraints>
@@ -1611,6 +1619,7 @@
                                     <outlet property="date" destination="fnr-Qm-BJe" id="OM9-ei-RH7"/>
                                     <outlet property="distance" destination="QPY-lw-LJx" id="6wh-n0-74F"/>
                                     <outlet property="fileName" destination="knq-lT-6lR" id="ODB-XS-yvY"/>
+                                    <outlet property="fileNameIcon" destination="nys-Jl-eo9" id="SPZ-Np-Yl5"/>
                                     <outlet property="flightIcon" destination="kWF-h7-DKy" id="zbq-Dr-Xmc"/>
                                     <outlet property="flightTime" destination="TJ6-sh-rHB" id="iJf-Ua-ldq"/>
                                     <outlet property="fuel" destination="bU9-Ql-uYs" id="Uix-YJ-qx9"/>
@@ -1964,6 +1973,7 @@
     <resources>
         <image name="airplane.departure" catalog="system" width="128" height="84"/>
         <image name="chart.xyaxis.line" catalog="system" width="128" height="102"/>
+        <image name="checkmark.icloud" catalog="system" width="128" height="90"/>
         <image name="fuelpump" catalog="system" width="128" height="122"/>
         <image name="gearshape" catalog="system" width="128" height="123"/>
         <image name="point.topleft.down.curvedto.point.filled.bottomright.up" catalog="system" width="119" height="128"/>

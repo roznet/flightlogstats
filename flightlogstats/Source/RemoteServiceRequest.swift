@@ -39,9 +39,13 @@ class AsyncOperation : Operation {
     
 
 }
+extension Notification.Name {
+    static let newFileUploaded : Notification.Name = Notification.Name("Notification.Name.NewFileUploaded")
+}
 
 class RemoteServiceRequest {
     
+
     var progress : ProgressReport? = nil
     
     typealias CompletionHandler = (Status,RemoteServiceRequest) -> Void
