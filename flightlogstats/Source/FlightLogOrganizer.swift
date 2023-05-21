@@ -421,6 +421,32 @@ class FlightLogOrganizer {
         }
     }
     
+    func filterMissing(urls: [URL]) -> [URL] {
+        var rv : [URL] = []
+        for url in urls {
+            switch url.logFileType {
+            case .aircraft:
+                if let avionics = AvionicsSystem.from(jsonUrl: url),
+                   self.managedAircrafts[ avionics.systemId ] != nil {
+                    break
+                }else{
+                    rv.append(url)
+                }
+            case .log:
+                let filename = url.lastPathComponent
+                if self.managedFlightLogs[ filename ] == nil {
+                    rv.append(url)
+                }
+            case .rpt:
+                // always update rpt files
+                rv.append(url)
+            case .none:
+                break
+            }
+        }
+        return rv
+    }
+    
     func add(aircrafts: [URL]){
         var someNew : Int = 0
         var checked : Int = 0

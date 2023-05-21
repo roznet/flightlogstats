@@ -511,7 +511,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             result in
             switch result {
             case .success(let logurls):
-                if logurls.count > 50 {
+                let missing = self.logFileOrganizer.filterMissing(urls: logurls)
+                if missing.count > 50 {
                     self.importLargeNumberOfLogs(urls: logurls, method: method)
                 }else{
                     self.logFileOrganizer.importAndAddRecordsForFiles(urls: logurls, method: method)
