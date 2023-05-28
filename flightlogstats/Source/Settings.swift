@@ -126,7 +126,7 @@ struct Settings {
     var savvyToken : String?
    
     
-    @EnumStorage(key: Key.upload_method, defaultValue: .manual)
+    @EnumStorage(key: Key.upload_method, defaultValue: .automatic)
     var uploadMethod : UploadMethod
     
     //Default on macos is selected file, on iOS automatic
