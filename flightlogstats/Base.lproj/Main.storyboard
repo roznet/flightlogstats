@@ -3,7 +3,7 @@
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -471,31 +471,30 @@
                                             </stackView>
                                         </subviews>
                                     </stackView>
-                                    <segmentedControl opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="9Nb-pE-2dl">
-                                        <rect key="frame" x="338.5" y="14.5" width="203" height="32"/>
-                                        <segments>
-                                            <segment title="Full"/>
-                                            <segment title="Tabs"/>
-                                            <segment title="Custom"/>
-                                        </segments>
-                                    </segmentedControl>
-                                    <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="7Ag-KF-YBw">
-                                        <rect key="frame" x="651" y="14.5" width="173" height="32"/>
-                                        <segments>
-                                            <segment title="US Gallons"/>
-                                            <segment title="Liters"/>
-                                        </segments>
-                                    </segmentedControl>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="17" translatesAutoresizingMaskIntoConstraints="NO" id="DH1-vQ-boA">
+                                        <rect key="frame" x="431" y="14.5" width="393" height="31"/>
+                                        <subviews>
+                                            <segmentedControl opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="9Nb-pE-2dl">
+                                                <rect key="frame" x="0.0" y="0.0" width="203" height="32"/>
+                                                <segments>
+                                                    <segment title="Full"/>
+                                                    <segment title="Tabs"/>
+                                                    <segment title="Custom"/>
+                                                </segments>
+                                            </segmentedControl>
+                                            <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="7Ag-KF-YBw">
+                                                <rect key="frame" x="220" y="0.0" width="173" height="32"/>
+                                                <segments>
+                                                    <segment title="US Gallons"/>
+                                                    <segment title="Liters"/>
+                                                </segments>
+                                            </segmentedControl>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="MLD-kg-7pC"/>
                                 </constraints>
-                                <variation key="heightClass=regular-widthClass=compact">
-                                    <mask key="subviews">
-                                        <exclude reference="9Nb-pE-2dl"/>
-                                        <exclude reference="7Ag-KF-YBw"/>
-                                    </mask>
-                                </variation>
                             </stackView>
                             <stackView opaque="NO" contentMode="left" distribution="equalCentering" alignment="center" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="25Q-Ay-JWf">
                                 <rect key="frame" x="5" y="144" width="824" height="60"/>
@@ -549,22 +548,22 @@
                                             </stackView>
                                         </subviews>
                                     </stackView>
-                                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="xrj-Mo-MF6">
-                                        <rect key="frame" x="651" y="14.5" width="173" height="32"/>
-                                        <segments>
-                                            <segment title="US Gallons"/>
-                                            <segment title="Liters"/>
-                                        </segments>
-                                    </segmentedControl>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aKH-GC-uKH">
+                                        <rect key="frame" x="651" y="14.5" width="173" height="31"/>
+                                        <subviews>
+                                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="xrj-Mo-MF6">
+                                                <rect key="frame" x="0.0" y="0.0" width="173" height="32"/>
+                                                <segments>
+                                                    <segment title="US Gallons"/>
+                                                    <segment title="Liters"/>
+                                                </segments>
+                                            </segmentedControl>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="hrz-FZ-vez"/>
                                 </constraints>
-                                <variation key="heightClass=regular-widthClass=compact">
-                                    <mask key="subviews">
-                                        <exclude reference="xrj-Mo-MF6"/>
-                                    </mask>
-                                </variation>
                             </stackView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="hdQ-sd-7Aw" userLabel="Fuel Collection View">
                                 <rect key="frame" x="5" y="254" width="824" height="850"/>
@@ -1540,6 +1539,9 @@
                                                             <color key="tintColor" systemColor="secondaryLabelColor"/>
                                                         </imageView>
                                                     </subviews>
+                                                    <constraints>
+                                                        <constraint firstItem="nys-Jl-eo9" firstAttribute="leading" secondItem="knq-lT-6lR" secondAttribute="trailing" id="5a9-DV-aFD"/>
+                                                    </constraints>
                                                 </stackView>
                                             </subviews>
                                             <constraints>
@@ -1606,6 +1608,7 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="f5y-BP-W6W" secondAttribute="trailing" constant="5" id="1ex-3f-A9k"/>
+                                        <constraint firstItem="knq-lT-6lR" firstAttribute="leading" secondItem="Fpc-Xo-3Um" secondAttribute="leading" constant="5" id="GjZ-wg-B2F"/>
                                         <constraint firstItem="eHV-1q-1DG" firstAttribute="top" secondItem="Fpc-Xo-3Um" secondAttribute="top" constant="5" id="Glx-l3-40N"/>
                                         <constraint firstAttribute="bottom" secondItem="eHV-1q-1DG" secondAttribute="bottom" constant="5" id="LVq-0V-bdH"/>
                                         <constraint firstItem="f5y-BP-W6W" firstAttribute="leading" secondItem="eHV-1q-1DG" secondAttribute="trailing" constant="5" id="LX9-Sv-J1s"/>
