@@ -108,6 +108,12 @@ struct FuelTanks<UnitType : Dimension> : Comparable, Codable {
     public func isAlmostZero() -> Bool {
         return self.total.isAlmostZero()
     }
+    
+    @inlinable
+    public func totalIsWithin(diff : Measurement<UnitType>, of other : Self) -> Bool {
+        return fabs(self.totalMeasurement.converted(to: diff.unit).value - other.totalMeasurement.converted(to: diff.unit).value) < diff.value
+    }
+    
 
 }
 

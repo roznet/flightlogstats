@@ -67,7 +67,7 @@ class FuelAnalysisDataSource: TableDataSource {
         return name
     }
     
-    func addLine<UnitType>(name : String, fuel : FuelTanks<UnitType>, totalizer : FuelTanks<UnitType>, unit : UnitType, highlight : Bool = false) {
+    func addLine<UnitType>(name : String, fuel : FuelTanks<UnitType>, totalizer : FuelTanks<UnitType>, unit : UnitType, highlight : Bool = false, largeDiff : Bool = false) {
         
         self.cellHolders.append(CellHolder(string: self.adaptedName(name: name), attributes: self.titleAttributes))
         var geoIndex = 1
@@ -79,7 +79,13 @@ class FuelAnalysisDataSource: TableDataSource {
             if measurement.value == 0.0 {
                 self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
             }else{
-                let attributes : [NSAttributedString.Key:Any]? = highlight ? self.titleAttributes : nil
+                var attributes : [NSAttributedString.Key:Any]? = nil
+                if highlight {
+                    attributes = self.titleAttributes
+                    if !self.flightSummary.totaliserConsistent {
+                        attributes?[.backgroundColor] = UIColor.yellow
+                    }
+                }
                 let dv = displayContext.displayedValue(field: .FQtyT, measurement: measurement.measurementDimension, providedUnit: true)
                 dv.adjust(geometry: self.geometries[geoIndex], numberAttribute: attributes)
                 self.cellHolders.append(dv.cellHolder(attributes: attributes))
@@ -117,7 +123,7 @@ class FuelAnalysisDataSource: TableDataSource {
         if let displayContext = self.flightLogViewModel?.displayContext {
             self.displayContext = displayContext
         }
-                
+        
         if let aircraftPerformance = self.flightLogViewModel?.aircraftPerformance,
            let inputs = self.flightLogViewModel?.fuelAnalysisInputs,
            let fuelTargetUnit = self.flightLogViewModel?.fuelTargetUnit,

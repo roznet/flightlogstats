@@ -69,6 +69,8 @@ struct Settings {
         case import_startdate = "import.startdate"
         
         case database_version = "database_version"
+        
+        case fuel_discrepancy_max = "fuel_discrepancy_max"
     }
     
     static func registerDefaults() {
@@ -108,6 +110,9 @@ struct Settings {
     
     @UserStorage(key: Key.aircraft_tab_fuel, defaultValue: 60.0)
     private var aircraftTabFuelTotal : Double
+    
+    @UserStorage(key: Key.fuel_discrepancy_max, defaultValue: 2.0)
+    private var aircraftMaxFuelDiscrepancy : Double
 
     @UserStorage(key: Key.aircraft_gph, defaultValue: 17.0)
     private var aircraftGph : Double
@@ -158,6 +163,12 @@ struct Settings {
             self.addedFuelLeft = ingallons.left
             self.addedFuelRight = ingallons.right
         }
+    }
+    
+    var maxFuelDisrepancy : Measurement<UnitVolume> {
+        get { return Measurement(value: self.aircraftMaxFuelDiscrepancy, unit: Settings.fuelStoreUnit) }
+        set { self.aircraftMaxFuelDiscrepancy = newValue.converted(to: Settings.fuelStoreUnit).value }
+    
     }
     
     var aircraftPerformance : AircraftPerformance {

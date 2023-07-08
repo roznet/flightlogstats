@@ -31,6 +31,10 @@ struct FlightSummary : Codable {
     var fuelUsed : FuelQuantity { return self.fuelStart - self.fuelEnd }
     var fuelTotalizer : FuelQuantity
     
+    var totaliserConsistent : Bool {
+        return self.fuelUsed.totalIsWithin(diff: Settings.shared.maxFuelDisrepancy, of: self.fuelTotalizer)
+    }
+    
     let engineOn : TimeRange?
     let moving : TimeRange?
     let flying : TimeRange?

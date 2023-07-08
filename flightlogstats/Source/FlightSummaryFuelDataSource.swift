@@ -57,7 +57,7 @@ class FlightSummaryFuelDataSource: TableDataSource {
             self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
             var geoIndex = 1
             var attr : [NSAttributedString.Key:Any]? = nil
-            if fabs( fuel.totalMeasurement.converted(to: .aviationGallon).value - totalizer.totalMeasurement.converted(to: .aviationGallon).value ) > 1.0 {
+            if !self.flightSummary.totaliserConsistent {
                 attr = self.cellAttributes
                 attr![.backgroundColor] = UIColor.yellow
             }
