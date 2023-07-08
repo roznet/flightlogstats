@@ -56,13 +56,18 @@ class FlightSummaryFuelDataSource: TableDataSource {
         ] {
             self.cellHolders.append(CellHolder(string: name, attributes: self.titleAttributes))
             var geoIndex = 1
-            for fuelVal in [fuel.totalMeasurement, fuel.leftMeasurement, fuel.rightMeasurement, totalizer.totalMeasurement] {
+            var attr : [NSAttributedString.Key:Any]? = nil
+            if fabs( fuel.totalMeasurement.converted(to: .aviationGallon).value - totalizer.totalMeasurement.converted(to: .aviationGallon).value ) > 1.0 {
+                attr = self.cellAttributes
+                attr![.backgroundColor] = UIColor.yellow
+            }
+            for (fuelVal,a) in [(fuel.totalMeasurement,attr), (fuel.leftMeasurement,nil), (fuel.rightMeasurement,nil), (totalizer.totalMeasurement,attr)] {
                 if fuelVal.value != 0.0 {
                     let measurement = fuelVal.measurementDimension
                     // pick one fuel field, should be all the same
                     let dv = self.displayContext.displayedValue(field: .FQtyT, measurement: measurement)
                     dv.adjust(geometry: self.geometries[geoIndex])
-                    self.cellHolders.append(dv.cellHolder())
+                    self.cellHolders.append(dv.cellHolder(attributes: a))
                 }else{
                     self.cellHolders.append(CellHolder(string: "", attributes: self.cellAttributes))
                 }

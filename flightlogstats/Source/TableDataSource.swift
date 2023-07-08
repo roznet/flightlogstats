@@ -80,7 +80,16 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
     var selectedColor : UIColor = UIColor.systemTeal
     var highlightedBackgroundColor : UIColor =  UIColor.systemCyan //UIColor.secondarySystemBackground
     
-    func setBackgroundColor(for tableCell: UICollectionViewCell, itemAt indexPath : IndexPath) {
+    /// Set backgorund of cell using the following logic:
+    ///  specific color if row is highlighted or part of the frozen row or  columns
+    ///  For main cell, alternate color unless specified in attribute
+    ///
+    /// - Parameters:
+    ///   - tableCell: cell to modify
+    ///   - indexPath: indexpath of the cell
+    ///   - attribute: optional attribute only checked for background color in the main cell section
+    func setBackgroundColor(for tableCell: UICollectionViewCell, itemAt indexPath : IndexPath,
+                            attribute : [NSAttributedString.Key:Any]? = nil) {
         if self.highlightedBackgroundRows.contains(indexPath.section){
             tableCell.backgroundColor = self.highlightedBackgroundColor
         }else if indexPath.section < self.frozenRows || indexPath.item < self.frozenColumns{
@@ -89,10 +98,17 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
             if let selectedIndexPath = self.selectedIndexPath,
                selectedIndexPath.section == indexPath.section {
                 tableCell.backgroundColor = self.selectedColor
-            }else if indexPath.section % 2 == 0{
-                tableCell.backgroundColor = UIColor.systemBackground
             }else{
-                tableCell.backgroundColor = UIColor.systemGroupedBackground
+                if let attribute = attribute,
+                   let color = attribute[.backgroundColor] as? UIColor {
+                    // if specified, use the color from the attribute
+                    tableCell.backgroundColor = color
+                    
+                }else if indexPath.section % 2 == 0{
+                    tableCell.backgroundColor = UIColor.systemBackground
+                }else{
+                    tableCell.backgroundColor = UIColor.systemGroupedBackground
+                }
             }
         }
     }
@@ -152,7 +168,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
                     nuCell.numberWithUnitView.geometry = self.geometries[indexPath.item]
                     nuCell.numberWithUnitView.attributes = attr
                 }
-                self.setBackgroundColor(for: cell, itemAt: indexPath)
+                self.setBackgroundColor(for: cell, itemAt: indexPath, attribute: attr)
                 return cell
             case .measurement(let me, let formatter, let attr):
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MeasurementCollectionViewCell", for: indexPath)
@@ -162,7 +178,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
                     nuCell.measurementView.geometry = self.geometries[indexPath.item]
                     nuCell.measurementView.attributes = attr
                 }
-                self.setBackgroundColor(for: cell, itemAt: indexPath)
+                self.setBackgroundColor(for: cell, itemAt: indexPath, attribute: attr)
                 return cell
             case .compoundMeasurement(let me, let comp, let attr):
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MeasurementCollectionViewCell", for: indexPath)
@@ -172,7 +188,7 @@ class TableDataSource: NSObject, UICollectionViewDataSource, UICollectionViewDel
                     nuCell.measurementView.geometry = self.geometries[indexPath.item]
                     nuCell.measurementView.attributes = attr
                 }
-                self.setBackgroundColor(for: cell, itemAt: indexPath)
+                self.setBackgroundColor(for: cell, itemAt: indexPath, attribute: attr)
                 return cell
 
             }
