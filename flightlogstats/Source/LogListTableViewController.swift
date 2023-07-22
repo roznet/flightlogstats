@@ -506,6 +506,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             method = .afterDate(Settings.shared.importStartDate)
         case .automatic:
             method = .allMissingFromFolder
+        case .last7d:
+            let ref = Date().addingTimeInterval(-7.0*24.0*60.0*60)
+            method = .afterDate(ref)
+        case .last24h:
+            let ref = Date().addingTimeInterval(-24.0*60.0*60)
+            method = .afterDate(ref)
         }
         FlightLogOrganizer.search(in: urls) {
             result in

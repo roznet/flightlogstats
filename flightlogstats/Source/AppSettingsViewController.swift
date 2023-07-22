@@ -9,10 +9,14 @@ import UIKit
 import WebKit
 class AppSettingsViewController: UIViewController {
 
-    private let importMenuConfig : [(Settings.ImportMethod,String)] = [ (.automatic, "Automatic"),
-                                                              (.fromDate, "From Date"),
-                                                              (.selectedFile, "Selected File"),
-                                                              (.sinceLastImport, "Since Last Import") ]
+    private let importMenuConfig : [(Settings.ImportMethod,String)] = [
+        (.automatic, "Automatic"),
+        (.last24h, "Last 24 hours"),
+        (.last7d, "Last 7 days"),
+        (.fromDate, "From Date"),
+        (.selectedFile, "Selected File"),
+        (.sinceLastImport, "Since Last Import")
+    ]
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -61,6 +65,12 @@ class AppSettingsViewController: UIViewController {
         self.flyStoSwitch.isOn = Settings.shared.flystoEnabled
         self.datePicker.date = Settings.shared.importStartDate
         self.uploadMethodSwitch.isOn = Settings.shared.uploadMethod == .automatic
+        
+        if Settings.shared.importMethod == .fromDate {
+            self.datePicker.isHidden = false
+        }else{
+            self.datePicker.isHidden = true
+        }
         
         for (method,title) in self.importMenuConfig {
             if Settings.shared.importMethod == method {
@@ -114,6 +124,8 @@ class AppSettingsViewController: UIViewController {
         <p>To import logs, insert an SD Card, press the + button and select the root of the card. The app will then search recursively all the log files present on the SD Card. Here is what each import method will do.</p>
         <ul>
         <li><b>Automatic</b> will search recursively and automatically import from the SD Card any log file not currently in the app</li>
+        <li><b>Last 24 hours</b> will search recursively and automatically import from the SD Card any log file not currently in the app that was created in the last 24 hours</li>
+        <li><b>Last 7 days</b> will search recursively and automatically import from the SD Card any log file not currently in the app that was created in the last 7 days</li>
         <li><b>From Date</b> will only import new files not the the app that are more recent than the selected date and will ignore any files older</li>
         <li><b>Since Last Import</b> the first time will import all the files on the card, but subsequently will only import files that are more recent than the last import. So for example if you then insert an SD Card with older files, they will be ignored</li>
         <li><b>Selected File</b> will only import the files that are explicitely selected, and will not do any recursive search. If you select this option in the open dialog box you need to select the specific files you want to import</li>

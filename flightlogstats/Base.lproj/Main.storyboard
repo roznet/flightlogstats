@@ -1818,7 +1818,6 @@
                                                     <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" translatesAutoresizingMaskIntoConstraints="NO" id="Qnl-QR-19L">
                                                         <rect key="frame" x="199" y="0.0" width="301" height="903.5"/>
                                                         <connections>
-                                                            <action selector="switchToggle:" destination="npJ-vZ-DSg" eventType="valueChanged" id="srT-nr-XbC"/>
                                                             <action selector="uiControlChanged:" destination="npJ-vZ-DSg" eventType="valueChanged" id="JsQ-xk-zwi"/>
                                                         </connections>
                                                     </datePicker>

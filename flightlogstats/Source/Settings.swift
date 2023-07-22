@@ -32,6 +32,8 @@ struct Settings {
     }
     enum ImportMethod : String {
         case automatic
+        case last24h
+        case last7d
         case fromDate
         case sinceLastImport
         case selectedFile
