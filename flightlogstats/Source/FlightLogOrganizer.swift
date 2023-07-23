@@ -16,6 +16,7 @@ extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
     static let newLocalFilesDiscovered : Notification.Name = Notification.Name("Notification.Name.NewLocalFilesDiscovered")
     static let aircraftListChanged  : Notification.Name = Notification.Name("Notification.Name.AircraftListChanged")
+    static let noFileDiscovered : Notification.Name = Notification.Name("Notification.Name.NoFileDiscovered")
 }
 
 class FlightLogOrganizer {
@@ -673,7 +674,6 @@ class FlightLogOrganizer {
     
     private func copyLogFile(file : URL, dest : URL) -> Bool {
         var someNew : Bool = false
-        Logger.app.info("Copy \(dest)")
         if !FileManager.default.fileExists(atPath: dest.path) {
             do {
                 try FileManager.default.copyItem(at: file, to: dest)
@@ -710,7 +710,7 @@ class FlightLogOrganizer {
     }
     
     enum LogSelectionMethod {
-        case allMissingFromFolder // Automatically look for files missing in a folder 
+        case allMissingFromFolder // Automatically look for files missing in a folder
         case sinceLatestImportedFile // Only import files after the latest imported file
         case selectedFile([URL]) // Only import specified files
         case afterDate(Date) // Only import files after the specified date
@@ -743,16 +743,13 @@ class FlightLogOrganizer {
                 self.syncCloud()
             }
         }
+        else {
+            NotificationCenter.default.post(name: .noFileDiscovered, object: self)
+        }
     }
     
-    /// Import (copy to local container) files missing according to selection Method
-    /// - Parameters:
-    ///   - urls: list of files to import
-    ///   - method: selection method
-    func importFiles(urls : [URL], method : LogSelectionMethod) -> Bool {
-        let destFolder = self.localFolder
-        var someNew : Bool = false
-        
+    func buildImportList(urls : [URL], method :LogSelectionMethod) -> [URL]{
+        var rv : [URL] = []
         for url in urls {
             var shouldInclude = false
             switch method {
@@ -779,15 +776,31 @@ class FlightLogOrganizer {
                 }
             }
             if shouldInclude {
-                if url.logFileType == .rpt {
-                    if self.copyRptFile(file: url,destFolder: destFolder) {
-                        someNew = true
-                    }
-                }else{
-                    let dest = destFolder.appendingPathComponent(url.lastPathComponent)
-                    if self.copyLogFile(file: url, dest: dest) {
-                        someNew = true
-                    }
+                rv.append(url)
+            }
+        }
+        return rv
+    }
+    
+    /// Import (copy to local container) files missing according to selection Method
+    /// - Parameters:
+    ///   - urls: list of files to import
+    ///   - method: selection method
+    func importFiles(urls : [URL], method : LogSelectionMethod) -> Bool {
+        let destFolder = self.localFolder
+        var someNew : Bool = false
+        
+        let importList = self.buildImportList(urls: urls, method: method)
+
+        for url in importList {
+            if url.logFileType == .rpt {
+                if self.copyRptFile(file: url,destFolder: destFolder) {
+                    someNew = true
+                }
+            }else{
+                let dest = destFolder.appendingPathComponent(url.lastPathComponent)
+                if self.copyLogFile(file: url, dest: dest) {
+                    someNew = true
                 }
             }
         }

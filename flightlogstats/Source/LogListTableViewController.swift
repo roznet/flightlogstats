@@ -212,7 +212,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             self.buildList()
 
         }
-        
+        NotificationCenter.default.addObserver(forName: .noFileDiscovered, object: nil, queue: nil){
+            _ in
+            Logger.ui.info("No file discovered")
+            self.progressReportOverlay?.removeOverlay()
+        }
         NotificationCenter.default.addObserver(forName: .ErrorOccured, object: AppDelegate.errorManager, queue: nil) {
             _ in
             if let error = AppDelegate.errorManager.popLast() {
@@ -518,10 +522,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             switch result {
             case .success(let logurls):
                 let missing = self.logFileOrganizer.filterMissing(urls: logurls)
-                if missing.count > 50 {
-                    self.importLargeNumberOfLogs(urls: logurls, method: method)
+                let importList = self.logFileOrganizer.buildImportList(urls: missing, method: method)
+                if importList.count > 50 {
+                    self.importLargeNumberOfLogs(urls: importList, method: method)
                 }else{
-                    self.logFileOrganizer.importAndAddRecordsForFiles(urls: logurls, method: method)
+                    self.logFileOrganizer.importAndAddRecordsForFiles(urls: importList, method: method)
                 }
             case .failure(let error):
                 Logger.app.error("Failed to find url \(error.localizedDescription)")
