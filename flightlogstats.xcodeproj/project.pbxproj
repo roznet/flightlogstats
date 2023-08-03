@@ -109,6 +109,7 @@
 		42CEA373281C2F7400AB7B5F /* log_211204_102045_EGLL.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */; };
 		42D154DB280DE413000A0BB9 /* FlightLogOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */; };
 		42DF535A28B6486700512C34 /* Visit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42DF535928B6486700512C34 /* Visit.swift */; };
+		42DF60872A7C3138005760C6 /* log_230721_084427_LIRQ.csv in Resources */ = {isa = PBXBuildFile; fileRef = 42DF60862A7C3138005760C6 /* log_230721_084427_LIRQ.csv */; };
 		42E13B8E2813DBD200AF38AC /* FlightLogModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 42E13B8C2813DBD200AF38AC /* FlightLogModel.xcdatamodeld */; };
 		42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */; };
 		42E83FEE283CB5B000869598 /* BufferedStreamReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */; };
@@ -246,6 +247,7 @@
 		42CEA36F281C2F7400AB7B5F /* log_211204_102045_EGLL.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_211204_102045_EGLL.csv; sourceTree = "<group>"; };
 		42D154DA280DE413000A0BB9 /* FlightLogOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogOrganizer.swift; path = Source/FlightLogOrganizer.swift; sourceTree = "<group>"; };
 		42DF535928B6486700512C34 /* Visit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Visit.swift; path = Source/Visit.swift; sourceTree = "<group>"; };
+		42DF60862A7C3138005760C6 /* log_230721_084427_LIRQ.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_230721_084427_LIRQ.csv; sourceTree = "<group>"; };
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 		42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestParsingLogFiles.swift; sourceTree = "<group>"; };
 		42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BufferedStreamReader.swift; path = Source/BufferedStreamReader.swift; sourceTree = "<group>"; };
@@ -492,6 +494,7 @@
 		4280C8C6280D48E700A0FB32 /* TestAssets */ = {
 			isa = PBXGroup;
 			children = (
+				42DF60862A7C3138005760C6 /* log_230721_084427_LIRQ.csv */,
 				42F096DE29394C9F00201850 /* log_210613_032326_LCPH.csv */,
 				42F096E129394C9F00201850 /* log_210613_070502_LGAV.csv */,
 				42F096E229394C9F00201850 /* log_210613_115132_LDLO.csv */,
@@ -752,6 +755,7 @@
 				4203FBD02905B0D2005B0530 /* rpt_220620_134709_N122DR.csv in Resources */,
 				42F096E929394C9F00201850 /* log_210613_070502_LGAV.csv in Resources */,
 				42F096EA29394C9F00201850 /* log_210613_115132_LDLO.csv in Resources */,
+				42DF60872A7C3138005760C6 /* log_230721_084427_LIRQ.csv in Resources */,
 				42F1E84C284A491600DB732A /* log_220502_095923______.csv in Resources */,
 				420247AF2840011300B7E52C /* log_small_sample.csv in Resources */,
 				42F096E829394C9F00201850 /* log_220905_091502_LGIO.csv in Resources */,
@@ -1052,7 +1056,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = flightlogstats/FlightLogStats.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlogstats/Info.plist;
@@ -1087,7 +1091,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = flightlogstats/FlightLogStats.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlogstats/Info.plist;

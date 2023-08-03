@@ -343,7 +343,7 @@ class DisplayContext {
             return .average
         case .E1_MAP,.E2_MAP:
             return .average
-        case .E1_RPM,.E2_RPM:
+        case .E1_RPM,.E2_RPM,.E1_NP,.E2_NP:
             return .average
         case .E1_PctPwr,.E2_PctPwr:
             return .average
@@ -431,7 +431,7 @@ class DisplayContext {
             return UnitPressure.poundsForcePerSquareInch
         case .E1_MAP,.E2_MAP:
             return UnitPressure.inchesOfMercury
-        case .E1_RPM,.E2_RPM:
+        case .E1_RPM,.E2_RPM,.E1_NP,.E2_NP:
             return UnitAngularVelocity.revolutionsPerMinute
         case .E1_PctPwr,.E2_PctPwr:
             return UnitPercent.percentPerHundred
@@ -526,7 +526,7 @@ class DisplayContext {
             return DisplayedValue(formatter: .measurement(Self.mapFormatter), value: .measurement(measurement))
         case .E1_FPres,.E2_FPres:
             return DisplayedValue(formatter: .measurement(Self.mapFormatter), value: .measurement(measurement))
-        case .E1_RPM,.E2_RPM:
+        case .E1_RPM,.E2_RPM,.E1_NP,.E2_NP:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))
         case .E1_PctPwr,.E2_PctPwr:
             return DisplayedValue(formatter: .measurement(Self.defaultFormatter), value: .measurement(measurement))

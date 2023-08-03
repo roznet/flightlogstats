@@ -97,9 +97,9 @@ struct FlightSummary : Codable {
     }
     
     init( data : FlightData) throws {
-        let values = data.doubleDataFrame(for: [.GndSpd,.IAS,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT,.AltMSL] )
-        
-        let engineOnValues = values.dropFirst(field: .E1_PctPwr) { $0 > 0.0 }?.dropLast(field: .E1_PctPwr) { $0 > 0.0 }
+        let values = data.doubleDataFrame(for: [.GndSpd,.IAS,.E1_NP,.E1_PctPwr,.FQtyL,.FQtyR,.Distance,.FTotalizerT,.AltMSL] )
+        let engineField : FlightLogFile.Field = values.has(field: .E1_PctPwr) ? .E1_PctPwr : .E1_NP
+        let engineOnValues = values.dropFirst(field: engineField) { $0 > 0.0 }?.dropLast(field: engineField) { $0 > 0.0 }
         let movingValues = engineOnValues?.dropFirst(field: .GndSpd, minimumMatchCount: 5) { $0 > 0.0 }?.dropLast(field: .GndSpd) { $0 > 0.0 }
         let flyingValues = engineOnValues?.dropFirst(field: .IAS) { $0 > 35.0 }?.dropLast(field: .IAS) { $0 > 35.0 }
 

@@ -37,6 +37,7 @@ enum TestLogFileSamples : String, CaseIterable {
     
     case perspective = "log_210613_032326_LCPH"
     case diamond = "log_220905_064831_LGMG"
+    case tbm930 = "log_230721_084427_LIRQ"
     
     static var allSampleNames : [String] { return self.allCases.map { $0.rawValue } }
     
@@ -56,6 +57,7 @@ class TestParsingLogFiles: XCTestCase {
     }
     
     func testFlightData() {
+        self.runFlightTestData(sample: .tbm930)
         self.runFlightTestData(sample: .flight1)
         self.runFlightTestData(sample: .perspective)
         self.runFlightTestData(sample: .diamond)
@@ -68,13 +70,20 @@ class TestParsingLogFiles: XCTestCase {
             XCTAssertTrue(false)
             return
         }
+       
+        do {
+            let summary = try FlightSummary(data: data)
+            print(summary)
+        }catch{
+            print(error)
+        }
         
         let createCollector : (FlightLogFile.Field,Double) -> ValueStats = {_,f in return ValueStats(value: f) }
         let updateCollector : (inout ValueStats?,Double) -> Void = {v,d in v?.update(double: d) }
+        let speedPower = data.doubleDataFrame(for: [.GndSpd,.IAS,.E1_NP,.E1_PctPwr,.AltMSL])
+        let engineField : FlightLogFile.Field  = speedPower.has(field: .E1_NP) ? .E1_NP : .E1_PctPwr
         
-        let speedPower = data.doubleDataFrame(for: [.GndSpd,.IAS,.E1_PctPwr,.AltMSL])
-        
-        if let engineOn = speedPower.dropFirst(field: .E1_PctPwr, matching: { $0 > 0 }),
+        if let engineOn = speedPower.dropFirst(field: engineField, matching: { $0 > 0 }),
            let moving = engineOn.dropFirst(field: .GndSpd,matching: { $0 > 0 }) {
             XCTAssertLessThan(engineOn.count, data.count)
             XCTAssertLessThanOrEqual(moving.count, engineOn.count)
