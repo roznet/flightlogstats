@@ -54,7 +54,11 @@ class TableCollectionViewLayout: UICollectionViewLayout {
     }
     
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        return itemAttributes[indexPath.section][indexPath.item]
+        if indexPath.section < itemAttributes.count {
+            return itemAttributes[indexPath.section][indexPath.item]
+        }else{
+            return nil
+        }
     }
     
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {

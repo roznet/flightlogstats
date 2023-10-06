@@ -11,6 +11,38 @@ import WebKit
 import OSLog
 import RZUtilsSwift
 
+extension FlightLogFileRecord {
+    var savvyStatus : FlightSavvyRecord.Status {
+        get {
+            return self.savvy_record?.status ?? .pending
+        }
+        set {
+            self.ensureSavvyStatus()
+            self.savvy_record?.status = newValue
+            self.savvy_record?.status_date = Date()
+        }
+    }
+    var savvyUpdateDate : Date? {
+        return self.savvy_record?.status_date
+    }
+    
+    
+    func savvyUploadCompletion(status : SavvyRequest.Status, request : RemoteServiceRequest) {
+        var checkSavvyStatus : FlightFlyStoRecord.Status = .ready
+        switch status {
+        case .progressing:
+            return
+        case .success,.already:
+            checkSavvyStatus = .uploaded
+        case .error,.tokenExpired,.denied:
+            checkSavvyStatus = .failed
+        }
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        
+        self.savvyStatus = checkSavvyStatus
+    }
+    
+}
 // UIViewController with a WKWebView and a callback to handle the result
 // Documentation in https://github.com/savvyaviation/api-docs
 class SavvyAuthenticateViewController : UIViewController, WKNavigationDelegate {
@@ -89,6 +121,7 @@ class SavvyRequest : RemoteServiceRequest {
     let url : URL
     let aircraftIdentifier : AircraftIdentifier
     var completionHandler : CompletionHandler? = nil
+    var uploadResponse : SavvyUploadResponse? = nil
 
     init(viewController : UIViewController, url : URL, aircraftIdentifier : AircraftIdentifier) {
         self.viewController = viewController
@@ -204,6 +237,7 @@ class SavvyRequest : RemoteServiceRequest {
                     do {
                         let decoder = JSONDecoder()
                         let result = try decoder.decode(SavvyUploadResponse.self, from: data)
+                        self.uploadResponse = result
                         if result.status == "OK" {
                             Logger.net.info("Savvy: Uploaded \(filename)")
                             self.end(status: .success)

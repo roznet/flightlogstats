@@ -96,17 +96,10 @@ class FlightLogViewModel {
     }
     
     var savvyStatus : FlightSavvyRecord.Status {
-        get {
-            return self.flightLogFileRecord.savvy_record?.status ?? .pending
-        }
-        set {
-            self.flightLogFileRecord.ensureSavvyStatus()
-            self.flightLogFileRecord.savvy_record?.status = newValue
-            self.flightLogFileRecord.savvy_record?.status_date = Date()
-        }
+        return self.flightLogFileRecord.savvyStatus
     }
     var savvyUpdateDate : Date? {
-        return self.flightLogFileRecord.savvy_record?.status_date
+        return self.flightLogFileRecord.savvyUpdateDate
     }
     var uploadStatusText : String {
         var messages : [String] = []
@@ -313,54 +306,9 @@ class FlightLogViewModel {
             Logger.net.info("No network available, skipping uploads")
             return
         }
-        let flySto = Settings.shared.flystoEnabled
-        let savvy = Settings.shared.savvyEnabled
-        var started : Bool = false
-        if let url = self.flightLogFileRecord.url {
-            if flySto && (force || self.flystoStatus != .uploaded) {
-                Logger.ui.info("Starting flySto upload ")
-                self.flyStoRequest = FlyStoUploadRequest(viewController: viewController, url: url)
-                self.flyStoRequest?.progress = self.progress
-                started = true
-                self.progress?.update(state: .start, message: .uploadingFiles)
-                self.flyStoRequest?.execute() {
-                    status,req in
-                    AppDelegate.worker.async {
-                        self.flightLogFileRecord.flyStoUploadCompletion(status: status, request: req)
-                        NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)
-                        self.save()
-                        self.progress?.update(state: .complete, message: .uploadingFiles)
-                    }
-                }
-            }
-            if savvy && (force || self.savvyStatus != .uploaded) {
-                if let identifier = self.flightLogFileRecord.aircraftRecord?.aircraftIdentifier {
-                    self.savvyRequest = SavvyRequest(viewController: viewController, url: url, aircraftIdentifier: identifier)
-                    if !started { // if not already started
-                        self.progress?.update(state: .start, message: .uploadingFiles)
-                    }
-                    started = true
-                    self.savvyRequest?.execute(){ status,_ in
-                        AppDelegate.worker.async {
-                            switch status {
-                            case .progressing(let pct):
-                                self.progress?.update(state: .progressing(pct), message: .uploadingFiles)
-                                return
-                            case .success,.already:
-                                self.savvyStatus = .uploaded
-                            case .error,.denied,.tokenExpired:
-                                self.savvyStatus = .failed
-                            }
-                            NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)
-                            self.save()
-                            self.progress?.update(state: .complete, message: .uploadingFiles)
-                        }
-                    }
-                }
-            }
-        }
-        if !started {
-            self.progress?.update(state: .complete, message: .uploadingFiles)
+        
+        if self.flightLogFileRecord.url != nil {
+            RequestQueue.shared.add(record: self.flightLogFileRecord, viewController: viewController, force: force)
         }
     }
     private var flyStoLogFileRequest : FlyStoLogFilesRequest? = nil
