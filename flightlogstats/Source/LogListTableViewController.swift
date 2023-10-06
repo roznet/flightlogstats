@@ -70,6 +70,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.buildList()
                 self.tableView.reloadData()
             },
+            UIAction(title: "Force Upload", image: UIImage(systemName: "square.and.arrow.up")){
+                _ in
+                let vc = (self.delegate as? UIViewController) ?? self
+                FlightLogOrganizer.shared.buildUploadList(viewController: vc)
+                self.tableView.reloadData()
+            },
             UIAction(title: "Delete/Restore Logs", image: UIImage(systemName: "minus.circle")){
                 _ in
                 self.buildList()

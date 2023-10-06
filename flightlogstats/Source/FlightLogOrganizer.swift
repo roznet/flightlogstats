@@ -604,6 +604,29 @@ class FlightLogOrganizer {
         }
         
     }
+    
+    //MARK: - Upload File management
+    
+    func buildUploadList(viewController : UIViewController) {
+        let list = self.flightLogFileRecords(request: .flightsOnly){
+            record in
+            if (record.recordStatus == .quickParsed || record.recordStatus == .parsed) {
+                if Settings.shared.flystoEnabled && record.flystoStatus != .uploaded {
+                    return true
+                }
+                if Settings.shared.savvyEnabled && record.savvyStatus != .uploaded {
+                    return true
+                }
+            }
+            return false
+        }
+        Logger.ui.info("\(list.count) / \(self.managedFlightLogs.count) potential to upload")
+        let count = 3
+        let todo = [list[0], list[1]]
+        RequestQueue.shared.add(records: todo, viewController: viewController)
+        
+    }
+    
     //MARK: - Aggregated Data
     /// Maintained full history of aggregatedData.
     /// When records are updated this will be update. Can be nil to disable the aggregation all together
