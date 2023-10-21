@@ -194,7 +194,7 @@ class FlightLogOrganizer {
                 Logger.app.error("Failed to load \(error.localizedDescription)")
             }else{
                 let path = storeDescription.url?.path ?? ""
-                Logger.app.info("Loaded store \(storeDescription.type) \(path)")
+                Logger.app.info("Loaded store \(storeDescription.type) \(path.truncated(limit: 64))")
                 container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
                 self.checkForUpdates()
             }
@@ -620,9 +620,9 @@ class FlightLogOrganizer {
             }
             return false
         }
-        Logger.ui.info("\(list.count) / \(self.managedFlightLogs.count) potential to upload")
-        let count = 3
-        let todo = [list[0], list[1]]
+        let count = Settings.shared.uploadBatchCount
+        let todo = Array(list.prefix(min(count, list.count)))
+        Logger.ui.info("\(list.count) / \(self.managedFlightLogs.count) potential to upload, will upload \(todo.count)")
         RequestQueue.shared.add(records: todo, viewController: viewController)
         
     }
@@ -700,7 +700,7 @@ class FlightLogOrganizer {
         if !FileManager.default.fileExists(atPath: dest.path) {
             do {
                 try FileManager.default.copyItem(at: file, to: dest)
-                Logger.app.info("copied \(file.lastPathComponent) to \(dest.path)")
+                Logger.app.info("copied \(file.lastPathComponent) to \(dest.path.truncated(limit:64))")
                 someNew = true
             } catch {
                 Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest.path)")
@@ -767,12 +767,14 @@ class FlightLogOrganizer {
             }
         }
         else {
+            Logger.app.info("Import found no new files")
             NotificationCenter.default.post(name: .noFileDiscovered, object: self)
         }
     }
     
     func buildImportList(urls : [URL], method :LogSelectionMethod) -> [URL]{
         var rv : [URL] = []
+        
         for url in urls {
             var shouldInclude = false
             switch method {
@@ -802,6 +804,7 @@ class FlightLogOrganizer {
                 rv.append(url)
             }
         }
+        Logger.app.info("Found \(rv.count) new files out of \(urls.count)")
         return rv
     }
     
@@ -854,7 +857,7 @@ class FlightLogOrganizer {
                 Logger.app.error("Failed to load \(error.localizedDescription)")
             }else{
                 let path = storeDescription.url?.path ?? ""
-                Logger.app.info("Loaded store \(storeDescription.type) \(path)")
+                Logger.app.info("Loaded store \(storeDescription.type) \(path.truncated(limit: 64))")
                 container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
                 self.checkForUpdates()
             }

@@ -70,7 +70,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.buildList()
                 self.tableView.reloadData()
             },
-            UIAction(title: "Force Upload", image: UIImage(systemName: "square.and.arrow.up")){
+            UIAction(title: "Upload next \(Settings.shared.uploadBatchCount) flights", image: UIImage(systemName: "square.and.arrow.up")){
                 _ in
                 let vc = (self.delegate as? UIViewController) ?? self
                 FlightLogOrganizer.shared.buildUploadList(viewController: vc)
@@ -539,6 +539,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 if importList.count > 50 {
                     self.importLargeNumberOfLogs(urls: importList, method: method)
                 }else{
+                    Logger.ui.info("Starting search")
                     self.logFileOrganizer.importAndAddRecordsForFiles(urls: importList, method: method)
                 }
             case .failure(let error):
@@ -554,12 +555,15 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
     
     func importLargeNumberOfLogs(urls: [URL], method: FlightLogOrganizer.LogSelectionMethod) {
+        Logger.ui.info("Checking user decision for large number")
         let importAll = UIAlertAction(title: "Import All", style: .default) {
             action in
+            Logger.ui.info("user decided to import all")
             self.logFileOrganizer.importAndAddRecordsForFiles(urls: urls, method: method)
         }
         let settings = UIAlertAction(title: "Edit Import Method", style: .default) {
             action in
+            Logger.ui.info("user decided to edit settings")
             let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
             let vc = storyboard.instantiateViewController(identifier: "appSettingsViewController")
             vc.modalPresentationStyle = .fullScreen
@@ -568,6 +572,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         let cancel = UIAlertAction(title: "Abort", style: .cancel) {
             action in
             //
+            Logger.ui.info("user canceled")
         }
         let alert = UIAlertController(title: "Large Number of Files",
                                       message: "There is a large number of files to import (\(urls.count)). This may take a while. Please confirm before proceeding?", preferredStyle: .alert)

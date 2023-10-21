@@ -21,7 +21,7 @@ class BugReportViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-    var url : URL? = URL(string: "https://flyfun.aero/boarding/bugreport/new")
+    var url : URL? = URL(string: Secrets.shared["flightlogstats.bugreport"] ?? "")
     var bugFilePath : String = RZFileOrganizer.writeableFilePath("bugreport.zip")
     
     @IBOutlet weak var webView: WKWebView!

@@ -74,6 +74,7 @@ struct Settings {
         
         case fuel_discrepancy_max = "fuel_discrepancy_max"
         case common_bug_id = "common_bug_id"
+        case upload_batch_count = "upload_batch_count"
     }
     
     static func registerDefaults() {
@@ -135,7 +136,9 @@ struct Settings {
     
     @UserStorage(key: Key.common_bug_id, defaultValue: -1)
     var commonBugId : Int
-   
+    
+    @UserStorage(key: Key.upload_batch_count, defaultValue: 12)
+    var uploadBatchCount : Int
     
     @EnumStorage(key: Key.upload_method, defaultValue: .automatic)
     var uploadMethod : UploadMethod
