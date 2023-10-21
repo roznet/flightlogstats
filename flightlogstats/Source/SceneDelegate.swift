@@ -68,10 +68,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        Logger.app.info("context \(URLContexts)")
         for context in URLContexts {
             if context.url.path == "/oauth/flysto" {
-                Logger.app.info("context \(context.url)")
+                Logger.app.info("opening context \(context.url)")
                 OAuthSwift.handle(url: context.url)
             }else{
                 Logger.app.info("ignoring \(context)")
