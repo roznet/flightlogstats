@@ -1947,7 +1947,7 @@
             <objects>
                 <navigationController id="SpX-dd-qC9" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="yUG-iT-RMB">
-                        <rect key="frame" x="0.0" y="24" width="420" height="44"/>
+                        <rect key="frame" x="0.0" y="24" width="420" height="50"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
