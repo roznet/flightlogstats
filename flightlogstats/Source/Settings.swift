@@ -73,6 +73,7 @@ struct Settings {
         case database_version = "database_version"
         
         case fuel_discrepancy_max = "fuel_discrepancy_max"
+        case common_bug_id = "common_bug_id"
     }
     
     static func registerDefaults() {
@@ -131,6 +132,9 @@ struct Settings {
     var savvyEnabled : Bool
     @CodableStorage(key: Key.savvy_token)
     var savvyToken : String?
+    
+    @UserStorage(key: Key.common_bug_id, defaultValue: -1)
+    var commonBugId : Int
    
     
     @EnumStorage(key: Key.upload_method, defaultValue: .automatic)

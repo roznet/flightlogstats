@@ -26,6 +26,8 @@
 		422807562ACE080000FAAF6D /* RequestQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422807552ACE080000FAAF6D /* RequestQueue.swift */; };
 		423367A6293BC85F007D2285 /* MeasurementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A5293BC85F007D2285 /* MeasurementView.swift */; };
 		423367A8293BC967007D2285 /* MeasurementCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */; };
+		42365B072ADAEE3E005AFE3E /* BugReportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42365B062ADAEE3E005AFE3E /* BugReportViewController.swift */; };
+		42365B0A2ADAF1B8005AFE3E /* DeviceGuru in Frameworks */ = {isa = PBXBuildFile; productRef = 42365B092ADAF1B8005AFE3E /* DeviceGuru */; };
 		423731622985CA3E001A99CA /* SavvyRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423731612985CA3E001A99CA /* SavvyRequest.swift */; };
 		4239290D2864D08800CD33C0 /* AircraftPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290C2864D08800CD33C0 /* AircraftPerformance.swift */; };
 		4239290F2864D0AF00CD33C0 /* FuelAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */; };
@@ -164,9 +166,11 @@
 		421E08692864455000D7D174 /* FuelAnalysisDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysisDataSource.swift; path = Source/FuelAnalysisDataSource.swift; sourceTree = "<group>"; };
 		421EE5BE290C53E600996EC6 /* AircraftRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftRecord.swift; path = Source/AircraftRecord.swift; sourceTree = "<group>"; };
 		421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileAggregatedData.swift; path = Source/FlightLogFileAggregatedData.swift; sourceTree = "<group>"; };
+		421F94412AE3ADA400B997D9 /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		422807552ACE080000FAAF6D /* RequestQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RequestQueue.swift; path = Source/RequestQueue.swift; sourceTree = "<group>"; };
 		423367A5293BC85F007D2285 /* MeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementView.swift; path = Source/MeasurementView.swift; sourceTree = "<group>"; };
 		423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementCollectionViewCell.swift; path = Source/MeasurementCollectionViewCell.swift; sourceTree = "<group>"; };
+		42365B062ADAEE3E005AFE3E /* BugReportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BugReportViewController.swift; path = Source/BugReportViewController.swift; sourceTree = "<group>"; };
 		423731612985CA3E001A99CA /* SavvyRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SavvyRequest.swift; path = Source/SavvyRequest.swift; sourceTree = "<group>"; };
 		4239290C2864D08800CD33C0 /* AircraftPerformance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftPerformance.swift; path = Source/AircraftPerformance.swift; sourceTree = "<group>"; };
 		4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelAnalysis.swift; path = Source/FuelAnalysis.swift; sourceTree = "<group>"; };
@@ -275,6 +279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				42A11EA028E882E70031D209 /* OAuthSwift in Frameworks */,
+				42365B0A2ADAF1B8005AFE3E /* DeviceGuru in Frameworks */,
 				4280C8D7280D70CB00A0FB32 /* CloudKit.framework in Frameworks */,
 				4280C8D2280D4BE400A0FB32 /* RZUtilsTouch in Frameworks */,
 				4280C8CF280D4AD300A0FB32 /* RZUtilsUniversal in Frameworks */,
@@ -376,6 +381,7 @@
 				423EF3522872E78900EA7415 /* DetailSettingsViewController.swift */,
 				4258B5C02936AA8E00AEA55A /* AppSettingsViewController.swift */,
 				4252A84E29903BFC009D7180 /* UploadSettingsViewController.swift */,
+				42365B062ADAEE3E005AFE3E /* BugReportViewController.swift */,
 			);
 			name = SettingsAndPopups;
 			sourceTree = "<group>";
@@ -393,6 +399,7 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
+				421F94412AE3ADA400B997D9 /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLogStats.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlogstats */,
 				4280C893280D43E500A0FB32 /* flightlogstatsTests */,
@@ -630,6 +637,7 @@
 				4268A0C628357E6300A3CB05 /* KDTree */,
 				42A11E9F28E882E70031D209 /* OAuthSwift */,
 				42A11EA728FACD2C0031D209 /* ZIPFoundation */,
+				42365B092ADAF1B8005AFE3E /* DeviceGuru */,
 			);
 			productName = flightlog1000;
 			productReference = 4280C87A280D43E400A0FB32 /* FlightLogStats.app */;
@@ -711,6 +719,7 @@
 				4268A0C528357E6300A3CB05 /* XCRemoteSwiftPackageReference "KDTree" */,
 				42A11E9E28E882E70031D209 /* XCRemoteSwiftPackageReference "OAuthSwift" */,
 				42A11EA628FACD2C0031D209 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				42365B082ADAF1B8005AFE3E /* XCRemoteSwiftPackageReference "DeviceGuru" */,
 			);
 			productRefGroup = 4280C87B280D43E400A0FB32 /* Products */;
 			projectDirPath = "";
@@ -864,6 +873,7 @@
 				429949D9282A9F7C00CA1B89 /* TableCollectionViewCell.swift in Sources */,
 				42DF535A28B6486700512C34 /* Visit.swift in Sources */,
 				423EF3532872E78900EA7415 /* DetailSettingsViewController.swift in Sources */,
+				42365B072ADAEE3E005AFE3E /* BugReportViewController.swift in Sources */,
 				42A20B5A289D7D1500439880 /* FlightData+Map.swift in Sources */,
 				429949DE282C6AD300CA1B89 /* TableCollectionViewLayout.swift in Sources */,
 				4209D8612860F4A600B79A07 /* LogTabBarController.swift in Sources */,
@@ -1239,6 +1249,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		42365B082ADAF1B8005AFE3E /* XCRemoteSwiftPackageReference "DeviceGuru" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/InderKumarRathore/DeviceGuru.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.2;
+			};
+		};
 		425D04F52832F47B0028FD67 /* XCRemoteSwiftPackageReference "rzflight" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/roznet/rzflight";
@@ -1290,6 +1308,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		42365B092ADAF1B8005AFE3E /* DeviceGuru */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 42365B082ADAF1B8005AFE3E /* XCRemoteSwiftPackageReference "DeviceGuru" */;
+			productName = DeviceGuru;
+		};
 		425D04F62832F47B0028FD67 /* RZFlight */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 425D04F52832F47B0028FD67 /* XCRemoteSwiftPackageReference "rzflight" */;

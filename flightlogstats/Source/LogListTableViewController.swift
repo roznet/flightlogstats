@@ -115,6 +115,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 Logger.app.info("Rebuild info")
                 self.logFileOrganizer.updateRecords(count: 1000, force: true)
             },/**/
+            UIAction(title: "Send BugReport or Feedback"){
+                _ in
+                let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(identifier: "bugReportViewController")
+                vc.modalPresentationStyle = .fullScreen
+                self.present(vc, animated: true)
+            }
             ]
 #if DEBUG
         menuItems.append(contentsOf: [

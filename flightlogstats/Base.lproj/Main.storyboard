@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -1087,7 +1087,7 @@
                             <constraint firstItem="hBr-FW-esI" firstAttribute="trailing" secondItem="8Xl-gc-ZSL" secondAttribute="trailing" constant="5" id="q8v-lJ-9U2"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Flights" image="point.topleft.down.curvedto.point.filled.bottomright.up" catalog="system" id="gvR-GP-vzb"/>
+                    <tabBarItem key="tabBarItem" title="Flights" image="point.topleft.down.to.point.bottomright.filled.curvepath" catalog="system" id="gvR-GP-vzb"/>
                     <connections>
                         <outlet property="aggregationSegment" destination="NBF-Ln-SQM" id="Eq5-7z-hNG"/>
                         <outlet property="logListCollectionView" destination="8Xl-gc-ZSL" id="7MS-QB-VGL"/>
@@ -1971,6 +1971,49 @@
             </objects>
             <point key="canvasLocation" x="-1633" y="801"/>
         </scene>
+        <!--Bug Report View Controller-->
+        <scene sceneID="ga3-1a-kvs">
+            <objects>
+                <viewController storyboardIdentifier="bugReportViewController" id="3Ga-AC-uuH" userLabel="Bug Report View Controller" customClass="BugReportViewController" customModule="FlightLogStats" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="cAJ-YC-RiC">
+                        <rect key="frame" x="0.0" y="0.0" width="834" height="1194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Uq8-lr-oQW">
+                                <rect key="frame" x="749" y="24" width="64.5" height="34.5"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Done"/>
+                                <connections>
+                                    <action selector="doneButton:" destination="3Ga-AC-uuH" eventType="touchUpInside" id="YPb-Zk-VZn"/>
+                                </connections>
+                            </button>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g7J-C5-lAb">
+                                <rect key="frame" x="0.0" y="76" width="834" height="1118"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Ykm-Lh-CM1"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="g7J-C5-lAb" firstAttribute="top" secondItem="Uq8-lr-oQW" secondAttribute="bottom" constant="17.5" id="1Uv-Mo-SrB"/>
+                            <constraint firstItem="Ykm-Lh-CM1" firstAttribute="trailing" secondItem="Uq8-lr-oQW" secondAttribute="trailing" constant="20.5" id="Bnp-xp-srs"/>
+                            <constraint firstItem="g7J-C5-lAb" firstAttribute="bottom" secondItem="Ykm-Lh-CM1" secondAttribute="bottom" constant="20" id="G87-Yb-I6r"/>
+                            <constraint firstItem="g7J-C5-lAb" firstAttribute="leading" secondItem="Ykm-Lh-CM1" secondAttribute="leading" id="KU6-6j-lu2"/>
+                            <constraint firstItem="Uq8-lr-oQW" firstAttribute="top" secondItem="Ykm-Lh-CM1" secondAttribute="top" id="LPN-Fv-j6B"/>
+                            <constraint firstItem="Ykm-Lh-CM1" firstAttribute="trailing" secondItem="g7J-C5-lAb" secondAttribute="trailing" id="c5s-Qt-Tvk"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="g7J-C5-lAb" id="MQy-6a-nLf"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ghB-xq-fAY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1590" y="2404"/>
+        </scene>
     </scenes>
     <resources>
         <image name="airplane.departure" catalog="system" width="128" height="84"/>
@@ -1978,12 +2021,12 @@
         <image name="checkmark.icloud" catalog="system" width="128" height="90"/>
         <image name="fuelpump" catalog="system" width="128" height="122"/>
         <image name="gearshape" catalog="system" width="128" height="123"/>
-        <image name="point.topleft.down.curvedto.point.filled.bottomright.up" catalog="system" width="119" height="128"/>
-        <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
+        <image name="point.topleft.down.to.point.bottomright.filled.curvepath" catalog="system" width="119" height="128"/>
+        <image name="square.and.arrow.up" catalog="system" width="108" height="128"/>
         <image name="tablecells" catalog="system" width="128" height="93"/>
         <image name="timer" catalog="system" width="128" height="123"/>
         <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
