@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="UzS-5f-0Gy">
     <device id="ipad11_0rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -1947,7 +1947,7 @@
             <objects>
                 <navigationController id="SpX-dd-qC9" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="yUG-iT-RMB">
-                        <rect key="frame" x="0.0" y="24" width="420" height="50"/>
+                        <rect key="frame" x="0.0" y="24" width="420" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -1994,6 +1994,9 @@
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="FjZ-zF-mtS">
+                                <rect key="frame" x="407" y="570" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Ykm-Lh-CM1"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2004,9 +2007,12 @@
                             <constraint firstItem="g7J-C5-lAb" firstAttribute="leading" secondItem="Ykm-Lh-CM1" secondAttribute="leading" id="KU6-6j-lu2"/>
                             <constraint firstItem="Uq8-lr-oQW" firstAttribute="top" secondItem="Ykm-Lh-CM1" secondAttribute="top" id="LPN-Fv-j6B"/>
                             <constraint firstItem="Ykm-Lh-CM1" firstAttribute="trailing" secondItem="g7J-C5-lAb" secondAttribute="trailing" id="c5s-Qt-Tvk"/>
+                            <constraint firstItem="FjZ-zF-mtS" firstAttribute="centerY" secondItem="Ykm-Lh-CM1" secondAttribute="centerY" id="i9V-Oi-NMm"/>
+                            <constraint firstItem="FjZ-zF-mtS" firstAttribute="centerX" secondItem="Ykm-Lh-CM1" secondAttribute="centerX" id="kd6-at-LAf"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicatorView" destination="FjZ-zF-mtS" id="yiP-4F-P9O"/>
                         <outlet property="webView" destination="g7J-C5-lAb" id="MQy-6a-nLf"/>
                     </connections>
                 </viewController>

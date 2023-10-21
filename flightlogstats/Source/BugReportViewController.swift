@@ -13,7 +13,7 @@ import RZUtils
 import ZIPFoundation
 import RZUtilsSwift
 
-class BugReportViewController: UIViewController {
+class BugReportViewController: UIViewController,WKNavigationDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,16 +26,24 @@ class BugReportViewController: UIViewController {
     
     @IBOutlet weak var webView: WKWebView!
     
+    @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
+    
     @IBAction func doneButton(_ sender: Any) {
         self.dismiss(animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if let urlreq = self.urlRequest() {
-            Logger.web.info("Starting bug report")
-            self.webView?.load(urlreq)
+        self.activityIndicatorView.startAnimating()
+        self.webView.navigationDelegate = self
+        AppDelegate.worker.async {
+            if let urlreq = self.urlRequest() {
+                Logger.web.info("Starting bug report")
+                DispatchQueue.main.async {
+                    self.webView?.load(urlreq)
+                }
+            }
+
         }
     }
     
@@ -114,14 +122,23 @@ class BugReportViewController: UIViewController {
         return archiveSucess
     
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    @objc func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        self.activityIndicatorView.stopAnimating()
+        self.activityIndicatorView.hidesWhenStopped = true
+        self.webView.evaluateJavaScript("document.getElementById('commonid').value"){
+            rv, err in
+            if let cid = rv as? String {
+                Logger.ui.info("Found common id \(cid)")
+                Settings.shared.commonBugId = (cid as NSString).integerValue
+            }else if let cid = rv as? Int {
+                Logger.ui.info("Found common id \(cid)")
+                Settings.shared.commonBugId = cid
+            }else{
+                Logger.ui.warning("Could not find common id")
+            }
+            
+        }
     }
-    */
 
 }
