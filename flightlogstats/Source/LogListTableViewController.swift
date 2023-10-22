@@ -429,19 +429,23 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     func buildList() {
         if self.filterEmpty {
-            self.fullLogInfoList = self.logFileOrganizer.flightLogFileRecords(request: .flightsOnly)
-            DispatchQueue.main.async {
-                self.updateSearchedList()
+            AppDelegate.worker.async {
+                self.fullLogInfoList = self.logFileOrganizer.flightLogFileRecords(request: .flightsOnly)
                 self.buildAircraftList()
-                self.tableView.reloadData()
-                self.ensureOneDetailDisplayed()
+                DispatchQueue.main.async {
+                    self.updateSearchedList()
+                    self.tableView.reloadData()
+                    self.ensureOneDetailDisplayed()
+                }
             }
         }else{
             self.fullLogInfoList = self.logFileOrganizer.flightLogFileRecords(request: .all)
-            self.updateSearchedList()
             self.buildAircraftList()
-            self.tableView.reloadData()
-            self.ensureOneDetailDisplayed()
+            DispatchQueue.main.async {
+                self.updateSearchedList()
+                self.tableView.reloadData()
+                self.ensureOneDetailDisplayed()
+            }
         }
     }
     private var aircraftTrips : [AircraftRecord.SystemId : Trip] = [:]
@@ -459,7 +463,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             }
             return l.aircraftIdentifier < r.aircraftIdentifier
         }
-        Logger.app.info("Build aircraft list")
+        Logger.app.info("Build aircraft list count=\(self.aircraftsList.count)")
     }
 
     private func ensureOneDetailDisplayed() {

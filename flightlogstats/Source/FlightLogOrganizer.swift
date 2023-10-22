@@ -212,7 +212,6 @@ class FlightLogOrganizer {
         if context.hasChanges {
             do {
                 try context.save()
-                Logger.app.info("Saved context")
             }catch{
                 let nserror = error as NSError
                 Logger.app.error("Failed to save context \(nserror)")
@@ -878,7 +877,6 @@ class FlightLogOrganizer {
            cloudContext.hasChanges {
             do {
                 try cloudContext.save()
-                Logger.app.info("Saved cloud context")
             }catch{
                 let nserror = error as NSError
                 Logger.app.error("Failed to save cloud contexts \(nserror)")

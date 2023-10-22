@@ -1,124 +1,131 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "BrightFutures",
-        "repositoryURL": "https://github.com/Thomvis/BrightFutures.git",
-        "state": {
-          "branch": null,
-          "revision": "fa66fa183dce7196d431244d0215748cd14c5758",
-          "version": "8.2.0"
-        }
-      },
-      {
-        "package": "DeviceGuru",
-        "repositoryURL": "https://github.com/InderKumarRathore/DeviceGuru.git",
-        "state": {
-          "branch": null,
-          "revision": "ba9482c93ec8dfd59cdf7b63c4c21ded4b07bfcc",
-          "version": "10.0.4"
-        }
-      },
-      {
-        "package": "Erik",
-        "repositoryURL": "https://github.com/phimage/Erik.git",
-        "state": {
-          "branch": null,
-          "revision": "109a130e9cdb00789a43a7a625293eeb12d22989",
-          "version": "5.1.0"
-        }
-      },
-      {
-        "package": "FileKit",
-        "repositoryURL": "https://github.com/nvzqz/FileKit.git",
-        "state": {
-          "branch": null,
-          "revision": "826d9161b184509f80d85c28cd612d630646de98",
-          "version": "6.0.0"
-        }
-      },
-      {
-        "package": "FMDB",
-        "repositoryURL": "https://github.com/ccgus/fmdb",
-        "state": {
-          "branch": null,
-          "revision": "61e51fde7f7aab6554f30ab061cc588b28a97d04",
-          "version": "2.7.7"
-        }
-      },
-      {
-        "package": "Geomagnetism",
-        "repositoryURL": "https://github.com/roznet/Geomagnetism",
-        "state": {
-          "branch": null,
-          "revision": "74049c87ab58b6e004342a64de2884c60b0c4734",
-          "version": "1.0.0"
-        }
-      },
-      {
-        "package": "Kanna",
-        "repositoryURL": "https://github.com/tid-kijyun/Kanna.git",
-        "state": {
-          "branch": null,
-          "revision": "f9e4922223dd0d3dfbf02ca70812cf5531fc0593",
-          "version": "5.2.7"
-        }
-      },
-      {
-        "package": "KDTree",
-        "repositoryURL": "https://github.com/Bersaelor/KDTree.git",
-        "state": {
-          "branch": null,
-          "revision": "490df2848e3f497bdc2edf61667f4ab669cff26e",
-          "version": "1.4.1"
-        }
-      },
-      {
-        "package": "OAuthSwift",
-        "repositoryURL": "https://github.com/OAuthSwift/OAuthSwift.git",
-        "state": {
-          "branch": null,
-          "revision": "d85964b96dbce94df961f28b996187c835089903",
-          "version": "2.2.0"
-        }
-      },
-      {
-        "package": "RZFlight",
-        "repositoryURL": "https://github.com/roznet/rzflight",
-        "state": {
-          "branch": null,
-          "revision": "daa918e2413b71034df81bac61153d854b78dae2",
-          "version": "1.0.4"
-        }
-      },
-      {
-        "package": "RZUtilsTouch",
-        "repositoryURL": "https://github.com/roznet/rzutils-touch",
-        "state": {
-          "branch": null,
-          "revision": "a6951a86b5e8aa9d779b1d4605d444f066e84739",
-          "version": "1.0.6"
-        }
-      },
-      {
-        "package": "Swifter",
-        "repositoryURL": "https://github.com/httpswift/swifter.git",
-        "state": {
-          "branch": null,
-          "revision": "9483a5d459b45c3ffd059f7b55f9638e268632fd",
-          "version": "1.5.0"
-        }
-      },
-      {
-        "package": "ZIPFoundation",
-        "repositoryURL": "https://github.com/weichsel/ZIPFoundation.git",
-        "state": {
-          "branch": null,
-          "revision": "43ec568034b3731101dbf7670765d671c30f54f3",
-          "version": "0.9.16"
-        }
+  "pins" : [
+    {
+      "identity" : "brightfutures",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Thomvis/BrightFutures.git",
+      "state" : {
+        "revision" : "fa66fa183dce7196d431244d0215748cd14c5758",
+        "version" : "8.2.0"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "deviceguru",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/InderKumarRathore/DeviceGuru.git",
+      "state" : {
+        "revision" : "ba9482c93ec8dfd59cdf7b63c4c21ded4b07bfcc",
+        "version" : "10.0.4"
+      }
+    },
+    {
+      "identity" : "erik",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/phimage/Erik.git",
+      "state" : {
+        "revision" : "109a130e9cdb00789a43a7a625293eeb12d22989",
+        "version" : "5.1.0"
+      }
+    },
+    {
+      "identity" : "filekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nvzqz/FileKit.git",
+      "state" : {
+        "revision" : "826d9161b184509f80d85c28cd612d630646de98",
+        "version" : "6.0.0"
+      }
+    },
+    {
+      "identity" : "fmdb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ccgus/fmdb",
+      "state" : {
+        "revision" : "61e51fde7f7aab6554f30ab061cc588b28a97d04",
+        "version" : "2.7.7"
+      }
+    },
+    {
+      "identity" : "geomagnetism",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/Geomagnetism",
+      "state" : {
+        "revision" : "74049c87ab58b6e004342a64de2884c60b0c4734",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "kanna",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tid-kijyun/Kanna.git",
+      "state" : {
+        "revision" : "f9e4922223dd0d3dfbf02ca70812cf5531fc0593",
+        "version" : "5.2.7"
+      }
+    },
+    {
+      "identity" : "kdtree",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Bersaelor/KDTree.git",
+      "state" : {
+        "revision" : "490df2848e3f497bdc2edf61667f4ab669cff26e",
+        "version" : "1.4.1"
+      }
+    },
+    {
+      "identity" : "oauthswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OAuthSwift/OAuthSwift.git",
+      "state" : {
+        "revision" : "d85964b96dbce94df961f28b996187c835089903",
+        "version" : "2.2.0"
+      }
+    },
+    {
+      "identity" : "rzflight",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/rzflight",
+      "state" : {
+        "revision" : "daa918e2413b71034df81bac61153d854b78dae2",
+        "version" : "1.0.4"
+      }
+    },
+    {
+      "identity" : "rzutils",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/rzutils",
+      "state" : {
+        "branch" : "master",
+        "revision" : "79386e111f1036c7827e555df047ba9e416e73b9"
+      }
+    },
+    {
+      "identity" : "rzutils-touch",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roznet/rzutils-touch",
+      "state" : {
+        "revision" : "a6951a86b5e8aa9d779b1d4605d444f066e84739",
+        "version" : "1.0.6"
+      }
+    },
+    {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/httpswift/swifter.git",
+      "state" : {
+        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation.git",
+      "state" : {
+        "revision" : "43ec568034b3731101dbf7670765d671c30f54f3",
+        "version" : "0.9.16"
+      }
+    }
+  ],
+  "version" : 2
 }
