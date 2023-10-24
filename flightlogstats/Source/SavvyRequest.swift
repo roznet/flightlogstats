@@ -55,7 +55,7 @@ class SavvyAuthenticateViewController : UIViewController, WKNavigationDelegate {
     typealias CompletionHandler = (Status) -> Void
     @IBOutlet var webView : WKWebView? = nil
     var callback : CompletionHandler? = nil
-    var url : URL? = URL(string: "https://apps.savvyaviation.com/request-api-token/?app_name=FlightLogStats&callback_url=flightlogstats://ro-z.net/savvy/token")
+    var url : URL? = URL(string: "https://apps.savvyaviation.com/account/request-api-token/?app_name=FlightLogStats&callback_url=flightlogstats://ro-z.net/savvy/token")
     
     @IBAction func doneButton(_ sender: Any) {
         self.callback?(.canceled)
@@ -150,16 +150,18 @@ class SavvyRequest : RemoteServiceRequest {
         if let token = Settings.shared.savvyToken {
             self.startRequest(token: token)
         }else{
-            self.authenticate(viewController: self.viewController) { status in
-                switch status {
-                case .token(let token):
-                    Settings.shared.savvyToken = token
-                    self.startRequest(token: token)
-                case .failed(let error):
-                    self.end(status: .error("Failed to get token \(error)"))
-                case .canceled:
-                    Logger.net.error("Savvy: Canceled")
-                    self.end(status: .denied)
+            DispatchQueue.main.async {
+                self.authenticate(viewController: self.viewController) { status in
+                    switch status {
+                    case .token(let token):
+                        Settings.shared.savvyToken = token
+                        self.startRequest(token: token)
+                    case .failed(let error):
+                        self.end(status: .error("Failed to get token \(error)"))
+                    case .canceled:
+                        Logger.net.error("Savvy: Canceled")
+                        self.end(status: .denied)
+                    }
                 }
             }
         }
