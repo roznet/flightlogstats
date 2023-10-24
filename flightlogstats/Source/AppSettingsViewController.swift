@@ -102,6 +102,20 @@ class AppSettingsViewController: UIViewController {
     }
 
     func updateHelp() {
+        let buildString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        let versionString = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        
+        var versionHTML = ""
+        if let buildString = buildString,
+            let versionString = versionString {
+            if buildString.hasPrefix(versionString) {
+                versionHTML = "<h1>Version \(versionString)</h1>"
+            }else{
+                versionHTML = "<p>Version <b>\(versionString) (\(buildString))</b></p>"
+            }
+        }
+        
+        
         let htmlString : String = """
         <!DOCTYPE html>
         <html>
@@ -119,6 +133,7 @@ class AppSettingsViewController: UIViewController {
             }
         </style>
         <body>
+        \(versionHTML)
         <h1>Help</h1>
         <h2>Import Method</h2>
         <p>To import logs, insert an SD Card, press the + button and select the root of the card. The app will then search recursively all the log files present on the SD Card. Here is what each import method will do.</p>
@@ -136,6 +151,8 @@ class AppSettingsViewController: UIViewController {
         </body>
         </html>
         """
+        
+        
         self.helpView.loadHTMLString(htmlString, baseURL: nil)
     }
 }
