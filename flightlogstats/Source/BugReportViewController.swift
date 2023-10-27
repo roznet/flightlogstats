@@ -103,6 +103,13 @@ class BugReportViewController: UIViewController,WKNavigationDelegate {
         let bugPath = self.bugFilePath
         let bugPathURL = URL(fileURLWithPath: bugPath )
         var archiveSucess = true
+        if FileManager.default.fileExists(atPath: self.bugFilePath) {
+            do {
+                try FileManager.default.removeItem(atPath: self.bugFilePath)
+            }catch{
+                Logger.app.error("Failed to prepare log file \(error)")
+            }
+        }
         
         let archive = Archive(url: bugPathURL, accessMode: .create)
         let lines = Logger.logEntriesFormatted(hours: 24)

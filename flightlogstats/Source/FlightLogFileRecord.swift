@@ -107,7 +107,7 @@ class FlightLogFileRecord: NSManagedObject {
                 try FileManager.default.removeItem(at: log.url)
                 self.flightLog = nil
             }catch{
-                Logger.app.error("Failed to delete \(log.url.path)")
+                Logger.app.error("Failed to delete \(log.url.path) \(error)")
             }
         }
     }

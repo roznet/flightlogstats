@@ -167,6 +167,7 @@
 		421EE5BE290C53E600996EC6 /* AircraftRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftRecord.swift; path = Source/AircraftRecord.swift; sourceTree = "<group>"; };
 		421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileAggregatedData.swift; path = Source/FlightLogFileAggregatedData.swift; sourceTree = "<group>"; };
 		422807552ACE080000FAAF6D /* RequestQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RequestQueue.swift; path = Source/RequestQueue.swift; sourceTree = "<group>"; };
+		422B4D232AE8D6B900DB037A /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		423367A5293BC85F007D2285 /* MeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementView.swift; path = Source/MeasurementView.swift; sourceTree = "<group>"; };
 		423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementCollectionViewCell.swift; path = Source/MeasurementCollectionViewCell.swift; sourceTree = "<group>"; };
 		42365B062ADAEE3E005AFE3E /* BugReportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BugReportViewController.swift; path = Source/BugReportViewController.swift; sourceTree = "<group>"; };
@@ -398,6 +399,7 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
+				422B4D232AE8D6B900DB037A /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLogStats.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlogstats */,
 				4280C893280D43E500A0FB32 /* flightlogstatsTests */,
@@ -1068,7 +1070,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = flightlogstats/FlightLogStats.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlogstats/Info.plist;
@@ -1083,7 +1085,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlogstats";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
@@ -1103,7 +1105,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = flightlogstats/FlightLogStats.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = M7QSSF3624;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = flightlogstats/Info.plist;
@@ -1118,7 +1120,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4;
+				MARKETING_VERSION = 2.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.ro-z.flightlogstats";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;

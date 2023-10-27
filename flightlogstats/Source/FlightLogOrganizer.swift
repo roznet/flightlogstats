@@ -256,8 +256,8 @@ class FlightLogOrganizer {
             }
             Logger.app.info("Loaded \(fetchedInfo.count) Logs: existing \(existing) added \(added) ")
             self.updateRecords(count: 1)
-        }catch{
-            Logger.app.error("Failed to query for files")
+        }catch let error{
+            Logger.app.error("Failed to query for files \(error)")
         }
     }
 
@@ -278,8 +278,8 @@ class FlightLogOrganizer {
             }
             NotificationCenter.default.post(name: .aircraftListChanged, object: self)
             Logger.app.info("Loaded \(fetchAircrafts.count) Aircrafts: existing \(existing) added \(added)")
-        }catch{
-            Logger.app.error("Failed to query for aircrafts")
+        }catch let error{
+            Logger.app.error("Failed to query for aircrafts \(error)")
         }
     }
    
@@ -599,7 +599,7 @@ class FlightLogOrganizer {
             }
             Logger.app.info("Deleted \(count) out of \(files.count) files")
         }catch{
-            Logger.app.error("Failed to look at content for delete")
+            Logger.app.error("Failed to look at content for delete \(error)")
         }
         
     }
@@ -702,7 +702,7 @@ class FlightLogOrganizer {
                 Logger.app.info("copied \(file.lastPathComponent) to \(dest.path.truncated(limit:64))")
                 someNew = true
             } catch {
-                Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest.path)")
+                Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest.path.truncated(limit: 96)) \(error)")
             }
         }else{
             Logger.app.info("Already copied \(file.lastPathComponent)")
@@ -720,7 +720,7 @@ class FlightLogOrganizer {
                     Logger.app.info("Created \(dest.lastPathComponent) from \(file.lastPathComponent)")
                     someNew = true
                 }catch{
-                    Logger.app.error("Failed to create \(dest.lastPathComponent)")
+                    Logger.app.error("Failed to create \(dest.lastPathComponent) \(error)")
                 }
             }else{
                 Logger.app.info("Already created \(dest.lastPathComponent)")

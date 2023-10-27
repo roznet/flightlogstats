@@ -86,7 +86,7 @@ public class FlightLogFile {
                     self.logType = .quickParsed
                 }catch{
                     self.logType = .error(.parsingError)
-                    Logger.app.error("Failed to parse log file \(self.url.lastPathComponent)")
+                    Logger.app.error("Failed to parse log file \(self.url.lastPathComponent) \(error)")
                 }
             }else{
                 self.logType = .empty
@@ -109,7 +109,7 @@ public class FlightLogFile {
                     self.logType = .parsed
                 }catch{
                     self.logType = .error(.parsingError)
-                    Logger.app.error("Failed to parse log file \(self.url.lastPathComponent)")
+                    Logger.app.error("Failed to parse log file \(self.url.lastPathComponent) \(error)")
                 }
             }else{
                 self.logType = .empty

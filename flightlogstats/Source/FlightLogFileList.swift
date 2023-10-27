@@ -68,7 +68,7 @@ class FlightLogFileList {
                     Logger.app.info("copied \(file.lastPathComponent) to \(dest)")
                     someNew = true
                 } catch {
-                    Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest)")
+                    Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest) \(error)")
                 }
             }else{
                 Logger.app.info("Already copied \(file.lastPathComponent)")

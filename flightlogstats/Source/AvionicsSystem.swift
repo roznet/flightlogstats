@@ -57,7 +57,7 @@ class AvionicsSystem : CustomStringConvertible, Equatable, Codable {
             let data = try Data(contentsOf: jsonUrl)
             return try JSONDecoder().decode(AvionicsSystem.self, from: data)
         }catch{
-            Logger.app.error("Failed to parse aircraft \(jsonUrl.lastPathComponent)")
+            Logger.app.error("Failed to parse aircraft \(jsonUrl.lastPathComponent) \(error)")
             return nil
         }
             
