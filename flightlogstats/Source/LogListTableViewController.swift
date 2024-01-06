@@ -540,7 +540,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             case .success(let logurls):
                 let missing = self.logFileOrganizer.filterMissing(urls: logurls)
                 let importList = self.logFileOrganizer.buildImportList(urls: missing, method: method)
-                if importList.count > 50 {
+                if importList.count > 150 {
                     self.importLargeNumberOfLogs(urls: importList, method: method)
                 }else{
                     Logger.ui.info("Starting search")
@@ -560,10 +560,11 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     func importLargeNumberOfLogs(urls: [URL], method: FlightLogOrganizer.LogSelectionMethod) {
         Logger.ui.info("Checking user decision for large number")
-        let importAll = UIAlertAction(title: "Import All", style: .default) {
+        let bookmarks = urls.bookmarks()
+        let importAll = UIAlertAction(title: "Import All Now", style: .default) {
             action in
             Logger.ui.info("user decided to import all")
-            self.logFileOrganizer.importAndAddRecordsForFiles(urls: urls, method: method)
+            self.logFileOrganizer.importAndAddRecordsForFiles(urls: bookmarks.urls(), method: method)
         }
         let settings = UIAlertAction(title: "Edit Import Method", style: .default) {
             action in
