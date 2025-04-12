@@ -126,12 +126,12 @@ struct Settings {
     
     @UserStorage(key: Key.flysto_enabled, defaultValue: false)
     var flystoEnabled : Bool
-    @CodableStorage(key: Key.flysto_credentials)
+    @CodableStorage(key: Key.flysto_credentials, defaultValue: nil)
     var flystoCredentials : OAuthSwiftCredential?
 
     @UserStorage(key: Key.savvy_enabled, defaultValue: false)
     var savvyEnabled : Bool
-    @CodableStorage(key: Key.savvy_token)
+    @CodableStorage(key: Key.savvy_token, defaultValue: nil)
     var savvyToken : String?
     
     @UserStorage(key: Key.common_bug_id, defaultValue: -1)

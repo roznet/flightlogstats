@@ -219,6 +219,40 @@ class FlightLogOrganizer {
         }
     }
     
+    func exportCsv() {
+        let fields = FlightSummary.Field.allCases
+        let fileUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("flights.csv")
+        
+        var csvString = "file,date,start_ident,end_ident"
+        for field in fields {
+            csvString += ",\(field.rawValue)"
+        }
+        csvString += "\n"
+        for log in self.managedFlightLogs.values {
+            if log.isFlight == false {
+                continue
+            }
+            csvString += "\(log.log_file_name ?? ""),\(log.start_time?.ISO8601Format() ?? "")"
+            csvString += ",\(log.start_airport_icao ?? "")"
+            csvString += ",\(log.end_airport_icao ?? "")"
+            for field in fields {
+                if let value = log.flightSummary?.measurement(for: field)?.value {
+                    csvString += ",\(value)"
+                }else {
+                    csvString += ","
+                }
+            }
+            csvString += "\n"
+        }
+        do {
+            try csvString.write(to: fileUrl, atomically: true, encoding: .utf8)
+            Logger.app.info("Wrote csv to \(fileUrl.path)")
+        }catch{
+            Logger.app.error("Failed to write csv \(error)")
+        }
+        
+    }
+    
     func checkForUpdates() {
         Settings.shared.databaseVersion = 1
     }
@@ -400,6 +434,7 @@ class FlightLogOrganizer {
                 }
                 // nothing done, ready for more
                 self.currentState = .complete
+                //self.exportCsv()
             }
         }
     }

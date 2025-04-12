@@ -135,11 +135,13 @@ class FlightData {
     /// - Parameter includeAllFields: true return all field, false only return felds checked for na
     /// - Returns: indexed for value  that are valid (will call dropna)
     func doubleDataFrame(for fields : [Field] = [], includeAllFields : Bool = true) -> DataFrame<Date,Double,Field> {
+        // If not constructed yet (0 element) build the data frame from raw data.
         if self.doubleDataFrame.count == 0 {
             let cstart = Date()
             self.convertDataFrame()
             Logger.app.info("Converted \(self.doubleDataFrame.count) rows in \(Date().timeIntervalSince(cstart)) secs")
         }
+        // if no input fields specified return everything
         if fields.count == 0 {
             return self.doubleDataFrame
         }else{
