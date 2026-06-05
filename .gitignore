@@ -7,4 +7,6 @@ xcuserdata
 ~$*
 t.json
 secrets.json
+python/venv
+__pycache__/
 
