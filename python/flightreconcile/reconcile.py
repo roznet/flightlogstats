@@ -355,6 +355,13 @@ def _totals(nav: Navlog, log: FlightLog, rec: Reconciliation) -> Dict:
         phases["climb_level_s"] = sum(
             m.duration_s for lab, m in subs if lab == "level" and m.duration_s)
 
+        dsubs = log.vertical_subsegments(actual_phases["tod_i"],
+                                         actual_phases["land_i"])
+        phases["descent_subsegments"] = dsubs
+        phases["descent_active"] = _aggregate_subsegs(dsubs, "descent")
+        phases["descent_level_s"] = sum(
+            m.duration_s for lab, m in dsubs if lab == "level" and m.duration_s)
+
     return {
         "planned_dist_nm": nav.dist_total_nm,
         "planned_route_gc_nm": round(planned_gc, 1),
