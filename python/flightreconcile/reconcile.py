@@ -263,6 +263,33 @@ def _planned_climb_descent(nav: Navlog):
     return climb, descent
 
 
+def _aggregate_subsegs(subs, want):
+    """Combine same-label sub-segments into one PhaseMetrics (e.g. climbing
+    portions only, with level-offs removed)."""
+    items = [m for lab, m in subs if lab == want and m.duration_s]
+    if not items:
+        return None
+    agg = PhaseMetrics(label=f"{want.capitalize()} only")
+    agg.duration_s = sum(m.duration_s for m in items)
+    agg.fuel_gal = sum(m.fuel_gal for m in items if m.fuel_gal is not None)
+    agg.dist_nm = sum(m.dist_nm for m in items if m.dist_nm is not None)
+    agg.alt_start = items[0].alt_start
+    agg.alt_end = items[-1].alt_end
+    alt_gain = sum((m.alt_end - m.alt_start) for m in items
+                   if m.alt_end is not None and m.alt_start is not None)
+    agg.rate_fpm = alt_gain / (agg.duration_s / 60.0) if agg.duration_s else None
+
+    def wavg(attr):
+        num = sum(getattr(m, attr) * m.duration_s for m in items
+                  if getattr(m, attr) is not None)
+        den = sum(m.duration_s for m in items if getattr(m, attr) is not None)
+        return num / den if den else None
+    agg.avg_ias = wavg("avg_ias")
+    agg.avg_tas = wavg("avg_tas")
+    agg.avg_gs = wavg("avg_gs")
+    return agg
+
+
 def _accuracy(rec: "Reconciliation") -> Dict:
     """Model accuracy over reliable (overflown->overflown) legs only."""
     rl = [lg for lg in rec.legs if lg.reliable]
@@ -320,6 +347,13 @@ def _totals(nav: Navlog, log: FlightLog, rec: Reconciliation) -> Dict:
         "climb_plan": climb_plan,
         "descent_plan": descent_plan,
     }
+    if actual_phases:
+        subs = log.vertical_subsegments(actual_phases["takeoff_i"],
+                                        actual_phases["toc_i"])
+        phases["climb_subsegments"] = subs
+        phases["climb_active"] = _aggregate_subsegs(subs, "climb")
+        phases["climb_level_s"] = sum(
+            m.duration_s for lab, m in subs if lab == "level" and m.duration_s)
 
     return {
         "planned_dist_nm": nav.dist_total_nm,

@@ -23,6 +23,7 @@ _COLMAP = {
     "Latitude": "lat",
     "Longitude": "lon",
     "AltMSL": "alt_msl",
+    "VSpd": "vspd",
     "OAT": "oat",
     "IAS": "ias",
     "GndSpd": "gs",
@@ -175,6 +176,62 @@ class FlightLog:
                 setattr(m, attr, float(v) if pd.notna(v) else None)
         return m
 
+    def vertical_subsegments(self, i0: int, i1: int,
+                             thresh_fpm: float = 200.0,
+                             min_dur_s: float = 20.0):
+        """Split [i0,i1] into contiguous climb / level / descent runs.
+
+        Each second is classified by a smoothed vertical rate; runs shorter than
+        ``min_dur_s`` are merged into the previous run. Returns a list of
+        ``(label, PhaseMetrics)`` where label is 'climb' | 'level' | 'descent'.
+        """
+        seg = self.df.iloc[i0:i1 + 1]
+        if len(seg) < 3:
+            return []
+        if "vspd" in seg and seg["vspd"].notna().any():
+            vs = seg["vspd"]
+        else:
+            vs = seg["alt_msl"].diff() * 60.0
+        rate = vs.rolling(15, center=True, min_periods=1).mean().to_numpy()
+
+        def cls(r):
+            if r > thresh_fpm:
+                return "climb"
+            if r < -thresh_fpm:
+                return "descent"
+            return "level"
+
+        labels = [cls(r) for r in rate]
+        # contiguous runs as [label, start, end] (positions within seg)
+        runs = []
+        s = 0
+        for k in range(1, len(labels) + 1):
+            if k == len(labels) or labels[k] != labels[s]:
+                runs.append([labels[s], s, k - 1])
+                s = k
+
+        t = seg["time_utc"]
+        def dur(a, b):
+            return (t.iloc[b] - t.iloc[a]).total_seconds()
+
+        # merge too-short runs into the previous run (keep previous label)
+        merged = []
+        for r in runs:
+            if merged and dur(r[1], r[2]) < min_dur_s:
+                merged[-1][2] = r[2]
+            else:
+                merged.append(r)
+        # coalesce neighbours that now share a label
+        coalesced = []
+        for r in merged:
+            if coalesced and coalesced[-1][0] == r[0]:
+                coalesced[-1][2] = r[2]
+            else:
+                coalesced.append(r)
+
+        return [(lab, self.segment_metrics(i0 + a, i0 + b, lab.capitalize()))
+                for lab, a, b in coalesced]
+
     def phases(self) -> Optional[dict]:
         """Detect takeoff / TOC / TOD / landing and summarise each phase.
 
@@ -231,7 +288,7 @@ def parse_g1000(path: str) -> FlightLog:
     df = df.rename(columns=rename)
 
     # numeric coercion
-    for c in ("lat", "lon", "alt_msl", "oat", "ias", "gs", "tas",
+    for c in ("lat", "lon", "alt_msl", "vspd", "oat", "ias", "gs", "tas",
               "fuel_l", "fuel_r", "ff1", "ff2", "wind_spd", "wind_dir",
               "wpt_dst", "wpt_brg", "mag_var", "hdg", "trk"):
         if c in df.columns:

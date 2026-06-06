@@ -24,6 +24,13 @@ def _hm(s: Optional[float]) -> str:
     return f"{sign}{s // 3600}:{(s % 3600) // 60:02d}"
 
 
+def _ms(s: Optional[float]) -> str:
+    if s is None:
+        return "-"
+    s = int(round(s))
+    return f"{s // 60}:{s % 60:02d}"
+
+
 def _f(v, fmt="{:.1f}"):
     return "-" if v is None else fmt.format(v)
 
@@ -113,7 +120,31 @@ def markdown(rec: Reconciliation) -> str:
              "(climb = takeoff→within 500 ft of cruise; descent = leaving cruise→"
              "landing). Fuel is totaliser. Rate is +climb/−descent.")
     L.append("")
-    _phase_table(L, "Climb", phases.get("climb_plan"), actual.get("climb"))
+    _phase_table(L, "Climb (gross, incl. level-offs)", phases.get("climb_plan"), actual.get("climb"))
+
+    # climb broken into climbing / level-off sub-segments
+    subs = phases.get("climb_subsegments") or []
+    if subs:
+        lvl = phases.get("climb_level_s") or 0
+        L.append(f"**Climb sub-segments** — level-off time during climb: "
+                 f"**{_ms(lvl)}** (likely ATC step-climbs). Each contiguous "
+                 "climbing / level run from takeoff to top-of-climb:")
+        L.append("")
+        L.append("| # | Mode | Alt band (ft) | Time (m:s) | Dist | Fuel | Rate (fpm) | IAS |")
+        L.append("|--:|---|--:|--:|--:|--:|--:|--:|")
+        for i, (lab, m) in enumerate(subs, 1):
+            band = f"{_f(m.alt_start,'{:.0f}')}→{_f(m.alt_end,'{:.0f}')}"
+            L.append(
+                f"| {i} | {lab} | {band} | {_ms(m.duration_s)} | "
+                f"{_f(m.dist_nm)} | {_f(m.fuel_gal)} | {_f(m.rate_fpm,'{:.0f}')} | "
+                f"{_f(m.avg_ias,'{:.0f}')} |"
+            )
+        L.append("")
+        active = phases.get("climb_active")
+        if active:
+            _phase_table(L, "Climbing only (level-offs removed) vs plan",
+                         phases.get("climb_plan"), active)
+
     _phase_table(L, "Descent", phases.get("descent_plan"), actual.get("descent"))
 
     # ---- per-waypoint ----
