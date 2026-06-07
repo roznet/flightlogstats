@@ -140,14 +140,14 @@ def save_map(anchor_id, via_id, anchor_ll, via_ll, out_clusters, in_clusters,
         return None
     import math
 
-    fig, axes = plt.subplots(1, 2, figsize=(16, 8))
+    fig, axes = plt.subplots(1, 2, figsize=(22, 11))
     for ax, clusters, title in ((axes[0], out_clusters, f"Outbound {anchor_id}→{via_id}"),
                                 (axes[1], in_clusters, f"Inbound {via_id}→{anchor_id}")):
         for cid, cl in enumerate(clusters):
             color = _COLORS[cid % len(_COLORS)]
             label = f"{cl[0].label} (n={len(cl)})" if cl else ""
             for k, f in enumerate(cl):
-                ax.plot(f.lon, f.lat, "-", color=color, lw=0.9, alpha=0.7,
+                ax.plot(f.lon, f.lat, "-", color=color, lw=1.8, alpha=0.8,
                         label=label if k == 0 else None)
         ax.plot([anchor_ll[1]], [anchor_ll[0]], "k^", ms=9)
         ax.annotate(anchor_id, (anchor_ll[1], anchor_ll[0]), fontsize=8,
@@ -155,13 +155,13 @@ def save_map(anchor_id, via_id, anchor_ll, via_ll, out_clusters, in_clusters,
         ax.plot([via_ll[1]], [via_ll[0]], "ks", ms=8)
         ax.annotate(via_id, (via_ll[1], via_ll[0]), fontsize=8,
                     xytext=(4, 4), textcoords="offset points")
-        ax.set_title(title)
+        ax.set_title(title, fontsize=13)
         ax.set_xlabel("Longitude"); ax.set_ylabel("Latitude")
         ax.grid(True, alpha=0.3)
-        ax.legend(loc="best", fontsize=7)
+        ax.legend(loc="best", fontsize=10)
         mid = math.radians((anchor_ll[0] + via_ll[0]) / 2)
         ax.set_aspect(1.0 / max(0.1, abs(math.cos(mid))))
     fig.tight_layout()
-    fig.savefig(path, dpi=130)
+    fig.savefig(path, dpi=170)
     plt.close(fig)
     return path
