@@ -18,9 +18,13 @@ quantifies how the flight differed from the plan (shortcuts, vectors, winds).
 python3 -m venv venv
 ./venv/bin/pip install -r flightreconcile/requirements.txt
 
-./venv/bin/python -m flightreconcile.cli navlog.pdf log.csv --pdf report.pdf
+./venv/bin/python -m flightreconcile.cli navlog.html log.csv --pdf report.pdf
 # or: -o report.md   /   --html report.html   (the map PNG is written alongside)
 ```
+
+The navlog may be a ForeFlight **HTML** export (`.html`, recommended — cleaner,
+more robust to parse) or the **PDF** export (`.pdf`); the parser is chosen by the
+file extension.
 
 Outputs (any combination): `--pdf`, `--html`, `-o` (markdown). The route map PNG
 is generated next to whichever report you ask for (override with `--map`).
@@ -58,6 +62,7 @@ Three layers (see `reconcile.py`):
 | file | purpose |
 |---|---|
 | `navlog_parser.py` | ForeFlight navlog PDF → `Navlog` (summary + planned waypoints) |
+| `navlog_html_parser.py` | ForeFlight navlog HTML → `Navlog` (preferred; uses real tables) |
 | `g1000_parser.py`  | Garmin CSV → `FlightLog` (track, fuel, waypoint events) |
 | `reconcile.py`     | matching layers A/B/C → per-waypoint / per-leg / totals |
 | `report.py`        | markdown report + route map PNG |

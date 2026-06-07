@@ -9,6 +9,7 @@ import os
 import sys
 
 from .navlog_parser import parse_navlog
+from .navlog_html_parser import parse_navlog_html
 from .g1000_parser import parse_g1000
 from .reconcile import reconcile
 from . import report
@@ -25,7 +26,9 @@ def main(argv=None) -> int:
     ap.add_argument("--map", dest="map_path", help="output route map PNG path")
     args = ap.parse_args(argv)
 
-    nav = parse_navlog(args.navlog)
+    ext = os.path.splitext(args.navlog)[1].lower()
+    nav = (parse_navlog_html(args.navlog) if ext in (".html", ".htm")
+           else parse_navlog(args.navlog))
     log = parse_g1000(args.log)
     rec = reconcile(nav, log)
 
