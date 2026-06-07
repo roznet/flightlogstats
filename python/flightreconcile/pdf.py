@@ -45,6 +45,13 @@ _SEP = re.compile(r"^\|[\s:\-|]+\|$")
 
 
 def save_pdf(rec: Reconciliation, path: str, map_path: Optional[str] = None) -> str:
+    return render_markdown_pdf(
+        markdown(rec), path, map_path=map_path,
+        title=f"Reconciliation {rec.nav.departure}-{rec.nav.destination}")
+
+
+def render_markdown_pdf(md: str, path: str, map_path: Optional[str] = None,
+                        title: str = "Report") -> str:
     styles = getSampleStyleSheet()
     h1 = ParagraphStyle("h1", parent=styles["Title"], fontSize=15, spaceAfter=6)
     h2 = ParagraphStyle("h2", parent=styles["Heading2"], fontSize=11, spaceBefore=10, spaceAfter=3)
@@ -57,7 +64,7 @@ def save_pdf(rec: Reconciliation, path: str, map_path: Optional[str] = None) -> 
         path, pagesize=landscape(A4),
         leftMargin=12 * mm, rightMargin=12 * mm,
         topMargin=12 * mm, bottomMargin=12 * mm,
-        title=f"Reconciliation {rec.nav.departure}-{rec.nav.destination}",
+        title=title,
     )
     avail = doc.width
     flow = []
@@ -103,7 +110,7 @@ def save_pdf(rec: Reconciliation, path: str, map_path: Optional[str] = None) -> 
                 pass
             inserted_map[0] = True
 
-    for line in markdown(rec).splitlines():
+    for line in md.splitlines():
         if line.startswith("|"):
             if _SEP.match(line):
                 continue

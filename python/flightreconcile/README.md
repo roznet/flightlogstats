@@ -77,6 +77,32 @@ Three layers (see `reconcile.py`):
   fuel flow** (apples-to-apples with the planned flow-based model). Tank-based
   burn is also reported as a cross-check.
 
+## Corridor analysis — compare routing options across many flights
+
+Separate tool (`corridor_cli`) that answers *"which way is objectively better?"*
+when several routings share a common point. It scans the whole log directory,
+keeps flights that fly an **anchor ↔ via** corridor, auto-clusters the common
+segment into routing options, labels each by a distinctive nav fix, and compares
+them with **wind-adjusted** metrics.
+
+```sh
+# default corridor EGTF <-> BILGO, iCloud logs, flyfun nav.db
+./venv/bin/python -m flightreconcile.corridor_cli --pdf corridor.pdf
+
+# any corridor
+./venv/bin/python -m flightreconcile.corridor_cli --anchor EGTF --via DVR --pdf out.pdf
+```
+
+Key metric is **still-air time** = ∫(groundspeed/TAS) dt — the segment time with
+the day's wind removed, so flights weeks apart are comparable. **Track NM** is
+the over-ground detour; **avg TAS/alt** the speed/altitude trade. Each option
+also gets a plain `short|long / low|high` profile tag.
+
+Requires the `euro_aip` library (for the nav database) and a nav.db:
+`pip install -e ~/Developer/public/rzflight/euro_aip`; default db is
+`~/Developer/public/flyfun-apps/main/data/nav.db` (override with `--db`).
+Scan results are cached under `~/.cache/flightreconcile`.
+
 ## Modules
 
 | file | purpose |
@@ -85,6 +111,8 @@ Three layers (see `reconcile.py`):
 | `navlog_html_parser.py` | ForeFlight navlog HTML → `Navlog` (preferred; uses real tables) |
 | `g1000_parser.py`  | Garmin CSV → `FlightLog` (track, fuel, waypoint events) |
 | `logfinder.py`     | match a navlog to the right G1000 log in a directory |
+| `corridor.py`      | scan corridor flights, segment metrics, cluster + label options |
+| `corridor_report.py` / `corridor_cli.py` | corridor comparison report + map + CLI |
 | `reconcile.py`     | matching layers A/B/C → per-waypoint / per-leg / totals |
 | `report.py`        | markdown report + route map PNG |
 | `cli.py`           | command line entry point |
