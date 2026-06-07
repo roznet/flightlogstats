@@ -98,13 +98,16 @@ the day's wind removed, so flights weeks apart are comparable. **Track NM** is
 the over-ground detour; **avg/max TAS/alt** the speed/altitude trade; **Start**
 the local departure time. Each option also gets a `short|long / low|high` tag.
 
-**Routing labels** are rule-based on the *fixes actually flown* (the FMS active-
-waypoint sequence) plus cruise altitude — see `DEFAULT_RULES` in `corridor.py`,
-which you can edit to match how you file. The shipped rules describe the EGTF↔
-BILGO choices: **OCAS** (low, outside controlled airspace via OCK/LYD) vs
-**Airways** (controlled, via GWC or high on M25), split by whether the **CMB
-shortcut** was flown. Pass `--cluster` to fall back to geometric track-shape
-clustering instead of rules.
+**Routing options** are found by **track-shape clustering** (default — cleanest
+map separation), each cluster labelled by its most distinctive nav fix and then
+given a friendly name via the editable `RENAME` map in `corridor.py` (e.g.
+`RCH → "OCAS (low, OCK/LYD)"`). Tune the number of options with `--cluster-rms`.
+
+Alternatively `--rules` groups by the *fixes actually flown* (FMS sequence) using
+the editable `DEFAULT_RULES` — strategy labels like **OCAS** (low via OCK/LYD)
+vs **Airways** (via GWC), split by the **CMB shortcut**. (`M25*` are treated as
+custom OCAS departure fixes.) Rules capture intent precisely but the clusters
+draw a cleaner map.
 
 Requires the `euro_aip` library (for the nav database) and a nav.db:
 `pip install -e ~/Developer/public/rzflight/euro_aip`; default db is
