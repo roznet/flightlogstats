@@ -39,15 +39,15 @@ CACHE_VERSION = 3  # bump when scan/metric logic changes to invalidate caches
 # Rule-based route labels by the fixes actually flown (the AtvWpt sequence).
 # Ordered; first match wins. all_of: every fix present; any_of: at least one;
 # none_of: none present. These describe how a pilot files/flies the corridor.
-# "Airways" = filed through controlled airspace: either via GWC (the western
-# airways entry) or climbed high (max alt > 13000 ft, e.g. the M25 airway high).
-# "OCAS" = stayed low outside controlled airspace via OCK/LYD. Within Airways,
-# the CMB shortcut (cleared direct CMB) vs the detour is the second split.
+# Route labels by the fixes actually flown (FMS AtvWpt sequence). "OCAS" = filed
+# low outside controlled airspace via the pilot's own departure fixes (M25* are
+# custom names; OCK/LYD) — even if ATC climbs you high later. "Airways" = filed
+# through controlled airspace via GWC, split by whether the CMB shortcut was
+# flown. M25* is a definitive OCAS marker, checked before the airways rules.
 DEFAULT_RULES = [
+    {"label": "OCAS (low, OCK/LYD)", "any_prefix": ["M25"]},
     {"label": "Airways + CMB shortcut", "any_of": ["GWC"], "all_of": ["CMB"]},
-    {"label": "Airways + CMB shortcut", "alt_above": 13000, "all_of": ["CMB"]},
     {"label": "Airways (no shortcut)", "any_of": ["GWC"]},
-    {"label": "Airways (no shortcut)", "alt_above": 13000},
     {"label": "OCAS (low, OCK/LYD)", "any_of": ["OCK", "LYD", "LZD", "RINTI", "DVR"]},
     {"label": "Direct / other"},
 ]
@@ -289,6 +289,9 @@ def _matches(rule, f) -> bool:
     if any(x not in s for x in rule.get("all_of", [])):
         return False
     if rule.get("any_of") and not any(x in s for x in rule["any_of"]):
+        return False
+    if rule.get("any_prefix") and not any(
+            tok.startswith(p) for tok in s for p in rule["any_prefix"]):
         return False
     if any(x in s for x in rule.get("none_of", [])):
         return False
