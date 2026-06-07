@@ -26,6 +26,23 @@ The navlog may be a ForeFlight **HTML** export (`.html`, recommended — cleaner
 more robust to parse) or the **PDF** export (`.pdf`); the parser is chosen by the
 file extension.
 
+### Auto-matching the G1000 log
+
+Instead of a CSV, pass a **directory** of logs and the matching one is found
+automatically from the navlog's date + origin/destination — no need to hunt for
+the right file:
+
+```sh
+./venv/bin/python -m flightreconcile.cli navlog.html \
+  ~/Library/Mobile\ Documents/iCloud~net~ro-z~flightlogstats/Documents --pdf report.pdf
+```
+
+Logs are named `log_YYMMDD_HHMMSS_<airport>.csv`. Matching uses the filename date
+as a prefilter, then confirms the log's **start position ≈ navlog origin** and
+**end position ≈ destination** (peeking only the first fix + tail of each file).
+This ignores the filename airport, which is unreliable (it can be a nearby
+airport or blank), and disambiguates multiple logs on the same day.
+
 Outputs (any combination): `--pdf`, `--html`, `-o` (markdown). The route map PNG
 is generated next to whichever report you ask for (override with `--map`).
 
@@ -64,6 +81,7 @@ Three layers (see `reconcile.py`):
 | `navlog_parser.py` | ForeFlight navlog PDF → `Navlog` (summary + planned waypoints) |
 | `navlog_html_parser.py` | ForeFlight navlog HTML → `Navlog` (preferred; uses real tables) |
 | `g1000_parser.py`  | Garmin CSV → `FlightLog` (track, fuel, waypoint events) |
+| `logfinder.py`     | match a navlog to the right G1000 log in a directory |
 | `reconcile.py`     | matching layers A/B/C → per-waypoint / per-leg / totals |
 | `report.py`        | markdown report + route map PNG |
 | `cli.py`           | command line entry point |

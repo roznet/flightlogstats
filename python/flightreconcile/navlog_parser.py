@@ -12,11 +12,24 @@ name/data row and the row(s) below as the MSA/OAT row.
 """
 from __future__ import annotations
 
+import datetime as _dt
 import re
 from dataclasses import dataclass, field, asdict
 from typing import Optional, List, Dict, Any
 
 import pdfplumber
+
+
+def parse_header_date(text: str) -> Optional[_dt.date]:
+    """Extract the flight date from a navlog header like '(Jun 07, 2026)'."""
+    m = re.search(r"\(([A-Z][a-z]{2})\s+(\d{1,2}),\s*(\d{4})\)", text)
+    if not m:
+        return None
+    try:
+        return _dt.datetime.strptime(
+            f"{m.group(1)} {int(m.group(2))} {m.group(3)}", "%b %d %Y").date()
+    except ValueError:
+        return None
 
 from . import geo
 
@@ -94,6 +107,7 @@ class Navlog:
     departure: Optional[str] = None
     destination: Optional[str] = None
     aircraft: Optional[str] = None
+    date: Optional[_dt.date] = None
     route: Optional[str] = None
     ete_total_s: Optional[int] = None
     dist_total_nm: Optional[float] = None
@@ -275,6 +289,7 @@ def _parse_summary(page, nav: Navlog) -> None:
     m = _RE_HDR.search(txt)
     if m:
         nav.departure, nav.destination, nav.aircraft = m.group(1), m.group(2), m.group(3)
+    nav.date = parse_header_date(txt)
 
     # Top metrics: a label line "ETE Distance Avg Wind ..." followed by a
     # value line "2h58m 538NM 7kt tail (261°/015) ... 174kt 11000'".

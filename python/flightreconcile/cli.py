@@ -12,14 +12,40 @@ from .navlog_parser import parse_navlog
 from .navlog_html_parser import parse_navlog_html
 from .g1000_parser import parse_g1000
 from .reconcile import reconcile
+from .logfinder import find_logs
 from . import report
+
+
+def _resolve_log(nav, directory):
+    """Auto-select the G1000 log matching the navlog; print the decision."""
+    date = nav.date.isoformat() if nav.date else "?"
+    print(f"Matching {nav.departure}->{nav.destination} ({date}) "
+          f"against logs in {directory} ...")
+    matches, ranked = find_logs(nav, directory)
+    if not ranked:
+        print("  no candidate logs found.")
+        return None
+    if matches:
+        best = matches[0]
+        print(f"  MATCH: {os.path.basename(best.path)}  "
+              f"(start {best.start_dist_nm:.1f} nm from origin, "
+              f"end {best.end_dist_nm:.1f} nm from dest, started {best.start_time})")
+        if len(matches) > 1:
+            print(f"  ({len(matches)} candidates matched; using the closest)")
+        return best.path
+    print("  no log matched start≈origin AND end≈destination. Closest:")
+    for m in ranked[:5]:
+        print(f"    {os.path.basename(m.path)}  start {m.start_dist_nm:.1f} nm / "
+              f"end {m.end_dist_nm:.1f} nm")
+    return None
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawTextHelpFormatter)
-    ap.add_argument("navlog", help="ForeFlight navlog PDF")
-    ap.add_argument("log", help="Garmin G1000 CSV log")
+    ap.add_argument("navlog", help="ForeFlight navlog (.html preferred, or .pdf)")
+    ap.add_argument("log", help="Garmin G1000 CSV log, OR a directory of logs to "
+                               "auto-match against the navlog")
     ap.add_argument("-o", "--out", help="output markdown report path")
     ap.add_argument("--pdf", dest="pdf_path", help="output PDF report path")
     ap.add_argument("--html", dest="html_path", help="output HTML report path")
@@ -29,7 +55,14 @@ def main(argv=None) -> int:
     ext = os.path.splitext(args.navlog)[1].lower()
     nav = (parse_navlog_html(args.navlog) if ext in (".html", ".htm")
            else parse_navlog(args.navlog))
-    log = parse_g1000(args.log)
+
+    log_path = args.log
+    if os.path.isdir(log_path):
+        log_path = _resolve_log(nav, args.log)
+        if log_path is None:
+            return 1
+
+    log = parse_g1000(log_path)
     rec = reconcile(nav, log)
 
     md = report.markdown(rec)

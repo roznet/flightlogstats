@@ -15,7 +15,7 @@ import pandas as pd
 
 from . import geo
 from .navlog_parser import (
-    Navlog, PlannedWaypoint, _num, _hhmm_to_s, _split_pair,
+    Navlog, PlannedWaypoint, _num, _hhmm_to_s, _split_pair, parse_header_date,
 )
 
 _HDR_RE = re.compile(r"([A-Z]{4})\s*[—–-]\s*([A-Z]{4})\s*\([^)]*\)\s*in\s+(\S+)")
@@ -57,6 +57,7 @@ def _parse_text(raw: str, nav: Navlog) -> None:
         m = _HDR_RE.search(l)
         if m:
             nav.departure, nav.destination, nav.aircraft = m.groups()
+            nav.date = parse_header_date(l)
         if l == "Route" and i + 1 < len(lines):
             nav.route = lines[i + 1]
 
