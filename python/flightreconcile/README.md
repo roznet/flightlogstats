@@ -28,13 +28,16 @@ file extension.
 
 ### Auto-matching the G1000 log
 
-Instead of a CSV, pass a **directory** of logs and the matching one is found
-automatically from the navlog's date + origin/destination — no need to hunt for
-the right file:
+Instead of a CSV, pass a **directory** of logs (or nothing — it defaults to the
+flightlogstats iCloud directory) and the matching log is found automatically from
+the navlog's date + origin/destination — no need to hunt for the right file:
 
 ```sh
-./venv/bin/python -m flightreconcile.cli navlog.html \
-  ~/Library/Mobile\ Documents/iCloud~net~ro-z~flightlogstats/Documents --pdf report.pdf
+# simplest: just the navlog; the iCloud log directory is searched automatically
+./venv/bin/python -m flightreconcile.cli navlog.html --pdf report.pdf
+
+# or point at any directory of logs
+./venv/bin/python -m flightreconcile.cli navlog.html /path/to/logs --pdf report.pdf
 ```
 
 Logs are named `log_YYMMDD_HHMMSS_<airport>.csv`. Matching uses the filename date

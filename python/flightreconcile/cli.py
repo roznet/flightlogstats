@@ -16,6 +16,10 @@ from .logfinder import find_logs
 from . import report
 
 
+DEFAULT_LOG_DIR = os.path.expanduser(
+    "~/Library/Mobile Documents/iCloud~net~ro-z~flightlogstats/Documents")
+
+
 def _resolve_log(nav, directory):
     """Auto-select the G1000 log matching the navlog; print the decision."""
     date = nav.date.isoformat() if nav.date else "?"
@@ -44,8 +48,10 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawTextHelpFormatter)
     ap.add_argument("navlog", help="ForeFlight navlog (.html preferred, or .pdf)")
-    ap.add_argument("log", help="Garmin G1000 CSV log, OR a directory of logs to "
-                               "auto-match against the navlog")
+    ap.add_argument("log", nargs="?", default=None,
+                    help="Garmin G1000 CSV log, OR a directory of logs to "
+                         "auto-match against the navlog. Defaults to the "
+                         "flightlogstats iCloud directory.")
     ap.add_argument("-o", "--out", help="output markdown report path")
     ap.add_argument("--pdf", dest="pdf_path", help="output PDF report path")
     ap.add_argument("--html", dest="html_path", help="output HTML report path")
@@ -56,9 +62,11 @@ def main(argv=None) -> int:
     nav = (parse_navlog_html(args.navlog) if ext in (".html", ".htm")
            else parse_navlog(args.navlog))
 
-    log_path = args.log
+    log_path = args.log or DEFAULT_LOG_DIR
     if os.path.isdir(log_path):
-        log_path = _resolve_log(nav, args.log)
+        if not args.log:
+            print(f"No log given; using default log directory.")
+        log_path = _resolve_log(nav, log_path)
         if log_path is None:
             return 1
 
