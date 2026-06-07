@@ -95,8 +95,16 @@ them with **wind-adjusted** metrics.
 
 Key metric is **still-air time** = ∫(groundspeed/TAS) dt — the segment time with
 the day's wind removed, so flights weeks apart are comparable. **Track NM** is
-the over-ground detour; **avg TAS/alt** the speed/altitude trade. Each option
-also gets a plain `short|long / low|high` profile tag.
+the over-ground detour; **avg/max TAS/alt** the speed/altitude trade; **Start**
+the local departure time. Each option also gets a `short|long / low|high` tag.
+
+**Routing labels** are rule-based on the *fixes actually flown* (the FMS active-
+waypoint sequence) plus cruise altitude — see `DEFAULT_RULES` in `corridor.py`,
+which you can edit to match how you file. The shipped rules describe the EGTF↔
+BILGO choices: **OCAS** (low, outside controlled airspace via OCK/LYD) vs
+**Airways** (controlled, via GWC or high on M25), split by whether the **CMB
+shortcut** was flown. Pass `--cluster` to fall back to geometric track-shape
+clustering instead of rules.
 
 Requires the `euro_aip` library (for the nav database) and a nav.db:
 `pip install -e ~/Developer/public/rzflight/euro_aip`; default db is

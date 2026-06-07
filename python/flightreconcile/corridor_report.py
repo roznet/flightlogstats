@@ -27,6 +27,7 @@ def _option_rows(clusters: List[List[CorridorFlight]]):
             "time_s": _mean([f.time_s for f in cl]),
             "avg_tas": _mean([f.avg_tas for f in cl]),
             "avg_alt": _mean([f.avg_alt for f in cl]),
+            "max_alt": _mean([f.max_alt for f in cl]),
             "fuel": _mean([f.fuel_gal for f in cl]),
         })
     return rows
@@ -59,8 +60,8 @@ def _direction_section(L, title, clusters):
     L.append("**Routing options (means over the segment; still-air time removes "
              "the day's wind):**")
     L.append("")
-    L.append("| Option (via) | Profile | Flights | Track NM | Still-air | Avg TAS | Avg alt | Fuel | Actual time |")
-    L.append("|---|---|--:|--:|--:|--:|--:|--:|--:|")
+    L.append("| Routing | Profile | Flights | Track NM | Still-air | Avg TAS | Avg alt | Max alt | Fuel | Actual time |")
+    L.append("|---|---|--:|--:|--:|--:|--:|--:|--:|--:|")
     best_air = min((r["still_air_s"] for r in rows if r["still_air_s"]), default=None)
     best_trk = min((r["track_nm"] for r in rows if r["track_nm"]), default=None)
     for r in rows:
@@ -73,7 +74,7 @@ def _direction_section(L, title, clusters):
         L.append(
             f"| {r['label']} | {r['profile']} | {r['n']} | {trk} | {air} | "
             f"{_f(r['avg_tas'],'{:.0f}')} | {_f(r['avg_alt'],'{:.0f}')} | "
-            f"{_f(r['fuel'])} | {_ms(r['time_s'])} |"
+            f"{_f(r['max_alt'],'{:.0f}')} | {_f(r['fuel'])} | {_ms(r['time_s'])} |"
         )
     L.append("")
 
@@ -90,8 +91,8 @@ def _direction_section(L, title, clusters):
         L.append("")
 
     # per-flight detail
-    L.append("| Option | Date | Far | Track NM | Still-air | Actual | Wind | Avg TAS | Avg alt | Fuel |")
-    L.append("|---|---|---|--:|--:|--:|--:|--:|--:|--:|")
+    L.append("| Routing | Date | Start | Far | Track NM | Still-air | Actual | Wind | Avg TAS | Avg alt | Max alt | Fuel |")
+    L.append("|---|---|---|---|--:|--:|--:|--:|--:|--:|--:|--:|")
     for cl in clusters:
         for f in sorted(cl, key=lambda x: x.date):
             wind = (f.still_air_s - f.time_s) if (f.still_air_s and f.time_s) else None
@@ -99,9 +100,10 @@ def _direction_section(L, title, clusters):
             if wind is not None:
                 wtag = f"{'tail' if wind > 0 else 'head'} {abs(wind)/60:.0f}m"
             L.append(
-                f"| {f.label} | {f.date} | {f.far_ident or '?'} | {_f(f.track_nm)} | "
-                f"{_ms(f.still_air_s)} | {_ms(f.time_s)} | {wtag} | "
-                f"{_f(f.avg_tas,'{:.0f}')} | {_f(f.avg_alt,'{:.0f}')} | {_f(f.fuel_gal)} |"
+                f"| {f.label} | {f.date} | {f.start_hhmm} | {f.far_ident or '?'} | "
+                f"{_f(f.track_nm)} | {_ms(f.still_air_s)} | {_ms(f.time_s)} | {wtag} | "
+                f"{_f(f.avg_tas,'{:.0f}')} | {_f(f.avg_alt,'{:.0f}')} | "
+                f"{_f(f.max_alt,'{:.0f}')} | {_f(f.fuel_gal)} |"
             )
     L.append("")
 

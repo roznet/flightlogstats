@@ -34,7 +34,23 @@ from .g1000_parser import parse_g1000
 from .logfinder import _first_fix, _last_fix, _flt
 
 CACHE_DIR = os.path.expanduser("~/.cache/flightreconcile")
-CACHE_VERSION = 2  # bump when scan/metric logic changes to invalidate caches
+CACHE_VERSION = 3  # bump when scan/metric logic changes to invalidate caches
+
+# Rule-based route labels by the fixes actually flown (the AtvWpt sequence).
+# Ordered; first match wins. all_of: every fix present; any_of: at least one;
+# none_of: none present. These describe how a pilot files/flies the corridor.
+# "Airways" = filed through controlled airspace: either via GWC (the western
+# airways entry) or climbed high (max alt > 13000 ft, e.g. the M25 airway high).
+# "OCAS" = stayed low outside controlled airspace via OCK/LYD. Within Airways,
+# the CMB shortcut (cleared direct CMB) vs the detour is the second split.
+DEFAULT_RULES = [
+    {"label": "Airways + CMB shortcut", "any_of": ["GWC"], "all_of": ["CMB"]},
+    {"label": "Airways + CMB shortcut", "alt_above": 13000, "all_of": ["CMB"]},
+    {"label": "Airways (no shortcut)", "any_of": ["GWC"]},
+    {"label": "Airways (no shortcut)", "alt_above": 13000},
+    {"label": "OCAS (low, OCK/LYD)", "any_of": ["OCK", "LYD", "LZD", "RINTI", "DVR"]},
+    {"label": "Direct / other"},
+]
 
 
 def _vec_haversine_nm(lat, lon, lat0, lon0):
@@ -114,8 +130,11 @@ class CorridorFlight:
     avg_tas: float
     avg_gs: float
     avg_alt: float
+    max_alt: float
     fuel_gal: float
     near_via_nm: float
+    start_hhmm: str = ""
+    fms_seq: List[str] = field(default_factory=list)
     far_ident: Optional[str] = None
     lat: np.ndarray = None        # segment track (anchor->via order)
     lon: np.ndarray = None
@@ -152,6 +171,7 @@ def _seg_metrics(seg) -> dict:
         "avg_tas": float(np.nanmean(tas[np.isfinite(tas) & (tas > 40)])) if np.isfinite(tas).any() else float("nan"),
         "avg_gs": track_nm / (time_s / 3600.0) if time_s > 0 else float("nan"),
         "avg_alt": float(np.nanmean(alt)),
+        "max_alt": float(np.nanmax(alt)) if np.isfinite(alt).any() else float("nan"),
         "fuel_gal": fuel,
         "lat": lat, "lon": lon,
     }
@@ -238,11 +258,23 @@ def scan_corridor(directory: str, anchor_ll, via_ll, model=None,
 
         m = _seg_metrics(seg)
         far = _nearest_airport(apt_arr, far_ll) if apt_arr is not None else None
+
+        # fixes actually flown on the segment (FMS active-waypoint sequence,
+        # split at the via point by direction)
+        evs = log.waypoint_events()
+        fms_seq: List[str] = []
+        if evs:
+            de = [geo.haversine_nm(e.lat, e.lon, via_ll[0], via_ll[1]) for e in evs]
+            kv = int(np.argmin(de))
+            chosen = evs[:kv + 1] if direction == "out" else evs[kv:]
+            fms_seq = [e.ident for e in chosen]
+
         cf = CorridorFlight(
             path=fp, date=s[0], direction=direction,
             track_nm=m["track_nm"], time_s=m["time_s"], still_air_s=m["still_air_s"],
             avg_tas=m["avg_tas"], avg_gs=m["avg_gs"], avg_alt=m["avg_alt"],
-            fuel_gal=m["fuel_gal"], near_via_nm=float(dv[vi]), far_ident=far,
+            max_alt=m["max_alt"], fuel_gal=m["fuel_gal"], near_via_nm=float(dv[vi]),
+            start_hhmm=str(s[1])[:5], fms_seq=fms_seq, far_ident=far,
             lat=m["lat"], lon=m["lon"],
         )
         cf.offsets = _offset_profile(m["lat"], m["lon"], anchor_ll, via_ll)
@@ -250,6 +282,41 @@ def scan_corridor(directory: str, anchor_ll, via_ll, model=None,
     if cache:
         _cache_save(directory, anchor_ll, via_ll, anchor_radius_nm, via_radius_nm, flights)
     return flights
+
+
+def _matches(rule, f) -> bool:
+    s = set(f.fms_seq or [])
+    if any(x not in s for x in rule.get("all_of", [])):
+        return False
+    if rule.get("any_of") and not any(x in s for x in rule["any_of"]):
+        return False
+    if any(x in s for x in rule.get("none_of", [])):
+        return False
+    if "alt_above" in rule and not (f.max_alt and f.max_alt > rule["alt_above"]):
+        return False
+    if "alt_below" in rule and not (f.max_alt and f.max_alt < rule["alt_below"]):
+        return False
+    return True
+
+
+def classify(flights: List[CorridorFlight], rules=DEFAULT_RULES
+             ) -> List[List[CorridorFlight]]:
+    """Group flights by the first matching route rule (flown fixes + altitude).
+
+    Sets each flight's .label; returns groups ordered by rule order. Flights
+    matching no rule fall into 'Direct / other'.
+    """
+    groups = {}
+    for f in flights:
+        label = next((r["label"] for r in rules if _matches(r, f)), "Direct / other")
+        f.label = label
+        groups.setdefault(label, []).append(f)
+    order = list(dict.fromkeys([r["label"] for r in rules] + ["Direct / other"]))
+    clusters = [groups[l] for l in order if l in groups]
+    for cid, cl in enumerate(clusters):
+        for f in cl:
+            f.cluster = cid
+    return clusters
 
 
 def cluster(flights: List[CorridorFlight], rms_thresh_nm: float = 12.0

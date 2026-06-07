@@ -25,8 +25,10 @@ def main(argv=None) -> int:
     ap.add_argument("--via", default="BILGO", help="common via point (default BILGO)")
     ap.add_argument("--dir", default=C.DEFAULT_LOG_DIR, help="directory of G1000 logs")
     ap.add_argument("--db", default=C.DEFAULT_DB, help="euro_aip nav database")
+    ap.add_argument("--cluster", action="store_true",
+                    help="group by track-shape clustering instead of route rules")
     ap.add_argument("--cluster-rms", type=float, default=12.0,
-                    help="clustering threshold in nm (smaller = more options)")
+                    help="clustering threshold in nm (with --cluster)")
     ap.add_argument("-o", "--out", help="markdown output path")
     ap.add_argument("--pdf", dest="pdf_path", help="PDF output path")
     ap.add_argument("--html", dest="html_path", help="HTML output path")
@@ -48,8 +50,11 @@ def main(argv=None) -> int:
 
     def grouped(direction):
         fs = [f for f in flights if f.direction == direction]
-        cls = C.cluster(fs, rms_thresh_nm=args.cluster_rms)
-        C.label_clusters(cls, fixes, anchor, via)
+        if args.cluster:
+            cls = C.cluster(fs, rms_thresh_nm=args.cluster_rms)
+            C.label_clusters(cls, fixes, anchor, via)
+        else:
+            cls = C.classify(fs)  # rule-based on flown fixes (OCAS / Airways / ...)
         return cls
 
     out_cl, in_cl = grouped("out"), grouped("in")
