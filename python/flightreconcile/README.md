@@ -114,6 +114,80 @@ Requires the `euro_aip` library (for the nav database) and a nav.db:
 `~/Developer/public/flyfun-apps/main/data/nav.db` (override with `--db`).
 Scan results are cached under `~/.cache/flightreconcile`.
 
+## Frequency prediction — which ATC frequency am I likely to get?
+
+Separate tool (`freq_cli`) that answers *"what will I be told to call next?"*
+from your own logs. Every G1000 log records the **active COM1/COM2 frequency**
+once a second, so the corpus is a record of where, how high and in which
+direction each frequency was actually used.
+
+```sh
+# the frequency sequence to expect along a route
+./venv/bin/python -m flightreconcile.freq_cli route EGTF OCK LYD LFAT --alt 5000
+
+# what am I on now, and what comes next, at a position
+./venv/bin/python -m flightreconcile.freq_cli at 51.32 -0.49 --alt 3000 \
+    --trk 90 --current 125.250
+
+# how good is it? leave-one-flight-out over the whole corpus
+./venv/bin/python -m flightreconcile.freq_cli eval
+
+# which frequencies appear in the logs, where, and at what level
+./venv/bin/python -m flightreconcile.freq_cli list
+```
+
+`route` prints a **ladder**: the predicted frequency for each stretch of the
+route, with the along-track distance where it changes, how confident the vote is
+and how many past flights back it. Read it as a watch list, not a clearance.
+
+### How it works
+
+Two signals are blended (`freq.py`):
+
+- **Where you are.** A k-nearest-neighbour vote over the indexed points. The
+  distance is horizontal NM **+ 6 NM per 1000 ft** of altitude difference **+ up
+  to 25 NM** for flying the opposite way. Direction and altitude matter because
+  the *point* of a handoff is diffuse (median ~20 NM spread around its centroid)
+  while the *region* a frequency covers is well defined. Asking "which sector am
+  I in" beats "which handoff point is nearest" by a wide margin.
+- **What you are on.** A transition table, P(next | current), since handoff
+  chains are stable.
+
+Accuracy on the author's corpus (459 logs, 143k indexed points, 396 distinct
+frequencies), leave-one-flight-out:
+
+| question | top-1 | top-3 |
+|---|---|---|
+| most common frequency (baseline) | 5.5% | 13.1% |
+| which frequency am I on now | 62.1% | 83.3% |
+| next frequency, current known | 56.6% | 71.8% |
+| next frequency, position only | 50.3% | 68.5% |
+
+Distance to the next handoff is estimated to a median error of ~8 NM.
+
+### Notes / data quirks handled
+
+- **Radio flicker.** A standby swap made and undone shows up as a one-second
+  frequency run; roughly a tenth of raw runs are this kind of noise and would
+  otherwise look like handoffs. Runs shorter than `MIN_DWELL_S` (60 s) are
+  dropped and equal neighbours merged — except the first and last, which are the
+  ground frequencies and are short only because the log starts or stops there.
+- **Evaluation leakage.** Scoring a flight while its *own* transitions are still
+  in the table overstates next-frequency accuracy by several points, so
+  `evaluate()` subtracts the held-out flight from both signals.
+- **Airspace changes.** Frequencies renumber (8.33 kHz) and sectors are
+  reorganised, so `--since YYYY-MM-DD` restricts the model to recent flights.
+  Log dates come in both `YYYY-MM-DD` and `DD/MM/YYYY` and are normalised.
+- **Climb and descent.** `route` ramps the altitude at 3 NM per 1000 ft at each
+  end rather than assuming cruise level throughout, because tower and approach
+  frequencies live low and area control lives high.
+- There is **no AIP frequency database** in nav.db, so frequencies cannot be
+  named ("London Information"). `list` labels them instead by the nearest fix or
+  airport to where they are used, plus the altitude band.
+
+Only COM1 is modelled. COM2 holds a useful hint (the next frequency is often
+tuned there before the swap) but is noisy with ATIS and monitoring.
+
 ## Modules
 
 | file | purpose |
@@ -124,6 +198,8 @@ Scan results are cached under `~/.cache/flightreconcile`.
 | `logfinder.py`     | match a navlog to the right G1000 log in a directory |
 | `corridor.py`      | scan corridor flights, segment metrics, cluster + label options |
 | `corridor_report.py` / `corridor_cli.py` | corridor comparison report + map + CLI |
+| `freq.py`          | frequency segments + point index, kNN/transition model |
+| `freq_cli.py`      | frequency prediction CLI (route / at / eval / list) |
 | `reconcile.py`     | matching layers A/B/C → per-waypoint / per-leg / totals |
 | `report.py`        | markdown report + route map PNG |
 | `cli.py`           | command line entry point |
