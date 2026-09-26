@@ -83,10 +83,17 @@ def cmd_route(args) -> int:
           f"{'alt':>7}  also likely")
     for r in rungs:
         alts = " ".join(r.alternates[:2])
-        print(f"{r.from_nm:7.0f} {r.to_nm:7.0f} {r.freq:>9} "
+        mark = "?" if r.unsettled else " "
+        print(f"{r.from_nm:7.0f} {r.to_nm:7.0f} {r.freq:>9}{mark}"
               f"{r.confidence * 100:4.0f}% {r.support:8d} {r.alt:7.0f}  {alts}")
     print("\nconf = share of the neighbour vote; flights = how many past flights "
-          "back it.\nRead it as a watch list, not a clearance.")
+          "back it.\n? = no settled answer over that stretch, the listed "
+          "candidates all plausible.\nRead it as a watch list, not a clearance.")
+    if args.map_path:
+        from .freq_report import save_route_map
+        written = save_route_map(rungs, pts, names, args.map_path, args.alt,
+                                 corpus=corpus, position_nm=args.position)
+        print(f"wrote {written}" if written else "map skipped (no matplotlib)")
     return 0
 
 
@@ -175,6 +182,9 @@ def main(argv=None) -> int:
     p.add_argument("--step", type=float, default=4.0, help="sample spacing nm")
     p.add_argument("--min-rung", type=float, default=8.0,
                    help="drop predicted sectors shorter than this (nm)")
+    p.add_argument("--map", dest="map_path", help="write a route map PNG here")
+    p.add_argument("--position", type=float,
+                   help="mark a current position, nm along the route")
     p.add_argument("--climb", type=float, default=F.CLIMB_NM_PER_1000FT,
                    dest="climb_nm_per_1000ft",
                    help="climb/descent gradient, track nm per 1000 ft "

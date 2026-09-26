@@ -549,6 +549,7 @@ class Rung:
     support: int
     alt: float
     alternates: List[str] = field(default_factory=list)
+    unsettled: bool = False       # no clear winner over this stretch
 
 
 def sample_route(points: Sequence[Tuple[float, float]], step_nm: float = 4.0
@@ -574,28 +575,126 @@ def sample_route(points: Sequence[Tuple[float, float]], step_nm: float = 4.0
 
 def altitude_profile(along_nm: float, total_nm: float, cruise_alt: float,
                      field_alt: float = 1000.0,
-                     nm_per_1000ft: float = CLIMB_NM_PER_1000FT) -> float:
+                     nm_per_1000ft: float = CLIMB_NM_PER_1000FT,
+                     end_alt: Optional[float] = None) -> float:
     """A crude climb/cruise/descent profile.
 
     Altitude matters near the ends, where tower and approach frequencies live at
     low level and area control lives above, so a flat cruise altitude would
     predict the wrong frequencies for the first and last few minutes.
+
+    ``field_alt`` is where the climb starts and ``end_alt`` where the descent
+    finishes. They differ in live mode: the start is the altitude you are at
+    right now (already level, so no climb), while the far end is still airfield
+    elevation. Tying them together would hold the profile at cruise all the way
+    to the threshold and lose every arrival frequency.
     """
+    end_alt = field_alt if end_alt is None else end_alt
     climb = max(0.0, (cruise_alt - field_alt) / 1000.0 * nm_per_1000ft)
-    descent = climb
+    descent = max(0.0, (cruise_alt - end_alt) / 1000.0 * nm_per_1000ft)
     if along_nm < climb and climb > 0:
         return field_alt + (cruise_alt - field_alt) * (along_nm / climb)
     if along_nm > total_nm - descent and descent > 0:
         left = max(0.0, total_nm - along_nm)
-        return field_alt + (cruise_alt - field_alt) * (left / descent)
+        return end_alt + (cruise_alt - end_alt) * (left / descent)
     return cruise_alt
+
+
+def route_progress(points: Sequence[Tuple[float, float]], lat: float, lon: float
+                   ) -> Tuple[int, float]:
+    """Where we are along the route: (index of the next waypoint, offset nm).
+
+    Projects the position onto each leg and keeps the closest. The offset is how
+    far off the planned line we are, which is what distinguishes "on the route"
+    from "being vectored".
+    """
+    if len(points) < 2:
+        return 0, 0.0
+    lat0 = sum(p[0] for p in points) / len(points)
+    lon0 = sum(p[1] for p in points) / len(points)
+    px, py = project(lat, lon, lat0, lon0)
+    best_i, best_d = 1, float("inf")
+    for i in range(len(points) - 1):
+        ax, ay = project(points[i][0], points[i][1], lat0, lon0)
+        bx, by = project(points[i + 1][0], points[i + 1][1], lat0, lon0)
+        vx, vy = bx - ax, by - ay
+        seg2 = vx * vx + vy * vy
+        t = 0.0 if seg2 == 0 else max(0.0, min(1.0, ((px - ax) * vx + (py - ay) * vy) / seg2))
+        d = math.hypot(px - (ax + t * vx), py - (ay + t * vy))
+        if d < best_d:
+            best_d, best_i = d, i + 1
+    return best_i, best_d
+
+
+def rejoin_index(points: Sequence[Tuple[float, float]], lat: float, lon: float,
+                 trk: Optional[float], cone_deg: float = 100.0,
+                 from_index: int = 0) -> Optional[int]:
+    """Index of the route waypoint we would next be sent direct to.
+
+    Off the planned route - vectors, a shortcut, a deviation - the realistic
+    assumption is the IFR one: you rejoin at the next fix you are actually
+    flying towards, not at the nearest point on the line, which may be behind
+    you. Candidates start at the next waypoint along the route, so a bearing
+    alone can never nominate a fix already passed (flying south of mid-route,
+    the departure airport is "ahead" by bearing but is not a rejoin). Among
+    those, take the earliest lying within ``cone_deg`` of the current track;
+    if nothing is (a hold, a 180 for weather), take the next one along, since
+    that is where the vectors will eventually put you.
+
+    ``from_index`` is the furthest waypoint already passed, so progress never
+    runs backwards.
+    """
+    if not points:
+        return None
+    nxt, _ = route_progress(points, lat, lon)
+    start = max(from_index, min(nxt, len(points) - 1))
+    remaining = list(range(start, len(points)))
+    if not remaining:
+        return None
+    if trk is not None:
+        for i in remaining:
+            brg = geo.initial_bearing(lat, lon, points[i][0], points[i][1])
+            if abs(geo.angle_diff(brg, trk)) <= cone_deg / 2.0:
+                return i
+    return remaining[0]
+
+
+def remaining_route(points: Sequence[Tuple[float, float]], lat: float, lon: float,
+                    trk: Optional[float], from_index: int = 0
+                    ) -> Tuple[List[Tuple[float, float]], Optional[int]]:
+    """Current position, then the route from the rejoin waypoint onward."""
+    i = rejoin_index(points, lat, lon, trk, from_index=from_index)
+    if i is None:
+        return [(lat, lon)], None
+    return [(lat, lon)] + [tuple(p) for p in points[i:]], i
+
+
+def live_ladder(model: FreqModel, points: Sequence[Tuple[float, float]],
+                lat: float, lon: float, alt: float, trk: Optional[float],
+                cruise_alt: Optional[float] = None, from_index: int = 0,
+                step_nm: float = 4.0, min_rung_nm: float = 8.0,
+                destination_alt: float = 1000.0
+                ) -> Tuple[List[Rung], Optional[int]]:
+    """The ladder ahead of you from where you actually are.
+
+    Distances are from the current position, not from departure. The altitude
+    profile starts at the current altitude rather than field elevation, so a
+    level aircraft gets no phantom climb - only the descent at the far end.
+    """
+    route, idx = remaining_route(points, lat, lon, trk, from_index)
+    if len(route) < 2:
+        return [], idx
+    rungs = route_ladder(model, route, cruise_alt or alt, step_nm=step_nm,
+                         min_rung_nm=min_rung_nm, field_alt=alt,
+                         end_alt=destination_alt)
+    return rungs, idx
 
 
 def route_ladder(model: FreqModel, points: Sequence[Tuple[float, float]],
                  cruise_alt: float, step_nm: float = 4.0,
                  min_rung_nm: float = 8.0, field_alt: float = 1000.0,
-                 climb_nm_per_1000ft: float = CLIMB_NM_PER_1000FT
-                 ) -> List[Rung]:
+                 climb_nm_per_1000ft: float = CLIMB_NM_PER_1000FT,
+                 end_alt: Optional[float] = None) -> List[Rung]:
     """Predict the frequency sequence along a route, in order.
 
     Walks the route, asks "which frequency here" at every sample, then collapses
@@ -609,7 +708,7 @@ def route_ladder(model: FreqModel, points: Sequence[Tuple[float, float]],
     preds = []
     for la, lo, brg, nm in samples:
         alt = altitude_profile(nm, total, cruise_alt, field_alt,
-                               climb_nm_per_1000ft)
+                               climb_nm_per_1000ft, end_alt)
         g = model.current(la, lo, alt, brg, top=3)
         preds.append((nm, alt, g))
 
@@ -626,22 +725,58 @@ def route_ladder(model: FreqModel, points: Sequence[Tuple[float, float]],
         else:
             rungs.append(Rung(top.freq, nm, nm, top.prob, top.support, alt,
                               [x.freq for x in g[1:]]))
+    def solid(r: Rung) -> bool:
+        # Approach and tower sectors near an airport are only a few miles of
+        # route, and they are the ones worth knowing, so a short rung survives
+        # when the vote is clear and several flights back it.
+        return r.confidence >= 0.6 and r.support >= 5
+
     merged: List[Rung] = []
-    for r in rungs:
-        span = r.to_nm - r.from_nm
-        # A short run is usually prediction noise rather than a sector, but not
-        # always: approach and tower sectors near an airport are genuinely only a
-        # few miles of route, and they are the ones worth knowing. So a short run
-        # survives if the vote is clear and several flights back it. The first run
-        # is always kept: it is the departure frequency.
-        solid = r.confidence >= 0.6 and r.support >= 5
-        if span < min_rung_nm and merged and not solid:
-            merged[-1].to_nm = r.to_nm
+    i = 0
+    while i < len(rungs):
+        r = rungs[i]
+        # The first rung is the departure frequency: always kept, however brief.
+        if i == 0 or (r.to_nm - r.from_nm) >= min_rung_nm or solid(r):
+            if merged and merged[-1].freq == r.freq:
+                merged[-1].to_nm = r.to_nm
+            else:
+                merged.append(r)
+            i += 1
             continue
-        if merged and merged[-1].freq == r.freq:
-            merged[-1].to_nm = r.to_nm
+
+        # A run of short, unconvincing rungs means the model has no settled
+        # answer over this stretch. Collapsing them into the PREVIOUS rung would
+        # quietly extend a confident frequency across ground it was never
+        # predicted for - claiming "123.430, 87%" for 19 nm when the real answer
+        # is a three-way tie around 40%. So they become one band of their own,
+        # carrying the candidates and the low confidence that goes with them.
+        group: List[Rung] = []
+        while i < len(rungs):
+            rj = rungs[i]
+            if (rj.to_nm - rj.from_nm) >= min_rung_nm or solid(rj):
+                break
+            group.append(rj)
+            i += 1
+        if not group:
             continue
-        merged.append(r)
+        span: Dict[str, float] = {}
+        weighted: Dict[str, float] = {}
+        for g in group:
+            w = max(g.to_nm - g.from_nm, step_nm)
+            span[g.freq] = span.get(g.freq, 0.0) + w
+            weighted[g.freq] = weighted.get(g.freq, 0.0) + w * g.confidence
+        band_span = sum(span.values()) or 1.0      # not `total`: that is the route length
+        order = sorted(span, key=lambda f: -span[f])
+        best = order[0]
+        band = Rung(best, group[0].from_nm, group[-1].to_nm,
+                    weighted[best] / band_span,
+                    max(g.support for g in group if g.freq == best),
+                    group[0].alt, order[1:3], unsettled=len(order) > 1)
+        if merged and merged[-1].freq == band.freq and not band.unsettled:
+            merged[-1].to_nm = band.to_nm
+        else:
+            merged.append(band)
+
     # Each rung runs to where the prediction flips, so the ladder has no gaps:
     # its own last sample is only the last point that voted for it.
     for a, b in zip(merged, merged[1:]):
