@@ -185,8 +185,27 @@ rather than creating it.
 - Order follows the core jobs: import/uploads sheet (phase 1) → frequency
   timeline (phase 3) → fuel card (phase 4) → Settings → list last. Stats and
   trips move only if they break.
-- Accessibility and Dynamic Type come with SwiftUI; the custom `draw(_:)` cells
-  go with the screens that use them.
+- **Tables: keep the UIKit table engine** (`TableCollectionViewLayout` +
+  `TableDataSource` + `RZNumberWithUnitGeometry`), decided 2026-09-27. SwiftUI
+  has nothing equivalent to its combination of scrolling both ways with frozen
+  header rows and columns, column widths measured from content, and numbers
+  aligned on decimal point and unit:
+  - `Table` pins the header row but has no frozen columns, and on iPhone
+    (compact width) shows only the first column;
+  - `Grid` sizes columns from content and can align decimals with a custom
+    alignment guide, but is not lazy and has no frozen rows or columns;
+  - frozen column + two-way scroll means two synchronised scroll views
+    (`onScrollGeometryChange`, iOS 18): possible, fiddly, and rebuilding what
+    already works.
+
+  So: **wide tables** (legs × fields, stats flight list) stay on the engine,
+  embedded in SwiftUI screens through a `UIViewRepresentable` wrapper. **Small
+  key/value tables** (summary time, fuel, aircraft; 2-6 columns) move to SwiftUI
+  `Grid` when their screen moves, with the decimal alignment reproduced by an
+  alignment guide. Give the engine the two things it lacks rather than replacing
+  it: an `accessibilityLabel` per cell from its `CellHolder` (cells draw text in
+  `draw(_:)`, invisible to VoiceOver), and fonts through `UIFontMetrics` with a
+  geometry recompute on content-size change (Dynamic Type).
 - Mac Catalyst stays (the iCloud Drive sync hub): menu commands for import and
   upload; see `upload-and-import.md` §Mac Catalyst.
 
