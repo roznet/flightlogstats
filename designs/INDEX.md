@@ -63,7 +63,7 @@ Dated (2026-09-27) inventory of verified bugs: build (B), correctness (C), impor
 
 Not INDEX modules; linked here for discovery.
 
-- `plans/modernisation.md`: phased roadmap (build/CI, FlightLogKit package, library + concurrency, upload engine, plan vs actual, Frequency Bingo, UI migration).
+- `plans/modernisation.md`: roadmap ordered by the app's core jobs (post-flight import + FlySto upload, fuel, frequencies): build/CI, import + upload, FlightLogKit, frequency review + Bingo, fuel check, plan vs actual, UI migration.
 - `plans/upload-and-import.md`: LogLibrary actor, derived vs CloudKit user-state stores, tombstones, FlySto-only `UploadCoordinator`, Mac Catalyst as the iCloud Drive hub.
 - `plans/plan-vs-actual.md`: position relative to the plan; one `RouteTracker`, log replay and live GPS sources, Route tab; ForeFlight navlog deferred.
 - `future/frequency-bingo.md`: ATC frequency prediction from the pilot's own logs.

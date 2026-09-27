@@ -72,9 +72,11 @@ to copy the pattern but must drop-and-rebuild on mismatch.
 
 ## Gotchas
 
-- **`FuelTanks.isAlmostEqual` compares self to self** and always returns true, so
-  every `isAlmostEqual` built on it (`FuelAnalysis.Inputs`,
-  `AircraftPerformance`, `AircraftRecord`) only compares gph and ids.
+- **`FuelTanks.isAlmostEqual` compares self to self** and always returns true
+  (latent: no live caller today).
+- **`FuelTanks ==` compares totals only.** `FuelAnalysis.Inputs` equality
+  therefore ignores the left/right split, and `FlightLogViewModel` uses it to
+  decide whether to rebuild (known-issues C11).
 - **`Trip` `NmpG` converts a distance to `UnitVolume.aviationGallon`**: a
   dimension mismatch.
 - **Crosswind/headwind use CRS, not TRK** (see `log-parsing.md`).

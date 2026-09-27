@@ -3,6 +3,32 @@
 > Status: **proposal** (2026-09-27), from a full code review. Sub-plans:
 > `upload-and-import.md`, `plan-vs-actual.md`, and the existing
 > `../future/frequency-bingo.md`. Bug inventory: `../known-issues.md`.
+> Reprioritised 2026-09-27 around the author's core jobs (below).
+
+## The jobs the app is for
+
+In order of use, as stated by the author (2026-09-27):
+
+1. **After the flight: `+` import from the SD card**, which saves the logs to
+   iCloud Drive (synced to the Mac) and **uploads them to FlySto**.
+2. **Fuel**: the refill calculation, and checking fuel after the flight.
+3. **Frequencies after the flight**, being extended by Frequency Bingo.
+
+Everything else (trips, stats, graphs by phase or autopilot, plan vs actual) is
+secondary. The roadmap spends effort in that order and keeps the rest working
+without investing in it.
+
+### What that means for the design
+
+- **Import and upload are one flow, not two features.** `+` → progress → logs in
+  iCloud → FlySto upload queued → land on the newest flight. Today upload is a
+  separate action, or happens only when a log is displayed.
+- **The newest flight is the home screen after an import.** Summary with FlySto
+  status, the fuel check, and the frequencies flown, without hunting in the list.
+- **Frequency review of one flight comes before prediction.** Bingo's index
+  (debounced COM1 segments with the nearest fix and altitude band) is also the
+  best per-flight frequency timeline, better than today's raw `[.COM1, .COM2]`
+  legs. Build the index first, show it per flight, then add the prediction.
 
 ## Where the app stands
 
@@ -43,18 +69,20 @@ record-version re-derive mechanism, and the Python lab with its eval harnesses.
 
 ## Phases
 
-| # | Phase | Size | Outcome |
-|---|---|---|---|
-| 0 | Build, CI, hygiene | S | green build, tests in CI, obvious bugs fixed |
-| 1 | `FlightLogKit` package | M | parsing + analysis testable with `swift test`, Swift 6 mode inside |
-| 2 | Library + concurrency | M | `LogLibrary` actor, background contexts, one file location, tombstones, synced user state |
-| 3 | Upload engine | S-M | FlySto only: real queue, Keychain, status machine |
-| 4 | Plan vs actual | M-L | Route tab: plan overlay, cursor-linked map and charts, replay |
-| 5 | Frequency Bingo | M | as designed in `future/frequency-bingo.md`, on the phase 4 engine |
-| 6 | UI migration | ongoing | Swift Charts replaces `GCSimpleGraph`, rzutils-touch dropped, SwiftUI settings/stats, accessibility |
+| # | Phase | Job | Size | Outcome |
+|---|---|---|---|---|
+| 0 | Build, CI, hygiene, Savvy removal, fuel bugs | all | S | green build, tests in CI, core-job bugs fixed |
+| 1 | Post-flight import + FlySto upload | 1 | M | one `+` flow: off-main import, one iCloud location, tombstones, real FlySto queue, Keychain, synced user state, land on newest flight |
+| 2 | `FlightLogKit` package | 2, 3 | M | parsing, fuel and legs testable with `swift test`; home for the frequency index |
+| 3 | Frequency review + Bingo | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live |
+| 4 | Post-flight fuel check | 2 | S | fuel card on the newest flight: used by totaliser vs tanks, landing fuel, refill to target |
+| 5 | Plan vs actual | secondary | M | Route tab reusing Bingo's route engine; post-flight only |
+| 6 | UI migration | ongoing | ongoing | Swift Charts replaces `GCSimpleGraph`, rzutils-touch dropped, SwiftUI screens as they are touched |
 
-Phases 2-3 and 4-5 are independent tracks after phase 1; do whichever hurts
-more first. The upload work fixes things users hit; plan-vs-actual is new value.
+Phase 1 before `FlightLogKit` because it touches the library, network and Core
+Data, not the parser; its test seams (`LogLibrary`, `HTTPClient`) do not need
+the package. Phase 3 needs the package for the index and model. Phase 4 is small
+and can slot in anywhere after phase 2.
 
 ### Phase 0: build, CI, hygiene
 
@@ -71,8 +99,14 @@ more first. The upload work fixes things users hit; plan-vs-actual is new value.
   `actions/checkout` with `lfs: true`, `xcodebuild test` on the unit target,
   cached SPM checkouts. Add rzflight's `claude-code-review.yml` and the
   `code-review` command.
-- Fix with a test each: C1 `FuelTanks.isAlmostEqual`, C2 `NmpG` units, C3 frame
-  alignment, C4 quoted spaces, C5 POSIX locale, X2 stats tab index.
+- Fix with a test each, core jobs first:
+  - fuel: C11 (`FuelTanks ==` compares totals only, so an edit that moves fuel
+    between tanks does not mark the view model dirty and the fuel table is not
+    rebuilt), C7 (quick-parse totaliser), C8 (fuel unit
+    assumed gallons), C1 (latent, no live caller);
+  - import: I5 (folder pick with `.selectedFile` imports nothing, the Mac default);
+  - C3 frame alignment (prerequisite for any map/time work), C4 quoted spaces,
+    C5 POSIX locale; C2 and X2 only because they are one-liners.
 - **Remove Savvy** (decided 2026-09-27): `SavvyRequest.swift`,
   `SavvyAuthenticateViewController`, `FlightSavvyRecord` + the `savvy_record`
   relationship (a lightweight migration: entity removal), the Savvy settings and
@@ -81,7 +115,13 @@ more first. The upload work fixes things users hit; plan-vs-actual is new value.
   Resolves U5 and half of U4 before the upload rewrite starts.
 - Complete `secrets.sample.json`.
 
-### Phase 1: `FlightLogKit`
+### Phase 1: post-flight import + FlySto upload
+
+See `upload-and-import.md` (its phases 1-4). The user-visible result is the
+`+` flow above. Stays UIKit apart from the progress/uploads sheet, which can be
+the first SwiftUI screen.
+
+### Phase 2: `FlightLogKit`
 
 Local SPM package in the repo (`Packages/FlightLogKit`), moved in this order:
 
@@ -94,7 +134,7 @@ Local SPM package in the repo (`Packages/FlightLogKit`), moved in this order:
 
 Swift Testing with parameterised cases per fixture log; Swift 6 language mode in
 the package from day one (value types, `Sendable`, `let` statics). The app
-target stays Swift 5 mode until phase 2 has removed the shared mutable state.
+target stays Swift 5 mode until phase 1 has removed the shared mutable state.
 Target macOS for `swift test`; **Linux is not a goal** (RZData is ObjC-backed and
 CoreLocation types are used throughout, and nothing needs it).
 
@@ -102,15 +142,37 @@ Do not swap the home-grown parser for TabularData without a benchmark: the
 byte-level parser and date shortcut are deliberate performance choices. Storing
 columns directly while parsing (no row-major copy) is the cheaper win.
 
-### Phase 2 and 3
+### Phase 3: frequency review, then Bingo
 
-See `upload-and-import.md`.
+`../future/frequency-bingo.md` phases, with one step added in front:
 
-### Phase 4 and 5
+0. **Per-flight frequency timeline** (new): build the index (Bingo phase 1
+   without the model), and show the selected flight's debounced COM1 segments,
+   each with its nearest fix, altitude band, duration and position on the map.
+   Replaces the Comms grouping of the Graphs tab as the way to look at
+   frequencies after a flight, and is useful before any prediction exists.
+1. Index + model with the Python parity fixture.
+2. Plan mode. Its route entry and route engine (`RouteTracker` with the rejoin
+   rule, in RZFlight) are what plan-vs-actual later reuses.
+3. Live mode.
+4. Confirmation taps, and predicted vs actual for a flown flight: the
+   natural follow-up of step 0.
 
-See `plan-vs-actual.md` and `../future/frequency-bingo.md`. Phase 4 builds the
-position engine (`RouteTracker`, `PositionSource`) that Bingo's live mode reuses,
-and the first SwiftUI screen, which sets the pattern for phase 6.
+### Phase 4: post-flight fuel check
+
+Small, on top of the existing `FuelAnalysis`, shown on the newest flight:
+
+- fuel used by **totaliser vs tank quantity**, and the discrepancy;
+- landing fuel and endurance at the aircraft's gph;
+- refill to target per tank (the existing calculator, pre-filled);
+- optional: the totaliser-vs-tank discrepancy across the aircraft's recent
+  flights, which shows a drifting fuel-flow calibration or a gauge problem.
+  Worth doing only if it would change what you do; ask before building.
+
+### Phase 5: plan vs actual
+
+See `plan-vs-actual.md`. Post-flight only; builds on the phase 3 route engine
+rather than creating it.
 
 ### Phase 6: UI migration
 
@@ -120,7 +182,9 @@ and the first SwiftUI screen, which sets the pattern for phase 6.
 - **Swift Charts** replaces `GCSimpleGraphView` screen by screen; when the last
   one goes, drop rzutils-touch (and its broken manifest) entirely.
 - Map: `MKPolyline` / `MKGradientPolylineRenderer` replace the custom renderer.
-- Order: Settings (a `Form`) → Stats → Summary tables → Fuel → list last.
+- Order follows the core jobs: import/uploads sheet (phase 1) → frequency
+  timeline (phase 3) → fuel card (phase 4) → Settings → list last. Stats and
+  trips move only if they break.
 - Accessibility and Dynamic Type come with SwiftUI; the custom `draw(_:)` cells
   go with the screens that use them.
 - Mac Catalyst stays (the iCloud Drive sync hub): menu commands for import and

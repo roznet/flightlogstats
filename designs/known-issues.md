@@ -20,7 +20,7 @@
 
 | # | Issue | Where |
 |---|---|---|
-| C1 | `FuelTanks.isAlmostEqual` compares self with self (always true) | `FuelTanks.swift` |
+| C1 | `FuelTanks.isAlmostEqual` compares self with self (always true). Latent: its only caller chain (`AircraftRecord.isAlmostEqual`) has no live caller | `FuelTanks.swift` |
 | C2 | `Trip` `NmpG` converts distance to `UnitVolume.aviationGallon` | `Trip.swift` |
 | C3 | categorical pass resets `builtValues` not `builtCategorical`; coordinate frame uses raw `dates`; `lastindex` not reset | `FlightData.convertDataFrame` |
 | C4 | quoted field containing a space leaves quoted mode; lone `\r` throws | `CsvParser.swift` |
@@ -30,6 +30,7 @@
 | C8 | fuel start/end assumed in gallons, no unit conversion from the log | `FlightSummary.swift` |
 | C9 | `nearestAirport` has no distance cutoff; outside nav.db coverage a wrong airport is recorded | `FlightSummary.swift` |
 | C10 | `GpH` divides by moving time | `FlightSummary+Field.swift`, `Trip.swift` |
+| C11 | `FuelTanks ==` compares totals only, so `FuelAnalysis.Inputs` equality ignores the left/right split: moving fuel between tanks does not trigger `didWrite`, so the fuel table is not rebuilt (inferred) | `FuelTanks.swift`, `FlightLogViewModel.swift` |
 
 ## Import and sync
 

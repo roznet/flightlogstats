@@ -2,8 +2,9 @@
 
 > Status: **proposal** (2026-09-27). Nothing built in Swift; the reference model
 > is `python/flightreconcile` (see `../flightreconcile.md`). Parent roadmap:
-> `modernisation.md` (phase 4). Shares its position engine with
-> `../future/frequency-bingo.md` live mode.
+> `modernisation.md` (phase 5, **secondary**: not one of the app's core jobs).
+> The route engine (`RouteTracker`, rejoin rule, route entry) is built first by
+> `../future/frequency-bingo.md` plan and live modes; this plan reuses it.
 
 ## Intent
 

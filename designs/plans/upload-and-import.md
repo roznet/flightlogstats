@@ -5,6 +5,9 @@
 > `../log-import-sync.md` and `../remote-upload.md`. Parent roadmap:
 > `modernisation.md` (phases 2 and 3).
 
+This is the app's **primary job** (see `modernisation.md` §The jobs): after the
+flight, `+` import, save to iCloud Drive, upload to FlySto.
+
 ## Goals
 
 1. One tap from SD card to library, **never blocking the UI**, with visible progress.
@@ -55,6 +58,23 @@ download status, so the indexer waits on it rather than failing.
 Migration (once): move any file only in local `Documents/` into the container,
 convert `FlightFlyStoRecord` into `UploadRecord` keeping the FlySto `fileId`
 (Savvy records are simply dropped), copy fuel and aircraft user fields into UserState.
+
+## The post-flight flow (what the pilot sees)
+
+```
++  → pick SD card (folder)            one sheet, stays open
+   → "Found 3 new flights"            progress from ImportProgress stream
+   → saved to iCloud Drive            per-file tick
+   → "Uploading to FlySto 1/3"        from UploadCoordinator
+   → done: [Open latest flight]       lands on its Summary: FlySto status,
+                                      fuel check, frequencies flown
+```
+
+- Uploading starts on its own when FlySto is connected; if sign-in is needed,
+  the sheet says so with a Sign in button instead of opening Safari by itself.
+- Closing the sheet does not cancel anything; the list shows per-log status.
+- Non-flight logs (ground runs, taxi only) are imported but not uploaded, as
+  today's `buildUploadList` does.
 
 ## Upload engine
 
