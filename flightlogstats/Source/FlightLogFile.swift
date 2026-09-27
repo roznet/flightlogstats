@@ -175,6 +175,12 @@ extension FlightLogFile {
         return [:]
     }
     
+    /// The columns the frequency index needs, nil if not parsed or without radios
+    func frequencyScanRows() -> FrequencyScan.Rows? {
+        guard let data = self.data else { return nil }
+        return FrequencyScan.Rows(data: data)
+    }
+
     var mapOverlayView : FlightDataMapOverlay? {
         if let data = self.data {
             return FlightDataMapOverlay(data: data)

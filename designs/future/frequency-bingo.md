@@ -1,9 +1,10 @@
 # Frequency Bingo — guessing the ATC frequency from your own logs
 
-> Status: **proposal**. The model is built, tuned and validated in Python
-> (`python/flightreconcile/freq.py`, `freq_cli.py`, branch `freq-prediction`);
-> nothing exists in the app yet. The one prerequisite has landed: nav.db is
-> bundled, so route fixes resolve on device (commit `a3636bc`).
+> Status: **phase 1 in progress** (index + model, no UI). The model was built,
+> tuned and validated in Python (`python/flightreconcile/freq.py`, `freq_cli.py`)
+> and is ported to Swift in `FrequencyModel.swift`, with the persistent index in
+> `FrequencyIndexOrganizer.swift`. The prerequisite has landed: nav.db is bundled,
+> so route fixes resolve on device (commit `a3636bc`).
 > Related: [../../python/flightreconcile/README.md](../../python/flightreconcile/README.md)
 > (the reference implementation and its `eval` harness).
 
@@ -251,6 +252,37 @@ Export a fixture of query points with the Python model's expected top-3, and
 assert against it in `flightlogstatsTests`. Without it the two implementations
 drift and there is no way to tell which is wrong. `freq_cli eval` stays the
 reference for any model change.
+
+Done: `freq_cli fixture` scans `flightlogstatsTests/TestAssets` and writes
+`TestAssets/freq_fixture.json`, which `TestFrequencyModel` replays. It carries
+three things, checked separately so a failure says which half drifted:
+
+- the **segments** per log, against the Swift scan of the same CSVs (debounce,
+  first/last run rule, durations, distances);
+- the **point index** itself, rounded, so the model is tested on exactly the
+  corpus the expectations came from, independent of small differences between
+  the two CSV readers;
+- expected `current`, `next` (with and without the current frequency) and `when`
+  per query, each with and without its own flight held out, plus two route
+  ladders (one with an unsettled band) and a live ladder with its rejoin index.
+  The tuned constants are asserted too.
+
+Regenerate it after any change to `freq.py`, never by hand:
+
+```
+cd python
+python -m flightreconcile.freq_cli --dir ../flightlogstatsTests/TestAssets \
+    fixture ../flightlogstatsTests/TestAssets/freq_fixture.json
+```
+
+### Backfill
+
+Parsing is what feeds the incremental hook, and logs already parsed are never
+parsed again, so an index added to an existing install (or dropped by a version
+bump) would never fill. `FlightLogOrganizer.updateRecords` therefore, once
+nothing is left to parse, re-parses a batch of parsed logs missing from the index
+and reschedules itself until none are left. Every processed log is recorded in
+`freq_logs`, including those that yield nothing, so none is retried forever.
 
 ## Phasing
 

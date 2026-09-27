@@ -23,7 +23,11 @@ class FlightLogOrganizer {
     enum OrganizerError : Error {
         case failedToReadFolder
     }
-    public static var shared = FlightLogOrganizer()
+    public static var shared : FlightLogOrganizer = {
+        let organizer = FlightLogOrganizer()
+        organizer.frequencyIndex = FrequencyIndexOrganizer(databaseName: "frequencyIndex.db")
+        return organizer
+    }()
     public static let scheduler = DispatchQueue(label: "net.ro-z.flightlogstats.scheduler")
     
     //MARK: - Flight Log List management
@@ -381,6 +385,7 @@ class FlightLogOrganizer {
                                 if let agg = self.aggregatedData {
                                     agg.insertOrReplace(record: info)
                                 }
+                                self.frequencyIndex?.insertOrReplace(flightLog: flightLog)
                             }catch{
                                 info.recordStatus = .error
                                 Logger.app.error("Failed to update log \(error.localizedDescription)")
@@ -424,6 +429,10 @@ class FlightLogOrganizer {
                     self.updateRecords(count: count, force: false)
                     self.currentState = .ready
                 }
+            }else if self.backfillFrequencyIndex(count: count) > 0 {
+                // more may be left: same pattern as above, ready then schedule the next batch
+                self.currentState = .ready
+                self.updateRecords(count: count, force: false)
             }else{
                 if firstMissingCheck {
                     Logger.app.info("No logFile requires updating")
@@ -591,6 +600,7 @@ class FlightLogOrganizer {
     func delete(info : FlightLogFileRecord){
         if let name = info.log_file_name {
             self.managedFlightLogs.removeValue(forKey: name)
+            self.frequencyIndex?.delete(logFileName: name)
             info.delete()
             self.persistentContainer.viewContext.delete(info)
             self.saveContext()
@@ -619,6 +629,7 @@ class FlightLogOrganizer {
 
         self.managedFlightLogs = [:]
         self.managedAircrafts = [:]
+        self.frequencyIndex?.reset()
     }
     
     func deleteLocalFilesAndDatabase() {
@@ -665,6 +676,43 @@ class FlightLogOrganizer {
     /// Maintained full history of aggregatedData.
     /// When records are updated this will be update. Can be nil to disable the aggregation all together
     var aggregatedData : AggregatedDataOrganizer? = nil //AggregatedDataOrganizer(databaseName: "flights.db", table: "aggregatedData")
+    
+    //MARK: - Frequency Index
+    /// COM1 segments and points behind Frequency Bingo, updated as records are parsed.
+    /// Nil disables it; only the shared organizer has one, so tests stay hermetic.
+    var frequencyIndex : FrequencyIndexOrganizer? = nil
+    
+    /// Index logs parsed before the frequency index existed, or before it was rebuilt
+    /// after a version change: they are not parsed again otherwise, so the incremental
+    /// hook in `updateRecords` would never see them.
+    /// - Returns: the number of logs processed
+    private func backfillFrequencyIndex(count : Int) -> Int {
+        guard let index = self.frequencyIndex else { return 0 }
+        var todo : [FlightLogFileRecord] = []
+        for (_,info) in self.managedFlightLogs {
+            if let name = info.log_file_name, info.recordStatus == .parsed, !index.isIndexed(logFileName: name) {
+                todo.append(info)
+            }
+        }
+        guard !todo.isEmpty else { return 0 }
+        // most recent first, as for parsing
+        todo.sort() { $1.log_file_name! < $0.log_file_name! }
+        let batch = todo[..<min(count,todo.count)]
+        for info in batch {
+            guard let name = info.log_file_name,
+                  let flightLog = info.flightLog ?? self.flightLogFile(name: name)
+            else { continue }
+            let logRequiredParsing = flightLog.requiresParsing
+            flightLog.parse()
+            // recorded even when it yields nothing, so it is not retried
+            index.insertOrReplace(flightLog: flightLog)
+            if logRequiredParsing {
+                flightLog.clear()
+            }
+        }
+        Logger.app.info("Frequency index backfilled \(batch.count), \(todo.count - batch.count) left")
+        return batch.count
+    }
     
     //MARK: - Log Files discovery
     var localFolder : URL = { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }()

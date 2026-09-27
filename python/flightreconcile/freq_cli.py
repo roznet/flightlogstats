@@ -13,6 +13,10 @@
     # which frequencies appear in the logs, where, and at what level
     python -m flightreconcile.freq_cli list --names
 
+    # the parity fixture the Swift port is tested against
+    python -m flightreconcile.freq_cli --dir ../flightlogstatsTests/TestAssets \
+        fixture ../flightlogstatsTests/TestAssets/freq_fixture.json
+
 The first run scans the log directory (a few minutes for ~1000 logs) and caches
 the result in ~/.cache/flightreconcile, so later runs start instantly.
 """
@@ -157,6 +161,14 @@ def cmd_list(args) -> int:
     return 0
 
 
+def cmd_fixture(args) -> int:
+    from . import freq_fixture
+    data = freq_fixture.write(args.dir, args.out)
+    print(f"wrote {args.out}: {len(data['files'])} logs, {len(data['points'])} points, "
+          f"{len(data['queries'])} queries, {len(data['routes'])} routes")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         prog="python -m flightreconcile.freq_cli", description=__doc__,
@@ -209,6 +221,10 @@ def main(argv=None) -> int:
     p.add_argument("--limit", type=int, default=40)
     p.add_argument("--names", action="store_true", help="(default) place them by fix")
     p.set_defaults(func=cmd_list)
+
+    p = sub.add_parser("fixture", help="export the Swift parity fixture (JSON)")
+    p.add_argument("out", help="path of the JSON file to write")
+    p.set_defaults(func=cmd_fixture)
 
     args = ap.parse_args(argv)
     return args.func(args)

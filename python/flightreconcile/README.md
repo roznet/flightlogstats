@@ -134,6 +134,10 @@ direction each frequency was actually used.
 
 # which frequencies appear in the logs, where, and at what level
 ./venv/bin/python -m flightreconcile.freq_cli list
+
+# the parity fixture the app's Swift port is tested against (TestFrequencyModel)
+./venv/bin/python -m flightreconcile.freq_cli --dir ../flightlogstatsTests/TestAssets \
+    fixture ../flightlogstatsTests/TestAssets/freq_fixture.json
 ```
 
 `route` prints a **ladder**: the predicted frequency for each stretch of the
