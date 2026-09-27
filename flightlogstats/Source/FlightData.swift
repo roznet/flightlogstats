@@ -102,31 +102,6 @@ class FlightData {
         try self.parse(inputStream: inputStream, maxLineCount: maxLineCount, lineSamplingFrequency: lineSamplingFrequency)
     }
 
-    //MARK: - external and derived info
-    func fetchAirports(completion : @escaping ([Airport]) -> Void){
-        
-        guard CLLocationCoordinate2DIsValid(self.firstCoordinate) && CLLocationCoordinate2DIsValid(self.lastCoordinate)
-        else {
-            completion([])
-            return
-        }
-            
-        Airport.near(coord: self.firstCoordinate, count: 1, reporting: false){
-            startAirports in
-            Airport.near(coord: self.lastCoordinate, count: 1, reporting: false){
-                endAirports in
-                var rv : [Airport] = []
-                if let start = startAirports.first {
-                    rv.append(start)
-                }
-                if let end = endAirports.first {
-                    rv.append(end)
-                }
-                completion(rv)
-            }
-        }
-    }
-
     
     //MARK: - raw extracts
         
