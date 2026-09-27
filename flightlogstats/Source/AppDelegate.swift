@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let keepOrganizer = FlightLogOrganizer.shared
     public static var db : FMDatabase = FMDatabase()
     public static var knownAirports : KnownAirports? = nil
+    public static var knownWaypoints : KnownWaypoints? = nil
     public static let errorManager : ErrorManager = ErrorManager()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -26,11 +27,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppDelegate.queue.maxConcurrentOperationCount = 2
         AppDelegate.queue.name = "net.ro-z.flightlogstats.queue"
         Secrets.shared = Secrets(url: Bundle.main.url(forResource: "secrets", withExtension: "json") )
-        AppDelegate.db =  FMDatabase(url: Bundle.main.url(forResource: "airports", withExtension: "db"))
+        // nav.db carries airports, runways and European waypoints in the schema
+        // RZFlight's model code reads (icao_code / airport_icao). It replaces the
+        // old ourairports airports.db, which had no waypoints and used the
+        // pre-rename column names. Rebuild it with python/make_nav_db.py.
+        AppDelegate.db =  FMDatabase(url: Bundle.main.url(forResource: "nav", withExtension: "db"))
         AppDelegate.db.open()
         
         AppDelegate.worker.async {
             AppDelegate.knownAirports = KnownAirports(db: AppDelegate.db)
+            AppDelegate.knownWaypoints = KnownWaypoints(db: AppDelegate.db)
         }
         
         Settings.registerDefaults()

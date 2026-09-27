@@ -43,7 +43,7 @@
 		425B345B2894140800548557 /* ViewConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425B345A2894140800548557 /* ViewConfig.swift */; };
 		425D04F72832F47B0028FD67 /* RZFlight in Frameworks */ = {isa = PBXBuildFile; productRef = 425D04F62832F47B0028FD67 /* RZFlight */; };
 		425D04FA2832FCFE0028FD67 /* secrets.json in Resources */ = {isa = PBXBuildFile; fileRef = 425D04F92832FCFE0028FD67 /* secrets.json */; };
-		425D04FD283451F30028FD67 /* airports.db in Resources */ = {isa = PBXBuildFile; fileRef = 425D04FB283451F30028FD67 /* airports.db */; };
+		425D04FD283451F30028FD67 /* nav.db in Resources */ = {isa = PBXBuildFile; fileRef = 425D04FB283451F30028FD67 /* nav.db */; };
 		425D04FE283451F30028FD67 /* logFileFields.json in Resources */ = {isa = PBXBuildFile; fileRef = 425D04FC283451F30028FD67 /* logFileFields.json */; };
 		425D05002834521C0028FD67 /* FlightLegsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425D04FF2834521C0028FD67 /* FlightLegsDataSource.swift */; };
 		425F4EDB2893288A00F691BD /* StatsTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425F4EDA2893288A00F691BD /* StatsTabBarController.swift */; };
@@ -62,7 +62,6 @@
 		4264C23A2826858700F40436 /* FlightSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C2392826858700F40436 /* FlightSummary.swift */; };
 		4264C23C282691EF00F40436 /* FuelTanks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23B282691EF00F40436 /* FuelTanks.swift */; };
 		4264C23E2826922C00F40436 /* TimeRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C23D2826922C00F40436 /* TimeRange.swift */; };
-		4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4268A0C328357E2600A3CB05 /* KnownAirports.swift */; };
 		4268A0C728357E6300A3CB05 /* KDTree in Frameworks */ = {isa = PBXBuildFile; productRef = 4268A0C628357E6300A3CB05 /* KDTree */; };
 		4268A0C92842851900A3CB05 /* ProgressReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4268A0C82842851900A3CB05 /* ProgressReport.swift */; };
 		4280C885280D43E400A0FB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4280C883280D43E400A0FB32 /* Main.storyboard */; };
@@ -168,7 +167,6 @@
 		421EE5BE290C53E600996EC6 /* AircraftRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftRecord.swift; path = Source/AircraftRecord.swift; sourceTree = "<group>"; };
 		421EE5C02928E01E00996EC6 /* FlightLogFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightLogFileAggregatedData.swift; path = Source/FlightLogFileAggregatedData.swift; sourceTree = "<group>"; };
 		422807552ACE080000FAAF6D /* RequestQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RequestQueue.swift; path = Source/RequestQueue.swift; sourceTree = "<group>"; };
-		422B4D232AE8D6B900DB037A /* rzutils */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = rzutils; path = ../rzutils; sourceTree = "<group>"; };
 		423367A5293BC85F007D2285 /* MeasurementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementView.swift; path = Source/MeasurementView.swift; sourceTree = "<group>"; };
 		423367A7293BC967007D2285 /* MeasurementCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeasurementCollectionViewCell.swift; path = Source/MeasurementCollectionViewCell.swift; sourceTree = "<group>"; };
 		42365B062ADAEE3E005AFE3E /* BugReportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BugReportViewController.swift; path = Source/BugReportViewController.swift; sourceTree = "<group>"; };
@@ -186,7 +184,7 @@
 		425B3458289408D500548557 /* TableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TableDataSource.swift; path = Source/TableDataSource.swift; sourceTree = "<group>"; };
 		425B345A2894140800548557 /* ViewConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewConfig.swift; path = Source/ViewConfig.swift; sourceTree = "<group>"; };
 		425D04F92832FCFE0028FD67 /* secrets.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = secrets.json; sourceTree = "<group>"; };
-		425D04FB283451F30028FD67 /* airports.db */ = {isa = PBXFileReference; lastKnownFileType = text; name = airports.db; path = python/airports.db; sourceTree = SOURCE_ROOT; };
+		425D04FB283451F30028FD67 /* nav.db */ = {isa = PBXFileReference; lastKnownFileType = file; name = nav.db; path = python/nav.db; sourceTree = SOURCE_ROOT; };
 		425D04FC283451F30028FD67 /* logFileFields.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = logFileFields.json; path = python/logFileFields.json; sourceTree = SOURCE_ROOT; };
 		425D04FF2834521C0028FD67 /* FlightLegsDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlightLegsDataSource.swift; path = Source/FlightLegsDataSource.swift; sourceTree = "<group>"; };
 		425F4EDA2893288A00F691BD /* StatsTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StatsTabBarController.swift; path = Source/StatsTabBarController.swift; sourceTree = "<group>"; };
@@ -205,7 +203,6 @@
 		4264C2392826858700F40436 /* FlightSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightSummary.swift; path = Source/FlightSummary.swift; sourceTree = "<group>"; };
 		4264C23B282691EF00F40436 /* FuelTanks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FuelTanks.swift; path = Source/FuelTanks.swift; sourceTree = "<group>"; };
 		4264C23D2826922C00F40436 /* TimeRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimeRange.swift; path = Source/TimeRange.swift; sourceTree = "<group>"; };
-		4268A0C328357E2600A3CB05 /* KnownAirports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = KnownAirports.swift; path = Source/KnownAirports.swift; sourceTree = "<group>"; };
 		4268A0C82842851900A3CB05 /* ProgressReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProgressReport.swift; path = Source/ProgressReport.swift; sourceTree = "<group>"; };
 		4280C87A280D43E400A0FB32 /* FlightLogStats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightLogStats.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4280C884280D43E400A0FB32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -402,7 +399,6 @@
 		4280C871280D43E400A0FB32 = {
 			isa = PBXGroup;
 			children = (
-				422B4D232AE8D6B900DB037A /* rzutils */,
 				4280C8AD280D448600A0FB32 /* FlightLogStats.entitlements */,
 				4280C87C280D43E400A0FB32 /* flightlogstats */,
 				4280C893280D43E500A0FB32 /* flightlogstatsTests */,
@@ -492,7 +488,7 @@
 		4280C8C5280D46C900A0FB32 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				425D04FB283451F30028FD67 /* airports.db */,
+				425D04FB283451F30028FD67 /* nav.db */,
 				425D04FC283451F30028FD67 /* logFileFields.json */,
 				425D04F92832FCFE0028FD67 /* secrets.json */,
 				4280C888280D43E500A0FB32 /* LaunchScreen.storyboard */,
@@ -572,7 +568,6 @@
 			children = (
 				4264C23728267F6600F40436 /* Waypoint.swift */,
 				4264C23B282691EF00F40436 /* FuelTanks.swift */,
-				4268A0C328357E2600A3CB05 /* KnownAirports.swift */,
 				4239290C2864D08800CD33C0 /* AircraftPerformance.swift */,
 				4239290E2864D0AF00CD33C0 /* FuelAnalysis.swift */,
 				4203FBCA2905AF22005B0530 /* AvionicsSystem.swift */,
@@ -740,7 +735,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				425D04FD283451F30028FD67 /* airports.db in Resources */,
+				425D04FD283451F30028FD67 /* nav.db in Resources */,
 				4280C88A280D43E500A0FB32 /* LaunchScreen.storyboard in Resources */,
 				4280C887280D43E500A0FB32 /* Assets.xcassets in Resources */,
 				425D04FE283451F30028FD67 /* logFileFields.json in Resources */,
@@ -835,7 +830,6 @@
 				4264C23628267EDC00F40436 /* FlightLeg.swift in Sources */,
 				428F52F42A0655EE00124CDD /* FlyStoUploadRequest.swift in Sources */,
 				423367A6293BC85F007D2285 /* MeasurementView.swift in Sources */,
-				4268A0C428357E2600A3CB05 /* KnownAirports.swift in Sources */,
 				423731622985CA3E001A99CA /* SavvyRequest.swift in Sources */,
 				423367A8293BC967007D2285 /* MeasurementCollectionViewCell.swift in Sources */,
 				42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */,
@@ -1084,7 +1078,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1119,7 +1113,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1281,8 +1275,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/roznet/rzutils";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 		4280C8D0280D4BE400A0FB32 /* XCRemoteSwiftPackageReference "rzutils-touch" */ = {

@@ -89,10 +89,10 @@ struct FlightSummary : Codable {
         self.altitudeInFeet = info.max_altitude
         
         if let start_airport_icao = info.start_airport_icao {
-            self.startAirport = try? Airport(db: AppDelegate.db, ident: start_airport_icao)
+            self.startAirport = AppDelegate.knownAirports?.airport(icao: start_airport_icao)
         }
         if let end_airport_icao = info.end_airport_icao {
-            self.endAirport = try? Airport(db: AppDelegate.db, ident: end_airport_icao)
+            self.endAirport = AppDelegate.knownAirports?.airport(icao: end_airport_icao)
         }
     }
     
@@ -161,8 +161,8 @@ struct FlightSummary : Codable {
             self.route = []
         }
         
-        self.startAirport = AppDelegate.knownAirports?.nearest(coord: data.firstCoordinate, db: AppDelegate.db)
-        self.endAirport = AppDelegate.knownAirports?.nearest(coord: data.lastCoordinate, db: AppDelegate.db)
+        self.startAirport = AppDelegate.knownAirports?.nearestAirport(coord: data.firstCoordinate)
+        self.endAirport = AppDelegate.knownAirports?.nearestAirport(coord: data.lastCoordinate)
 
     }
     

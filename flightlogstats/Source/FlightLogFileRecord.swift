@@ -69,7 +69,9 @@ class FlightLogFileRecord: NSManagedObject {
     
     lazy var flightSummary : FlightSummary? = FlightSummary(info: self)
     
-    static let currentVersion : Int32 = 1
+    // 2: switched to nav.db, so the nearest-airport lookup behind
+    //    start_airport_icao / end_airport_icao can resolve differently.
+    static let currentVersion : Int32 = 2
     
     var fuelRecord : FlightFuelRecord {
         self.ensureFuelRecord()
