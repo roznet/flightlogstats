@@ -3,6 +3,8 @@
 > As-built (reviewed 2026-09-27). Per-log upload of the raw CSV to FlySto (OAuth2,
 > zipped POST) and Savvy Aviation (API token, multipart), status tracked per log in
 > Core Data. Modernisation: `plans/upload-and-import.md`.
+> **Savvy is to be removed** (decided 2026-09-27; `plans/modernisation.md` phase 0).
+> Its sections below describe the code until that lands.
 
 ## Triggers
 

@@ -1,6 +1,7 @@
 # Plan: upload and import pipeline
 
-> Status: **proposal** (2026-09-27). Nothing built. Replaces the as-built flow in
+> Status: **proposal** (2026-09-27), scope decisions from the author folded in the
+> same day: **FlySto only (Savvy removed)**, Mac Catalyst stays. Nothing built. Replaces the as-built flow in
 > `../log-import-sync.md` and `../remote-upload.md`. Parent roadmap:
 > `modernisation.md` (phases 2 and 3).
 
@@ -26,7 +27,9 @@
 | Deletion | **Tombstone** (`HiddenLog` in UserState) checked by import and sync; optional "also delete file" | Survives re-import from the SD card, which still holds the file | Deleting the file only (current) |
 | Identity | file name, plus size and a hash of the first 64 KB to detect a partial or changed copy | Names are unique per power-on but not guaranteed across aircraft | Name only |
 | Concurrency | `actor LogLibrary` (files, import, sync) + background `NSManagedObjectContext` per task | Ends the `viewContext`-on-4-queues problem | More `dispatchPrecondition`s |
-| Upload model | `protocol UploadService` + `actor UploadCoordinator` over a persisted `UploadRecord` queue | Adding a service is one conformer; status machine in one place | Per-service `Operation` subclasses |
+| Services | **FlySto only.** Savvy is removed (code, entity, token, WebKit login) in phase 0 of `modernisation.md` | Savvy is no longer used; one service halves the upload surface | Keeping Savvy behind a toggle |
+| Upload model | `actor UploadCoordinator` over a persisted `UploadRecord` queue; FlySto behind a small `UploadService` protocol **as a test seam** (a fake conformer), not for pluggability | Status machine in one place, testable without network | Per-service `Operation` subclasses; a plugin framework for one service |
+| Mac | **Mac Catalyst stays**, as the iCloud Drive sync hub (and SD import on the Mac) | The Python lab (`logfinder.py`) reads the same iCloud Drive folder on the Mac, so its layout is a contract | |
 | Auth UI | `ASWebAuthenticationSession`, started only from a user action; services enter `needsSignIn` otherwise | No surprise Safari on viewing a log | Auto-prompt from queue |
 | Secrets | Keychain (consider `kSecAttrSynchronizable` so a sign-in covers all devices) | UserDefaults is backed up in clear | |
 | Background | Phase A: foreground drain + `beginBackgroundTask`. Phase B only if needed: `BGProcessingTask` + background `URLSession` upload tasks from files | A batch is tens of MB; the complexity of background sessions is not justified until proven | Background sessions first |
@@ -50,14 +53,14 @@ Downloads: files evicted on another device need
 download status, so the indexer waits on it rather than failing.
 
 Migration (once): move any file only in local `Documents/` into the container,
-convert `FlightFlyStoRecord` / `FlightSavvyRecord` into `UploadRecord` keeping
-the FlySto `fileId`, copy fuel and aircraft user fields into UserState.
+convert `FlightFlyStoRecord` into `UploadRecord` keeping the FlySto `fileId`
+(Savvy records are simply dropped), copy fuel and aircraft user fields into UserState.
 
 ## Upload engine
 
 ```swift
 protocol UploadService: Sendable {
-    var id: ServiceID { get }                       // .flysto, .savvy
+    var id: ServiceID { get }                       // .flysto (a fake in tests)
     func state() async -> ServiceState              // .disabled, .needsSignIn, .ready
     func signIn(from anchor: ASPresentationAnchor) async throws
     func upload(_ log: LogFileRef) async throws -> UploadReceipt
@@ -72,10 +75,10 @@ Error classes, decided **inside each service**, never by callers:
 
 | Class | Examples | Action |
 |---|---|---|
-| `duplicate` | FlySto 409, Savvy `"duplicate"` | mark uploaded |
+| `duplicate` | FlySto 409 | mark uploaded |
 | `auth` | 401, refresh rejected | service → `needsSignIn`, pause its queue, one banner |
 | `transient` | network, 5xx, timeout | retry with backoff (1 min, 5 min, 30 min, then manual) |
-| `permanent` | 400 with body, no matching Savvy aircraft | failed with a readable reason; no retry |
+| `permanent` | 400 with body | failed with a readable reason; no retry |
 
 - **One worker per service, serial.** FlySto refreshes its token only when
   expired or after a 401, inside the service actor (single flight).
@@ -86,22 +89,31 @@ Error classes, decided **inside each service**, never by callers:
 - UI: per-service chip on each list row; an Uploads screen listing queue and
   failures with reasons, "retry all", "sign in" when paused.
 
-## Open questions (need an answer before building)
+## Open questions
 
-- **Which services matter?** Are FlySto and Savvy both still used, and are there
-  others worth adding (CloudAhoy, a logbook)? The protocol makes it cheap, but
-  each service costs maintenance when its API changes (Savvy was already
-  updated once, Oct 2023).
 - Does FlySto support PKCE? If so, drop the bundled client secret.
-- Is Mac Catalyst still a target? It changes the import defaults and the
-  sign-in callback handling.
+
+## Mac Catalyst
+
+The Mac is where the library meets iCloud Drive and the Python lab, so:
+
+- **One file location pays off most here**: the iPad writes straight into the
+  iCloud Drive container, and the Mac (and `flightreconcile`) sees new logs
+  without the app having to run and copy them.
+- **Keep the folder layout stable** (`Documents/` flat, `log_*.csv`, `sys_*.json`):
+  `logfinder.py` defaults to this directory.
+- Keep `.selectedFile` as the Mac import default (SD card readers mount as
+  volumes); fix I5 so picking a folder still works.
+- Sign-in: `ASWebAuthenticationSession` works on Catalyst, which removes today's
+  `SafariURLHandler` / `OAuthSwiftOpenURLExternally` split.
+- Add menu commands (Import, Upload pending) with keyboard shortcuts.
 
 ## Phasing
 
 1. **LogLibrary actor + background contexts** behind today's UI, fixing I1-I9
    (`../known-issues.md`). Tests: import fixtures into a temp container.
 2. **Store split + CloudKit UserState + migration.** Tombstones.
-3. **UploadCoordinator + FlySto/Savvy conformers + Keychain**, fixing U1-U8.
+3. **UploadCoordinator + FlySto service + Keychain**, fixing U1-U4, U6-U8.
 4. Uploads screen and list chips (can be the first SwiftUI screen).
 5. Only if needed: background upload sessions.
 

@@ -48,7 +48,7 @@ reason to build post-flight first.
 | 1 | **The log's own FMS sequence** (`AtvWpt` legs, resolved through `RoutePointResolver` over nav.db) | route geometry, zero input | free; misses fixes skipped by a direct-to |
 | 2 | **FlightExchange** from flyfun-weather (share sheet / file import, later API) | filed route, times, cruise altitude | small; format exists in RZFlight |
 | 3 | **Route string / ICAO FPL** pasted | route | small: `ICAOFlightPlanParser` + `RoutePointResolver` |
-| 4 | **ForeFlight navlog HTML** | per-waypoint planned ETA, fuel, GS, wind, altitude | port `navlog_html_parser.py` into RZFlight next to `ForeFlightParser`, with parity test |
+| 4 | **ForeFlight navlog HTML** *(deferred)* | per-waypoint planned ETA, fuel, GS, wind, altitude | port `navlog_html_parser.py` into RZFlight next to `ForeFlightParser`, with parity test. Kept in the background as a potential source; the Python reconcile stays the tool for it meanwhile |
 
 Auto-attach: a plan with a date and origin/destination is matched to the log
 whose first/last fix is near them (port of `logfinder.py`).
@@ -102,14 +102,25 @@ replay card. Nothing new in the engine.
   building live mode only as the Bingo live card, not as a general moving map.
 - Should flyfun-weather flights be fetched by API (needs FlyFunCommon sign-in)
   or only shared as files? Files first; the API adds an account dependency.
-- Is the ForeFlight navlog still the planning tool used? If flyfun-weather has
-  become the planner, source 4 may not be worth porting.
+- Without the navlog, **planned numbers per waypoint** (ETA, fuel) are missing:
+  FlightExchange carries departure/arrival time and cruise altitude, so only a
+  destination ETA delta is available. Option worth weighing: flyfun-weather's
+  headwind advisory already computes the cruise headwind at every route point
+  and a cruise TAS (`analysis/advisories/headwind.py`), so a per-waypoint ETA is
+  a small derivation there. Carried as an optional field in FlightExchange, it
+  would give planned times from the tool actually used, without porting the
+  navlog parser.
+
+Decided 2026-09-27: the ForeFlight navlog is **deferred** (source 4), kept as a
+potential plan source.
 
 ## Phasing
 
 1. RZFlight: signed XTK, monotonic tracker, rejoin; tests. FlightLogKit:
    `RouteTracker` over log samples, the `Plan*` fields, FMS-derived plan.
 2. Route tab, post-flight, FMS plan + FlightExchange + route string.
-3. Navlog import and the per-waypoint table with planned numbers; parity fixture.
-4. Replay control and card.
-5. Live source, shared with Frequency Bingo phase 3.
+3. Replay control and card.
+4. Live source, shared with Frequency Bingo phase 3.
+5. Deferred: planned numbers per waypoint (navlog import, or per-waypoint ETA in
+   FlightExchange), per-waypoint table, parity fixture against the Python
+   reconcile.

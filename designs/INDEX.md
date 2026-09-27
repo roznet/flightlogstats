@@ -2,7 +2,7 @@
 
 > iPad / iPhone / Mac Catalyst app for Garmin G1000 / Perspective flight logs:
 > import from the SD card, iCloud library, per-flight analysis, trips, fuel,
-> upload to FlySto and Savvy. Plus `python/flightreconcile`, the analysis lab.
+> upload to FlySto (Savvy being removed). Plus `python/flightreconcile`, the analysis lab.
 
 Build: Xcode project `flightlogstats.xcodeproj`, needs `git lfs pull` (nav.db and
 fixtures) and `flightlogstats/secrets.json` (copied from the sample on first build).
@@ -23,7 +23,7 @@ Key exports: `FlightLogOrganizer`, `search(in:)`, `importAndAddRecordsForFiles`,
 → Full doc: log-import-sync.md
 
 ### remote-upload
-FlySto (OAuth2, zipped POST) and Savvy (WKWebView token, multipart) upload, per-log status records, the `RequestQueue`, triggers (manual, batch, "automatic" on display), error mapping, and why the queue actually runs in parallel.
+FlySto (OAuth2, zipped POST) and Savvy (WKWebView token, multipart; slated for removal) upload, per-log status records, the `RequestQueue`, triggers (manual, batch, "automatic" on display), error mapping, and why the queue actually runs in parallel.
 Key exports: `RequestQueue`, `FlyStoRequest`, `FlyStoUploadRequest`, `FlyStoLogFilesRequest`, `SavvyRequest`, `FlightFlyStoRecord`, `FlightSavvyRecord`, `RemoteServiceRecord.Status`
 → Full doc: remote-upload.md
 
@@ -64,6 +64,6 @@ Dated (2026-09-27) inventory of verified bugs: build (B), correctness (C), impor
 Not INDEX modules; linked here for discovery.
 
 - `plans/modernisation.md`: phased roadmap (build/CI, FlightLogKit package, library + concurrency, upload engine, plan vs actual, Frequency Bingo, UI migration).
-- `plans/upload-and-import.md`: LogLibrary actor, derived vs CloudKit user-state stores, tombstones, `UploadService` / `UploadCoordinator`.
-- `plans/plan-vs-actual.md`: position relative to the plan; one `RouteTracker`, log replay and live GPS sources, Route tab.
+- `plans/upload-and-import.md`: LogLibrary actor, derived vs CloudKit user-state stores, tombstones, FlySto-only `UploadCoordinator`, Mac Catalyst as the iCloud Drive hub.
+- `plans/plan-vs-actual.md`: position relative to the plan; one `RouteTracker`, log replay and live GPS sources, Route tab; ForeFlight navlog deferred.
 - `future/frequency-bingo.md`: ATC frequency prediction from the pilot's own logs.

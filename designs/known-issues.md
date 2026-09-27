@@ -54,7 +54,7 @@
 | U2 | parallel FlySto token refresh on one refresh token (inferred credential wipe cascade) |
 | U3 | HTTP 400 classed as `denied`, wipes credentials |
 | U4 | OAuth state check disabled; tokens in UserDefaults; Savvy token logged |
-| U5 | Savvy: no retry, no token invalidation, no `.newFileUploaded` post |
+| U5 | Savvy: no retry, no token invalidation, no `.newFileUploaded` post. *To be resolved by removing Savvy (decided 2026-09-27)* |
 | U6 | viewing a log in automatic mode can open an auth screen unprompted |
 | U7 | `.csv.zip` files left in `Documents/` |
 | U8 | `secrets.sample.json` lacks `flysto.logFilesUrl`, `flightlogstats.bugreport` |

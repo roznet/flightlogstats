@@ -48,7 +48,7 @@ record-version re-derive mechanism, and the Python lab with its eval harnesses.
 | 0 | Build, CI, hygiene | S | green build, tests in CI, obvious bugs fixed |
 | 1 | `FlightLogKit` package | M | parsing + analysis testable with `swift test`, Swift 6 mode inside |
 | 2 | Library + concurrency | M | `LogLibrary` actor, background contexts, one file location, tombstones, synced user state |
-| 3 | Upload engine | M | real queue, Keychain, per-service status machine |
+| 3 | Upload engine | S-M | FlySto only: real queue, Keychain, status machine |
 | 4 | Plan vs actual | M-L | Route tab: plan overlay, cursor-linked map and charts, replay |
 | 5 | Frequency Bingo | M | as designed in `future/frequency-bingo.md`, on the phase 4 engine |
 | 6 | UI migration | ongoing | Swift Charts replaces `GCSimpleGraph`, rzutils-touch dropped, SwiftUI settings/stats, accessibility |
@@ -73,6 +73,12 @@ more first. The upload work fixes things users hit; plan-vs-actual is new value.
   `code-review` command.
 - Fix with a test each: C1 `FuelTanks.isAlmostEqual`, C2 `NmpG` units, C3 frame
   alignment, C4 quoted spaces, C5 POSIX locale, X2 stats tab index.
+- **Remove Savvy** (decided 2026-09-27): `SavvyRequest.swift`,
+  `SavvyAuthenticateViewController`, `FlightSavvyRecord` + the `savvy_record`
+  relationship (a lightweight migration: entity removal), the Savvy settings and
+  token (clear the stored token on upgrade), the `WebKit` import, Savvy branches
+  in `RequestQueue` / `UploadSettingsViewController` / list and summary views.
+  Resolves U5 and half of U4 before the upload rewrite starts.
 - Complete `secrets.sample.json`.
 
 ### Phase 1: `FlightLogKit`
@@ -117,7 +123,8 @@ and the first SwiftUI screen, which sets the pattern for phase 6.
 - Order: Settings (a `Form`) → Stats → Summary tables → Fuel → list last.
 - Accessibility and Dynamic Type come with SwiftUI; the custom `draw(_:)` cells
   go with the screens that use them.
-- Mac Catalyst: menu commands for import and upload, if Mac is still a target.
+- Mac Catalyst stays (the iCloud Drive sync hub): menu commands for import and
+  upload; see `upload-and-import.md` §Mac Catalyst.
 
 ## Explicitly not doing
 
