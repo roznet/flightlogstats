@@ -7,6 +7,8 @@
 > so route fixes resolve on device (commit `a3636bc`).
 > Related: [../../python/flightreconcile/README.md](../../python/flightreconcile/README.md)
 > (the reference implementation and its `eval` harness).
+> Position engine shared with [../plans/plan-vs-actual.md](../plans/plan-vs-actual.md)
+> (`RouteTracker`: log replay and live GPS drive the same rejoin logic).
 
 Every G1000 log records the **active COM1 frequency once a second**. A corpus of
 logs is therefore a record of where, at what altitude and in which direction
