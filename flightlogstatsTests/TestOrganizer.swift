@@ -231,7 +231,7 @@ class TestOrganizer: XCTestCase {
             Logger.test.info("Cleaned and prepared \(writeableUrl.path)")
         }
         
-        let container = NSPersistentContainer(name: "FlightLogModel")
+        let container = FlightLogOrganizer.makePersistentContainer()
         let description = NSPersistentStoreDescription()
         description.url = URL(fileURLWithPath: "/dev/null")
         container.persistentStoreDescriptions = [description]
@@ -344,7 +344,7 @@ class TestOrganizer: XCTestCase {
     func runTestOrganizer() throws {
         let organizer = FlightLogOrganizer()
         
-        let container = NSPersistentContainer(name: "FlightLogModel")
+        let container = FlightLogOrganizer.makePersistentContainer()
         let description = NSPersistentStoreDescription()
         description.url = URL(fileURLWithPath: "/dev/null")
         container.persistentStoreDescriptions = [description]

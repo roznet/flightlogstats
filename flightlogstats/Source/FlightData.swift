@@ -565,6 +565,7 @@ extension FlightData {
         self.doubleDataFrame = DataFrame(indexes: builtIndexes, values: builtValues)
 
         builtIndexes = []
+        lastindex = self.dates.first!
         var builtCategorical : [Field:[CategoricalValue]] = [:]
         
         builtIndexes.reserveCapacity(self.dates.capacity)
@@ -578,7 +579,7 @@ extension FlightData {
             if index < lastindex {
                 builtIndexes.removeAll(keepingCapacity: true)
                 for field in self.categoricalFields {
-                    builtValues[field]?.removeAll(keepingCapacity: true)
+                    builtCategorical[field]?.removeAll(keepingCapacity: true)
                 }
             }
             // edge case date is repeated

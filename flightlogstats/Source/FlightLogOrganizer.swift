@@ -189,9 +189,20 @@ class FlightLogOrganizer {
     private var managedFlightLogs : [String:FlightLogFileRecord] = [:]
     private var managedAircrafts : [SystemId:AircraftRecord] = [:]
     
+    /// Loaded once and shared by every container: each container loading its own copy
+    /// makes the entity lookup for the record classes ambiguous (and crash on insert)
+    static let managedObjectModel : NSManagedObjectModel = {
+        let url = Bundle(for: FlightLogOrganizer.self).url(forResource: "FlightLogModel", withExtension: "momd")!
+        return NSManagedObjectModel(contentsOf: url)!
+    }()
+
+    static func makePersistentContainer() -> NSPersistentContainer {
+        return NSPersistentContainer(name: "FlightLogModel", managedObjectModel: Self.managedObjectModel)
+    }
+
     private func createPersistentContainer() -> NSPersistentContainer {
         dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-        let container = NSPersistentContainer(name: "FlightLogModel")
+        let container = Self.makePersistentContainer()
         container.loadPersistentStores() {
             (storeDescription,error) in
             if let error = error {

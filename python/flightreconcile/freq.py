@@ -36,7 +36,7 @@ import numpy as np
 from . import geo
 
 CACHE_DIR = os.path.expanduser("~/.cache/flightreconcile")
-CACHE_VERSION = 2      # bump when the scan or segment logic changes
+CACHE_VERSION = 3      # bump when the scan or segment logic changes
 
 DEFAULT_LOG_DIR = os.path.expanduser(
     "~/Library/Mobile Documents/iCloud~net~ro-z~flightlogstats/Documents")
@@ -160,6 +160,7 @@ def _read_rows(path: str) -> Optional[dict]:
         want = [idx.get(c) for c in _COLS]
         date, time_s, com1, com2 = [], [], [], []
         lat, lon, alt, trk, gs, wpt = [], [], [], [], [], []
+        last = None
         for line in f:
             p = line.split(",")
             if len(p) < len(header) - 3:
@@ -178,6 +179,15 @@ def _read_rows(path: str) -> Optional[dict]:
                 sp = float(v[8]) if v[8] else 0.0
             except ValueError:
                 continue
+            # as the app's FlightData: a repeated timestamp is dropped and a clock
+            # going backwards restarts the log, so both readers see the same rows
+            # (a new date is taken as moving forward: date formats vary and do not sort)
+            if last is not None and v[0] == last[0] and t <= last[1]:
+                if t == last[1]:
+                    continue
+                for col in (date, time_s, com1, com2, lat, lon, alt, trk, gs, wpt):
+                    col.clear()
+            last = (v[0], t)
             date.append(v[0]); time_s.append(t); com1.append(v[2]); com2.append(v[3])
             lat.append(la); lon.append(lo); alt.append(al); trk.append(tk)
             gs.append(sp); wpt.append(v[9])
