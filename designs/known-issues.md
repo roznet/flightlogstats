@@ -8,11 +8,11 @@
 
 | # | Issue | Where |
 |---|---|---|
-| B1 | rzflight pinned at 1.0.4, which lacks `KnownWaypoints` / `RoutePointResolver` used since `a3636bc` | `Package.resolved`, `AppDelegate.swift` |
-| B2 | rzutils-touch 1.0.7 `Package.swift`: tools 5.5 with `.iOS(.v16)`; current Xcode rejects it. Only used for `GCSimpleGraph*` and one import | upstream |
+| B1 | ~~rzflight pinned at 1.0.4, which lacks `KnownWaypoints` / `RoutePointResolver` used since `a3636bc`~~ Resolved: 1.3.0 (`8cdd2e5`) | `Package.resolved`, `AppDelegate.swift` |
+| B2 | ~~rzutils-touch 1.0.7 `Package.swift`: tools 5.5 with `.iOS(.v16)`; current Xcode rejects it~~ Resolved: 1.0.8 (`8cdd2e5`). Only used for `GCSimpleGraph*` and one import | upstream |
 | B3 | `RZData` imported by 9 files but not a declared package product | `project.pbxproj` |
-| B4 | `Package.resolved` v1 format, no rzutils pin, stale pins (BrightFutures, Erik, FileKit, Kanna, Swifter) | |
-| B5 | CI builds for "iPhone 11" on `macOS-latest`, runs no tests, no LFS checkout | `.github/workflows/main.yml` |
+| B4 | ~~`Package.resolved` v1 format, no rzutils pin~~ (v3 since `8cdd2e5`); still stale pins (BrightFutures, Erik, FileKit, Kanna, Swifter) | |
+| B5 | ~~CI builds for "iPhone 11" on `macOS-latest`, runs no tests, no LFS checkout~~ Resolved 2026-09-28: `ios.yml` runs the unit target | `.github/workflows/main.yml` |
 | B6 | Orphan sources not in any target: `DataFrame.swift`, `GroupBy.swift`, `ValueStats.swift`, `CategoricalStats.swift` | `Source/` |
 | B7 | README tells contributors to run `airports.py` (obsolete; nav.db replaced it). `garmin2fdr.py` references undefined names | `README.md`, `python/` |
 
