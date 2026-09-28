@@ -22,7 +22,7 @@
 |---|---|---|
 | C1 | `FuelTanks.isAlmostEqual` compares self with self (always true). Latent: its only caller chain (`AircraftRecord.isAlmostEqual`) has no live caller | `FuelTanks.swift` |
 | C2 | `Trip` `NmpG` converts distance to `UnitVolume.aviationGallon` | `Trip.swift` |
-| C3 | categorical pass resets `builtValues` not `builtCategorical`; coordinate frame uses raw `dates`; `lastindex` not reset | `FlightData.convertDataFrame` |
+| C3 | coordinate frame uses raw, un-deduplicated `dates` (the double and categorical passes were aligned in `aef4e43`) | `FlightData.convertDataFrame` |
 | C4 | quoted field containing a space leaves quoted mode; lone `\r` throws | `CsvParser.swift` |
 | C5 | date shortcut mis-dates 10/11/12 s gaps; `DateFormatter` without POSIX locale | `FlightData.ParsingState` |
 | C6 | wind components computed against CRS rather than TRK | `FieldCalculations.swift` |

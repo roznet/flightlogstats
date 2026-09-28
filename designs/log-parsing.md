@@ -78,10 +78,10 @@ as the implementation. Delete them.
 - **Date shortcut.** To avoid `DateFormatter` per row, if the last digit of the
   time advanced by 0/1/2 the step is assumed to be 0/1/2 s. A real 10/11/12 s gap
   is mis-dated. The formatter has no `en_US_POSIX` locale.
-- **Frames can misalign.** In `convertDataFrame` the categorical pass resets
-  `builtValues` (doubles) instead of `builtCategorical` when time goes backwards,
-  `lastindex` is not reset between passes, and the coordinate frame uses
-  un-deduplicated `dates`. Any time → position lookup (map cursor, plan
+- **Frames can misalign.** In `convertDataFrame` the double and categorical
+  frames drop repeated dates and restart when time goes backwards, and line up
+  row for row (the frequency scan checks this). The coordinate frame still uses
+  the raw, un-deduplicated `dates`: any time → position lookup (map cursor, plan
   projection) must fix this first.
 - **Memory**: row-major and column-major copies are both held after conversion.
 - **Coupling**: field metadata and logging use `Bundle.main`, which blocks moving
