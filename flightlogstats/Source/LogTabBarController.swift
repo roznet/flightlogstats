@@ -17,7 +17,20 @@ class LogTabBarController: UITabBarController, LogSelectionDelegate {
     var logViewModel : FlightLogViewModel? = nil
     var progress : ProgressReport? = nil
     var progressReportOverlay : ProgressReportOverlay? = nil
-    
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // SwiftUI tabs are added in code, after the storyboard ones
+        let frequencies = FrequencyTimelineViewController()
+        var controllers = self.viewControllers ?? []
+        controllers.append(frequencies)
+        self.setViewControllers(controllers, animated: false)
+        // a flight selected before the view loaded did not reach the new tab
+        if let viewModel = self.logViewModel {
+            frequencies.viewModelHasChanged(viewModel: viewModel)
+        }
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         

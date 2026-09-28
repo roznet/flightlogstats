@@ -294,24 +294,8 @@ class FrequencyIndexOrganizer {
         var segments : [String:[FrequencySegment]] = [:]
         if let rs = db.executeQuery("SELECT * FROM \(Self.segmentsTable) ORDER BY log_file_name, seq", withArgumentsIn: []) {
             while rs.next() {
-                guard let name = rs.string(forColumn: "log_file_name"), let freq = rs.string(forColumn: "freq") else { continue }
-                let start : Date? = rs.columnIsNull("t_start") ? nil : Date(timeIntervalSinceReferenceDate: rs.double(forColumn: "t_start"))
-                segments[name, default: []].append(FrequencySegment(freq: freq,
-                                                                    logFileName: name,
-                                                                    logDate: dates[name],
-                                                                    start: start,
-                                                                    duration: rs.double(forColumn: "dur_s"),
-                                                                    nm: rs.double(forColumn: "nm"),
-                                                                    latIn: rs.double(forColumn: "lat_in"),
-                                                                    lonIn: rs.double(forColumn: "lon_in"),
-                                                                    altIn: rs.double(forColumn: "alt_in"),
-                                                                    trkIn: rs.double(forColumn: "trk_in"),
-                                                                    latOut: rs.double(forColumn: "lat_out"),
-                                                                    lonOut: rs.double(forColumn: "lon_out"),
-                                                                    altOut: rs.double(forColumn: "alt_out"),
-                                                                    prevFreq: rs.string(forColumn: "prev_freq"),
-                                                                    nextFreq: rs.string(forColumn: "next_freq"),
-                                                                    waypointIn: rs.string(forColumn: "wpt_in") ?? ""))
+                guard let name = rs.string(forColumn: "log_file_name"), let segment = Self.segment(rs, logDate: dates[name]) else { continue }
+                segments[name, default: []].append(segment)
             }
             rs.close()
         }
@@ -319,15 +303,8 @@ class FrequencyIndexOrganizer {
         var points : [String:[FrequencyPoint]] = [:]
         if let rs = db.executeQuery("SELECT * FROM \(Self.pointsTable) ORDER BY log_file_name, seq", withArgumentsIn: []) {
             while rs.next() {
-                guard let name = rs.string(forColumn: "log_file_name"), let freq = rs.string(forColumn: "freq") else { continue }
-                points[name, default: []].append(FrequencyPoint(lat: rs.double(forColumn: "lat"),
-                                                                lon: rs.double(forColumn: "lon"),
-                                                                alt: rs.double(forColumn: "alt"),
-                                                                trk: rs.double(forColumn: "trk"),
-                                                                gs: rs.double(forColumn: "gs"),
-                                                                freq: freq,
-                                                                nextFreq: rs.string(forColumn: "next_freq"),
-                                                                nmToNext: rs.columnIsNull("nm_to_next") ? nil : rs.double(forColumn: "nm_to_next")))
+                guard let name = rs.string(forColumn: "log_file_name"), let point = Self.point(rs) else { continue }
+                points[name, default: []].append(point)
             }
             rs.close()
         }
@@ -335,6 +312,101 @@ class FrequencyIndexOrganizer {
         return names.map {
             FrequencyLogIndex(logFileName: $0, logDate: dates[$0], segments: segments[$0] ?? [], points: points[$0] ?? [])
         }
+    }
+
+    //MARK: - one log
+
+    /// The index of one log, segments and points in time order.
+    /// - Returns: nil if the log has not been indexed yet. A log indexed without usable
+    ///   COM1 data (taxi only, no radios) comes back with no segments and no points.
+    func logIndex(logFileName : String) -> FrequencyLogIndex? {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        guard self.indexedLogs.contains(logFileName) else { return nil }
+        return self.loadLog(logFileName: logFileName)
+    }
+
+    /// The index of one log, indexing it first if it is not yet, through the same
+    /// `insertOrReplace(flightLog:)` as the incremental hook and the backfill.
+    /// Parses the log if needed and leaves it parsed. Slow on a first call: not on main.
+    /// - Returns: nil if the log did not parse (unreadable, empty), in which case nothing
+    ///   is recorded, so a file that is missing now is not marked as having no frequencies
+    func logIndex(flightLog : FlightLogFile) -> FrequencyLogIndex? {
+        let name = flightLog.name
+        if let rv = self.logIndex(logFileName: name) {
+            return rv
+        }
+        flightLog.parse()
+        guard flightLog.logType == .parsed else { return nil }
+        self.insertOrReplace(flightLog: flightLog)
+        return self.logIndex(logFileName: name)
+    }
+
+    /// caller holds the lock
+    private func loadLog(logFileName name : String) -> FrequencyLogIndex {
+        var logDate : Date? = nil
+        if let rs = db.executeQuery("SELECT log_date FROM \(Self.logsTable) WHERE log_file_name = ?", withArgumentsIn: [name]) {
+            if rs.next(), !rs.columnIsNull("log_date") {
+                logDate = Date(timeIntervalSinceReferenceDate: rs.double(forColumn: "log_date"))
+            }
+            rs.close()
+        }
+
+        var segments : [FrequencySegment] = []
+        if let rs = db.executeQuery("SELECT * FROM \(Self.segmentsTable) WHERE log_file_name = ? ORDER BY seq", withArgumentsIn: [name]) {
+            while rs.next() {
+                if let segment = Self.segment(rs, logDate: logDate) {
+                    segments.append(segment)
+                }
+            }
+            rs.close()
+        }
+
+        var points : [FrequencyPoint] = []
+        if let rs = db.executeQuery("SELECT * FROM \(Self.pointsTable) WHERE log_file_name = ? ORDER BY seq", withArgumentsIn: [name]) {
+            while rs.next() {
+                if let point = Self.point(rs) {
+                    points.append(point)
+                }
+            }
+            rs.close()
+        }
+        return FrequencyLogIndex(logFileName: name, logDate: logDate, segments: segments, points: points)
+    }
+
+    //MARK: - rows
+
+    private static func segment(_ rs : FMResultSet, logDate : Date?) -> FrequencySegment? {
+        guard let name = rs.string(forColumn: "log_file_name"), let freq = rs.string(forColumn: "freq") else { return nil }
+        let start : Date? = rs.columnIsNull("t_start") ? nil : Date(timeIntervalSinceReferenceDate: rs.double(forColumn: "t_start"))
+        return FrequencySegment(freq: freq,
+                                logFileName: name,
+                                logDate: logDate,
+                                start: start,
+                                duration: rs.double(forColumn: "dur_s"),
+                                nm: rs.double(forColumn: "nm"),
+                                latIn: rs.double(forColumn: "lat_in"),
+                                lonIn: rs.double(forColumn: "lon_in"),
+                                altIn: rs.double(forColumn: "alt_in"),
+                                trkIn: rs.double(forColumn: "trk_in"),
+                                latOut: rs.double(forColumn: "lat_out"),
+                                lonOut: rs.double(forColumn: "lon_out"),
+                                altOut: rs.double(forColumn: "alt_out"),
+                                prevFreq: rs.string(forColumn: "prev_freq"),
+                                nextFreq: rs.string(forColumn: "next_freq"),
+                                waypointIn: rs.string(forColumn: "wpt_in") ?? "")
+    }
+
+    private static func point(_ rs : FMResultSet) -> FrequencyPoint? {
+        guard let freq = rs.string(forColumn: "freq") else { return nil }
+        return FrequencyPoint(lat: rs.double(forColumn: "lat"),
+                              lon: rs.double(forColumn: "lon"),
+                              alt: rs.double(forColumn: "alt"),
+                              trk: rs.double(forColumn: "trk"),
+                              gs: rs.double(forColumn: "gs"),
+                              freq: freq,
+                              nextFreq: rs.string(forColumn: "next_freq"),
+                              nmToNext: rs.columnIsNull("nm_to_next") ? nil : rs.double(forColumn: "nm_to_next"))
     }
 }
 

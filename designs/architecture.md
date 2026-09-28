@@ -12,7 +12,8 @@
 - **Library**: every log the pilot has ever imported, synced as files through
   iCloud Drive, summarised into Core Data for the list and statistics.
 - **Per-flight views**: summary tables, fuel refill calculator, graphs + map of
-  the flown track with legs by waypoint / phase / comms / autopilot mode.
+  the flown track with legs by waypoint / phase / comms / autopilot mode, and the
+  frequency timeline (debounced COM1 segments from the Frequency Bingo index).
 - **Corpus views**: trips (away-from-base grouping) and monthly statistics.
 - **Upload**: FlySto (OAuth2) and Savvy (API token) per log, manual or batch.
 - **Lab**: `python/flightreconcile/` is where new analyses are prototyped
@@ -24,8 +25,9 @@
  UIKit (Main.storyboard, one file)                     ui-map-graphs.md
    MainSplitViewController
      ├─ LogListTableViewController   list, import, menu
-     └─ LogTabBarController (Summary | Fuel | Graphs)  or  StatsTabBarController
+     └─ LogTabBarController (Summary | Fuel | Graphs | Frequencies)  or  StatsTabBarController
           │ FlightLogViewModel, DisplayContext, TableDataSource subclasses
+          │ Frequencies: SwiftUI in a UIHostingController, added in code
  ─────────┼────────────────────────────────────────────────────────────────
  Library  │ FlightLogOrganizer (singleton)                log-import-sync.md
           │   Core Data (NSPersistentContainer, local only)
