@@ -1,7 +1,7 @@
 # Frequency Bingo — guessing the ATC frequency from your own logs
 
 > Status: **phase 1 done** (index + model, PR #10), and the per-flight
-> frequency timeline built on the index (PR #PRNUM, modernisation §Phase 3 step 0);
+> frequency timeline built on the index (PR #11, modernisation §Phase 3 step 0);
 > plan mode is next. The model was built,
 > tuned and validated in Python (`python/flightreconcile/freq.py`, `freq_cli.py`)
 > and is ported to Swift in `FrequencyModel.swift`, with the persistent index in
