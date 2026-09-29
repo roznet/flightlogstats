@@ -98,9 +98,9 @@ and plan-vs-actual live next). A host adds `OwnshipMapContent` inside its
 along the track on a rotated map) and applies `.ownshipLocate(live, position:)`.
 
 - `OwnshipVector` (pure, `TestOwnship`): position, track, ground speed, and the
-  `lead` point after 60 s by great circle. Same formula and earth radius as
-  RZFlight's `pointFromBearingDistance`, which is internal and on RZFlight 2.x
-  while the app pins 1.x: move to it once it is public.
+  `lead` point after 60 s by great circle, from RZFlight's
+  `CLLocationCoordinate2D.pointFromBearingDistance` (longitude normalised to
+  ±180 here: RZFlight does not).
 - `LiveLocation.shared` (`@Observable`, main actor): `CLLocationUpdate.liveUpdates(.airborne)`
   with a `CLServiceSession` for when-in-use authorisation. One instance, so the
   toggle is the same on every screen. GPS runs only while the toggle is on **and**
