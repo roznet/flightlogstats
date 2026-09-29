@@ -83,8 +83,30 @@ or `Settings`).
 - Points carry no segment number in the index; `FrequencyTimeline.pointsBySegment`
   recovers it from `freq`, `nextFreq` and non-increasing `nmToNext` (exact on
   every TestAssets log, `TestFrequencyTimeline`).
+- **Locate** (top-right of the map): toggles the live position, an aircraft icon
+  along the GPS track plus a line to where it will be in one minute at the current
+  ground speed (no line under ~2 kt or without a track). The camera moves to the
+  first fix after the toggle, then is left alone. See *Live position* below.
 - The Graphs tab's Comms grouping is still there; whether the timeline replaces
   it is the owner's call once it has been used.
+
+## Live position (`Ownship.swift`, `OwnshipMap.swift`)
+
+Built for reuse by every live SwiftUI map (Frequencies tab now, Bingo live mode
+and plan-vs-actual live next). A host adds `OwnshipMapContent` inside its
+`Map { }`, tracks the camera heading with `onMapCameraChange` (so the icon points
+along the track on a rotated map) and applies `.ownshipLocate(live, position:)`.
+
+- `OwnshipVector` (pure, `TestOwnship`): position, track, ground speed, and the
+  `lead` point after 60 s by great circle. Same formula and earth radius as
+  RZFlight's `pointFromBearingDistance`, which is internal and on RZFlight 2.x
+  while the app pins 1.x: move to it once it is public.
+- `LiveLocation.shared` (`@Observable`, main actor): `CLLocationUpdate.liveUpdates(.airborne)`
+  with a `CLServiceSession` for when-in-use authorisation. One instance, so the
+  toggle is the same on every screen. GPS runs only while the toggle is on **and**
+  a map using `.ownshipLocate` is on screen (appear/disappear count).
+- Permission: `NSLocationWhenInUseUsageDescription` in `Info.plist`, and
+  `com.apple.security.personal-information.location` for the Mac Catalyst sandbox.
 
 ## Presentation pattern
 
@@ -105,6 +127,7 @@ or `Settings`).
 `LogTabBarController`, `LogSummaryViewController`, `LogFuelAnalysisViewController`,
 `LogMapGraphsViewController`, `FrequencyTimelineViewController`,
 `FrequencyTimelineView`, `FrequencyTimelineViewModel`, `FrequencyTimeline`,
+`LiveLocation`, `OwnshipVector`, `OwnshipMapContent`, `ownshipLocate(_:position:)`,
 `StatsTabBarController`, `StatsTripsViewController`,
 `FlightLogViewModel`, `DisplayContext`, `ViewConfig`, `TableDataSource`,
 `TableCollectionViewLayout`, `FlightLegsDataSource`, `FlightDataMapOverlay`,

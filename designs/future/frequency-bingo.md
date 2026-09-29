@@ -248,7 +248,9 @@ custom `MKOverlayRenderer` already draws a track with a highlighted range.
   This is the most valuable layer and the least obvious: it shows *why* the model
   said something, and makes thin support visible rather than implied. Clip it to
   the route's bounding box or a frequency used elsewhere blows out the view.
-- Current position marker in live mode.
+- Current position marker in live mode: `OwnshipMapContent` (icon along the
+  track, one-minute lead vector) and the `.ownshipLocate` toggle, as on the
+  Frequencies tab.
 
 `freq_report.save_route_map` is the reference rendering.
 
@@ -311,8 +313,9 @@ and reschedules itself until none are left. Every processed log is recorded in
 
 1. **Index + model**, with the fixture test. No UI.
 2. **Plan mode** — table and map. Useful on the ground on its own.
-3. **Live mode** — needs `NSLocationWhenInUseUsageDescription` and a
-   `CLLocationManager`; the app has no location permission at all today.
+3. **Live mode** — GPS, location permission and the position marker exist
+   (`LiveLocation`, `OwnshipMapContent`, `.ownshipLocate`; ui-map-graphs.md,
+   *Live position*): feed `LiveLocation.shared.location` to the ladder.
 4. **Confirmation taps** (see below).
 
 ## Gotchas

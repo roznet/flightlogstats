@@ -91,8 +91,8 @@ New tab in `LogTabBarController` (later it can absorb the Graphs tab).
 
 ## Live mode (after Frequency Bingo phase 2)
 
-`LiveGPS` source, `NSLocationWhenInUseUsageDescription` (the app has no location
-permission today), plan chosen from attached or pasted routes. The card is the
+`LiveGPS` source over `LiveLocation` (permission and map marker already exist,
+ui-map-graphs.md *Live position*), plan chosen from attached or pasted routes. The card is the
 replay card. Nothing new in the engine.
 
 ## Open questions
