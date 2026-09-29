@@ -52,6 +52,47 @@ Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude,  AltInd,  IA
         
     }
 
+    private class LineCollector : CsvInterpreter {
+        var maxLineCount : Int? = nil
+        var lines : [[String]] = []
+        func start() {}
+        func process(line : [String], readCount : Int, lineCount : Int) { self.lines.append(line) }
+        func finished() {}
+    }
+
+    func csvLines(_ string : String) throws -> [[String]] {
+        guard let stream = self.streamForString(string: string) else { XCTFail(); return [] }
+        let collector = LineCollector()
+        try CsvParser.parse(bufferedStreamReader: BufferedStreamReader(inputStream: stream), interpreter: collector)
+        return collector.lines
+    }
+
+    /// C4: a space inside quotes stays in the field, and a lone \r ends a line.
+    func testCsvQuotedSpacesAndLineEndings() throws {
+        let quoted = try self.csvLines("a,  \"b c\" ,d\n")
+        XCTAssertEqual(quoted.first, ["a", "b c", "d"])
+
+        let lone = try self.csvLines("a,b\r1,\"x y\"\r")
+        XCTAssertGreaterThanOrEqual(lone.count, 2)
+        XCTAssertEqual(lone.first, ["a", "b"])
+        XCTAssertEqual(lone.dropFirst().first, ["1", "x y"])
+
+        let crlf = try self.csvLines("a,b\r\n1,2\r\n")
+        XCTAssertGreaterThanOrEqual(crlf.count, 2)
+        XCTAssertEqual(crlf.first, ["a", "b"])
+        XCTAssertEqual(crlf.dropFirst().first, ["1", "2"])
+
+        let string = """
+#airframe_info,airframe_name="an aircraft",  system_id="sid"
+#yyy-mm-dd, hh:mm:ss,   hh:mm, ident, degrees, degrees
+Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude
+2022-05-02, 13:58:26,  +00:00,  A, 56.4534912,   -3.0175426
+"""
+        guard let stream = self.streamForString(string: string) else { XCTFail(); return }
+        let data = try FlightData(inputStream: stream)
+        XCTAssertEqual(data.meta[.airframe_name], "an aircraft")
+    }
+
     /// Synthetic log: one row per second from 13:00:00, constant fuel flow.
     func syntheticLog(rows : Int, fuelFlow : Double, fuelUnit : String = "gals", fuelLeft : Double = 20.0, fuelRight : Double = 20.0) -> String {
         var lines = [
