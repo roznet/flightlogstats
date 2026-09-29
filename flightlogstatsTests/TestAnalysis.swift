@@ -91,4 +91,21 @@ final class TestAnalysis: XCTestCase {
         XCTAssertNotEqual(inputs, movedInputs)
     }
 
+    /// C1: `isAlmostEqual` compared self with self and was always true.
+    func testFuelTanksAlmostEqual() {
+        let even = FuelTanks(left: 30.0, right: 30.0, unit: UnitVolume.aviationGallon)
+        XCTAssertTrue(even.isAlmostEqual(to: even.converted(to: UnitVolume.liters)))
+        XCTAssertFalse(even.isAlmostEqual(to: FuelTanks(left: 20.0, right: 20.0, unit: UnitVolume.aviationGallon)))
+        XCTAssertFalse(even.isAlmostEqual(to: FuelTanks(left: 25.0, right: 35.0, unit: UnitVolume.aviationGallon)))
+
+        let aircraft = AircraftPerformance(fuelMax: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon),
+                                           fuelTab: FuelTanks(total: 60.0, unit: UnitVolume.aviationGallon),
+                                           gph: 17.0)
+        let bigger = AircraftPerformance(fuelMax: FuelTanks(total: 100.0, unit: UnitVolume.aviationGallon),
+                                         fuelTab: FuelTanks(total: 60.0, unit: UnitVolume.aviationGallon),
+                                         gph: 17.0)
+        XCTAssertTrue(aircraft.isAlmostEqual(to: aircraft))
+        XCTAssertFalse(aircraft.isAlmostEqual(to: bigger))
+    }
+
 }

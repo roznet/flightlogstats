@@ -102,7 +102,8 @@ struct FuelTanks<UnitType : Dimension> : Comparable, Codable {
     public func isAlmostEqual(
       to other: Self
     ) -> Bool {
-        return self.totalMeasurement.converted(to: self.unit).value.isAlmostEqual(to: self.totalMeasurement.value)
+        let converted = other.converted(to: self.unit)
+        return self.left.isAlmostEqual(to: converted.left) && self.right.isAlmostEqual(to: converted.right)
     }
     
     @inlinable
