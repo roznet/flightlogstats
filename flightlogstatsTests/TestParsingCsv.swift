@@ -88,6 +88,22 @@ Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude,  AltInd,  IA
         }
     }
 
+    /// C8: fuel quantities are converted from the log's unit to the store unit.
+    func testFuelUnitFromLog() throws {
+        for (unit, expected) in [("gals", UnitVolume.aviationGallon), ("L", UnitVolume.liters)] {
+            let string = self.syntheticLog(rows: 10, fuelFlow: 0.0, fuelUnit: unit, fuelLeft: 20.0, fuelRight: 30.0)
+            guard let stream = self.streamForString(string: string) else { XCTFail(); return }
+            let data = try FlightData(inputStream: stream)
+            XCTAssertEqual(FlightSummary.fuelUnit(in: data), expected)
+
+            let summary = try FlightSummary(data: data)
+            XCTAssertEqual(summary.fuelStart.unit, Settings.fuelStoreUnit)
+            let inLogUnit = summary.fuelStart.converted(to: expected)
+            XCTAssertEqual(inLogUnit.left, 20.0, accuracy: 1.0e-6, unit)
+            XCTAssertEqual(inLogUnit.right, 30.0, accuracy: 1.0e-6, unit)
+        }
+    }
+
     func disableTestDataFrame() {
         guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.smallLog.rawValue, withExtension: "csv"),
               let urlfixed = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.smallLog.rawValue, withExtension: "csv"),

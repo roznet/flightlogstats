@@ -144,9 +144,12 @@ struct FlightSummary : Codable {
         let fuel_end_r = values.last(field: .FQtyR)?.value ?? 0.0
         let fuel_totalizer = values.last(field: .FTotalizerT)?.value ?? 0.0
         
-        self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r, unit: Settings.fuelStoreUnit)
-        self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r, unit: Settings.fuelStoreUnit)
-        self.fuelTotalizer = FuelQuantity(total: fuel_totalizer, unit: Settings.fuelStoreUnit)
+        // the record stores fuel in Settings.fuelStoreUnit, the log may use another unit
+        let logFuelUnit = Self.fuelUnit(in: data)
+        self.fuelStart = FuelQuantity(left: fuel_start_l, right: fuel_start_r, unit: logFuelUnit).converted(to: Settings.fuelStoreUnit)
+        self.fuelEnd = FuelQuantity(left: fuel_end_l, right: fuel_end_r, unit: logFuelUnit).converted(to: Settings.fuelStoreUnit)
+        // the totaliser integrates the flow, assumed to be logged per hour in the same volume unit as the quantities
+        self.fuelTotalizer = FuelQuantity(total: fuel_totalizer, unit: logFuelUnit).converted(to: Settings.fuelStoreUnit)
         
         self.distanceInNm = values.last(field: .Distance)?.value ?? 0.0
         self.altitudeInFeet = values.max(for: .AltMSL) ?? 0.0
@@ -164,6 +167,16 @@ struct FlightSummary : Codable {
         self.startAirport = AppDelegate.knownAirports?.nearestAirport(coord: data.firstCoordinate)
         self.endAirport = AppDelegate.knownAirports?.nearestAirport(coord: data.lastCoordinate)
 
+    }
+    
+    /// Volume unit of the fuel quantities from the log's units line, `Settings.fuelStoreUnit` if unknown
+    static func fuelUnit(in data : FlightData) -> UnitVolume {
+        for field in [FlightLogFile.Field.FQtyL, .FQtyR, .FQtyT] {
+            if let unit = data.fieldsUnits[field] as? UnitVolume {
+                return unit
+            }
+        }
+        return Settings.fuelStoreUnit
     }
     
     func contains(_ searchText : String) -> Bool {
