@@ -245,7 +245,9 @@ class FrequencyTimelineViewController: UIHostingController<FrequencyTimelineView
     /// Called on main when a flight is selected
     func viewModelHasChanged(viewModel: FlightLogViewModel) {
         let record = viewModel.flightLogFileRecord
-        guard let name = record.log_file_name, name != self.timeline.logFileName else { return }
+        // same flight again: keep what is shown, but retry one that failed to load
+        guard let name = record.log_file_name,
+              name != self.timeline.logFileName || self.timeline.state == .unavailable else { return }
 
         self.timeline.startLoading(logFileName: name)
         guard let index = FlightLogOrganizer.shared.frequencyIndex else {
