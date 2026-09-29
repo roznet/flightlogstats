@@ -568,76 +568,66 @@ extension FlightData {
         self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
     }
     
+    /// Rows kept in the data frames: a repeated date keeps its first row, and time going
+    /// backwards (the log restarted) drops everything before it. Shared by all frames so
+    /// the double, categorical and coordinate frames line up row for row.
+    static func keptRows(dates : [Date]) -> [Int] {
+        guard var lastindex = dates.first else { return [] }
+        
+        var rv : [Int] = []
+        rv.reserveCapacity(dates.count)
+        for (row,index) in dates.enumerated() {
+            if index < lastindex {
+                rv.removeAll(keepingCapacity: true)
+            }
+            // edge case date is repeated
+            if rv.count == 0 || index != lastindex {
+                rv.append(row)
+                lastindex = index
+            }
+        }
+        return rv
+    }
+    
     private func convertDataFrame() {
         guard self.dates.first != nil else {
             return
         }
         
-        var lastindex = self.dates.first!
-        var builtIndexes : [Date] = []
+        // rows are appended to all four arrays together, guard anyway rather than trap
+        let rowCount = min(self.dates.count, self.values.count, self.strings.count, self.coordinatesArray.count)
+        if rowCount != self.dates.count {
+            Logger.app.error("Inconsistent row counts dates=\(self.dates.count) values=\(self.values.count) strings=\(self.strings.count) coordinates=\(self.coordinatesArray.count)")
+        }
+        let rows = Self.keptRows(dates: Array(self.dates.prefix(rowCount)))
+        let builtIndexes : [Date] = rows.map { self.dates[$0] }
+        
         var builtValues : [Field:[Double]] = [:]
-        
-        builtIndexes.reserveCapacity(self.dates.capacity)
-        
         for field in self.doubleFields {
             builtValues[field] = []
-            builtValues[field]?.reserveCapacity(builtIndexes.capacity)
+            builtValues[field]?.reserveCapacity(rows.count)
         }
-        
-        for (index,row) in zip(self.dates,self.values) {
-            if index < lastindex {
-                builtIndexes.removeAll(keepingCapacity: true)
-                for field in self.doubleFields {
-                    builtValues[field]?.removeAll(keepingCapacity: true)
-                }
-            }
-            // edge case date is repeated
-            if builtIndexes.count == 0 || index != lastindex {
-                // for some reason doing it manually here is much faster than calling function on dataframe?
-                builtIndexes.append(index)
-                for (field,element) in zip(doubleFields,row) {
-                    //self.values[field, default: []].append(element)
-                    builtValues[field]?.append(element)
-                }
-
-                lastindex = index
+        for row in rows {
+            // for some reason doing it manually here is much faster than calling function on dataframe?
+            for (field,element) in zip(doubleFields,self.values[row]) {
+                builtValues[field]?.append(element)
             }
         }
         self.doubleDataFrame = DataFrame(indexes: builtIndexes, values: builtValues)
 
-        builtIndexes = []
-        lastindex = self.dates.first!
         var builtCategorical : [Field:[CategoricalValue]] = [:]
-        
-        builtIndexes.reserveCapacity(self.dates.capacity)
-        
         for field in self.categoricalFields {
             builtCategorical[field] = []
-            builtCategorical[field]?.reserveCapacity(builtIndexes.capacity)
+            builtCategorical[field]?.reserveCapacity(rows.count)
         }
-        
-        for (index,row) in zip(self.dates,self.strings) {
-            if index < lastindex {
-                builtIndexes.removeAll(keepingCapacity: true)
-                for field in self.categoricalFields {
-                    builtCategorical[field]?.removeAll(keepingCapacity: true)
-                }
-            }
-            // edge case date is repeated
-            if builtIndexes.count == 0 || index != lastindex {
-                // for some reason doing it manually here is much faster than calling function on dataframe?
-                builtIndexes.append(index)
-                for (field,element) in zip(categoricalFields,row) {
-                    //self.values[field, default: []].append(element)
-                    builtCategorical[field]?.append(element)
-                }
-
-                lastindex = index
+        for row in rows {
+            for (field,element) in zip(categoricalFields,self.strings[row]) {
+                builtCategorical[field]?.append(element)
             }
         }
         self.categoricalDataFrame = DataFrame(indexes: builtIndexes, values: builtCategorical)
         
-        self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
-
+        let builtCoordinates : [CLLocationCoordinate2D] = rows.map { self.coordinatesArray[$0] }
+        self.coordinateDataFrame = DataFrame(indexes: builtIndexes, values: [.Coordinate:builtCoordinates])
     }
 }
