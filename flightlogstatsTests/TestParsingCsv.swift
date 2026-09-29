@@ -52,6 +52,126 @@ Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude,  AltInd,  IA
         
     }
 
+    private class LineCollector : CsvInterpreter {
+        var maxLineCount : Int? = nil
+        var lines : [[String]] = []
+        func start() {}
+        func process(line : [String], readCount : Int, lineCount : Int) { self.lines.append(line) }
+        func finished() {}
+    }
+
+    func csvLines(_ string : String) throws -> [[String]] {
+        guard let stream = self.streamForString(string: string) else { XCTFail(); return [] }
+        let collector = LineCollector()
+        try CsvParser.parse(bufferedStreamReader: BufferedStreamReader(inputStream: stream), interpreter: collector)
+        return collector.lines
+    }
+
+    /// C4: a space inside quotes stays in the field, and a lone \r ends a line.
+    func testCsvQuotedSpacesAndLineEndings() throws {
+        let quoted = try self.csvLines("a,  \"b c\" ,d\n")
+        XCTAssertEqual(quoted.first, ["a", "b c", "d"])
+
+        let lone = try self.csvLines("a,b\r1,\"x y\"\r")
+        XCTAssertGreaterThanOrEqual(lone.count, 2)
+        XCTAssertEqual(lone.first, ["a", "b"])
+        XCTAssertEqual(lone.dropFirst().first, ["1", "x y"])
+
+        let crlf = try self.csvLines("a,b\r\n1,2\r\n")
+        XCTAssertGreaterThanOrEqual(crlf.count, 2)
+        XCTAssertEqual(crlf.first, ["a", "b"])
+        XCTAssertEqual(crlf.dropFirst().first, ["1", "2"])
+
+        let string = """
+#airframe_info,airframe_name="an aircraft",  system_id="sid"
+#yyy-mm-dd, hh:mm:ss,   hh:mm, ident, degrees, degrees
+Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude
+2022-05-02, 13:58:26,  +00:00,  A, 56.4534912,   -3.0175426
+"""
+        guard let stream = self.streamForString(string: string) else { XCTFail(); return }
+        let data = try FlightData(inputStream: stream)
+        XCTAssertEqual(data.meta[.airframe_name], "an aircraft")
+    }
+
+    /// C5: gaps of 10, 11, 12 s were dated as 0, 1, 2 s by the last-digit shortcut.
+    func testDateGaps() throws {
+        let times = ["13:00:00", "13:00:10", "13:00:21", "13:00:33", "13:00:34", "13:00:34", "13:01:02", "14:00:00"]
+        var lines = [
+            "#airframe_info,airframe_name=\"an\",system_id=\"sid\"",
+            "#yyy-mm-dd, hh:mm:ss,   hh:mm, degrees, degrees, kt",
+            "Lcl Date,  Lcl Time, UTCOfst,  Latitude,    Longitude,  IAS",
+        ]
+        for time in times {
+            lines.append("2022-05-02, \(time),  +00:00, 56.4534912,   -3.0175426, 100.0")
+        }
+        guard let stream = self.streamForString(string: lines.joined(separator: "\n")) else { XCTFail(); return }
+        let data = try FlightData(inputStream: stream)
+        XCTAssertEqual(data.count, times.count)
+        guard let first = data.firstDate, let last = data.lastDate else { XCTFail(); return }
+        XCTAssertEqual(last.timeIntervalSince(first), 3600.0)
+
+        // repeated dates are dropped by the data frame
+        let indexes = data.doubleDataFrame(for: [.IAS]).indexes
+        let offsets = indexes.map { $0.timeIntervalSince(first) }
+        XCTAssertEqual(offsets, [0.0, 10.0, 21.0, 33.0, 34.0, 62.0, 3600.0])
+
+        XCTAssertEqual(FlightData.secondsOfDay("13:00:10"), 13*3600+10)
+        XCTAssertNil(FlightData.secondsOfDay("13:00"))
+        XCTAssertNil(FlightData.secondsOfDay("13:00:1a"))
+    }
+
+    /// Synthetic log: one row per second from 13:00:00, constant fuel flow.
+    func syntheticLog(rows : Int, fuelFlow : Double, fuelUnit : String = "gals", fuelLeft : Double = 20.0, fuelRight : Double = 20.0) -> String {
+        var lines = [
+            "#airframe_info,airframe_name=\"an\",system_id=\"sid\"",
+            "#yyy-mm-dd, hh:mm:ss,   hh:mm, degrees, degrees, kt, \(fuelUnit), \(fuelUnit), gph",
+            "Lcl Date,  Lcl Time, UTCOfst,  Latitude,    Longitude,  IAS, FQtyL, FQtyR, E1 FFlow",
+        ]
+        let start = 13*3600
+        for i in 0..<rows {
+            let t = start + i
+            let time = String(format: "%02d:%02d:%02d", t / 3600, (t / 60) % 60, t % 60)
+            lines.append("2022-05-02, \(time),  +00:00, 56.4534912,   -3.0175426, 100.0, \(fuelLeft), \(fuelRight), \(fuelFlow)")
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    /// C7: the totaliser integrates flow over the real time between parsed rows, so a
+    /// quick parse (one row in 300) agrees with the full parse.
+    func testTotalizerQuickParse() throws {
+        let flow = 12.0
+        let string = self.syntheticLog(rows: 1201, fuelFlow: flow)
+
+        for sampling in [1, 300] {
+            guard let stream = self.streamForString(string: string) else { XCTFail(); return }
+            let data = try FlightData(inputStream: stream, lineSamplingFrequency: sampling)
+            guard let first = data.firstDate, let last = data.lastDate,
+                  let total = data.doubleDataFrame(for: [.FTotalizerT]).last(field: .FTotalizerT)?.value else {
+                XCTFail("no totalizer for sampling \(sampling)")
+                continue
+            }
+            XCTAssertGreaterThan(data.count, 1)
+            let expected = last.timeIntervalSince(first) * flow / 3600.0
+            XCTAssertEqual(total, expected, accuracy: expected * 0.01, "sampling \(sampling)")
+        }
+    }
+
+    /// C8: fuel quantities are converted from the log's unit to the store unit.
+    func testFuelUnitFromLog() throws {
+        for (unit, expected) in [("gals", UnitVolume.aviationGallon), ("L", UnitVolume.liters)] {
+            let string = self.syntheticLog(rows: 10, fuelFlow: 0.0, fuelUnit: unit, fuelLeft: 20.0, fuelRight: 30.0)
+            guard let stream = self.streamForString(string: string) else { XCTFail(); return }
+            let data = try FlightData(inputStream: stream)
+            XCTAssertEqual(FlightSummary.fuelUnit(in: data), expected)
+
+            let summary = try FlightSummary(data: data)
+            XCTAssertEqual(summary.fuelStart.unit, Settings.fuelStoreUnit)
+            let inLogUnit = summary.fuelStart.converted(to: expected)
+            XCTAssertEqual(inLogUnit.left, 20.0, accuracy: 1.0e-6, unit)
+            XCTAssertEqual(inLogUnit.right, 30.0, accuracy: 1.0e-6, unit)
+        }
+    }
+
     func disableTestDataFrame() {
         guard let url = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.smallLog.rawValue, withExtension: "csv"),
               let urlfixed = Bundle(for: type(of: self)).url(forResource: TestLogFileSamples.smallLog.rawValue, withExtension: "csv"),

@@ -7,6 +7,8 @@
 > Updated 2026-09-28: build unblocked, CI runs the unit tests, Frequency Bingo
 > (#9) step 1 merged and pulled ahead of phases 1-2 (see §Order); step 0, the
 > per-flight frequency timeline, in PR #11, so plan mode (step 2) is next.
+> Updated 2026-09-29: the rest of phase 0 (fuel, import and parsing bugs,
+> hygiene, Savvy removal) in one PR; see §Phase 0 for what is left.
 
 ## The jobs the app is for
 
@@ -75,7 +77,7 @@ record-version re-derive mechanism, and the Python lab with its eval harnesses.
 
 | # | Phase | Job | Size | Outcome |
 |---|---|---|---|---|
-| 0 | Build, CI, hygiene, Savvy removal, fuel bugs | all | S | green build, tests in CI, core-job bugs fixed. **Build + CI done**; hygiene, Savvy, bugs open |
+| 0 | Build, CI, hygiene, Savvy removal, fuel bugs | all | S | green build, tests in CI, core-job bugs fixed. **Done** (2026-09-29) apart from the CI review workflow |
 | 1 | Post-flight import + FlySto upload | 1 | M | one `+` flow: off-main import, one iCloud location, tombstones, real FlySto queue, Keychain, synced user state, land on newest flight |
 | 2 | `FlightLogKit` package | 2, 3 | M | parsing, fuel and legs testable with `swift test`; home for the frequency index |
 | 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10); **timeline** in PR #11; plan mode next |
@@ -97,42 +99,40 @@ model were built in the app target (`FrequencyModel.swift`,
 would buy nothing. Bingo's UI touches neither import, upload nor Core Data
 sync, so it runs alongside phase 1. Two phase 0 items gate it: CI running the
 unit tests (done, so the parity fixture is enforced) and C3 before any Bingo
-map that overlays `FlightData`'s track. The timeline map draws from the index
+map that overlays `FlightData`'s track (done, `ecbd8ee`). The timeline map draws from the index
 only (which reads the aligned double frame), so it did not wait for C3.
 
 ### Phase 0: build, CI, hygiene
 
 - ~~Re-resolve packages: rzflight to a release containing `KnownWaypoints`,
   `RoutePointResolver` and the `Airport(db:ident:)` schema fix~~ (rzflight 1.3.0,
-  `8cdd2e5`). Still open: drop the stale pins (BrightFutures, Erik, FileKit,
-  Kanna, Swifter) and check `RZData` is a declared product (B3, B4).
+  `8cdd2e5`). ~~`RZData` as a declared product~~ (`60a8949`). The
+  "stale" pins (BrightFutures, Erik, FileKit, Kanna, Swifter) are not stale:
+  OAuthSwift 2.2.0 declares them, so they stay until OAuthSwift goes (B4).
 - ~~rzutils-touch: bump its `swift-tools-version` to 5.7 and tag~~ (1.0.8,
   `8cdd2e5`). Dropping it waits for Swift Charts in phase 6.
-- Delete the four orphan sources (`DataFrame.swift`, `GroupBy.swift`,
-  `ValueStats.swift`, `CategoricalStats.swift`) and `airports.py`; fix README.
+- ~~Delete the four orphan sources (`DataFrame.swift`, `GroupBy.swift`,
+  `ValueStats.swift`, `CategoricalStats.swift`) and `airports.py`; fix README~~
+  (`c09955d`).
 - ~~Align deployment targets on one value~~ (all 18.6, 2026-09-28).
 - ~~CI modelled on flyfun-weather's `ios.yml`~~ (done 2026-09-28:
   `.github/workflows/ios.yml`, `macos-26`, Xcode 26.6 pinned because the image
   has no 27 yet, LFS checkout, unit target only, vacuous-pass guard). Still
   open: rzflight's `claude-code-review.yml` and the `code-review` command.
-- Fix with a test each, core jobs first:
-  - fuel: C11 (`FuelTanks ==` compares totals only, so an edit that moves fuel
-    between tanks does not mark the view model dirty and the fuel table is not
-    rebuilt), C7 (quick-parse totaliser), C8 (fuel unit
-    assumed gallons), C1 (latent, no live caller);
-  - import: I5 (folder pick with `.selectedFile` imports nothing, the Mac default);
-  - C3 frame alignment (prerequisite for any map/time work on `FlightData`'s
-    coordinates; the double/categorical half is fixed in `aef4e43`, the
-    coordinate frame is left; Bingo maps avoid it by drawing from the index),
-    C4 quoted spaces,
-    C5 POSIX locale; C2 and X2 only because they are one-liners.
-- **Remove Savvy** (decided 2026-09-27): `SavvyRequest.swift`,
-  `SavvyAuthenticateViewController`, `FlightSavvyRecord` + the `savvy_record`
-  relationship (a lightweight migration: entity removal), the Savvy settings and
-  token (clear the stored token on upgrade), the `WebKit` import, Savvy branches
-  in `RequestQueue` / `UploadSettingsViewController` / list and summary views.
-  Resolves U5 and half of U4 before the upload rewrite starts.
-- Complete `secrets.sample.json`.
+- ~~Fix with a test each, core jobs first~~ (2026-09-29):
+  - fuel: ~~C11~~ (`3f2ab0a`), ~~C7~~ (`3791b73`), ~~C8~~ (`b2c4050`),
+    ~~C1~~ (`1474758`);
+  - import: ~~I5~~ (`26d469b`);
+  - ~~C3 frame alignment~~ (`ecbd8ee`: one set of kept rows for all three
+    frames, so `FlightData` coordinates can be looked up by time), ~~C4~~
+    (`efc121a`), ~~C5~~ (`d14c589`), ~~C2~~ (`93240d9`), ~~X2~~ (`75902d3`).
+- ~~**Remove Savvy**~~ (`00c0366`): request, auth view controller and its
+  scene, settings rows, `RequestQueue` / list / summary branches; Core Data
+  model version 2 without `FlightSavvyRecord` / `savvy_record` (lightweight
+  migration, tested from a version 1 store); `savvy.token` / `savvy.enabled`
+  removed from UserDefaults at launch. Resolves U5 and the logged-token half of
+  U4. `WebKit` stays imported by the bug report and app settings screens.
+- ~~Complete `secrets.sample.json`~~ (`c09955d`).
 
 ### Phase 1: post-flight import + FlySto upload
 

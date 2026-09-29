@@ -255,9 +255,9 @@ class LogFuelAnalysisViewController: UIViewController, ViewModelDelegate, UIText
 
     private func checkViewConsistency() {
         if let aircraft = self.flightLogViewModel?.aircraftPerformance {
-            if self.enteredFuelTarget == aircraft.fuelMax {
+            if self.enteredFuelTarget.totalMeasurement == aircraft.fuelMax.totalMeasurement {
                 self.fuelTargetSegment.selectedSegmentIndex = 0
-            }else if self.enteredFuelTarget == aircraft.fuelTab {
+            }else if self.enteredFuelTarget.totalMeasurement == aircraft.fuelTab.totalMeasurement {
                 self.fuelTargetSegment.selectedSegmentIndex = 1
             }else{
                 self.fuelTargetSegment.selectedSegmentIndex = 2

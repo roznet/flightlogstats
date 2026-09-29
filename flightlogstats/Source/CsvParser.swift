@@ -79,6 +79,10 @@ class CsvParser {
                 if state == .endOfLine {
                     state = .beginningOfLine
                 }
+                // a \r already ended the line: unless \n follows (\r\n), it was a lone \r
+                if state == .maybeEndOfLine && scalar != CSVScalar.LineFeed {
+                    state = .beginningOfLine
+                }
                 
                 switch scalar {
                 case CSVScalar.Comma:
@@ -116,14 +120,17 @@ class CsvParser {
                     }
                 case CSVScalar.Space:
                     switch state {
-                    case .inField:
+                    case .inField, .inQuotedField:
                         fieldBuffer.append(char)
+                    case .maybeEndOfQuotedField:
+                        // spaces after the closing quote are ignored
+                        break
                     default:
                         state = .maybeInField
                     }
                 case CSVScalar.DoubleQuote:
                     switch state {
-                    case .beginningOfLine, .endOfField:
+                    case .beginningOfLine, .endOfField, .maybeInField:
                         state = .inQuotedField
                     case .maybeEndOfQuotedField:
                         // double double quote, to escape double quote

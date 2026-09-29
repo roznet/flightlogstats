@@ -95,21 +95,11 @@ class FlightLogViewModel {
         return nil
     }
     
-    var savvyStatus : FlightSavvyRecord.Status {
-        return self.flightLogFileRecord.savvyStatus
-    }
-    var savvyUpdateDate : Date? {
-        return self.flightLogFileRecord.savvyUpdateDate
-    }
     var uploadStatusText : String {
         var messages : [String] = []
         if Settings.shared.flystoEnabled {
             let status = self.flystoStatus.rawValue.capitalized
             messages.append("FlySto: \(status)")
-        }
-        if Settings.shared.savvyEnabled {
-            let status = self.savvyStatus.rawValue.capitalized
-            messages.append("Savvy: \(status)")
         }
         if messages.count == 0 {
             messages.append("disabled")
@@ -296,7 +286,6 @@ class FlightLogViewModel {
     //MARK: - Servive Synchronization
     
     private var flyStoRequest : FlyStoUploadRequest? = nil
-    private var savvyRequest : SavvyRequest? = nil
     var flystoStatus : FlightFlyStoRecord.Status  { return self.flightLogFileRecord.flystoStatus }
     var flystoUpdateDate : Date? { return self.flightLogFileRecord.flystoUpdateDate }
     

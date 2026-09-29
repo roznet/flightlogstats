@@ -57,7 +57,7 @@ download status, so the indexer waits on it rather than failing.
 
 Migration (once): move any file only in local `Documents/` into the container,
 convert `FlightFlyStoRecord` into `UploadRecord` keeping the FlySto `fileId`
-(Savvy records are simply dropped), copy fuel and aircraft user fields into UserState.
+(Savvy records are already gone: model version 2, phase 0), copy fuel and aircraft user fields into UserState.
 
 ## The post-flight flow (what the pilot sees)
 

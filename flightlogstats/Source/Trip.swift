@@ -221,7 +221,7 @@ struct Trip {
                 }
             case .NmpG:
                 if let total = self.stats[.FuelTotalizer]?.sumMeasurement?.converted(to: UnitVolume.aviationGallon),
-                   let dist = self.stats[.Distance]?.sumMeasurement?.converted(to: UnitVolume.aviationGallon) {
+                   let dist = self.stats[.Distance]?.sumMeasurement?.converted(to: UnitLength.nauticalMiles) {
                     return Measurement(value: dist.value/total.value, unit: UnitFuelEfficiency.nauticalMilesPerGallon)
                 }else{
                     return nil

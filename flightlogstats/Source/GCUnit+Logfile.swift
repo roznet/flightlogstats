@@ -32,6 +32,8 @@ extension Dimension {
         case "ft wgs" : return UnitLength.feet
         case "gals" : return UnitVolume.aviationGallon
         case "gph" : return UnitFuelFlow.gallonPerHour
+        // litre spellings not yet seen in a real log (C8), kept so a litre log is not read as gallons
+        case "L", "l", "lt", "ltr", "ltrs", "liters", "litres" : return UnitVolume.liters
         case "inch" : return UnitPressure.inchesOfMercury // alt setting
         case "kt" : return UnitSpeed.knots
         case "mt" : return UnitDimensionLess.scalar

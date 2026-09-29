@@ -195,6 +195,11 @@ extension FlightData {
         var firstDate : Date? = nil
         
         var units : [String] = []
+        
+        // date and offset columns and seconds of day of the last dated row, for the date shortcut
+        var lastDateString : String? = nil
+        var lastOffsetString : String? = nil
+        var lastSecondsOfDay : Int? = nil
 
         var data : FlightData
         
@@ -205,6 +210,7 @@ extension FlightData {
         var doubleInputsCount : Int = 0
         
         init(data : FlightData, totalSize : Int, maxLineCount: Int? = nil, lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil){
+            formatter.locale = Locale(identifier: "en_US_POSIX")
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
             self.data = data
             self.progress = progress
@@ -344,21 +350,17 @@ extension FlightData {
                     return
                 }
                 
-                // Usually date are +1, +2 or same, saves a lot of time vs date parsing to try to guess...
+                // Same date and offset columns as the previous row: offset its date by the
+                // difference in time of day, saves a lot of time vs date parsing
+                let secondsOfDay = FlightData.secondsOfDay(line[timeIndex])
                 var dateProxied = false
-                if self.lineSamplingFrequency == 1, let lastDate = data.dates.last {
-                    let lastDigit = Int(lastDate.timeIntervalSinceReferenceDate)
-                    let suffix = line[timeIndex].suffix(1)
-                    if suffix == "\( (lastDigit + 1) % 10)" {
-                        data.dates.append(lastDate.addingTimeInterval(1.0) )
-                        dateProxied = true
-                    }else if suffix == "\( (lastDigit + 2) % 10)" {
-                        data.dates.append(lastDate.addingTimeInterval(2.0) )
-                        dateProxied = true
-                    }else if suffix == "\( lastDigit % 10)" {
-                        data.dates.append(lastDate )
-                        dateProxied = true
-                    }
+                if let lastDate = data.dates.last,
+                   let secondsOfDay = secondsOfDay,
+                   let lastSecondsOfDay = self.lastSecondsOfDay,
+                   line[dateIndex] == self.lastDateString,
+                   line[offsetIndex] == self.lastOffsetString {
+                    data.dates.append(lastDate.addingTimeInterval(TimeInterval(secondsOfDay - lastSecondsOfDay)))
+                    dateProxied = true
                 }
                 if !dateProxied {
                     let dateString = String(format: "%@ %@ %@", line[dateIndex], line[timeIndex], line[offsetIndex])
@@ -379,8 +381,11 @@ extension FlightData {
                                     break
                                 }
                             }
-                            if data.dates.count == 0 && skipped < 5 {
-                                Logger.app.error("Failed to identify date format '\(dateString)'")
+                            if data.dates.count == 0 {
+                                // never keep a row without its date: values and dates must stay aligned
+                                if skipped < 5 {
+                                    Logger.app.error("Failed to identify date format '\(dateString)'")
+                                }
                                 skipped += 1
                                 return
                             }
@@ -395,6 +400,9 @@ extension FlightData {
                         }
                     }
                 }
+                self.lastDateString = line[dateIndex]
+                self.lastOffsetString = line[offsetIndex]
+                self.lastSecondsOfDay = secondsOfDay
 
                 self.doubleLine.removeAll(keepingCapacity: true)
                 self.stringLine.removeAll(keepingCapacity: true)
@@ -435,15 +443,22 @@ extension FlightData {
                 // match order with what was added for fields
                 doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
                 
+                // seconds since the previous kept row: the current date is already in
+                // data.dates. Time going backwards (log restart) counts as no time.
+                var elapsed : TimeInterval = 0.0
+                if data.dates.count > 1 {
+                    elapsed = max(0.0, data.dates[data.dates.count-1].timeIntervalSince(data.dates[data.dates.count-2]))
+                }
+
                 // first add all output of calculated double fields so they can
                 // also be used in doubleInputs
                 for calcField in FieldCalculation.calculatedFields {
                     if calcField.inputType == .doubles {
                         switch calcField.outputType {
                         case .double:
-                            doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                            doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
                         case .doubleArray:
-                            doubleLine.append(contentsOf:  calcField.evaluateToArray(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                            doubleLine.append(contentsOf:  calcField.evaluateToArray(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
                         case .string:
                             break
                         }
@@ -511,6 +526,32 @@ extension FlightData {
     }
     
     //MARK: - parse stream
+    
+    /// seconds since midnight of a `HH:mm:ss` string, nil if it is not in that form
+    static func secondsOfDay(_ time : String) -> Int? {
+        var parts = (0, 0, 0)
+        var index = 0
+        var digits = 0
+        for char in time.utf8 {
+            if char == UInt8(ascii: ":") {
+                guard digits > 0 else { return nil }
+                index += 1
+                digits = 0
+                continue
+            }
+            guard char >= UInt8(ascii: "0") && char <= UInt8(ascii: "9"), index < 3 else { return nil }
+            let digit = Int(char - UInt8(ascii: "0"))
+            switch index {
+            case 0: parts.0 = parts.0 * 10 + digit
+            case 1: parts.1 = parts.1 * 10 + digit
+            default: parts.2 = parts.2 * 10 + digit
+            }
+            digits += 1
+        }
+        guard index == 2, digits > 0 else { return nil }
+        return parts.0 * 3600 + parts.1 * 60 + parts.2
+    }
+
         
     func parse(inputStream : InputStream, totalSize : Int = 0, maxLineCount: Int? = nil,
                lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil) throws {
@@ -527,76 +568,66 @@ extension FlightData {
         self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
     }
     
+    /// Rows kept in the data frames: a repeated date keeps its first row, and time going
+    /// backwards (the log restarted) drops everything before it. Shared by all frames so
+    /// the double, categorical and coordinate frames line up row for row.
+    static func keptRows(dates : [Date]) -> [Int] {
+        guard var lastindex = dates.first else { return [] }
+        
+        var rv : [Int] = []
+        rv.reserveCapacity(dates.count)
+        for (row,index) in dates.enumerated() {
+            if index < lastindex {
+                rv.removeAll(keepingCapacity: true)
+            }
+            // edge case date is repeated
+            if rv.count == 0 || index != lastindex {
+                rv.append(row)
+                lastindex = index
+            }
+        }
+        return rv
+    }
+    
     private func convertDataFrame() {
         guard self.dates.first != nil else {
             return
         }
         
-        var lastindex = self.dates.first!
-        var builtIndexes : [Date] = []
+        // rows are appended to all four arrays together, guard anyway rather than trap
+        let rowCount = min(self.dates.count, self.values.count, self.strings.count, self.coordinatesArray.count)
+        if rowCount != self.dates.count {
+            Logger.app.error("Inconsistent row counts dates=\(self.dates.count) values=\(self.values.count) strings=\(self.strings.count) coordinates=\(self.coordinatesArray.count)")
+        }
+        let rows = Self.keptRows(dates: Array(self.dates.prefix(rowCount)))
+        let builtIndexes : [Date] = rows.map { self.dates[$0] }
+        
         var builtValues : [Field:[Double]] = [:]
-        
-        builtIndexes.reserveCapacity(self.dates.capacity)
-        
         for field in self.doubleFields {
             builtValues[field] = []
-            builtValues[field]?.reserveCapacity(builtIndexes.capacity)
+            builtValues[field]?.reserveCapacity(rows.count)
         }
-        
-        for (index,row) in zip(self.dates,self.values) {
-            if index < lastindex {
-                builtIndexes.removeAll(keepingCapacity: true)
-                for field in self.doubleFields {
-                    builtValues[field]?.removeAll(keepingCapacity: true)
-                }
-            }
-            // edge case date is repeated
-            if builtIndexes.count == 0 || index != lastindex {
-                // for some reason doing it manually here is much faster than calling function on dataframe?
-                builtIndexes.append(index)
-                for (field,element) in zip(doubleFields,row) {
-                    //self.values[field, default: []].append(element)
-                    builtValues[field]?.append(element)
-                }
-
-                lastindex = index
+        for row in rows {
+            // for some reason doing it manually here is much faster than calling function on dataframe?
+            for (field,element) in zip(doubleFields,self.values[row]) {
+                builtValues[field]?.append(element)
             }
         }
         self.doubleDataFrame = DataFrame(indexes: builtIndexes, values: builtValues)
 
-        builtIndexes = []
-        lastindex = self.dates.first!
         var builtCategorical : [Field:[CategoricalValue]] = [:]
-        
-        builtIndexes.reserveCapacity(self.dates.capacity)
-        
         for field in self.categoricalFields {
             builtCategorical[field] = []
-            builtCategorical[field]?.reserveCapacity(builtIndexes.capacity)
+            builtCategorical[field]?.reserveCapacity(rows.count)
         }
-        
-        for (index,row) in zip(self.dates,self.strings) {
-            if index < lastindex {
-                builtIndexes.removeAll(keepingCapacity: true)
-                for field in self.categoricalFields {
-                    builtCategorical[field]?.removeAll(keepingCapacity: true)
-                }
-            }
-            // edge case date is repeated
-            if builtIndexes.count == 0 || index != lastindex {
-                // for some reason doing it manually here is much faster than calling function on dataframe?
-                builtIndexes.append(index)
-                for (field,element) in zip(categoricalFields,row) {
-                    //self.values[field, default: []].append(element)
-                    builtCategorical[field]?.append(element)
-                }
-
-                lastindex = index
+        for row in rows {
+            for (field,element) in zip(categoricalFields,self.strings[row]) {
+                builtCategorical[field]?.append(element)
             }
         }
         self.categoricalDataFrame = DataFrame(indexes: builtIndexes, values: builtCategorical)
         
-        self.coordinateDataFrame = DataFrame(indexes: self.dates, values: [.Coordinate:self.coordinatesArray])
-
+        let builtCoordinates : [CLLocationCoordinate2D] = rows.map { self.coordinatesArray[$0] }
+        self.coordinateDataFrame = DataFrame(indexes: builtIndexes, values: [.Coordinate:builtCoordinates])
     }
 }

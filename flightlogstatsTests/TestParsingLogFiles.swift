@@ -173,6 +173,43 @@ class TestParsingLogFiles: XCTestCase {
         }
     }
     
+    /// C3: the coordinate frame drops repeated dates and restarts like the other frames,
+    /// so a row of the double frame and of the coordinate frame is the same instant.
+    /// `perspective` has repeated timestamps, `flight2` has time going backwards once.
+    func testCoordinateFrameAlignment() {
+        for sample in [TestLogFileSamples.perspective, .flight2] {
+            guard let url = sample.url, let data = FlightData(url: url) else {
+                XCTFail("failed to parse \(sample)")
+                continue
+            }
+            let doubles = data.doubleDataFrame()
+            let coordinates = data.coordinateColumn
+            XCTAssertGreaterThan(doubles.count, 0)
+            XCTAssertLessThan(doubles.count, data.count, "\(sample) should have dropped rows")
+            XCTAssertEqual(coordinates.indexes, doubles.indexes, "\(sample)")
+            
+            guard let latitudes = doubles[.Latitude]?.values,
+                  let longitudes = doubles[.Longitude]?.values,
+                  latitudes.count == coordinates.values.count else {
+                XCTFail("\(sample) missing positions")
+                continue
+            }
+            var mismatch = 0
+            for (idx,coord) in coordinates.values.enumerated() {
+                if latitudes[idx].isFinite && longitudes[idx].isFinite {
+                    if coord.latitude != latitudes[idx] || coord.longitude != longitudes[idx] {
+                        mismatch += 1
+                    }
+                }
+            }
+            XCTAssertEqual(mismatch, 0, "\(sample)")
+        }
+        
+        let t0 = Date(timeIntervalSinceReferenceDate: 0)
+        let dates = [0.0, 1.0, 1.0, 2.0, 1.0, 1.0, 3.0].map { t0.addingTimeInterval($0) }
+        XCTAssertEqual(FlightData.keptRows(dates: dates), [4, 6])
+    }
+    
     func testTaxiOnly() {
         guard let url = TestLogFileSamples.taxiOnly2.url,
               let logfile = FlightLogFile(url: url)

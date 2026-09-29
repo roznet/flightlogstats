@@ -1,6 +1,7 @@
 # Log parsing
 
-> As-built (reviewed 2026-09-27). Garmin CSV → `FlightData` (row-major while
+> As-built (reviewed 2026-09-27, synced 2026-09-29 after the phase 0 fixes).
+> Garmin CSV → `FlightData` (row-major while
 > parsing, column-major `DataFrame`s on demand) with calculated fields evaluated
 > per row. Types from RZData (rzutils) do the columnar work.
 
@@ -16,7 +17,8 @@ InputStream ─ BufferedStreamReader (1 MB chunks, byte pop)
                  rows                 -> values [[Double]], strings [[String]], coords
                                          + .Distance (great circle, nm)
                                          + FieldCalculation per row
-            ─ convertDataFrame() (lazy) -> doubleDataFrame, categoricalDataFrame,
+            ─ convertDataFrame() (lazy) -> keptRows(dates:) once, then
+                                          doubleDataFrame, categoricalDataFrame,
                                           coordinateDataFrame  (RZData DataFrame)
 ```
 
@@ -33,7 +35,8 @@ reads every row.
   `logFileFields.py`, loaded from `Bundle.main` into a `static var`.
 - Units: `Dimension.from(logFileUnit:)` and `GCUnit.mapping`
   (`GCUnit+Logfile.swift`). Two mappings, already drifted (`"ft Baro"` is only in
-  the first).
+  the first). Litre spellings (`L`, `ltr`, `liters`, ...) map to
+  `UnitVolume.liters` in `Dimension.from` only; none has been seen in a real log.
 - Avionics variants (G1000, Perspective, Perspective+, twins/turbines) share one
   column mapping; there is no model-specific parser. The TBM930 test is disabled.
 
@@ -44,15 +47,14 @@ reads every row.
 | `FQtyT` | L + R | |
 | EGT/CHT max, min, index | over cylinders | |
 | `WndCross` / `WndDirect` | wind vs **CRS** (selected course) | should arguably be TRK; CRS can be far off track |
-| `FTotalizerT` | `+= E1_FFlow / 3600` per row | assumes 1 Hz; ~300× too low after a quick parse; engine 1 only |
+| `FTotalizerT` | `+= E1_FFlow × elapsed / 3600`, elapsed = seconds since the previous parsed row (`usesElapsed`) | right-rectangle rule, so a quick parse loses the flow before its first sampled row; time going backwards counts as 0; engine 1 only; flow assumed per hour in the fuel quantity unit |
 | `FltPhase` | IAS > 35 kt and ±50 ft over 20 samples; rewrites earlier rows | |
 
-## Orphaned files
+## RZData types
 
-`DataFrame.swift`, `GroupBy.swift`, `ValueStats.swift`, `CategoricalStats.swift`
-in `Source/` are **not in any target**. The compiled types come from `RZData`.
-The local copies are an older fork (different signatures) and must not be read
-as the implementation. Delete them.
+`DataFrame`, `ValueStats`, `CategoricalStats` and the group-by come from
+`RZData` (a declared package product). The old local copies in `Source/` were
+deleted (`c09955d`).
 
 ## Key exports
 
@@ -60,29 +62,31 @@ as the implementation. Delete them.
 |---|---|
 | `BufferedStreamReader.swift` | `BufferedStreamReader` |
 | `CsvParser.swift` | `CsvParser`, `CsvInterpreter` |
-| `FlightData.swift` | `FlightData`, `FlightData.ParsingState`, `doubleDataFrame`, `categoricalDataFrame`, `coordinateDataFrame(for:)`, `fieldsUnits` |
+| `FlightData.swift` | `FlightData`, `FlightData.ParsingState`, `doubleDataFrame`, `categoricalDataFrame`, `coordinateDataFrame(for:)`, `coordinateColumn`, `fieldsUnits`, `keptRows(dates:)`, `secondsOfDay(_:)` |
 | `FlightLogFile.swift` | `FlightLogFile.parse`, `quickParse`, `dataSerie`, `legs`, `mapOverlayView` |
 | `FlightLogFile+Field.swift` | `FlightLogFile.Field`, `MetaField`, `fieldDefinitions` |
-| `FieldCalculations.swift` | `FieldCalculation`, `calculatedFields` |
+| `FieldCalculations.swift` | `FieldCalculation` (`usesElapsed`), `calculatedFields` |
 | `GCUnit+Logfile.swift` | unit mapping |
 | `AvionicsSystem.swift` | `AvionicsSystem` from `rpt_` CSV or `sys_` JSON |
 
 ## Gotchas
 
-- **Quoted spaces break.** A space inside a quoted field leaves quoted mode
-  (`CsvParser.swift` default branch), so `"a b"` parses as `ab"`. The
-  `#airframe_info` test line contains exactly this but asserts other keys.
-- **Lone `\r` line endings throw** `invalidStateForOtherChar`.
+- **Quoting.** A field is quoted only if the quote opens it (after optional
+  spaces); spaces inside are kept, spaces after the closing quote are dropped. A
+  quote inside an unquoted field is kept as a character (`key="a b"` in
+  `#airframe_info` stays whole and the interpreter strips the quotes). `\n`,
+  `\r\n` and lone `\r` all end a line (C4, `efc121a`).
 - **Rows need the units line.** A row is kept only if its column count matches
   the units row; a file without it yields no data, silently.
-- **Date shortcut.** To avoid `DateFormatter` per row, if the last digit of the
-  time advanced by 0/1/2 the step is assumed to be 0/1/2 s. A real 10/11/12 s gap
-  is mis-dated. The formatter has no `en_US_POSIX` locale.
-- **Frames can misalign.** In `convertDataFrame` the double and categorical
-  frames drop repeated dates and restart when time goes backwards, and line up
-  row for row (the frequency scan checks this). The coordinate frame still uses
-  the raw, un-deduplicated `dates`: any time → position lookup (map cursor, plan
-  projection) must fix this first.
+- **Date shortcut.** To avoid `DateFormatter` per row, a row whose date and
+  offset columns equal the previous row's is dated from the previous date plus
+  the difference in `HH:mm:ss` seconds of day: exact for any gap and any
+  sampling. Otherwise the formatter (`en_US_POSIX`) parses it (C5, `d14c589`).
+- **Rows kept in the frames.** `keptRows(dates:)` drops a repeated date (keeps
+  the first row) and restarts when time goes backwards (the log restarted: the
+  rows before are dropped). All three frames use it, so they line up row for row
+  and a time lookup on coordinates is safe (C3, `ecbd8ee`). `count`,
+  `firstCoordinate` and `lastCoordinate` still read the raw rows.
 - **Memory**: row-major and column-major copies are both held after conversion.
 - **Coupling**: field metadata and logging use `Bundle.main`, which blocks moving
   the parser into a package until switched to `Bundle.module`.

@@ -8,6 +8,7 @@
 import XCTest
 @testable import FlightLogStats
 import RZUtils
+import RZData
 
 final class TestAnalysis: XCTestCase {
 
@@ -54,7 +55,7 @@ final class TestAnalysis: XCTestCase {
                                         inputs: fuelInputs)
         // first case: current.total equal target.total but current.left < target.left, don't add anything
         
-        XCTAssertEqual(fuelAnalysis.targetFuel, fuelInputs.targetFuel)
+        XCTAssertEqual(fuelAnalysis.targetFuel.totalMeasurement, fuelInputs.targetFuel.totalMeasurement)
 
         // second case: current.total below target.total but current.right > target.right, only add to left
         
@@ -62,7 +63,7 @@ final class TestAnalysis: XCTestCase {
                                    current: FuelTanks(left: 28.0, right: 31.0, unit: UnitVolume.aviationGallon),
                                     totalizer: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon),
                                    inputs: fuelInputs)
-        XCTAssertEqual(fuelAnalysis.targetFuel, fuelInputs.targetFuel)
+        XCTAssertEqual(fuelAnalysis.targetFuel.totalMeasurement, fuelInputs.targetFuel.totalMeasurement)
 
         for one in [
             FuelTanks(left: 0.0, right: -1.0, unit: UnitVolume.aviationGallon),
@@ -73,6 +74,50 @@ final class TestAnalysis: XCTestCase {
             XCTAssertGreaterThanOrEqual(one.positiveOnly.total, 0.0)
         }
         
+    }
+
+    /// C11: equality must see a change in the left/right split, not only the total,
+    /// or `FlightLogViewModel` does not rebuild the fuel table.
+    func testFuelTanksEqualityPerTank() {
+        let even = FuelTanks(left: 30.0, right: 30.0, unit: UnitVolume.aviationGallon)
+        let moved = FuelTanks(left: 25.0, right: 35.0, unit: UnitVolume.aviationGallon)
+        XCTAssertEqual(even.total, moved.total)
+        XCTAssertNotEqual(even, moved)
+        XCTAssertEqual(even, FuelTanks(total: 60.0, unit: UnitVolume.aviationGallon))
+        // same quantity in another unit is still equal
+        XCTAssertEqual(even.converted(to: UnitVolume.liters).totalMeasurement, even.totalMeasurement)
+
+        let inputs = FuelAnalysis.Inputs(targetFuel: even, addedfuel: even, totalizerStartFuel: even)
+        let movedInputs = FuelAnalysis.Inputs(targetFuel: even, addedfuel: moved, totalizerStartFuel: even)
+        XCTAssertNotEqual(inputs, movedInputs)
+    }
+
+    /// C1: `isAlmostEqual` compared self with self and was always true.
+    func testFuelTanksAlmostEqual() {
+        let even = FuelTanks(left: 30.0, right: 30.0, unit: UnitVolume.aviationGallon)
+        XCTAssertTrue(even.isAlmostEqual(to: even.converted(to: UnitVolume.liters)))
+        XCTAssertFalse(even.isAlmostEqual(to: FuelTanks(left: 20.0, right: 20.0, unit: UnitVolume.aviationGallon)))
+        XCTAssertFalse(even.isAlmostEqual(to: FuelTanks(left: 25.0, right: 35.0, unit: UnitVolume.aviationGallon)))
+
+        let aircraft = AircraftPerformance(fuelMax: FuelTanks(total: 92.0, unit: UnitVolume.aviationGallon),
+                                           fuelTab: FuelTanks(total: 60.0, unit: UnitVolume.aviationGallon),
+                                           gph: 17.0)
+        let bigger = AircraftPerformance(fuelMax: FuelTanks(total: 100.0, unit: UnitVolume.aviationGallon),
+                                         fuelTab: FuelTanks(total: 60.0, unit: UnitVolume.aviationGallon),
+                                         gph: 17.0)
+        XCTAssertTrue(aircraft.isAlmostEqual(to: aircraft))
+        XCTAssertFalse(aircraft.isAlmostEqual(to: bigger))
+    }
+
+    /// C2: the trip distance was converted to gallons before dividing by fuel.
+    func testTripNauticalMilesPerGallon() {
+        var trip = Trip(unit: .month)
+        trip.stats[.Distance] = ValueStats(measurement: Measurement<Dimension>(value: 100.0, unit: UnitLength.nauticalMiles))
+        trip.stats[.FuelTotalizer] = ValueStats(measurement: Measurement<Dimension>(value: 10.0, unit: UnitVolume.aviationGallon))
+        // only its presence matters: the value is computed from distance and fuel
+        trip.stats[.NmpG] = ValueStats(measurement: Measurement<Dimension>(value: 0.0, unit: UnitLength.nauticalMiles))
+        guard let nmpg = trip.measurement(field: .NmpG) else { XCTFail(); return }
+        XCTAssertEqual(nmpg.value, 10.0, accuracy: 1.0e-6)
     }
 
 }

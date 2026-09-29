@@ -3,7 +3,7 @@
 > As-built overview of FlightLogStats (reviewed 2026-09-27): a UIKit iPad/iPhone/Mac
 > Catalyst app that imports Garmin G1000 / Perspective CSV logs, keeps them in
 > iCloud Drive, derives per-flight summaries into Core Data, and uploads logs to
-> FlySto and Savvy Aviation.
+> FlySto (Savvy Aviation upload removed 2026-09-29).
 
 ## What the app is
 
@@ -15,7 +15,7 @@
   the flown track with legs by waypoint / phase / comms / autopilot mode, and the
   frequency timeline (debounced COM1 segments from the Frequency Bingo index).
 - **Corpus views**: trips (away-from-base grouping) and monthly statistics.
-- **Upload**: FlySto (OAuth2) and Savvy (API token) per log, manual or batch.
+- **Upload**: FlySto (OAuth2) per log, manual or batch.
 - **Lab**: `python/flightreconcile/` is where new analyses are prototyped
   (plan vs actual, corridor comparison, frequency prediction) before any Swift.
 
@@ -32,7 +32,7 @@
  Library  │ FlightLogOrganizer (singleton)                log-import-sync.md
           │   Core Data (NSPersistentContainer, local only)
           │   Documents/ <-> iCloud Drive Documents (NSMetadataQuery copy)
-          │ RequestQueue -> FlyStoRequest / SavvyRequest   remote-upload.md
+          │ RequestQueue -> FlyStoRequest                  remote-upload.md
  ─────────┼────────────────────────────────────────────────────────────────
  Parsing  │ CsvParser -> FlightData -> RZData DataFrame   log-parsing.md
  Analysis │ FlightSummary, FlightLeg, Trips, FuelAnalysis  analysis.md
@@ -42,7 +42,7 @@
           │ KDTree, DeviceGuru
 ```
 
-All Swift lives flat in `flightlogstats/Source/` (81 files, ~13.7k lines, four of them not compiled). There is
+All Swift lives flat in `flightlogstats/Source/` (79 files, ~14.3k lines). There is
 no module boundary between UI, storage and analysis: analysis types read
 `AppDelegate.knownAirports` and `Settings.shared` directly.
 
@@ -57,7 +57,7 @@ no module boundary between UI, storage and analysis: analysis types read
 | Secrets | `flightlogstats/secrets.json` (gitignored, bundled); a build phase copies `secrets.sample.json` if missing |
 | Bundled data | `python/nav.db` (FMDB, airports + European waypoints, built by `make_nav_db.py`), `python/logFileFields.json` (field metadata) |
 | LFS | `*.db` and `log_*.csv` are Git LFS. Without `git lfs pull` the fixtures and nav.db are 130-byte pointers |
-| CI | `.github/workflows/main.yml`: `xcodebuild build` on "iPhone 11", no tests, no LFS |
+| CI | `.github/workflows/ios.yml`: `macos-26`, LFS checkout, builds and runs the unit target only |
 
 ## Concurrency model
 
@@ -80,16 +80,15 @@ is violated by design. Change notification is `NotificationCenter` throughout
 
 | Package | Why | State |
 |---|---|---|
-| **rzutils** (`RZUtils`, `RZUtilsSwift`, `RZUtilsUniversal`, `RZData`) | `DataFrame`, `ValueStats`, `GCUnit`, logging | `RZData` is imported by 9 files but is not a declared product in the pbxproj |
-| **rzutils-touch** (`RZUtilsTouch`) | `GCSimpleGraphView` charts (ObjC) | 1.0.7's `Package.swift` declares tools 5.5 with `.iOS(.v16)`; current Xcode rejects it |
-| **rzflight** (`RZFlight`) | `KnownAirports`, `KnownWaypoints`, `RoutePointResolver`, `RunwayWindModel` | pinned **1.0.4**, which predates `KnownWaypoints`/`RoutePointResolver`; needs a re-resolve to >= 1.3.0 (and main has the `Airport(db:ident:)` schema fix) |
+| **rzutils** (`RZUtils`, `RZUtilsSwift`, `RZUtilsUniversal`, `RZData`) | `DataFrame`, `ValueStats`, `GCUnit`, logging | 1.0.31; all four products linked by the app |
+| **rzutils-touch** (`RZUtilsTouch`) | `GCSimpleGraphView` charts (ObjC) | 1.0.8 (tools 5.7); dropped with Swift Charts in phase 6 |
+| **rzflight** (`RZFlight`) | `KnownAirports`, `KnownWaypoints`, `RoutePointResolver`, `RunwayWindModel` | 1.3.0 |
 | OAuthSwift | FlySto OAuth2 | |
 | ZIPFoundation | zip before FlySto upload, bug report | |
 
-`Package.resolved` is in the old v1 format, has no pin for rzutils, and still pins
-packages nothing references (BrightFutures, Erik, FileKit, Kanna, Swifter).
-
-**The app does not build as checked in** (see `known-issues.md` §Build).
+`Package.resolved` (v3) also pins BrightFutures, Erik, FileKit, Kanna and
+Swifter: nothing in the app uses them, but OAuthSwift 2.2.0's `Package.swift`
+declares them (for its tests), so SPM resolves them.
 
 ## Key exports
 
@@ -104,7 +103,7 @@ packages nothing references (BrightFutures, Erik, FileKit, Kanna, Swifter).
 ## Design docs map
 
 - `log-import-sync.md`: SD card to Core Data, iCloud, record versioning.
-- `remote-upload.md`: FlySto / Savvy upload.
+- `remote-upload.md`: FlySto upload.
 - `log-parsing.md`: CSV parser, fields, calculated fields, DataFrames.
 - `analysis.md`: summaries, legs, trips, fuel.
 - `ui-map-graphs.md`: screens, map overlay, graphs, table data sources.

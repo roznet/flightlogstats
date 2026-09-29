@@ -36,9 +36,7 @@ class AppSettingsViewController: UIViewController {
         self.dismiss(animated: true)
     }
     
-    @IBOutlet weak var savvyLabel: UILabel!
     @IBOutlet weak var flyStoLabel: UILabel!
-    @IBOutlet weak var savvySwitch: UISwitch!
     @IBOutlet weak var flyStoSwitch: UISwitch!
     
     @IBOutlet weak var uploadMethodSwitch: UISwitch!
@@ -47,9 +45,7 @@ class AppSettingsViewController: UIViewController {
     
     
     @IBAction func uiControlChanged(_ sender: Any) {
-        if (sender as? UISwitch) == self.savvySwitch {
-            Settings.shared.savvyEnabled = self.savvySwitch.isOn
-        }else if (sender as? UISwitch) == self.flyStoSwitch {
+        if (sender as? UISwitch) == self.flyStoSwitch {
             Settings.shared.flystoEnabled = self.flyStoSwitch.isOn
         }else if (sender as? UIDatePicker) == self.datePicker {
             Settings.shared.importStartDate = self.datePicker.date
@@ -61,7 +57,6 @@ class AppSettingsViewController: UIViewController {
     }
     
     func viewFromSettings(){
-        self.savvySwitch.isOn = Settings.shared.savvyEnabled
         self.flyStoSwitch.isOn = Settings.shared.flystoEnabled
         self.datePicker.date = Settings.shared.importStartDate
         self.uploadMethodSwitch.isOn = Settings.shared.uploadMethod == .automatic

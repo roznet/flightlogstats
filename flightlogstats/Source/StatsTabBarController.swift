@@ -9,12 +9,8 @@ import UIKit
 
 class StatsTabBarController: UITabBarController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        if let calendar = self.viewControllers?[1] as? StatsTripsViewController {
-            calendar.aggregation = .months
-        }
-    }
+    // The trips tab keeps its own default aggregation (.trips) and segment control.
+    // A cast of `viewControllers?[1]` to StatsTripsViewController used to set .months
+    // here, but index 1 is the detailed stats tab, so it never applied (X2).
     
 }
