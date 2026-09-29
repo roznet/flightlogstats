@@ -56,6 +56,8 @@
 		42F0B1A0000000000000A003 /* FrequencyIndexOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000A002 /* FrequencyIndexOrganizer.swift */; };
 		42F0B1A0000000000000B001 /* FrequencyTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000B000 /* FrequencyTimeline.swift */; };
 		42F0B1A0000000000000B003 /* FrequencyTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000B002 /* FrequencyTimelineView.swift */; };
+		42F0B1A0000000000000B011 /* FrequencyBingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000B010 /* FrequencyBingo.swift */; };
+		42F0B1A0000000000000B013 /* FrequencyBingoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000B012 /* FrequencyBingoView.swift */; };
 		42F0B1A0000000000000C001 /* Ownship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000C000 /* Ownship.swift */; };
 		42F0B1A0000000000000C003 /* OwnshipMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000C002 /* OwnshipMap.swift */; };
 		4264C230281D830000F40436 /* MainSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4264C22F281D830000F40436 /* MainSplitViewController.swift */; };
@@ -93,6 +95,7 @@
 		4291E195296D672100DE2990 /* TestFileAggregatedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4291E194296D672100DE2990 /* TestFileAggregatedData.swift */; };
 		42F0B1A0000000000000A005 /* TestFrequencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000A004 /* TestFrequencyModel.swift */; };
 		42F0B1A0000000000000B005 /* TestFrequencyTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000B004 /* TestFrequencyTimeline.swift */; };
+		42F0B1A0000000000000B015 /* TestFrequencyBingo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000B014 /* TestFrequencyBingo.swift */; };
 		42F0B1A0000000000000C005 /* TestOwnship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000C004 /* TestOwnship.swift */; };
 		42943B7B299CFF6F003B7E2A /* RemoteServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */; };
 		42943B7D299D0133003B7E2A /* RemoteServiceRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42943B7C299D0133003B7E2A /* RemoteServiceRecord.swift */; };
@@ -206,6 +209,8 @@
 		42F0B1A0000000000000A002 /* FrequencyIndexOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FrequencyIndexOrganizer.swift; path = Source/FrequencyIndexOrganizer.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000B000 /* FrequencyTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FrequencyTimeline.swift; path = Source/FrequencyTimeline.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000B002 /* FrequencyTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FrequencyTimelineView.swift; path = Source/FrequencyTimelineView.swift; sourceTree = "<group>"; };
+		42F0B1A0000000000000B010 /* FrequencyBingo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FrequencyBingo.swift; path = Source/FrequencyBingo.swift; sourceTree = "<group>"; };
+		42F0B1A0000000000000B012 /* FrequencyBingoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FrequencyBingoView.swift; path = Source/FrequencyBingoView.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000C000 /* Ownship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Ownship.swift; path = Source/Ownship.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000C002 /* OwnshipMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OwnshipMap.swift; path = Source/OwnshipMap.swift; sourceTree = "<group>"; };
 		4264C22F281D830000F40436 /* MainSplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainSplitViewController.swift; path = Source/MainSplitViewController.swift; sourceTree = "<group>"; };
@@ -243,6 +248,7 @@
 		4291E194296D672100DE2990 /* TestFileAggregatedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFileAggregatedData.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000A004 /* TestFrequencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrequencyModel.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000B004 /* TestFrequencyTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrequencyTimeline.swift; sourceTree = "<group>"; };
+		42F0B1A0000000000000B014 /* TestFrequencyBingo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFrequencyBingo.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000C004 /* TestOwnship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestOwnship.swift; sourceTree = "<group>"; };
 		42943B7A299CFF6F003B7E2A /* RemoteServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRequest.swift; path = Source/RemoteServiceRequest.swift; sourceTree = "<group>"; };
 		42943B7C299D0133003B7E2A /* RemoteServiceRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RemoteServiceRecord.swift; path = Source/RemoteServiceRecord.swift; sourceTree = "<group>"; };
@@ -459,6 +465,7 @@
 				4291E194296D672100DE2990 /* TestFileAggregatedData.swift */,
 				42F0B1A0000000000000A004 /* TestFrequencyModel.swift */,
 				42F0B1A0000000000000B004 /* TestFrequencyTimeline.swift */,
+				42F0B1A0000000000000B014 /* TestFrequencyBingo.swift */,
 				42F0B1A0000000000000C004 /* TestOwnship.swift */,
 				42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */,
 				42F1E84F284A4D2800DB732A /* TestOrganizer.swift */,
@@ -625,6 +632,8 @@
 				42F0B1A0000000000000A002 /* FrequencyIndexOrganizer.swift */,
 				42F0B1A0000000000000B000 /* FrequencyTimeline.swift */,
 				42F0B1A0000000000000B002 /* FrequencyTimelineView.swift */,
+				42F0B1A0000000000000B010 /* FrequencyBingo.swift */,
+				42F0B1A0000000000000B012 /* FrequencyBingoView.swift */,
 				42F0B1A0000000000000C000 /* Ownship.swift */,
 				42F0B1A0000000000000C002 /* OwnshipMap.swift */,
 				42A7A0BE28154A2400DF4495 /* FlightLogFileRecord.swift */,
@@ -868,6 +877,8 @@
 				42F0B1A0000000000000A003 /* FrequencyIndexOrganizer.swift in Sources */,
 				42F0B1A0000000000000B001 /* FrequencyTimeline.swift in Sources */,
 				42F0B1A0000000000000B003 /* FrequencyTimelineView.swift in Sources */,
+				42F0B1A0000000000000B011 /* FrequencyBingo.swift in Sources */,
+				42F0B1A0000000000000B013 /* FrequencyBingoView.swift in Sources */,
 				42F0B1A0000000000000C001 /* Ownship.swift in Sources */,
 				42F0B1A0000000000000C003 /* OwnshipMap.swift in Sources */,
 				4239290D2864D08800CD33C0 /* AircraftPerformance.swift in Sources */,
@@ -933,6 +944,7 @@
 				4291E195296D672100DE2990 /* TestFileAggregatedData.swift in Sources */,
 				42F0B1A0000000000000A005 /* TestFrequencyModel.swift in Sources */,
 				42F0B1A0000000000000B005 /* TestFrequencyTimeline.swift in Sources */,
+				42F0B1A0000000000000B015 /* TestFrequencyBingo.swift in Sources */,
 				42F0B1A0000000000000C005 /* TestOwnship.swift in Sources */,
 				42F1E848284A3C2E00DB732A /* TestParsingCsv.swift in Sources */,
 			);

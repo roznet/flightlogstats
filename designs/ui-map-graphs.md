@@ -1,7 +1,8 @@
 # UI: screens, map and graphs
 
-> As-built (reviewed 2026-09-27, Frequencies tab 2026-09-28). UIKit, one
-> storyboard, split view, plus one SwiftUI tab. The Graphs map shows the flown
+> As-built (reviewed 2026-09-27, Frequencies tab 2026-09-28, Frequency Bingo
+> 2026-09-29). UIKit, one storyboard, split view, plus one SwiftUI tab and one
+> SwiftUI modal (Frequency Bingo). The Graphs map shows the flown
 > track only; there is no plan overlay, no annotations, no time cursor. Plan for
 > the next version: `plans/plan-vs-actual.md`.
 
@@ -22,7 +23,9 @@ MainSplitViewController (Main.storyboard initial, classic master/detail)
      StatsTabBarController (built in code) ─ Flights StatsTripsViewController
                                             ─ Details StatsDetailledViewController (stub)
 Modals (code): settings, bug report, UploadSettingsViewController popover,
-UIDocumentPicker, progress overlay
+UIDocumentPicker, progress overlay, FrequencyBingoViewController (SwiftUI,
+"Frequency Bingo" in the More menu, or "Bingo this route" on the Frequencies
+tab; full screen, page sheet in compact width)
 ```
 
 Selection: list → `LogSelectionDelegate.selectlogInfo` → `LogTabBarController`
@@ -87,8 +90,21 @@ or `Settings`).
   along the GPS track plus a line to where it will be in one minute at the current
   ground speed (no line under ~2 kt or without a track). The camera moves to the
   first fix after the toggle, then is left alone. See *Live position* below.
+- **Bingo this route** (list header): opens Frequency Bingo through
+  `FrequencyBingoViewController.present(launch:from:)` on this flight's route
+  and cruise altitude (`FrequencyBingo.launch(logFileName:...)`).
 - The Graphs tab's Comms grouping is still there; whether the timeline replaces
   it is the owner's call once it has been used.
+
+## Frequency Bingo (`FrequencyBingo.swift`, `FrequencyBingoView.swift`)
+
+Plan mode of the Bingo tool, as specified in `future/frequency-bingo.md`
+§The page (that doc is the reference for behaviour). Same pattern as the
+Frequencies tab: a pure `@Observable` `FrequencyBingoViewModel` (no
+`AppDelegate`; the resolver and the store are injected) under a SwiftUI view in
+a `UIHostingController`, opened only through `FrequencyBingoViewController(launch:)`.
+Regular width: route, radio and ladder table on the left, map on the right;
+compact: route, radio, map, table stacked. No live position yet (live mode).
 
 ## Live position (`Ownship.swift`, `OwnshipMap.swift`)
 
@@ -128,6 +144,8 @@ along the track on a rotated map) and applies `.ownshipLocate(live, position:)`.
 `LogMapGraphsViewController`, `FrequencyTimelineViewController`,
 `FrequencyTimelineView`, `FrequencyTimelineViewModel`, `FrequencyTimeline`,
 `LiveLocation`, `OwnshipVector`, `OwnshipMapContent`, `ownshipLocate(_:position:)`,
+`FrequencyBingoViewController`, `FrequencyBingoView`, `FrequencyBingoViewModel`,
+`BingoLaunch`, `BingoRadio`, `BingoStore`,
 `StatsTabBarController`, `StatsTripsViewController`,
 `FlightLogViewModel`, `DisplayContext`, `ViewConfig`, `TableDataSource`,
 `TableCollectionViewLayout`, `FlightLegsDataSource`, `FlightDataMapOverlay`,

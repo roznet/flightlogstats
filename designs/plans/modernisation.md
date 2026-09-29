@@ -181,12 +181,12 @@ next.
    grouping stays until the owner has used the timeline and decides.
 1. ~~Index + model with the Python parity fixture~~ (PR #10, `a8149e9`;
    parity realigned in `aef4e43`).
-2. Plan mode (**next**, specified in `../future/frequency-bingo.md` §The page:
+2. ~~Plan mode~~ (issue #13, `../future/frequency-bingo.md` §The page:
    its own tool opened through `BingoLaunch`, route as `RZFlight.Route` stored as
    `FlightExchange`, a pilot-driven current / previous / next radio). Its route
    entry and route engine (today in `FrequencyModel.swift`, moving to RZFlight
    as `RouteTracker` with the rejoin rule) are what plan-vs-actual later reuses.
-3. Live mode.
+3. Live mode (**next**).
 4. Confirmation taps, and predicted vs actual for a flown flight: the
    natural follow-up of step 0.
 

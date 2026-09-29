@@ -15,10 +15,13 @@ import SwiftUI
 import MapKit
 import UIKit
 import OSLog
+import RZFlight
 
 struct FrequencyTimelineView: View {
     let model : FrequencyTimelineViewModel
     var live : LiveLocation = .shared
+    /// opens Frequency Bingo on this flight's route
+    var onBingo : () -> Void = {}
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var position : MapCameraPosition = .automatic
@@ -149,7 +152,15 @@ struct FrequencyTimelineView: View {
                             .id(row.number)
                     }
                 } header: {
-                    Text("\(self.model.rows.count) frequencies, \(FrequencyTimeline.format(duration: self.model.totalDuration))")
+                    HStack {
+                        Text("\(self.model.rows.count) frequencies, \(FrequencyTimeline.format(duration: self.model.totalDuration))")
+                        Spacer()
+                        Button("Bingo this route", systemImage: "antenna.radiowaves.left.and.right") {
+                            self.onBingo()
+                        }
+                        .font(.caption)
+                        .buttonStyle(.borderless)
+                    }
                 } footer: {
                     Text("COM1 as recorded by the log, after dropping runs under a minute (radio flicker). The first and last rows are the ground frequencies and are kept even when short. The altitude band is at entry and exit.")
                 }
@@ -234,11 +245,16 @@ struct FrequencyTimelineRowView: View {
 /// flight's segments from the frequency index.
 class FrequencyTimelineViewController: UIHostingController<FrequencyTimelineView>, ViewModelDelegate {
     let timeline : FrequencyTimelineViewModel
+    /// the selected flight, for "Bingo this route"
+    private var record : FlightLogFileRecord? = nil
 
     init() {
         let timeline = FrequencyTimelineViewModel()
         self.timeline = timeline
         super.init(rootView: FrequencyTimelineView(model: timeline))
+        self.rootView = FrequencyTimelineView(model: timeline, onBingo: { [weak self] in
+            self?.bingoThisRoute()
+        })
         self.tabBarItem = UITabBarItem(title: "Frequencies",
                                        image: UIImage(systemName: "antenna.radiowaves.left.and.right"),
                                        selectedImage: nil)
@@ -254,6 +270,7 @@ class FrequencyTimelineViewController: UIHostingController<FrequencyTimelineView
     /// Called on main when a flight is selected
     func viewModelHasChanged(viewModel: FlightLogViewModel) {
         let record = viewModel.flightLogFileRecord
+        self.record = record
         // same flight again: keep what is shown, but retry one that failed to load
         guard let name = record.log_file_name,
               name != self.timeline.logFileName || self.timeline.state == .unavailable else { return }
@@ -278,6 +295,34 @@ class FrequencyTimelineViewController: UIHostingController<FrequencyTimelineView
                 }else{
                     self.timeline.unavailable(logFileName: name)
                 }
+            }
+        }
+    }
+
+    /// Frequency Bingo on this flight's route: departure, active waypoints and
+    /// destination, with the altitude it cruised at
+    private func bingoThisRoute() {
+        guard let record = self.record, let name = record.log_file_name else { return }
+        // Core Data on main; only the altitude scan of the parsed log runs on worker
+        let summary = record.flightSummary
+        let departure = summary?.startAirport?.icao
+        let destination = summary?.endAirport?.icao
+        let waypoints = summary?.route.map { $0.name } ?? []
+        let flying = summary?.flying
+        let flightLog = record.flightLog
+        AppDelegate.worker.async {
+            var cruise : Int? = nil
+            if let rows = flightLog?.frequencyScanRows() {
+                cruise = FrequencyBingo.cruiseAltitude(altitudes: FrequencyBingo.flyingAltitudes(rows: rows, flying: flying))
+            }
+            var resolver : RoutePointResolver? = nil
+            if let airports = AppDelegate.knownAirports {
+                resolver = RoutePointResolver(airports: airports, waypoints: AppDelegate.knownWaypoints)
+            }
+            let launch = FrequencyBingo.launch(logFileName: name, departure: departure, destination: destination,
+                                               waypoints: waypoints, cruiseAltitudeFt: cruise, resolver: resolver)
+            DispatchQueue.main.async {
+                FrequencyBingoViewController.present(launch: launch, from: self)
             }
         }
     }
