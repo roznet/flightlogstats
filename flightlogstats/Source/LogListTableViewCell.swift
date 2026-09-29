@@ -134,9 +134,6 @@ class LogListTableViewCell: UITableViewCell {
             if let record = info.flysto_record, record.status == .uploaded {
                 uploaded = true
             }
-            if let record = info.savvy_record, record.status == .uploaded {
-                uploaded = true
-            }
             if uploaded {
                 self.fileNameIcon.isHidden = false
             }else{

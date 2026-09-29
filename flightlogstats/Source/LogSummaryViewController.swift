@@ -83,7 +83,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
     // MARK: - Actions
     
     @IBAction func exportButton(_ sender: Any) {
-        if Settings.shared.savvyEnabled || Settings.shared.flystoEnabled {
+        if Settings.shared.flystoEnabled {
             self.flightLogViewModel?.startServiceSynchronization(viewController: self)
         }else{
             self.showServiceConfigurationPopup()

@@ -13,19 +13,10 @@ class UploadSettingsViewController: UIViewController {
     weak var summaryViewController : UIViewController? = nil
     
     @IBOutlet weak var flystoSwitch: UISwitch!
-    @IBOutlet weak var savvySwitch: UISwitch!
    
     //Status Labels
     @IBOutlet weak var flystoMainStatusLabel: UILabel!
     @IBOutlet weak var flystoSubStatusLabel: UILabel!
-    
-    @IBOutlet weak var savvyMainStatusLabel: UILabel!
-    @IBOutlet weak var savvySubStatusLabel: UILabel!
-    
-    @IBAction func logoutSavvy(_ sender: Any) {
-        SavvyRequest.clearCredential()
-        NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
-    }
     
     @IBAction func logoutFlysto(_ sender: Any) {
         FlyStoRequest.clearCredential()
@@ -56,9 +47,7 @@ class UploadSettingsViewController: UIViewController {
     }
 
     @IBAction func uiControlChanged(_ sender: Any) {
-        if (sender as? UISwitch) == self.savvySwitch {
-            Settings.shared.savvyEnabled = self.savvySwitch.isOn
-        }else if (sender as? UISwitch) == self.flystoSwitch {
+        if (sender as? UISwitch) == self.flystoSwitch {
             Settings.shared.flystoEnabled = self.flystoSwitch.isOn
         }
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
@@ -100,10 +89,8 @@ class UploadSettingsViewController: UIViewController {
         }
     }
     func viewFromSettings(){
-        self.savvySwitch.isOn = Settings.shared.savvyEnabled
         self.flystoSwitch.isOn = Settings.shared.flystoEnabled
         self.updateStatus(status: self.flightLogViewModel?.flystoStatus, on: Settings.shared.flystoEnabled, date: self.flightLogViewModel?.flystoUpdateDate, label: self.flystoMainStatusLabel, sublabel: self.flystoSubStatusLabel, message: "flysto")
-        self.updateStatus(status: self.flightLogViewModel?.savvyStatus, on: Settings.shared.savvyEnabled, date: self.flightLogViewModel?.savvyUpdateDate, label: self.savvyMainStatusLabel, sublabel: self.savvySubStatusLabel, message: "savvy")
         
     }
 }

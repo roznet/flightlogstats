@@ -670,9 +670,6 @@ class FlightLogOrganizer {
                 if Settings.shared.flystoEnabled && record.flystoStatus != .uploaded {
                     return true
                 }
-                if Settings.shared.savvyEnabled && record.savvyStatus != .uploaded {
-                    return true
-                }
             }
             return false
         }

@@ -62,8 +62,6 @@ struct Settings {
         
         case flysto_credentials = "flysto.credentials"
         case flysto_enabled = "flysto.enabled"
-        case savvy_token = "savvy.token"
-        case savvy_enabled = "savvy.enabled"
         
         case upload_method = "upload.method"
         
@@ -75,6 +73,18 @@ struct Settings {
         case fuel_discrepancy_max = "fuel_discrepancy_max"
         case common_bug_id = "common_bug_id"
         case upload_batch_count = "upload_batch_count"
+    }
+    
+    /// Keys of settings that no longer exist (Savvy upload, removed); cleared at launch
+    /// so the old Savvy API token does not stay on the device.
+    static let obsoleteKeys : [String] = [ "savvy.token", "savvy.enabled" ]
+    
+    static func removeObsoleteKeys(from defaults : UserDefaults = UserDefaults.standard) {
+        for key in Self.obsoleteKeys {
+            if defaults.object(forKey: key) != nil {
+                defaults.removeObject(forKey: key)
+            }
+        }
     }
     
     static func registerDefaults() {
@@ -129,10 +139,6 @@ struct Settings {
     @CodableStorage(key: Key.flysto_credentials, defaultValue: nil)
     var flystoCredentials : OAuthSwiftCredential?
 
-    @UserStorage(key: Key.savvy_enabled, defaultValue: false)
-    var savvyEnabled : Bool
-    @CodableStorage(key: Key.savvy_token, defaultValue: nil)
-    var savvyToken : String?
     
     @UserStorage(key: Key.common_bug_id, defaultValue: -1)
     var commonBugId : Int

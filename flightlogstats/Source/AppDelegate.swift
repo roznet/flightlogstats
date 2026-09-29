@@ -40,6 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         Settings.registerDefaults()
+        Settings.removeObsoleteKeys()
 
         AppDelegate.worker.async {
             //#warning("Don't checkin")

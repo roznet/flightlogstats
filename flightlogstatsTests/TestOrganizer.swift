@@ -219,6 +219,85 @@ class TestOrganizer: XCTestCase {
         self.wait(for: [expectation], timeout: TimeInterval(10.0))
     }
     
+    /// Savvy removal: a library saved with model version 1 (with `FlightSavvyRecord` and
+    /// `savvy_record`) opens with the current model by lightweight migration, keeping the
+    /// logs and their FlySto status.
+    func testModelMigrationFromVersion1() throws {
+        guard let v1url = Bundle(for: FlightLogOrganizer.self).url(forResource: "FlightLogModel", withExtension: "mom", subdirectory: "FlightLogModel.momd"),
+              let v1 = NSManagedObjectModel(contentsOf: v1url) else {
+            XCTFail("no version 1 model in FlightLogModel.momd")
+            return
+        }
+        XCTAssertNotNil(v1.entitiesByName["FlightSavvyRecord"])
+        XCTAssertNil(FlightLogOrganizer.managedObjectModel.entitiesByName["FlightSavvyRecord"])
+        // plain managed objects: the record classes belong to the current model
+        for entity in v1.entities {
+            entity.managedObjectClassName = NSStringFromClass(NSManagedObject.self)
+        }
+        
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("testMigration-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(at: folder)
+        }
+        let storeUrl = folder.appendingPathComponent("FlightLogModel.sqlite")
+        let logName = "log_220417_125002_LFQA.csv"
+        
+        // an existing library, written with version 1
+        let old = NSPersistentContainer(name: "FlightLogModel", managedObjectModel: v1)
+        old.persistentStoreDescriptions = [NSPersistentStoreDescription(url: storeUrl)]
+        var loadError : Error? = nil
+        old.loadPersistentStores { _, error in loadError = error }
+        XCTAssertNil(loadError)
+        let oldContext = old.viewContext
+        let log = NSEntityDescription.insertNewObject(forEntityName: "FlightLogFileRecord", into: oldContext)
+        log.setValue(logName, forKey: "log_file_name")
+        let flysto = NSEntityDescription.insertNewObject(forEntityName: "FlightFlyStoRecord", into: oldContext)
+        flysto.setValue("uploaded", forKey: "upload_status")
+        log.setValue(flysto, forKey: "flysto_record")
+        let savvy = NSEntityDescription.insertNewObject(forEntityName: "FlightSavvyRecord", into: oldContext)
+        savvy.setValue("uploaded", forKey: "upload_status")
+        log.setValue(savvy, forKey: "savvy_record")
+        try oldContext.save()
+        for store in old.persistentStoreCoordinator.persistentStores {
+            try old.persistentStoreCoordinator.remove(store)
+        }
+        
+        // opened as the app does
+        let current = FlightLogOrganizer.makePersistentContainer()
+        let description = NSPersistentStoreDescription(url: storeUrl)
+        XCTAssertTrue(description.shouldMigrateStoreAutomatically)
+        XCTAssertTrue(description.shouldInferMappingModelAutomatically)
+        current.persistentStoreDescriptions = [description]
+        current.loadPersistentStores { _, error in loadError = error }
+        XCTAssertNil(loadError)
+        
+        let records : [FlightLogFileRecord] = try current.viewContext.fetch(FlightLogFileRecord.fetchRequest())
+        XCTAssertEqual(records.count, 1)
+        XCTAssertEqual(records.first?.log_file_name, logName)
+        XCTAssertEqual(records.first?.flysto_record?.upload_status, "uploaded")
+        
+        for store in current.persistentStoreCoordinator.persistentStores {
+            try current.persistentStoreCoordinator.remove(store)
+        }
+    }
+    
+    /// Savvy removal: the stored Savvy token and switch are cleared at launch.
+    func testRemoveObsoleteSettings() throws {
+        let suite = "net.ro-z.flightlogstats.test.obsolete"
+        guard let defaults = UserDefaults(suiteName: suite) else { XCTFail(); return }
+        defer {
+            defaults.removePersistentDomain(forName: suite)
+        }
+        defaults.set("token", forKey: "savvy.token")
+        defaults.set(true, forKey: "savvy.enabled")
+        defaults.set(true, forKey: "flysto.enabled")
+        Settings.removeObsoleteKeys(from: defaults)
+        XCTAssertNil(defaults.object(forKey: "savvy.token"))
+        XCTAssertNil(defaults.object(forKey: "savvy.enabled"))
+        XCTAssertEqual(defaults.object(forKey: "flysto.enabled") as? Bool, true)
+    }
+    
     func testLogFileNameGuesses(){
         guard let url = Bundle(for: type(of: self)).resourceURL
         else {
