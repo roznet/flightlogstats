@@ -8,6 +8,7 @@
 import XCTest
 @testable import FlightLogStats
 import RZUtils
+import RZData
 
 final class TestAnalysis: XCTestCase {
 
@@ -106,6 +107,17 @@ final class TestAnalysis: XCTestCase {
                                          gph: 17.0)
         XCTAssertTrue(aircraft.isAlmostEqual(to: aircraft))
         XCTAssertFalse(aircraft.isAlmostEqual(to: bigger))
+    }
+
+    /// C2: the trip distance was converted to gallons before dividing by fuel.
+    func testTripNauticalMilesPerGallon() {
+        var trip = Trip(unit: .month)
+        trip.stats[.Distance] = ValueStats(measurement: Measurement<Dimension>(value: 100.0, unit: UnitLength.nauticalMiles))
+        trip.stats[.FuelTotalizer] = ValueStats(measurement: Measurement<Dimension>(value: 10.0, unit: UnitVolume.aviationGallon))
+        // only its presence matters: the value is computed from distance and fuel
+        trip.stats[.NmpG] = ValueStats(measurement: Measurement<Dimension>(value: 0.0, unit: UnitLength.nauticalMiles))
+        guard let nmpg = trip.measurement(field: .NmpG) else { XCTFail(); return }
+        XCTAssertEqual(nmpg.value, 10.0, accuracy: 1.0e-6)
     }
 
 }
