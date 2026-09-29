@@ -2,7 +2,7 @@
 
 > iPad / iPhone / Mac Catalyst app for Garmin G1000 / Perspective flight logs:
 > import from the SD card, iCloud library, per-flight analysis, trips, fuel,
-> upload to FlySto (Savvy being removed). Plus `python/flightreconcile`, the analysis lab.
+> upload to FlySto. Plus `python/flightreconcile`, the analysis lab.
 
 Build: Xcode project `flightlogstats.xcodeproj`, needs `git lfs pull` (nav.db and
 fixtures) and `flightlogstats/secrets.json` (copied from the sample on first build).
@@ -23,15 +23,15 @@ Key exports: `FlightLogOrganizer`, `search(in:)`, `importAndAddRecordsForFiles`,
 → Full doc: log-import-sync.md
 
 ### remote-upload
-FlySto (OAuth2, zipped POST) and Savvy (WKWebView token, multipart; slated for removal) upload, per-log status records, the `RequestQueue`, triggers (manual, batch, "automatic" on display), error mapping, and why the queue actually runs in parallel.
-Key exports: `RequestQueue`, `FlyStoRequest`, `FlyStoUploadRequest`, `FlyStoLogFilesRequest`, `SavvyRequest`, `FlightFlyStoRecord`, `FlightSavvyRecord`, `RemoteServiceRecord.Status`
+FlySto (OAuth2, zipped POST) upload, per-log status records, the `RequestQueue`, triggers (manual, batch, "automatic" on display), error mapping, and why the queue actually runs in parallel. Savvy removed 2026-09-29 (stored token cleared at launch).
+Key exports: `RequestQueue`, `FlyStoRequest`, `FlyStoUploadRequest`, `FlyStoLogFilesRequest`, `FlightFlyStoRecord`, `RemoteServiceRecord.Status`, `Settings.removeObsoleteKeys`
 → Full doc: remote-upload.md
 
 ## Parsing & analysis
 
 ### log-parsing
-Byte-level CSV parser into `FlightData` (row-major, lazily column-major via RZData `DataFrame`), field enum + `logFileFields.json` metadata, calculated fields (wind, totaliser, flight phase), quick vs full parse, orphaned local DataFrame sources.
-Key exports: `CsvParser`, `BufferedStreamReader`, `FlightData`, `FlightLogFile`, `FlightLogFile.Field`, `FieldCalculation`, `AvionicsSystem`
+Byte-level CSV parser into `FlightData` (row-major, lazily column-major via RZData `DataFrame`, all frames on the same kept rows), field enum + `logFileFields.json` metadata, calculated fields (wind, time-integrated totaliser, flight phase), exact date shortcut, quick vs full parse.
+Key exports: `CsvParser`, `BufferedStreamReader`, `FlightData`, `FlightData.keptRows`, `FlightLogFile`, `FlightLogFile.Field`, `FieldCalculation`, `AvionicsSystem`
 → Full doc: log-parsing.md
 
 ### analysis

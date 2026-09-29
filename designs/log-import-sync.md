@@ -1,6 +1,6 @@
 # Log import and iCloud sync
 
-> As-built (reviewed 2026-09-27). How a log gets from the SD card into the library,
+> As-built (reviewed 2026-09-27, synced 2026-09-29). How a log gets from the SD card into the library,
 > how files and records are kept, and how iCloud sync works. Owner:
 > `FlightLogOrganizer`. Modernisation: `plans/upload-and-import.md`.
 
@@ -36,14 +36,20 @@ SD card ──UIDocumentPicker (open in place, security scoped)──┐
 ## Core Data model
 
 `FlightLogModel.xcdatamodeld` (`usedWithCloudKit="YES"`, codegen `category`, all
-attributes optional, all delete rules Nullify):
+attributes optional, all delete rules Nullify). Current version **2**
+(`FlightLogModel 2.xcdatamodel`): version 1 without `FlightSavvyRecord` and
+`FlightLogFileRecord.savvy_record`, dropped with Savvy (`00c0366`). Stores
+migrate by inferred lightweight migration (the `NSPersistentStoreDescription`
+defaults); `testModelMigrationFromVersion1` opens a version 1 store with the
+current model. Keep every old version in the bundle: Core Data finds the source
+model there.
 
 | Entity | Holds | Derived or user? |
 |---|---|---|
-| `FlightLogFileRecord` | `log_file_name`, `info_status`, `version`, times (engine/moving/flying), fuel start/end, `fuel_totalizer_total`, `route`, start/end ICAO, distance, max alt; to-one `aircraft_record`, `flysto_record`, `savvy_record`, `fuel_record` | derived |
+| `FlightLogFileRecord` | `log_file_name`, `info_status`, `version`, times (engine/moving/flying), fuel start/end, `fuel_totalizer_total`, `route`, start/end ICAO, distance, max alt; to-one `aircraft_record`, `flysto_record`, `fuel_record` | derived |
 | `AircraftRecord` | `system_id`, `airframe_name`, `aircraft_identifier` (registration), `fuel_max`, `fuel_tab`, `gph` | mixed: registration and performance are user input |
 | `FlightFuelRecord` | added fuel L/R, target, totaliser start | user |
-| `FlightFlyStoRecord` / `FlightSavvyRecord` | `upload_status`, `status_date`, FlySto `upload_response` (`{fileId}`) | service state |
+| `FlightFlyStoRecord` | `upload_status`, `status_date`, `upload_response` (`{fileId}`) | service state |
 
 This split is the key fact for any redesign: **only the user and service state
 needs to sync**; everything else is reproducible from the CSVs.
@@ -75,7 +81,7 @@ The serial queue guarantees airports exist before any parse needs
 |---|---|
 | `FlightLogOrganizer.shared` | library singleton: container, `managedFlightLogs` (name → record), `managedAircrafts` (systemId → record) |
 | `search(in:completion:)` | security-scoped, coordinated discovery |
-| `filterMissing`, `buildImportList(urls:method:)`, `importFiles` | dedupe, select, copy |
+| `filterMissing`, `buildImportList(urls:method:)`, `isSelected(url:in:)`, `importFiles` | dedupe, select, copy |
 | `importAndAddRecordsForFiles(urls:method:process:)` | picker entry point |
 | `addMissingRecordsFromLocal`, `add(aircrafts:)`, `addMinimum` | record creation |
 | `updateRecords(count:force:)` | batched full parse and version migration |
@@ -98,8 +104,10 @@ The serial queue guarantees airports exist before any parse needs
   bookmarks. Likely fails for an SD card on iOS (unverified on device).
 - **Double reporting.** The deep enumerator plus explicit `data_log` recursion
   finds files twice; with several picked URLs, `completion` runs once per URL.
-- **`.selectedFile` with a folder picked imports nothing** (the folder is not a
-  file in `selectedUrls`).
+- **`.selectedFile` selects by path**: a found URL is selected if it is a picked
+  URL or lies under one (`FlightLogOrganizer.isSelected`, resolved and
+  standardised paths), so picking a folder, the Mac default, imports its logs
+  (I5, `26d469b`).
 - **Observers pile up.** `syncCloud(with:)` adds an `NSMetadataQuery` observer on
   every activation and never stops the query.
 - **`updateRecords` state machine**: resets `currentState = .ready` right after

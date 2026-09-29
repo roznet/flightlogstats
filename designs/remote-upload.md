@@ -1,10 +1,10 @@
-# Remote upload (FlySto, Savvy Aviation)
+# Remote upload (FlySto)
 
-> As-built (reviewed 2026-09-27). Per-log upload of the raw CSV to FlySto (OAuth2,
-> zipped POST) and Savvy Aviation (API token, multipart), status tracked per log in
-> Core Data. Modernisation: `plans/upload-and-import.md`.
-> **Savvy is to be removed** (decided 2026-09-27; `plans/modernisation.md` phase 0).
-> Its sections below describe the code until that lands.
+> As-built (reviewed 2026-09-27, synced 2026-09-29). Per-log upload of the raw CSV
+> to FlySto (OAuth2, zipped POST), status tracked per log in Core Data.
+> Modernisation: `plans/upload-and-import.md`.
+> **Savvy Aviation was removed** 2026-09-29 (`00c0366`): code, settings rows,
+> `FlightSavvyRecord` (Core Data model version 2) and the stored token.
 
 ## Triggers
 
@@ -34,30 +34,24 @@ background `URLSession`. `UIBackgroundModes` declares `fetch` and
 - `processSwiftOAuthError`: 503 → `tokenExpired`, 409 → `already`, 400 →
   `denied` (clears credentials), `accessDenied` → clears credentials.
 
-**Savvy** (`SavvyRequest`, `SavvyAuthenticateViewController`)
-- Token captured from a `WKWebView` redirect to `flightlogstats://`, stored in
-  UserDefaults.
-- `get-aircraft` → match registration (`AircraftRecord.aircraftIdentifier`,
-  case-insensitive) → multipart `upload_files_api/<id>` via `URLSession.shared`.
-- `"Error"` with `details == "duplicate"` → `already`. No retry (`attempt` never
-  increments), no token invalidation.
+**Savvy** (removed). `Settings.removeObsoleteKeys()` deletes `savvy.token` and
+`savvy.enabled` from UserDefaults at every launch.
 
 ## Status model
 
 `RemoteServiceRecord.Status`: `ready`, `pending`, `uploaded`, `failed`.
-`flystoStatus` / `savvyStatus` are computed over the one-to-one records, created
-lazily by `ensureFlyStoStatus` / `ensureSavvyStatus`. Mapping: success/already →
-uploaded; error/tokenExpired/denied → failed. `pending` is documented as
-"uploaded in background" but nothing sets it; Savvy's getter defaults to it,
-FlySto's to `ready`.
+`flystoStatus` is computed over the one-to-one `FlightFlyStoRecord`, created
+lazily by `ensureFlyStoStatus`. Mapping: success/already → uploaded;
+error/tokenExpired/denied → failed. `pending` is documented as "uploaded in
+background" but nothing sets it; the getter defaults to `ready`.
 
 ## Queue
 
 `RequestQueue.shared` wraps an `OperationQueue`. `Item: Operation` holds the
 record and a `UIViewController` (for auth UI), checks
-`RZSystemInfo.networkAvailable()`, then runs FlySto and/or Savvy if enabled and
-not uploaded (or forced). Completions hop to `AppDelegate.worker`, set status,
-post `.flightLogViewModelUploadFinished`, save.
+`RZSystemInfo.networkAvailable()`, then runs FlySto if enabled and not uploaded
+(or forced). Completions hop to `AppDelegate.worker`, set status, report the
+item's `pct` progress state, post `.flightLogViewModelUploadFinished`, save.
 
 ## Key exports
 
@@ -66,8 +60,8 @@ post `.flightLogViewModelUploadFinished`, save.
 | `RequestQueue`, `RequestQueue.Item` | upload queue |
 | `RemoteServiceRequest`, `AsyncOperation` | base class; `AsyncOperation` is unused |
 | `FlyStoRequest`, `FlyStoUploadRequest`, `FlyStoLogFilesRequest` | FlySto |
-| `SavvyRequest`, `SavvyAuthenticateViewController` | Savvy |
-| `FlightFlyStoRecord`, `FlightSavvyRecord`, `RemoteServiceRecord.Status` | per-log status |
+| `FlightFlyStoRecord`, `RemoteServiceRecord.Status` | per-log status |
+| `Settings.removeObsoleteKeys` | clears the removed Savvy settings |
 | `FlightLogOrganizer.buildUploadList` | batch selection |
 | `BugReportViewController` | zips 24 h of logs to `Secrets["flightlogstats.bugreport"]` |
 
@@ -83,16 +77,13 @@ post `.flightLogViewModelUploadFinished`, save.
   credential.
 - **Displaying a log can open a login screen.** In automatic mode with a service
   enabled but no credential, `startAutomaticUploadIfNeeded` triggers auth UI.
-- **Secrets in UserDefaults**, not the Keychain. The Savvy token is logged in
-  plain text, and the bug report uploads 24 h of logs.
-- **Savvy registration**: `aircraftIdentifier` returns `""` when nil, so the
-  failure reads "No matching aircraft"; no aircraft record at all skips Savvy
-  silently. Savvy never posts `.newFileUploaded`, so the list does not refresh.
+- **Secrets in UserDefaults**, not the Keychain, and the bug report uploads 24 h
+  of logs.
 - **Zip litter**: `<log>.csv.zip` files accumulate in `Documents/` (and are
   therefore candidates for iCloud sync).
-- **`secrets.sample.json` is incomplete**: lacks `flysto.logFilesUrl` and
-  `flightlogstats.bugreport`.
+- **`secrets.sample.json`** has every key the code reads; `flightlogstats.bugreport`
+  is empty, so the bug report has no endpoint in a contributor build.
 - **No test seam**: requests build `OAuth2Swift` / `URLSession.shared` directly and
   need a `UIViewController`. Nothing in this module is unit tested.
 - **Per-device state**: with Core Data not synced, a second device re-uploads
-  everything and relies on 409 / "duplicate" to come back `already`.
+  everything and relies on 409 to come back `already`.

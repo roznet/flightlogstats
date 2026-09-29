@@ -22,7 +22,7 @@ MainSplitViewController (Main.storyboard initial, classic master/detail)
      StatsTabBarController (built in code) ─ Flights StatsTripsViewController
                                             ─ Details StatsDetailledViewController (stub)
 Modals (code): settings, bug report, UploadSettingsViewController popover,
-SavvyAuthenticateViewController, UIDocumentPicker, progress overlay
+UIDocumentPicker, progress overlay
 ```
 
 Selection: list → `LogSelectionDelegate.selectlogInfo` → `LogTabBarController`
@@ -78,7 +78,8 @@ or `Settings`).
   handoff matching the row number (labels on the line collide). Tapping a row or
   a marker highlights that segment, dims the rest and zooms to it.
 - **Draws only from the index**, never from `FlightData`'s coordinate frame
-  (C3 is open there), so markers sit on the drawn line.
+  (C3 was open there when it was built; fixed since, `ecbd8ee`), so markers sit
+  on the drawn line.
 - Points carry no segment number in the index; `FrequencyTimeline.pointsBySegment`
   recovers it from `freq`, `nextFreq` and non-increasing `nmToNext` (exact on
   every TestAssets log, `TestFrequencyTimeline`).
@@ -115,8 +116,8 @@ or `Settings`).
   block API, "removed" with `removeObserver(self)`, which cannot remove them.
   They accumulate on every appearance (`LogMapGraphsViewController`,
   `LogSummaryViewController`, `LogTabBarController`, `LogListTableViewController`).
-- **Stats tab wiring**: `StatsTabBarController` casts `viewControllers?[1]` to
-  `StatsTripsViewController`, but index 1 is the Details stub in the storyboard.
+- **Stats tab default**: the Flights tab opens on `.trips`. A cast that meant to
+  set `.months` targeted the Details index and never applied; removed (X2).
 - **Accessibility**: none. Table cells draw text in `draw(_:)`, invisible to
   VoiceOver; no Dynamic Type.
 - **`FlightLogViewModel.build()` runs on `worker`** while main reads the same
