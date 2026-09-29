@@ -93,6 +93,33 @@ Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude
         XCTAssertEqual(data.meta[.airframe_name], "an aircraft")
     }
 
+    /// C5: gaps of 10, 11, 12 s were dated as 0, 1, 2 s by the last-digit shortcut.
+    func testDateGaps() throws {
+        let times = ["13:00:00", "13:00:10", "13:00:21", "13:00:33", "13:00:34", "13:00:34", "13:01:02", "14:00:00"]
+        var lines = [
+            "#airframe_info,airframe_name=\"an\",system_id=\"sid\"",
+            "#yyy-mm-dd, hh:mm:ss,   hh:mm, degrees, degrees, kt",
+            "Lcl Date,  Lcl Time, UTCOfst,  Latitude,    Longitude,  IAS",
+        ]
+        for time in times {
+            lines.append("2022-05-02, \(time),  +00:00, 56.4534912,   -3.0175426, 100.0")
+        }
+        guard let stream = self.streamForString(string: lines.joined(separator: "\n")) else { XCTFail(); return }
+        let data = try FlightData(inputStream: stream)
+        XCTAssertEqual(data.count, times.count)
+        guard let first = data.firstDate, let last = data.lastDate else { XCTFail(); return }
+        XCTAssertEqual(last.timeIntervalSince(first), 3600.0)
+
+        // repeated dates are dropped by the data frame
+        let indexes = data.doubleDataFrame(for: [.IAS]).indexes
+        let offsets = indexes.map { $0.timeIntervalSince(first) }
+        XCTAssertEqual(offsets, [0.0, 10.0, 21.0, 33.0, 34.0, 62.0, 3600.0])
+
+        XCTAssertEqual(FlightData.secondsOfDay("13:00:10"), 13*3600+10)
+        XCTAssertNil(FlightData.secondsOfDay("13:00"))
+        XCTAssertNil(FlightData.secondsOfDay("13:00:1a"))
+    }
+
     /// Synthetic log: one row per second from 13:00:00, constant fuel flow.
     func syntheticLog(rows : Int, fuelFlow : Double, fuelUnit : String = "gals", fuelLeft : Double = 20.0, fuelRight : Double = 20.0) -> String {
         var lines = [

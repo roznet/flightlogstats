@@ -195,6 +195,11 @@ extension FlightData {
         var firstDate : Date? = nil
         
         var units : [String] = []
+        
+        // date and offset columns and seconds of day of the last dated row, for the date shortcut
+        var lastDateString : String? = nil
+        var lastOffsetString : String? = nil
+        var lastSecondsOfDay : Int? = nil
 
         var data : FlightData
         
@@ -205,6 +210,7 @@ extension FlightData {
         var doubleInputsCount : Int = 0
         
         init(data : FlightData, totalSize : Int, maxLineCount: Int? = nil, lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil){
+            formatter.locale = Locale(identifier: "en_US_POSIX")
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZ"
             self.data = data
             self.progress = progress
@@ -344,21 +350,17 @@ extension FlightData {
                     return
                 }
                 
-                // Usually date are +1, +2 or same, saves a lot of time vs date parsing to try to guess...
+                // Same date and offset columns as the previous row: offset its date by the
+                // difference in time of day, saves a lot of time vs date parsing
+                let secondsOfDay = FlightData.secondsOfDay(line[timeIndex])
                 var dateProxied = false
-                if self.lineSamplingFrequency == 1, let lastDate = data.dates.last {
-                    let lastDigit = Int(lastDate.timeIntervalSinceReferenceDate)
-                    let suffix = line[timeIndex].suffix(1)
-                    if suffix == "\( (lastDigit + 1) % 10)" {
-                        data.dates.append(lastDate.addingTimeInterval(1.0) )
-                        dateProxied = true
-                    }else if suffix == "\( (lastDigit + 2) % 10)" {
-                        data.dates.append(lastDate.addingTimeInterval(2.0) )
-                        dateProxied = true
-                    }else if suffix == "\( lastDigit % 10)" {
-                        data.dates.append(lastDate )
-                        dateProxied = true
-                    }
+                if let lastDate = data.dates.last,
+                   let secondsOfDay = secondsOfDay,
+                   let lastSecondsOfDay = self.lastSecondsOfDay,
+                   line[dateIndex] == self.lastDateString,
+                   line[offsetIndex] == self.lastOffsetString {
+                    data.dates.append(lastDate.addingTimeInterval(TimeInterval(secondsOfDay - lastSecondsOfDay)))
+                    dateProxied = true
                 }
                 if !dateProxied {
                     let dateString = String(format: "%@ %@ %@", line[dateIndex], line[timeIndex], line[offsetIndex])
@@ -379,8 +381,11 @@ extension FlightData {
                                     break
                                 }
                             }
-                            if data.dates.count == 0 && skipped < 5 {
-                                Logger.app.error("Failed to identify date format '\(dateString)'")
+                            if data.dates.count == 0 {
+                                // never keep a row without its date: values and dates must stay aligned
+                                if skipped < 5 {
+                                    Logger.app.error("Failed to identify date format '\(dateString)'")
+                                }
                                 skipped += 1
                                 return
                             }
@@ -395,6 +400,9 @@ extension FlightData {
                         }
                     }
                 }
+                self.lastDateString = line[dateIndex]
+                self.lastOffsetString = line[offsetIndex]
+                self.lastSecondsOfDay = secondsOfDay
 
                 self.doubleLine.removeAll(keepingCapacity: true)
                 self.stringLine.removeAll(keepingCapacity: true)
@@ -518,6 +526,32 @@ extension FlightData {
     }
     
     //MARK: - parse stream
+    
+    /// seconds since midnight of a `HH:mm:ss` string, nil if it is not in that form
+    static func secondsOfDay(_ time : String) -> Int? {
+        var parts = (0, 0, 0)
+        var index = 0
+        var digits = 0
+        for char in time.utf8 {
+            if char == UInt8(ascii: ":") {
+                guard digits > 0 else { return nil }
+                index += 1
+                digits = 0
+                continue
+            }
+            guard char >= UInt8(ascii: "0") && char <= UInt8(ascii: "9"), index < 3 else { return nil }
+            let digit = Int(char - UInt8(ascii: "0"))
+            switch index {
+            case 0: parts.0 = parts.0 * 10 + digit
+            case 1: parts.1 = parts.1 * 10 + digit
+            default: parts.2 = parts.2 * 10 + digit
+            }
+            digits += 1
+        }
+        guard index == 2, digits > 0 else { return nil }
+        return parts.0 * 3600 + parts.1 * 60 + parts.2
+    }
+
         
     func parse(inputStream : InputStream, totalSize : Int = 0, maxLineCount: Int? = nil,
                lineSamplingFrequency : Int = 1, progress : ProgressReport? = nil) throws {
