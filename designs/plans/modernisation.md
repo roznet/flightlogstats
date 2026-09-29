@@ -82,7 +82,7 @@ record-version re-derive mechanism, and the Python lab with its eval harnesses.
 | 0 | Build, CI, hygiene, Savvy removal, fuel bugs | all | S | green build, tests in CI, core-job bugs fixed. **Done** (2026-09-29) apart from the CI review workflow |
 | 1 | Post-flight import + FlySto upload | 1 | M | one `+` flow: off-main import, one iCloud location, tombstones, real FlySto queue, Keychain, synced user state, land on newest flight |
 | 2 | `FlightLogKit` package | 2, 3 | M | parsing, fuel and legs testable with `swift test`; home for the frequency index |
-| 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10); **timeline** merged (PR #11); plan mode specified, next |
+| 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10); **timeline** merged (PR #11); plan mode and live mode built |
 | 4 | Post-flight fuel check | 2 | S | fuel card on the newest flight: used by totaliser vs tanks, landing fuel, refill to target |
 | 5 | Plan vs actual | secondary | M | Route tab reusing Bingo's route engine; post-flight only |
 | 6 | UI migration | ongoing | ongoing | Swift Charts replaces `GCSimpleGraph`, rzutils-touch dropped, SwiftUI screens as they are touched |
@@ -186,8 +186,9 @@ next.
    `FlightExchange`, a pilot-driven current / previous / next radio). Its route
    entry and route engine (today in `FrequencyModel.swift`, moving to RZFlight
    as `RouteTracker` with the rejoin rule) are what plan-vs-actual later reuses.
-3. Live mode (**next**).
-4. Confirmation taps, and predicted vs actual for a flown flight: the
+3. ~~Live mode~~ (on the Bingo map's locate toggle; `../future/frequency-bingo.md`
+   §Implementing live mode).
+4. Confirmation taps (**next**), and predicted vs actual for a flown flight: the
    natural follow-up of step 0.
 
 ### Phase 4: post-flight fuel check

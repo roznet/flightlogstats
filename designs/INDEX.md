@@ -42,7 +42,7 @@ Key exports: `FlightSummary`, `FlightLeg.legs(byfields:)`, `TimeRange`, `Trips`,
 ## UI
 
 ### ui-map-graphs
-Screen map (split view, log tab bar, stats tab bar), map track overlay and graphs (`GCSimpleGraphView`), one-way leg → map/graph linking, the SwiftUI Frequencies tab (per-flight COM1 timeline from the Bingo index, numbered handoff markers), the Frequency Bingo plan mode screen (modal, `BingoLaunch`), reusable live position (GPS locate toggle, aircraft icon, one-minute lead vector), `FlightLogViewModel` / `TableDataSource` / `DisplayContext` presentation pattern, observer leaks, accessibility gaps.
+Screen map (split view, log tab bar, stats tab bar), map track overlay and graphs (`GCSimpleGraphView`), one-way leg → map/graph linking, the SwiftUI Frequencies tab (per-flight COM1 timeline from the Bingo index, numbered handoff markers), the Frequency Bingo screen (modal, `BingoLaunch`; plan mode, and live mode on the locate toggle), reusable live position (GPS locate toggle, aircraft icon, one-minute lead vector), `FlightLogViewModel` / `TableDataSource` / `DisplayContext` presentation pattern, observer leaks, accessibility gaps.
 Key exports: `MainSplitViewController`, `LogTabBarController`, `LogMapGraphsViewController`, `FrequencyTimelineViewController`, `FrequencyTimelineViewModel`, `FrequencyBingoViewController`, `FrequencyBingoViewModel`, `BingoLaunch`, `LiveLocation`, `OwnshipMapContent`, `FlightDataMapOverlay`, `FlightDataMapOverlayView`, `FlightLogViewModel`, `TableDataSource`, `DisplayContext`
 → Full doc: ui-map-graphs.md
 
@@ -66,4 +66,4 @@ Not INDEX modules; linked here for discovery.
 - `plans/modernisation.md`: roadmap ordered by the app's core jobs (post-flight import + FlySto upload, fuel, frequencies): build/CI, import + upload, FlightLogKit, frequency review + Bingo, fuel check, plan vs actual, UI migration.
 - `plans/upload-and-import.md`: LogLibrary actor, derived vs CloudKit user-state stores, tombstones, FlySto-only `UploadCoordinator`, Mac Catalyst as the iCloud Drive hub.
 - `plans/plan-vs-actual.md`: position relative to the plan; one `RouteTracker`, log replay and live GPS sources, Route tab; ForeFlight navlog deferred.
-- `future/frequency-bingo.md`: ATC frequency prediction from the pilot's own logs; index, model, per-flight timeline and plan mode built (standalone tool, `RZFlight.Route` / `FlightExchange` routes, current / previous / next radio); live mode next.
+- `future/frequency-bingo.md`: ATC frequency prediction from the pilot's own logs; index, model, per-flight timeline, plan mode and live mode built (standalone tool, `RZFlight.Route` / `FlightExchange` routes, current / previous / next radio, GPS ladder with handoff distance/ETA); confirmation taps next.

@@ -98,13 +98,16 @@ or `Settings`).
 
 ## Frequency Bingo (`FrequencyBingo.swift`, `FrequencyBingoView.swift`)
 
-Plan mode of the Bingo tool, as specified in `future/frequency-bingo.md`
+Plan and live modes of the Bingo tool, as specified in `future/frequency-bingo.md`
 §The page (that doc is the reference for behaviour). Same pattern as the
 Frequencies tab: a pure `@Observable` `FrequencyBingoViewModel` (no
 `AppDelegate`; the resolver and the store are injected) under a SwiftUI view in
 a `UIHostingController`, opened only through `FrequencyBingoViewController(launch:)`.
 Regular width: route, radio and ladder table on the left, map on the right;
-compact: route, radio, map, table stacked. No live position yet (live mode).
+compact: route, radio, map, table stacked. The map carries the live position
+(`OwnshipMapContent`, `.ownshipLocate`); a fix switches the screen to live mode
+(ladder from the position, handoff distance/ETA in the next box), see
+`future/frequency-bingo.md` §Implementing live mode.
 
 ## Live position (`Ownship.swift`, `OwnshipMap.swift`)
 

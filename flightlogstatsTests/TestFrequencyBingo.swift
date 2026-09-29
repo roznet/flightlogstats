@@ -2,8 +2,9 @@
 //  TestFrequencyBingo.swift
 //  FlightLogStatsTests
 //
-//  Frequency Bingo plan mode: the radio's tap rules, current -> rung selection,
-//  storage as FlightExchange, the route of a flown flight and its ladder.
+//  Frequency Bingo: the radio's tap rules, current -> rung selection, storage as
+//  FlightExchange, the route of a flown flight and its ladder, and live mode (GPS
+//  fixes, the handoff ahead, the live ladder from a point of a flown flight).
 //
 //  Design: designs/future/frequency-bingo.md §Implementing plan mode
 //
@@ -185,6 +186,75 @@ final class TestFrequencyBingo: XCTestCase {
                        ["132.100", "124.105"])
     }
 
+    //MARK: - live
+
+    /// CoreLocation's invalid values (negative accuracy or course) become nil
+    func testLiveFix() {
+        let coordinate = CLLocationCoordinate2D(latitude: 46.0, longitude: 7.0)
+        let good = BingoFix(location: CLLocation(coordinate: coordinate, altitude: 3048.0, horizontalAccuracy: 5,
+                                                 verticalAccuracy: 10, course: 270.0, courseAccuracy: 5,
+                                                 speed: 61.73, speedAccuracy: 1, timestamp: Date()))
+        XCTAssertEqual(try XCTUnwrap(good.altitudeFt), 10000.0, accuracy: 0.1)
+        XCTAssertEqual(good.track, 270.0)
+        XCTAssertEqual(try XCTUnwrap(good.groundSpeedKt), 120.0, accuracy: 0.1)
+        XCTAssertTrue(good.isAirborne)
+
+        let bad = BingoFix(location: CLLocation(coordinate: coordinate, altitude: 3048.0, horizontalAccuracy: 5,
+                                                verticalAccuracy: -1, course: -1, courseAccuracy: -1,
+                                                speed: -1, speedAccuracy: -1, timestamp: Date()))
+        XCTAssertNil(bad.altitudeFt)
+        XCTAssertNil(bad.track)
+        XCTAssertNil(bad.groundSpeedKt)
+        XCTAssertFalse(bad.isAirborne)
+    }
+
+    /// On the ground the climb to the plan's cruise is still ahead; in the air the
+    /// current altitude is both, so there is no phantom climb
+    func testLiveAltitudes() {
+        let coordinate = CLLocationCoordinate2D(latitude: 46.0, longitude: 7.0)
+        let ground = BingoFix(coordinate: coordinate, altitudeFt: 1600, track: nil, groundSpeedKt: 10)
+        XCTAssertTrue(FrequencyBingo.liveAltitudes(fix: ground, plannedFt: 11000) == (1600, 11000))
+        let noAltitude = BingoFix(coordinate: coordinate, altitudeFt: nil, track: nil, groundSpeedKt: nil)
+        XCTAssertTrue(FrequencyBingo.liveAltitudes(fix: noAltitude, plannedFt: 11000) == (FrequencyBingo.fieldAltitudeFt, 11000))
+        // descending through 4000 on an 11000 ft plan: no climb back to cruise
+        let descending = BingoFix(coordinate: coordinate, altitudeFt: 4000, track: 90, groundSpeedKt: 120)
+        XCTAssertTrue(FrequencyBingo.liveAltitudes(fix: descending, plannedFt: 11000) == (4000, 4000))
+        let airborneNoAltitude = BingoFix(coordinate: coordinate, altitudeFt: nil, track: 90, groundSpeedKt: 120)
+        XCTAssertTrue(FrequencyBingo.liveAltitudes(fix: airborneNoAltitude, plannedFt: 11000) == (11000, 11000))
+    }
+
+    /// The handoff is the end of the current frequency's rung ahead; a current on no
+    /// rung ahead is due
+    func testHandoff() throws {
+        let rungs = self.sampleRungs()
+        XCTAssertNil(FrequencyBingo.handoff([], current: nil, groundSpeedKt: 120))
+
+        // no current: the first change along the ladder, 13 nm at 120 kt is 6.5 min
+        let first = try XCTUnwrap(FrequencyBingo.handoff(rungs, current: nil, groundSpeedKt: 120))
+        XCTAssertEqual(first.nm, 13)
+        XCTAssertEqual(try XCTUnwrap(first.minutes), 6.5, accuracy: 1e-9)
+        XCTAssertFalse(first.due)
+        // too slow for an ETA
+        XCTAssertNil(try XCTUnwrap(FrequencyBingo.handoff(rungs, current: nil, groundSpeedKt: 10)).minutes)
+
+        XCTAssertEqual(FrequencyBingo.handoff(rungs, current: "118.275", groundSpeedKt: nil)?.nm, 13)
+        // switched early, on the next rung's frequency: its end, not due
+        XCTAssertEqual(FrequencyBingo.handoff(rungs, current: "119.175", groundSpeedKt: nil)?.nm, 72)
+        // the last rung's frequency holds to the end: no handoff
+        XCTAssertNil(FrequencyBingo.handoff(rungs, current: "118.890", groundSpeedKt: nil))
+        // on no rung ahead: the rung it belonged to ended behind, due
+        let due = try XCTUnwrap(FrequencyBingo.handoff(rungs, current: "121.500", groundSpeedKt: 120))
+        XCTAssertTrue(due.due)
+        XCTAssertEqual(due.nm, 0)
+
+        // a candidate of a band with no clear winner counts as its rung; a plain alternate does not
+        var banded = rungs
+        banded[0] = Rung(freq: "118.275", fromNm: 0, toNm: 13, confidence: 0.4, support: 3, alt: 1000,
+                         alternates: ["120.000"], unsettled: true)
+        XCTAssertEqual(FrequencyBingo.handoff(banded, current: "120.000", groundSpeedKt: nil)?.nm, 13)
+        XCTAssertEqual(FrequencyBingo.handoff(rungs, current: "126.350", groundSpeedKt: nil)?.due, true)
+    }
+
     //MARK: - storage
 
     /// current.json holds a FlightExchange RZFlight decodes unchanged, plus the radio;
@@ -364,5 +434,59 @@ final class TestFrequencyBingo: XCTestCase {
             XCTAssertLessThanOrEqual(rung.rung.fromNm, rung.rung.toNm)
             XCTAssertTrue(model.freqs.contains(rung.freq))
         }
+
+        // live, from a point halfway through the flight: the ladder starts at the
+        // position and runs to the end of the route from the rejoin fix
+        let mid = rows.lat.count / 2
+        let fix = BingoFix(coordinate: CLLocationCoordinate2D(latitude: rows.lat[mid], longitude: rows.lon[mid]),
+                           altitudeFt: rows.alt[mid], track: rows.trk[mid], groundSpeedKt: 120)
+        let (liveRungs, rejoin) = FrequencyBingo.liveRungs(model: model, points: points, fix: fix,
+                                                           plannedFt: cruise, fromIndex: 0)
+        let rejoinIndex = try XCTUnwrap(rejoin)
+        XCTAssertGreaterThanOrEqual(rejoinIndex, 1)
+        XCTAssertLessThan(rejoinIndex, points.count)
+        let ahead = [fix.coordinate] + points[rejoinIndex...]
+        let aheadNm = zip(ahead, ahead.dropFirst()).reduce(0.0) {
+            $0 + FrequencyGeo.haversineNm($1.0.latitude, $1.0.longitude, $1.1.latitude, $1.1.longitude)
+        }
+        let firstLive = try XCTUnwrap(liveRungs.first)
+        XCTAssertEqual(firstLive.rung.fromNm, 0.0, accuracy: 1e-9)
+        XCTAssertEqual(firstLive.handoff.latitude, fix.coordinate.latitude, accuracy: 1e-9)
+        XCTAssertEqual(try XCTUnwrap(liveRungs.last).rung.toNm, aheadNm, accuracy: 1e-6)
+        // the rejoin floor keeps progress monotonic
+        XCTAssertGreaterThanOrEqual(FrequencyBingo.liveRungs(model: model, points: points, fix: fix, plannedFt: cruise,
+                                                             fromIndex: points.count - 1).rejoinIndex ?? 0,
+                                    points.count - 1)
+
+        // the screen's model: a fix switches to live, nil back to the plan ladder
+        let screen = self.viewModel(launch: BingoLaunch(route: route, cruiseAltitudeFt: cruise, source: .menu))
+        screen.update(model: model)
+        self.wait(for: [self.until { !screen.computing && !screen.rungs.isEmpty }], timeout: 60)
+        XCTAssertFalse(screen.isLive)
+        XCTAssertEqual(screen.rungs.count, rungs.count)
+
+        screen.update(live: fix)
+        XCTAssertTrue(screen.isLive)
+        self.wait(for: [self.until { !screen.computing && screen.rungs.first?.handoff.latitude == fix.coordinate.latitude }], timeout: 60)
+        XCTAssertEqual(screen.rungs.count, liveRungs.count)
+        XCTAssertEqual(screen.rejoinFloor, rejoinIndex)
+        XCTAssertEqual(screen.selected, 0)
+        if liveRungs.count > 1 {
+            XCTAssertEqual(try XCTUnwrap(screen.handoff).nm, liveRungs[1].rung.fromNm, accuracy: 1e-9)
+        }
+        // a current on no rung ahead: the handoff is due at once, before the next fix
+        screen.makeCurrent("121.500")
+        XCTAssertEqual(screen.handoff?.due, true)
+
+        screen.update(live: nil)
+        XCTAssertFalse(screen.isLive)
+        XCTAssertNil(screen.handoff)
+        self.wait(for: [self.until { !screen.computing && !screen.rungs.isEmpty }], timeout: 60)
+        XCTAssertEqual(try XCTUnwrap(screen.rungs.last).rung.toNm, total, accuracy: 1e-6)
+    }
+
+    /// Fulfilled once the condition holds, checked on the main run loop
+    private func until(_ condition : @escaping () -> Bool) -> XCTestExpectation {
+        return XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in condition() }, object: nil)
     }
 }
