@@ -6,7 +6,9 @@
 > Reprioritised 2026-09-27 around the author's core jobs (below).
 > Updated 2026-09-28: build unblocked, CI runs the unit tests, Frequency Bingo
 > (#9) step 1 merged and pulled ahead of phases 1-2 (see §Order); step 0, the
-> per-flight frequency timeline, in PR #11, so plan mode (step 2) is next.
+> per-flight frequency timeline, merged (PR #11). Updated 2026-09-29: phase 0
+> fixes and Savvy removal merged (PR #12); Bingo plan mode (step 2) specified in
+> `../future/frequency-bingo.md` §The page, next to build.
 > Updated 2026-09-29: the rest of phase 0 (fuel, import and parsing bugs,
 > hygiene, Savvy removal) in one PR; see §Phase 0 for what is left.
 
@@ -80,7 +82,7 @@ record-version re-derive mechanism, and the Python lab with its eval harnesses.
 | 0 | Build, CI, hygiene, Savvy removal, fuel bugs | all | S | green build, tests in CI, core-job bugs fixed. **Done** (2026-09-29) apart from the CI review workflow |
 | 1 | Post-flight import + FlySto upload | 1 | M | one `+` flow: off-main import, one iCloud location, tombstones, real FlySto queue, Keychain, synced user state, land on newest flight |
 | 2 | `FlightLogKit` package | 2, 3 | M | parsing, fuel and legs testable with `swift test`; home for the frequency index |
-| 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10); **timeline** in PR #11; plan mode next |
+| 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10); **timeline** merged (PR #11); plan mode specified, next |
 | 4 | Post-flight fuel check | 2 | S | fuel card on the newest flight: used by totaliser vs tanks, landing fuel, refill to target |
 | 5 | Plan vs actual | secondary | M | Route tab reusing Bingo's route engine; post-flight only |
 | 6 | UI migration | ongoing | ongoing | Swift Charts replaces `GCSimpleGraph`, rzutils-touch dropped, SwiftUI screens as they are touched |
@@ -179,8 +181,11 @@ next.
    grouping stays until the owner has used the timeline and decides.
 1. ~~Index + model with the Python parity fixture~~ (PR #10, `a8149e9`;
    parity realigned in `aef4e43`).
-2. Plan mode (**next**). Its route entry and route engine (`RouteTracker` with
-   the rejoin rule, in RZFlight) are what plan-vs-actual later reuses.
+2. Plan mode (**next**, specified in `../future/frequency-bingo.md` §The page:
+   its own tool opened through `BingoLaunch`, route as `RZFlight.Route` stored as
+   `FlightExchange`, a pilot-driven current / previous / next radio). Its route
+   entry and route engine (today in `FrequencyModel.swift`, moving to RZFlight
+   as `RouteTracker` with the rejoin rule) are what plan-vs-actual later reuses.
 3. Live mode.
 4. Confirmation taps, and predicted vs actual for a flown flight: the
    natural follow-up of step 0.

@@ -2,7 +2,7 @@
 
 > Status: **phase 1 done** (index + model, PR #10), and the per-flight
 > frequency timeline built on the index (PR #11, modernisation §Phase 3 step 0);
-> plan mode is next. The model was built,
+> plan mode is specified (§The page, 2026-09-29) and next to build. The model was built,
 > tuned and validated in Python (`python/flightreconcile/freq.py`, `freq_cli.py`)
 > and is ported to Swift in `FrequencyModel.swift`, with the persistent index in
 > `FrequencyIndexOrganizer.swift`. The prerequisite has landed: nav.db is bundled,
@@ -29,7 +29,9 @@ every frequency was actually used. This feature turns that into a prediction:
 | Index storage | A dedicated `FrequencyIndexOrganizer` on the `AggregatedDataOrganizer` pattern (FMDB, versioned config table, delete-by-log-file-name) |
 | Index build | Incremental, hooked next to the existing call in `updateRecords` |
 | Version mismatch | **Drop and rebuild.** Do *not* copy `AggregatedDataOrganizer`'s behaviour of returning nil, which silently disables the feature |
-| Page placement | New tab in `StatsTabBarController` — corpus-wide, not tied to a selected log |
+| Page placement | **Its own tool**, opened from the log list menu for now, through one `BingoLaunch` entry point so a flown flight or an import can open it (decided 2026-09-29; was a Stats tab) |
+| Route model | **`RZFlight.Route`**, stored and shared as `FlightExchange` JSON, the format of flyfun-weather / forms / brief |
+| Radio | **Current / previous / next, pilot-driven**, like a COM active/standby pair. The pilot's current is the model's `current` input; the model never changes it |
 | Modes | **Plan** (route + altitude → ladder) and **Live** (GPS), one page |
 | Off route | Rejoin at the next fix ahead on the route, within ±50° of track — the IFR assumption |
 | GPS | iPad with GPS. Baro-vs-GPS altitude disagreement is accepted (~1 nm of metric cost) |
@@ -201,12 +203,125 @@ unsettled`.
 
 ## The page
 
+### Placement and entry points
+
+Bingo is **its own tool, not a tab of a log or of the stats**. It is used before
+and during a flight, not while browsing the library. For now it opens from the
+log list's `moreFunctionMenu` ("Frequency Bingo"), presented full screen (a
+sheet on iPhone).
+
+It must be **startable from anywhere with a route**, so the screen is opened
+through one entry point that takes an optional starting route, never by a
+caller reaching into its state:
+
+```swift
+struct BingoLaunch {
+    var route : Route?          // RZFlight.Route, nil = empty route field
+    var cruiseAltitudeFt : Int? // defaults to route.cruiseAltitudeFt, then the last used
+    var source : Source         // .menu, .flight(logFileName), .imported(FlightExchange.Source?)
+}
+FrequencyBingoViewController(launch: BingoLaunch)
+```
+
+Planned callers: the menu (last route, or empty); **a flown flight** ("Bingo
+this route" on the summary or the Frequencies tab), which builds a `Route` from
+the log's departure, destination and active waypoints, with the cruise altitude
+it flew; later, imports (below).
+
+### Route: `RZFlight.Route`, shared as `FlightExchange`
+
+The route the screen works on is an **`RZFlight.Route`**, the type flyfun-weather,
+flyfun-forms and flyfunbrief already share. Import and share is then a matter of
+adapters, never of a new route model:
+
+- **Typed**: a route string (`LSGS DJL REM … EGTF`) resolved with
+  `RoutePointResolver(airports:waypoints:)` over `AppDelegate.knownAirports` /
+  `knownWaypoints` into a `Route` with `waypointCoords`. Unresolved names are
+  shown, not dropped (`rejectedWaypoints`).
+- **From a flown flight**: see above.
+- **Follow-on, not in plan mode v1**: FlyFun Weather and Autorouter arrive as
+  `FlightExchange` (rzflight `designs/flight_exchange_design.md`), a clipboard
+  ICAO FPL through `ICAOFlightPlanParser`. flyfun-forms' `designs/flight-import.md`
+  is the pattern to follow: every method produces the same in-app value, the
+  screen consumes only that, so adding a method never touches the screen.
+
+**Persistence** uses the same wire format: the current route is stored as
+`FlightExchange` JSON (`source.app = "flightlogstats"`), with the cruise altitude
+in `route.cruiseAltitudeFt`. What is saved can be shared or imported by the other
+flyfun apps unchanged. Recent routes are a small list of those, most recent
+first. Nothing Bingo-specific goes into `Route`; screen state (the radio, the
+selected rung) is stored beside it, not inside it.
+
+`Route` is geometry-free beyond its points. The route geometry the ladder needs
+(`sampleRoute`, `routeProgress`, `rejoinIndex`) already exists in
+`FrequencyModel.swift`, parity-tested against `freq.py`; plan mode uses it as is.
+It moves to RZFlight (`RouteTracker`, shared with plan-vs-actual and
+flyfun-weather) when plan-vs-actual needs it, not as part of this screen.
+
+### Layout
+
+From the author's sketch (2026-09-29):
+
+```
+┌─ ROUTE ──────────────────────────┐   ┌───────────┐
+│ LSGS DJL REM … EGTF   11000 ft ▲▼│   │           │
+└──────────────────────────────────┘   │    MAP    │
+┌─ CURRENT ──────────┐ ┌─ NEXT ─────┐  │           │
+│                    │ │ 132.100    │  │           │
+│      118.890       │ │ 62% · 8 nm │  │           │
+│                    │ ├────────────┤  │           │
+├────────────────────┤ │ 124.105    │  │           │
+│ prev  125.415   ⇄  │ │ 31%        │  │           │
+└────────────────────┘ └────────────┘  └───────────┘
+┌─ NEXT FREQUENCY TABLE (the ladder) ────────────────┐
+│ #  from  to   freq     conf  flights  also likely  │
+│ 3   72  133   125.415  64%   5        124.105      │
+│ 4  137  230   118.890 100%   6                     │
+└────────────────────────────────────────────────────┘
+```
+
+Compact width (iPhone) stacks route, radio, map, table, as the Frequencies tab
+stacks map over list.
+
+### The radio: current, previous, next
+
+The top of the screen behaves like a **COM radio's active/standby pair**, and
+the pilot drives it; the model never changes it.
+
+| Element | Content |
+|---|---|
+| **Current** | Large. The frequency the pilot says they are on. Empty until set |
+| **Previous** | Small, under current. The one before, to switch back after a mistake |
+| **Next** | Up to two candidates from the model, with probability and flights; distance to the handoff in live mode. The second is shown only when it is a near tie (the 60/40 boundary case), never as a filler |
+
+Every change goes through one rule: **whatever becomes current pushes the old
+current into previous.**
+
+| Tap | Effect |
+|---|---|
+| a **next** candidate | becomes current; old current → previous |
+| **previous** (⇄) | swaps with current (flip-flop) |
+| any frequency in the **table** (a rung or an "also likely") | becomes current; old current → previous |
+| **current** | keypad for a frequency the model did not offer (follow-on) |
+
+**Current is a model input.** Next comes from
+`FrequencyModel.next(lat:lon:alt:trk:current:top:)` with the pilot's current,
+which is what lifts next-frequency top-1 from 50.3% (position only) to 56.6%.
+With no current set, next falls back to position only.
+
+The radio state (current, previous) is kept with the route and survives leaving
+the screen and relaunching: losing it in the air is worse than keeping a stale
+one.
+
 ### Plan mode
 
-Route field + cruise altitude → the ladder. Route parsing uses
-`RoutePointResolver(airports:waypoints:)` from RZFlight over
-`AppDelegate.knownAirports` / `AppDelegate.knownWaypoints`, both now loaded from
-nav.db. A stepper on altitude re-runs the ladder in place.
+Route + cruise altitude → the ladder. A stepper on altitude re-runs it in place.
+
+"Where you are" in plan mode is **the start of the rung the current frequency
+belongs to**: setting current to 125.415 selects rung 3, highlights it in the
+table and on the map, and the next box shows what follows from there. Tapping
+next repeatedly steps through the flight, a rehearsal of the frequencies to
+expect. A current that is on no rung keeps the selection where it was.
 
 ```
    from      to      freq   conf  flights     alt  also likely
@@ -218,19 +333,69 @@ nav.db. A stepper on altitude re-runs the ladder in place.
 
 ### Live mode
 
-GPS position, altitude and track drive the same model. Shows the current
-frequency, the next, and distance/ETA to the handoff. Ground speed gives the
-ETA. Recompute on each location update — it is cheap.
+GPS position, altitude and track replace the plan mode position; the radio and
+the tap rules are unchanged. Next shows distance and ETA to the handoff (ground
+speed gives the ETA). When the position passes a predicted handoff, next is
+highlighted as a prompt; **it never switches current by itself**, as a real
+radio does not.
 
-The only session state is **the highest waypoint index reached**, for the rejoin
-rule. Reset it when the route is edited. Everything else is a pure function of
-position, altitude and track, so the card cannot drift out of sync.
+Recompute on each location update: it is cheap. The only model session state is
+**the highest waypoint index reached**, for the rejoin rule; reset it when the
+route is edited. Position, permission and the ownship marker are the ones the Frequencies tab
+already uses: `LiveLocation.shared`, `OwnshipMapContent`, the `.ownshipLocate`
+toggle (ui-map-graphs.md, *Live position*).
+
+### Implementing plan mode
+
+What exists, and what the screen adds. Nothing here needs a model change; if
+the ladder looks wrong, fix it in `freq.py` first (parity rule).
+
+| Need | Use |
+|---|---|
+| The model | `FlightLogOrganizer.shared.frequencyIndex?.model()`, on `AppDelegate.worker` (the first load reads the whole index; later calls are cached). Rebuild the view state on `.frequencyIndexChanged` |
+| The ladder | `FrequencyModel.routeLadder(points:cruiseAlt:)` → `[Rung]` (`freq`, `fromNm`, `toNm`, `confidence`, `support`, `alt`, `alternates`, `unsettled`) |
+| Rung geometry for the map | `FrequencyModel.sampleRoute(_:stepNm:)`: cut the route at each rung's `fromNm` / `toNm` |
+| Next box | `FrequencyModel.next(lat:lon:alt:trk:current:top: 2)` at the start of the selected rung, track from the route leg there |
+| Route resolution | `RoutePointResolver(airports:waypoints:).resolveRouteString(_:)` → `Route?`, over `AppDelegate.knownAirports` / `knownWaypoints` |
+
+**Current → rung.** Setting current selects the first rung at or after the
+selected one whose `freq` is current, then any whose `alternates` contain it;
+failing both, the selection stays.
+
+**Route from a flown flight.** Departure and destination from the
+`FlightSummary`; intermediate points from the active-waypoint legs
+(`FlightLeg.legs(byfields: [.AtvWpt])`), consecutive duplicates removed and
+airports at the ends dropped, resolved like a typed route. Cruise altitude: the
+90th percentile of altitude while flying, rounded to 500 ft.
+
+**Storage.** `Application Support/FrequencyBingo/`: `current.json` (a
+`FlightExchange` plus the radio: current, previous, selected rung) and
+`recent.json` (up to 10 `FlightExchange`, most recent first, deduplicated on the
+route string). Not `Documents/`: that folder is the log library mirrored to
+iCloud Drive.
+
+**Code layout**, following the Frequencies tab:
+- `FrequencyBingo.swift`, pure (Foundation, CoreLocation, RZFlight, Observation):
+  `BingoLaunch`, the radio state and its tap rules, route from a flight, storage,
+  the `@Observable` view model.
+- `FrequencyBingoView.swift`: the SwiftUI view and
+  `FrequencyBingoViewController(launch:)`, a `UIHostingController`.
+- Map: SwiftUI `Map` with the Frequencies tab's per-segment colours and numbered
+  markers (`FrequencyTimelineMarker`), rung numbers matching the table.
+
+**Tests** (`TestFrequencyBingo`): every row of the tap table, including the
+flip-flop and a current on no rung; current → rung selection; storage round
+trip (a stored `FlightExchange` decodes in RZFlight unchanged); route from a
+TestAssets flight; a ladder over that route is non-empty, ordered and covers it
+from 0 to its length.
 
 ### The frequency table, and the flights behind it
 
 A frequency list ordered along the route, with probability, supporting-flight
-count and location, current and next highlighted. **Tapping a frequency opens a
-small table below listing the flights that contribute it** — segments carry
+count and location, current and next highlighted. Tapping a frequency sets it
+as current (the radio rule above), so the flights behind it are behind a
+separate control: **the flights count of a row opens a small table listing the
+flights that contribute it** (follow-on, not plan mode v1). Segments carry
 `log_file_name`, which is the key of `FlightLogFileRecord`, so each row is a
 real record that can be pushed into the existing detail view.
 
@@ -312,11 +477,17 @@ and reschedules itself until none are left. Every processed log is recorded in
 ## Phasing
 
 1. **Index + model**, with the fixture test. No UI.
-2. **Plan mode** — table and map. Useful on the ground on its own.
+2. **Plan mode**: typed route or a flown flight's route, altitude stepper, the
+   radio (current / previous / next), the ladder and the map. Useful on the
+   ground on its own.
+2b. **Route import** (follow-on): FlyFun Weather and Autorouter as
+   `FlightExchange`, clipboard ICAO FPL.
 3. **Live mode** — GPS, location permission and the position marker exist
    (`LiveLocation`, `OwnshipMapContent`, `.ownshipLocate`; ui-map-graphs.md,
    *Live position*): feed `LiveLocation.shared.location` to the ladder.
-4. **Confirmation taps** (see below).
+4. **Confirmation taps**: the radio already records them (every change of
+   current is a timestamped, positioned confirmation); this phase stores them
+   and adds predicted vs actual (see below).
 
 ## Gotchas
 
