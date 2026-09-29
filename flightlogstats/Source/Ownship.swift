@@ -9,6 +9,7 @@
 
 import Foundation
 import CoreLocation
+import RZFlight
 
 struct OwnshipVector : Equatable {
     /// how far ahead the lead point is drawn
@@ -42,32 +43,15 @@ struct OwnshipVector : Equatable {
     /// or the track is unknown
     var lead : CLLocationCoordinate2D? {
         guard let course = self.course, let speed = self.speed, speed >= Self.minimumSpeed else { return nil }
-        return Self.coordinate(from: self.coordinate, bearing: course, distanceMeters: speed * self.leadTime)
+        // great circle, from RZFlight
+        let lead = self.coordinate.pointFromBearingDistance(bearing: course, distanceNm: speed * self.leadTime / 1852.0)
+        // normalise to -180...180 across the antimeridian
+        let longitude = (lead.longitude + 540.0).truncatingRemainder(dividingBy: 360.0) - 180.0
+        return CLLocationCoordinate2D(latitude: lead.latitude, longitude: longitude)
     }
 
     static func == (lhs : OwnshipVector, rhs : OwnshipVector) -> Bool {
         return lhs.coordinate.latitude == rhs.coordinate.latitude && lhs.coordinate.longitude == rhs.coordinate.longitude
             && lhs.course == rhs.course && lhs.speed == rhs.speed && lhs.leadTime == rhs.leadTime
-    }
-
-    /// Great circle destination point. Same formula and earth radius as RZFlight's
-    /// `CLLocationCoordinate2D.pointFromBearingDistance`, which is internal to RZFlight
-    /// (and the app is pinned to RZFlight 1.x): move there once it is public.
-    static func coordinate(from start : CLLocationCoordinate2D, bearing : CLLocationDirection, distanceMeters : CLLocationDistance) -> CLLocationCoordinate2D {
-        let earthRadiusNm : Double = 3440.065
-        let angular = (distanceMeters / 1852.0) / earthRadiusNm
-
-        let lat1 = start.latitude * .pi / 180.0
-        let lon1 = start.longitude * .pi / 180.0
-        let bearingRad = bearing * .pi / 180.0
-
-        let lat2 = asin(sin(lat1) * cos(angular) + cos(lat1) * sin(angular) * cos(bearingRad))
-        let lon2 = lon1 + atan2(sin(bearingRad) * sin(angular) * cos(lat1),
-                                cos(angular) - sin(lat1) * sin(lat2))
-
-        var longitude = lon2 * 180.0 / .pi
-        // normalise to -180...180 across the antimeridian
-        longitude = (longitude + 540.0).truncatingRemainder(dividingBy: 360.0) - 180.0
-        return CLLocationCoordinate2D(latitude: lat2 * 180.0 / .pi, longitude: longitude)
     }
 }

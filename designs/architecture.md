@@ -82,7 +82,7 @@ is violated by design. Change notification is `NotificationCenter` throughout
 |---|---|---|
 | **rzutils** (`RZUtils`, `RZUtilsSwift`, `RZUtilsUniversal`, `RZData`) | `DataFrame`, `ValueStats`, `GCUnit`, logging | 1.0.31; all four products linked by the app |
 | **rzutils-touch** (`RZUtilsTouch`) | `GCSimpleGraphView` charts (ObjC) | 1.0.8 (tools 5.7); dropped with Swift Charts in phase 6 |
-| **rzflight** (`RZFlight`) | `KnownAirports`, `KnownWaypoints`, `RoutePointResolver`, `RunwayWindModel` | 1.3.0 |
+| **rzflight** (`RZFlight`) | `KnownAirports`, `KnownWaypoints`, `RoutePointResolver`, `RunwayWindModel`, `pointFromBearingDistance` | branch `main` (past v2.0) while app-driven changes land; pin a release once they settle |
 | OAuthSwift | FlySto OAuth2 | |
 | ZIPFoundation | zip before FlySto upload, bug report | |
 

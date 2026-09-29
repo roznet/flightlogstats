@@ -1295,8 +1295,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/roznet/rzflight";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.3;
+				branch = main;
+				kind = branch;
 			};
 		};
 		4268A0C528357E6300A3CB05 /* XCRemoteSwiftPackageReference "KDTree" */ = {
