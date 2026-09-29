@@ -879,9 +879,7 @@ class FlightLogOrganizer {
             case .allMissingFromFolder:
                 shouldInclude = true
             case .selectedFile(let selectedUrls):
-                if selectedUrls.contains(url) {
-                    shouldInclude = true
-                }
+                shouldInclude = Self.isSelected(url: url, in: selectedUrls)
             case .sinceLatestImportedFile:
                 if let first = self.first(request: .all) {
                     if let guessedDate = url.logFileGuessedDate,
@@ -899,6 +897,25 @@ class FlightLogOrganizer {
         }
         Logger.app.info("Found \(rv.count) new files out of \(urls.count)")
         return rv
+    }
+    
+    /// True if `url` is one of `selectedUrls` or inside one of them: picking a folder
+    /// (the Mac picker default) selects every log found under it.
+    static func isSelected(url : URL, in selectedUrls : [URL]) -> Bool {
+        let path = url.resolvingSymlinksInPath().standardizedFileURL.path
+        for selected in selectedUrls {
+            var selectedPath = selected.resolvingSymlinksInPath().standardizedFileURL.path
+            if path == selectedPath {
+                return true
+            }
+            if !selectedPath.hasSuffix("/") {
+                selectedPath.append("/")
+            }
+            if path.hasPrefix(selectedPath) {
+                return true
+            }
+        }
+        return false
     }
     
     /// Import (copy to local container) files missing according to selection Method

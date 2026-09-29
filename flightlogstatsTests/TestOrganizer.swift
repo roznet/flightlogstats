@@ -184,6 +184,41 @@ class TestOrganizer: XCTestCase {
         self.wait(for: [expectation], timeout: TimeInterval(10.0))
     }
     
+    /// I5: with the `.selectedFile` method, a picked folder selects the logs inside it.
+    func testSelectedFolderImportsItsFiles() throws {
+        guard let bundleUrl : URL = Bundle(for: type(of: self)).resourceURL,
+              let organizer = self.createOrganizerWithMemoryContainer(localFolderName: "testSelectedFolder", cloudFolderName: nil)
+        else {
+            XCTFail()
+            return
+        }
+        
+        let expectation = XCTestExpectation(description: "found files")
+        FlightLogOrganizer.search(in: [bundleUrl]) {
+            result in
+            switch result {
+            case .failure(let error):
+                XCTFail("failed to search \(error.localizedDescription)")
+            case .success(let urls):
+                XCTAssertFalse(urls.isEmpty)
+                let folderList = organizer.buildImportList(urls: urls, method: .selectedFile([bundleUrl]))
+                XCTAssertEqual(folderList.count, urls.count)
+                
+                if let one = urls.first {
+                    let fileList = organizer.buildImportList(urls: urls, method: .selectedFile([one]))
+                    // search can report a file twice (I4), so compare as a set
+                    XCTAssertEqual(Set(fileList.map { $0.path }), [one.path])
+                }
+                
+                // a folder whose name only shares a prefix is not a parent
+                let sibling = URL(fileURLWithPath: bundleUrl.path + "x", isDirectory: true)
+                XCTAssertTrue(organizer.buildImportList(urls: urls, method: .selectedFile([sibling])).isEmpty)
+            }
+            expectation.fulfill()
+        }
+        self.wait(for: [expectation], timeout: TimeInterval(10.0))
+    }
+    
     func testLogFileNameGuesses(){
         guard let url = Bundle(for: type(of: self)).resourceURL
         else {
