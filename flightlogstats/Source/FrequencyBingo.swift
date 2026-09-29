@@ -2,10 +2,14 @@
 //  FrequencyBingo.swift
 //  FlightLogStats
 //
-//  Frequency Bingo plan mode: a route and a cruise altitude give the ladder of
+//  Frequency Bingo: in plan mode, a route and a cruise altitude give the ladder of
 //  frequencies to expect, and a radio (current / previous / next) the pilot
 //  drives, like a COM active/standby pair. The pilot's current is the model's
 //  `current` input; the model never changes it.
+//
+//  Live mode: GPS fixes replace the plan position. The ladder runs from the
+//  position (FrequencyModel.liveLadder and its rejoin rule), next is asked at the
+//  position, and the handoff ahead gets a distance and an ETA. Still never a switch.
 //
 //  Pure (Foundation, CoreLocation, RZFlight, Observation): no AppDelegate or
 //  Settings. The screen and its hosting controller are in FrequencyBingoView.swift.
@@ -102,7 +106,11 @@ enum FrequencyBingo {
     /// Ladder rows for a route: the model's rungs, each with its piece of route
     static func rungs(model : FrequencyModel, points : [CLLocationCoordinate2D], cruiseAlt : Double) -> [BingoRung] {
         guard points.count >= 2 else { return [] }
-        let ladder = model.routeLadder(points: points, cruiseAlt: cruiseAlt)
+        return self.rungs(ladder: model.routeLadder(points: points, cruiseAlt: cruiseAlt), points: points)
+    }
+
+    /// Ladder rows for rungs already computed over `points`
+    static func rungs(ladder : [FrequencyModel.Rung], points : [CLLocationCoordinate2D]) -> [BingoRung] {
         return ladder.enumerated().compactMap { item in
             let (i, rung) = (item.offset, item.element)
             let path = self.cut(points, fromNm: rung.fromNm, toNm: rung.toNm)
@@ -302,6 +310,107 @@ enum FrequencyBingo {
     }
 }
 
+//MARK: - Live
+
+/// A GPS fix as the live ladder needs it. Invalid CoreLocation values (negative
+/// accuracy or course) become nil rather than numbers.
+struct BingoFix {
+    let coordinate : CLLocationCoordinate2D
+    let altitudeFt : Double?
+    let track : Double?
+    let groundSpeedKt : Double?
+
+    init(coordinate : CLLocationCoordinate2D, altitudeFt : Double?, track : Double?, groundSpeedKt : Double?) {
+        self.coordinate = coordinate
+        self.altitudeFt = altitudeFt
+        self.track = track
+        self.groundSpeedKt = groundSpeedKt
+    }
+
+    init(location : CLLocation) {
+        self.coordinate = location.coordinate
+        self.altitudeFt = location.verticalAccuracy >= 0 ? location.altitude / 0.3048 : nil
+        self.track = location.course >= 0 && location.courseAccuracy >= 0 ? location.course : nil
+        self.groundSpeedKt = location.speed >= 0 && location.speedAccuracy >= 0 ? location.speed * 3600.0 / 1852.0 : nil
+    }
+
+    var isAirborne : Bool { return (self.groundSpeedKt ?? 0.0) >= FrequencyBingo.airborneSpeedKt }
+}
+
+/// The handoff ahead of the position in live mode
+struct BingoHandoff : Equatable {
+    /// track miles from the position, 0 when due
+    let nm : Double
+    /// at the current ground speed, nil when too slow to say
+    let minutes : Double?
+
+    /// the position is past the end of the current frequency's rung
+    var due : Bool { return self.nm <= 0.0 }
+}
+
+extension FrequencyBingo {
+    /// below this ground speed a fix is on the ground: the climb is still ahead, and no ETA
+    static let airborneSpeedKt = 40.0
+    /// profile start when a fix has no altitude, the ladder's own field default
+    static let fieldAltitudeFt = 1000.0
+
+    /// Start altitude and cruise for the live ladder. On the ground the plan's cruise,
+    /// so the climb is still ahead; in the air the current altitude for both, as the
+    /// reference does, so a level or descending aircraft gets no phantom climb.
+    static func liveAltitudes(fix : BingoFix, plannedFt : Int) -> (alt : Double, cruise : Double) {
+        let planned = Double(plannedFt)
+        guard fix.isAirborne else {
+            return (fix.altitudeFt ?? self.fieldAltitudeFt, planned)
+        }
+        let alt = fix.altitudeFt ?? planned
+        return (alt, alt)
+    }
+
+    /// The ladder ahead of a fix: the position, then the route from the rejoin waypoint.
+    /// Distances start at 0 at the position.
+    static func liveRungs(model : FrequencyModel, points : [CLLocationCoordinate2D], fix : BingoFix,
+                          plannedFt : Int, fromIndex : Int) -> (rungs : [BingoRung], rejoinIndex : Int?) {
+        guard points.count >= 2 else { return ([], nil) }
+        let (alt, cruise) = self.liveAltitudes(fix: fix, plannedFt: plannedFt)
+        let (ladder, rejoin) = model.liveLadder(points: points, lat: fix.coordinate.latitude, lon: fix.coordinate.longitude,
+                                                alt: alt, trk: fix.track, cruiseAlt: cruise, fromIndex: fromIndex)
+        guard let rejoin = rejoin else { return ([], nil) }
+        let ahead = [fix.coordinate] + points[rejoin...]
+        return (self.rungs(ladder: ladder, points: ahead), rejoin)
+    }
+
+    /// Whether a rung is the one of a frequency: its own, or a candidate of a band
+    /// with no clear winner
+    static func rung(_ rung : FrequencyModel.Rung, matches freq : String) -> Bool {
+        return rung.freq == freq || (rung.unsettled && rung.alternates.contains(freq))
+    }
+
+    /// The handoff ahead in a live ladder: the end of the current frequency's rung.
+    ///
+    /// Without a current, the first change along the ladder. A current on no rung
+    /// ahead is due: the rung it belonged to ended behind the position. A current
+    /// that holds to the end of the route has no handoff.
+    static func handoff(_ rungs : [FrequencyModel.Rung], current : String?, groundSpeedKt : Double?) -> BingoHandoff? {
+        guard let first = rungs.first else { return nil }
+        let nm : Double
+        if let current = current {
+            guard let on = rungs.firstIndex(where: { self.rung($0, matches: current) }) else {
+                return BingoHandoff(nm: 0.0, minutes: 0.0)
+            }
+            guard let off = rungs[on...].firstIndex(where: { !self.rung($0, matches: current) }) else { return nil }
+            nm = rungs[off].fromNm
+        }else{
+            guard let off = rungs.firstIndex(where: { $0.freq != first.freq }) else { return nil }
+            nm = rungs[off].fromNm
+        }
+        var minutes : Double? = nil
+        if let speed = groundSpeedKt, speed >= self.airborneSpeedKt {
+            minutes = nm / speed * 60.0
+        }
+        return BingoHandoff(nm: nm, minutes: minutes)
+    }
+}
+
 //MARK: - Storage
 
 /// What `current.json` keeps: the route as the flyfun apps share it, and the screen
@@ -429,6 +538,10 @@ final class FrequencyBingoViewModel {
     private(set) var computing : Bool = false
     private(set) var recent : [FlightExchange] = []
     private(set) var flights : Int = 0
+    /// live mode: GPS fixes drive the ladder and next, from the position
+    private(set) var isLive : Bool = false
+    /// live mode: the end of the current frequency's rung ahead
+    private(set) var handoff : BingoHandoff? = nil
 
     var routePoints : [CLLocationCoordinate2D] { return self.route?.allCoordinates ?? [] }
     var selectedRung : BingoRung? {
@@ -441,6 +554,13 @@ final class FrequencyBingoViewModel {
     private let resolver : () -> RoutePointResolver?
     @ObservationIgnored private var flightId : String? = nil
     @ObservationIgnored private var generation : Int = 0
+    /// live: the highest route index reached, for the rejoin rule; reset on a new route
+    @ObservationIgnored private(set) var rejoinFloor : Int = 0
+    @ObservationIgnored private var lastFix : BingoFix? = nil
+    @ObservationIgnored private var pendingFix : BingoFix? = nil
+    @ObservationIgnored private var liveBusy : Bool = false
+    /// the plan mode selection, kept while live renumbers the rungs from the position
+    @ObservationIgnored private var planSelected : Int? = nil
     private let queue = DispatchQueue(label: "net.ro-z.flightlogstats.bingo")
 
     /// - Parameters:
@@ -498,6 +618,9 @@ final class FrequencyBingoViewModel {
             self.route = nil
             self.rungs = []
             self.selected = nil
+            self.planSelected = nil
+            self.rejoinFloor = 0
+            self.handoff = nil
             self.refreshNext()
             return
         }
@@ -582,7 +705,9 @@ final class FrequencyBingoViewModel {
         self.routeText = FrequencyBingo.routeString(withAltitude)
         if changed {
             self.selected = nil
+            self.planSelected = nil
             self.rungs = []
+            self.rejoinFloor = 0
         }
         if withAltitude.allCoordinates.count >= 2, let store = self.store {
             self.recent = store.addRecent(FrequencyBingo.exchange(withAltitude, flightId: self.flightId))
@@ -594,6 +719,11 @@ final class FrequencyBingoViewModel {
     /// Recompute the ladder off the main thread; a late result is dropped
     private func rebuild() {
         self.generation += 1
+        if self.isLive {
+            self.pendingFix = self.pendingFix ?? self.lastFix
+            self.runLive()
+            return
+        }
         let generation = self.generation
         guard let model = self.model, !model.isEmpty, self.routePoints.count >= 2 else {
             self.rungs = []
@@ -633,6 +763,14 @@ final class FrequencyBingoViewModel {
             self.next = []
             return
         }
+        if self.isLive {
+            // the handoff follows current at once; next needs the model, off main
+            self.handoff = FrequencyBingo.handoff(self.rungs.map { $0.rung }, current: self.radio.current,
+                                                  groundSpeedKt: self.lastFix?.groundSpeedKt)
+            self.pendingFix = self.pendingFix ?? self.lastFix
+            self.runLive()
+            return
+        }
         guard let rung = self.selectedRung ?? self.rungs.first else {
             self.next = []
             return
@@ -644,7 +782,89 @@ final class FrequencyBingoViewModel {
 
     private func save() {
         guard let store = self.store, let route = self.route else { return }
+        // live rungs are numbered from the position: keep the plan's selection
         store.saveCurrent(BingoState(flight: FrequencyBingo.exchange(route, flightId: self.flightId),
-                                     radio: self.radio, selectedRung: self.selected))
+                                     radio: self.radio, selectedRung: self.isLive ? self.planSelected : self.selected))
+    }
+
+    //MARK: live
+
+    /// A GPS fix, or nil when the position is off: back to plan mode
+    func update(live fix : BingoFix?) {
+        guard let fix = fix else {
+            guard self.isLive else { return }
+            self.isLive = false
+            self.handoff = nil
+            self.lastFix = nil
+            self.pendingFix = nil
+            self.rungs = []
+            self.selected = self.planSelected
+            self.rebuild()
+            return
+        }
+        if !self.isLive {
+            self.isLive = true
+            self.planSelected = self.selected
+            // drop a plan ladder still being computed
+            self.generation += 1
+        }
+        self.pendingFix = fix
+        self.runLive()
+    }
+
+    /// One live ladder at a time: fixes arriving meanwhile coalesce into the latest
+    private func runLive() {
+        guard !self.liveBusy, let fix = self.pendingFix else { return }
+        guard let model = self.model, !model.isEmpty, self.routePoints.count >= 2 else {
+            self.pendingFix = nil
+            self.lastFix = fix
+            self.rungs = []
+            self.next = []
+            self.handoff = nil
+            self.computing = false
+            return
+        }
+        self.pendingFix = nil
+        self.liveBusy = true
+        self.computing = self.rungs.isEmpty
+        let generation = self.generation
+        let points = self.routePoints
+        let planned = self.cruiseAltitudeFt
+        let floor = self.rejoinFloor
+        let current = self.radio.current
+        self.queue.async {
+            let (rungs, rejoin) = FrequencyBingo.liveRungs(model: model, points: points, fix: fix,
+                                                           plannedFt: planned, fromIndex: floor)
+            let (alt, _) = FrequencyBingo.liveAltitudes(fix: fix, plannedFt: planned)
+            let guesses = model.next(lat: fix.coordinate.latitude, lon: fix.coordinate.longitude, alt: alt,
+                                     trk: fix.track, current: current, top: 3)
+            DispatchQueue.main.async {
+                self.liveBusy = false
+                if generation == self.generation && self.isLive {
+                    self.applyLive(rungs: rungs, rejoinIndex: rejoin, guesses: guesses, fix: fix)
+                }
+                self.runLive()
+            }
+        }
+    }
+
+    private func applyLive(rungs : [BingoRung], rejoinIndex : Int?, guesses : [FrequencyGuess], fix : BingoFix) {
+        self.lastFix = fix
+        self.rungs = rungs
+        self.computing = false
+        // progress is only made in the air: on the ground away from the route the
+        // rejoin is a guess and must not lock the floor
+        if fix.isAirborne, let rejoin = rejoinIndex {
+            self.rejoinFloor = max(self.rejoinFloor, rejoin)
+        }
+        // where you are is the position: the current frequency's rung from the first
+        if let current = self.radio.current {
+            self.selected = rungs.firstIndex { FrequencyBingo.rung($0.rung, matches: current) }
+        }else{
+            self.selected = rungs.isEmpty ? nil : 0
+        }
+        self.next = FrequencyBingo.nextCandidates(guesses, current: self.radio.current)
+        self.handoff = FrequencyBingo.handoff(rungs.map { $0.rung }, current: self.radio.current,
+                                              groundSpeedKt: fix.groundSpeedKt)
     }
 }

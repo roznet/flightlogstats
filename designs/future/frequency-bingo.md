@@ -3,7 +3,8 @@
 > Status: **phase 1 done** (index + model, PR #10), and the per-flight
 > frequency timeline built on the index (PR #11, modernisation §Phase 3 step 0);
 > **plan mode built** (phase 2, issue #13, 2026-09-29: `FrequencyBingo.swift`,
-> `FrequencyBingoView.swift`, `TestFrequencyBingo`); live mode next. The model was built,
+> `FrequencyBingoView.swift`, `TestFrequencyBingo`); **live mode built** (phase 3,
+> 2026-09-29, same files, §Implementing live mode); confirmation taps next. The model was built,
 > tuned and validated in Python (`python/flightreconcile/freq.py`, `freq_cli.py`)
 > and is ported to Swift in `FrequencyModel.swift`, with the persistent index in
 > `FrequencyIndexOrganizer.swift`. The prerequisite has landed: nav.db is bundled,
@@ -434,6 +435,49 @@ trip (a stored `FlightExchange` decodes in RZFlight unchanged); route from a
 TestAssets flight; a ladder over that route is non-empty, ordered and covers it
 from 0 to its length.
 
+### Implementing live mode
+
+No new model code: `FrequencyModel.liveLadder` and `rejoinIndex` were ported
+with the parity fixture in phase 1. The screen adds the glue.
+
+- **Switch.** Live mode is on while the map's locate toggle (`.ownshipLocate`)
+  has a fix: `LiveLocation.shared.location` → `BingoFix(location:)` →
+  `FrequencyBingoViewModel.update(live:)`; nil (toggle off, denied, no fix) goes
+  back to the plan ladder and restores the plan selection. No separate mode
+  picker: one toggle, as on the Frequencies tab.
+- **`BingoFix`.** Position, altitude (ft), track and ground speed (kt), with
+  CoreLocation's invalid values (negative accuracy or course) as nil.
+  Airborne means ≥ 40 kt ground speed (`airborneSpeedKt`).
+- **Altitudes** (`liveAltitudes`). On the ground the ladder climbs from the fix
+  altitude to the plan's cruise (the climb is still ahead). In the air cruise is
+  the current altitude, as the reference does, so a level or descending aircraft
+  gets no phantom climb (§Gotchas, *Climb and descent are separate*).
+- **Ladder.** `FrequencyBingo.liveRungs`: `liveLadder` from the fix with
+  `fromIndex` = the rejoin floor, cut over `[position] + route[rejoin...]`, so
+  distances are "nm ahead" and rung 1 is where you are. Rungs are renumbered
+  from the position on every fix. The planned route is drawn faint under it.
+- **Rejoin floor.** The highest rejoin index reached, raised only by airborne
+  fixes (on the ground away from the route the rejoin is a guess and must not
+  lock progress); reset when the route changes.
+- **Next** is `next(... current:)` at the fix, computed with the ladder.
+- **Handoff** (`FrequencyBingo.handoff`): the end of the current frequency's
+  rung ahead (a band's candidate counts as its rung). Without a current, the
+  first change along the ladder. A current on no rung ahead is **due**: its rung
+  ended behind the position. Shown as "12 nm · 6 min" in the next box (ETA from
+  ground speed, none below 40 kt); due outlines the next box in orange. It never
+  changes current.
+- **Selection** in live mode is the current frequency's rung from the position
+  (rung 1 without a current). The plan selection is kept aside and is what
+  `current.json` stores while live.
+- **Cost.** One ladder at a time on the view model's queue; fixes arriving
+  meanwhile coalesce into the latest (`pendingFix`), and a result for an older
+  route, altitude or mode is dropped (`generation`).
+
+Tests: `BingoFix` conversions, the altitude rule, every handoff case, and on a
+TestAssets flight a live ladder from mid-flight (starts at the fix, ends at the
+route's end from the rejoin fix, floor keeps progress) and the view model going
+plan → live → plan.
+
 ### The frequency table, and the flights behind it
 
 A frequency list ordered along the route, with probability, supporting-flight
@@ -527,9 +571,8 @@ and reschedules itself until none are left. Every processed log is recorded in
    map. Useful on the ground on its own.
 2b. **Route import** (follow-on): FlyFun Weather and Autorouter as
    `FlightExchange`, clipboard ICAO FPL.
-3. **Live mode** — GPS, location permission and the position marker exist
-   (`LiveLocation`, `OwnshipMapContent`, `.ownshipLocate`; ui-map-graphs.md,
-   *Live position*): feed `LiveLocation.shared.location` to the ladder.
+3. ~~**Live mode**~~ — `LiveLocation.shared.location` fed to
+   `FrequencyModel.liveLadder` (§Implementing live mode).
 4. **Confirmation taps**: the radio already records them (every change of
    current is a timestamped, positioned confirmation); this phase stores them
    and adds predicted vs actual (see below).

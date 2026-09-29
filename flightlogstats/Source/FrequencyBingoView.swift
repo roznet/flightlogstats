@@ -2,10 +2,12 @@
 //  FrequencyBingoView.swift
 //  FlightLogStats
 //
-//  Frequency Bingo plan mode screen: route and altitude, the radio (current,
-//  previous, next), the ladder table and the map with numbered handoff markers
-//  keyed to the table, as on the Frequencies tab. SwiftUI in a
-//  UIHostingController, opened only through `FrequencyBingoViewController(launch:)`.
+//  Frequency Bingo screen: route and altitude, the radio (current, previous,
+//  next), the ladder table and the map with numbered handoff markers keyed to
+//  the table, as on the Frequencies tab. With the locate toggle on, live mode:
+//  GPS fixes replace the plan position, and next shows the distance and time to
+//  the handoff. SwiftUI in a UIHostingController, opened only through
+//  `FrequencyBingoViewController(launch:)`.
 //
 //  Design: designs/future/frequency-bingo.md §The page
 //
@@ -18,10 +20,12 @@ import RZFlight
 
 struct FrequencyBingoView: View {
     let model : FrequencyBingoViewModel
+    var live : LiveLocation = .shared
     var onDone : () -> Void = {}
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var position : MapCameraPosition = .automatic
+    @State private var mapHeading : CLLocationDirection = 0.0
     @FocusState private var routeFocused : Bool
 
     static func color(_ rung : BingoRung) -> Color {
@@ -60,6 +64,9 @@ struct FrequencyBingoView: View {
                     Button("Done") { self.onDone() }
                 }
             }
+        }
+        .onChange(of: self.live.location, initial: true) { _, location in
+            self.model.update(live: location.map { BingoFix(location: $0) })
         }
         .onChange(of: self.model.routeText) { _, _ in
             // a new route is shown whole; an edit in progress keeps the camera
@@ -157,9 +164,24 @@ struct FrequencyBingoView: View {
             .background(RoundedRectangle(cornerRadius: 10).fill(Color(uiColor: .secondarySystemBackground)))
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("NEXT")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 6) {
+                    Text("NEXT")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    if self.model.isLive {
+                        Text("LIVE")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 4)
+                            .background(Capsule().fill(Color.accentColor))
+                        Spacer(minLength: 0)
+                        if let handoff = self.model.handoff {
+                            Text(Self.handoffText(handoff))
+                                .font(.caption.monospacedDigit().weight(handoff.due ? .bold : .regular))
+                                .foregroundStyle(handoff.due ? Color.orange : Color.secondary)
+                        }
+                    }
+                }
                 if self.model.next.isEmpty {
                     Text(self.nextPlaceholder)
                         .font(.caption)
@@ -190,6 +212,10 @@ struct FrequencyBingoView: View {
             .padding(10)
             .frame(maxWidth: 220)
             .background(RoundedRectangle(cornerRadius: 10).fill(Color(uiColor: .secondarySystemBackground)))
+            // past a predicted handoff: a prompt, never a switch
+            .overlay(RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.orange, lineWidth: self.handoffDue ? 3 : 0))
+            .accessibilityHint(self.handoffDue ? "Handoff due" : "")
         }
         .padding(.horizontal)
     }
@@ -206,6 +232,19 @@ struct FrequencyBingoView: View {
             }
             return self.model.computing ? "Computing" : "No prediction"
         }
+    }
+
+    private var handoffDue : Bool {
+        return self.model.isLive && self.model.handoff?.due == true && !self.model.next.isEmpty
+    }
+
+    /// Distance and time to the handoff, "due" once past it
+    static func handoffText(_ handoff : BingoHandoff) -> String {
+        guard !handoff.due else { return "due" }
+        if let minutes = handoff.minutes {
+            return String(format: "%.0f nm · %.0f min", handoff.nm, max(1.0, minutes.rounded()))
+        }
+        return String(format: "%.0f nm", handoff.nm)
     }
 
     /// Probability and flights always together: a probability alone overstates
@@ -234,7 +273,7 @@ struct FrequencyBingoView: View {
                 } header: {
                     self.tableHeader
                 } footer: {
-                    Text("A watch list, not a clearance: predicted from your own logs (\(self.model.flights) flights), and confidently wrong where they are thin. Keep confidence and flights together. Dashed stretches have no clear winner. Tap a frequency to make it current.")
+                    Text((self.model.isLive ? "Live: distances from your position, rejoining the route at the next fix ahead. " : "") + "A watch list, not a clearance: predicted from your own logs (\(self.model.flights) flights), and confidently wrong where they are thin. Keep confidence and flights together. Dashed stretches have no clear winner. Tap a frequency to make it current.")
                 }
             }
             .listStyle(.plain)
@@ -260,7 +299,7 @@ struct FrequencyBingoView: View {
         }else{
             HStack {
                 Text("#").frame(width: 28, alignment: .leading)
-                Text("nm").frame(width: 76, alignment: .leading)
+                Text(self.model.isLive ? "nm ahead" : "nm").frame(width: 76, alignment: .leading)
                 Text("freq")
                 Spacer()
                 Text("conf · flights · alt")
@@ -273,6 +312,11 @@ struct FrequencyBingoView: View {
 
     private var map : some View {
         Map(position: self.$position) {
+            if self.model.isLive && self.model.routePoints.count >= 2 {
+                // the planned route under the ladder ahead, for the part behind or off route
+                MapPolyline(coordinates: self.model.routePoints)
+                    .stroke(.gray.opacity(0.5), lineWidth: 2)
+            }
             ForEach(self.model.rungs) { rung in
                 MapPolyline(coordinates: rung.path)
                     .stroke(self.strokeColor(rung),
@@ -295,7 +339,14 @@ struct FrequencyBingoView: View {
                 }
                 .annotationTitles(.hidden)
             }
+            if let vector = self.live.vector {
+                OwnshipMapContent(vector: vector, mapHeading: self.mapHeading)
+            }
         }
+        .onMapCameraChange(frequency: .continuous) { context in
+            self.mapHeading = context.camera.heading
+        }
+        .ownshipLocate(self.live, position: self.$position)
     }
 
     private func strokeColor(_ rung : BingoRung) -> Color {
