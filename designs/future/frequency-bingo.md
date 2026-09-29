@@ -1,6 +1,8 @@
 # Frequency Bingo — guessing the ATC frequency from your own logs
 
-> Status: **phase 1 in progress** (index + model, no UI). The model was built,
+> Status: **phase 1 done** (index + model, PR #10), and the per-flight
+> frequency timeline built on the index (PR #11, modernisation §Phase 3 step 0);
+> plan mode is next. The model was built,
 > tuned and validated in Python (`python/flightreconcile/freq.py`, `freq_cli.py`)
 > and is ported to Swift in `FrequencyModel.swift`, with the persistent index in
 > `FrequencyIndexOrganizer.swift`. The prerequisite has landed: nav.db is bundled,
@@ -134,6 +136,21 @@ updates the aggregated store
 The frequency index hooks in alongside it. `delete(info:)` must remove rows by
 `log_file_name`, exactly as the aggregated store does.
 
+### Reading one log
+
+`FrequencyIndexOrganizer.logIndex(logFileName:)` returns one log's segments and
+points in time order (`seq`), nil if the log is not indexed, and an empty index
+for a log indexed without signal (taxi only, no radios). `logIndex(flightLog:)`
+indexes a log that is missing first, through the same `insertOrReplace(flightLog:)`
+as the hook and the backfill, and records nothing if the log does not parse. The
+Frequencies tab of the log view (`FrequencyTimeline.swift`,
+`FrequencyTimelineView.swift`) is its consumer.
+
+Points store no segment number; `FrequencyTimeline.pointsBySegment` recovers it
+from `freq`, `nextFreq` and non-increasing `nmToNext` (exact on every TestAssets
+log). If a consumer ever needs it guaranteed, store `seg` in `freq_points` and
+bump `currentDatabaseVersion` (a full rebuild).
+
 ### Copy the pattern, not two of its behaviours
 
 `AggregatedDataOrganizer` is the model to follow — FMDB, a versioned config
@@ -173,6 +190,10 @@ final class FrequencyModel {
     func liveLadder(points:lat:lon:alt:trk:fromIndex:) -> ([Rung], Int?)
     func segments(for freq: String) -> [FrequencySegment]   // for the flight list
 }
+
+// per flight, on the index rather than the model (FrequencyIndexOrganizer)
+func logIndex(logFileName: String) -> FrequencyLogIndex?     // nil: not indexed
+func logIndex(flightLog: FlightLogFile) -> FrequencyLogIndex? // indexes if missing
 ```
 
 `Rung` carries `freq, fromNm, toNm, confidence, support, alt, alternates,

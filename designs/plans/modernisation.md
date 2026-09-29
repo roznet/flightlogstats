@@ -5,7 +5,8 @@
 > `../future/frequency-bingo.md`. Bug inventory: `../known-issues.md`.
 > Reprioritised 2026-09-27 around the author's core jobs (below).
 > Updated 2026-09-28: build unblocked, CI runs the unit tests, Frequency Bingo
-> (#9) step 1 merged and pulled ahead of phases 1-2 (see §Order).
+> (#9) step 1 merged and pulled ahead of phases 1-2 (see §Order); step 0, the
+> per-flight frequency timeline, in PR #11, so plan mode (step 2) is next.
 
 ## The jobs the app is for
 
@@ -77,7 +78,7 @@ record-version re-derive mechanism, and the Python lab with its eval harnesses.
 | 0 | Build, CI, hygiene, Savvy removal, fuel bugs | all | S | green build, tests in CI, core-job bugs fixed. **Build + CI done**; hygiene, Savvy, bugs open |
 | 1 | Post-flight import + FlySto upload | 1 | M | one `+` flow: off-main import, one iCloud location, tombstones, real FlySto queue, Keychain, synced user state, land on newest flight |
 | 2 | `FlightLogKit` package | 2, 3 | M | parsing, fuel and legs testable with `swift test`; home for the frequency index |
-| 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10) |
+| 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10); **timeline** in PR #11; plan mode next |
 | 4 | Post-flight fuel check | 2 | S | fuel card on the newest flight: used by totaliser vs tanks, landing fuel, refill to target |
 | 5 | Plan vs actual | secondary | M | Route tab reusing Bingo's route engine; post-flight only |
 | 6 | UI migration | ongoing | ongoing | Swift Charts replaces `GCSimpleGraph`, rzutils-touch dropped, SwiftUI screens as they are touched |
@@ -96,7 +97,8 @@ model were built in the app target (`FrequencyModel.swift`,
 would buy nothing. Bingo's UI touches neither import, upload nor Core Data
 sync, so it runs alongside phase 1. Two phase 0 items gate it: CI running the
 unit tests (done, so the parity fixture is enforced) and C3 before any Bingo
-map work (see Phase 3).
+map that overlays `FlightData`'s track. The timeline map draws from the index
+only (which reads the aligned double frame), so it did not wait for C3.
 
 ### Phase 0: build, CI, hygiene
 
@@ -119,9 +121,10 @@ map work (see Phase 3).
     rebuilt), C7 (quick-parse totaliser), C8 (fuel unit
     assumed gallons), C1 (latent, no live caller);
   - import: I5 (folder pick with `.selectedFile` imports nothing, the Mac default);
-  - C3 frame alignment (prerequisite for any map/time work, and so for
-    Bingo's map; the double/categorical half is fixed in `aef4e43`, the
-    coordinate frame is left), C4 quoted spaces,
+  - C3 frame alignment (prerequisite for any map/time work on `FlightData`'s
+    coordinates; the double/categorical half is fixed in `aef4e43`, the
+    coordinate frame is left; Bingo maps avoid it by drawing from the index),
+    C4 quoted spaces,
     C5 POSIX locale; C2 and X2 only because they are one-liners.
 - **Remove Savvy** (decided 2026-09-27): `SavvyRequest.swift`,
   `SavvyAuthenticateViewController`, `FlightSavvyRecord` + the `savvy_record`
@@ -163,18 +166,21 @@ columns directly while parsing (no row-major copy) is the cheaper win.
 ### Phase 3: frequency review, then Bingo
 
 `../future/frequency-bingo.md` phases (issue #9), with one step added in front.
-Step 1 shipped first (PR #10), so step 0 is now the next piece of work: the
-index it needs exists.
+Step 1 shipped first (PR #10), then step 0 on top of its index; plan mode is
+next.
 
-0. **Per-flight frequency timeline** (new, **next**): show the selected
-   flight's debounced COM1 segments from the index,
-   each with its nearest fix, altitude band, duration and position on the map.
-   Replaces the Comms grouping of the Graphs tab as the way to look at
-   frequencies after a flight, and is useful before any prediction exists.
+0. ~~**Per-flight frequency timeline**~~ (PR #11): a Frequencies tab in
+   `LogTabBarController` (SwiftUI in a `UIHostingController`) listing the
+   selected flight's debounced COM1 segments from the index, each with its fix,
+   altitude band, duration and track miles, and a map with each segment in its
+   own colour and numbered handoff markers matching the list. See
+   `../ui-map-graphs.md` §Frequencies tab. Meant to replace the Comms grouping
+   of the Graphs tab as the way to look at frequencies after a flight; that
+   grouping stays until the owner has used the timeline and decides.
 1. ~~Index + model with the Python parity fixture~~ (PR #10, `a8149e9`;
    parity realigned in `aef4e43`).
-2. Plan mode. Its route entry and route engine (`RouteTracker` with the rejoin
-   rule, in RZFlight) are what plan-vs-actual later reuses.
+2. Plan mode (**next**). Its route entry and route engine (`RouteTracker` with
+   the rejoin rule, in RZFlight) are what plan-vs-actual later reuses.
 3. Live mode.
 4. Confirmation taps, and predicted vs actual for a flown flight: the
    natural follow-up of step 0.
@@ -204,7 +210,8 @@ rather than creating it.
   one goes, drop rzutils-touch (and its broken manifest) entirely.
 - Map: `MKPolyline` / `MKGradientPolylineRenderer` replace the custom renderer.
 - Order follows the core jobs: import/uploads sheet (phase 1) → frequency
-  timeline (phase 3) → fuel card (phase 4) → Settings → list last. Stats and
+  timeline (phase 3, done first: PR #11, the first SwiftUI screen) → fuel
+  card (phase 4) → Settings → list last. Stats and
   trips move only if they break.
 - **Tables: keep the UIKit table engine** (`TableCollectionViewLayout` +
   `TableDataSource` + `RZNumberWithUnitGeometry`), decided 2026-09-27. SwiftUI
