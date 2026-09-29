@@ -87,9 +87,10 @@ struct FuelTanks<UnitType : Dimension> : Comparable, Codable {
         return lhs.totalMeasurement < rhs.totalMeasurement
     }
     
+    /// Per tank, across units. Ordering (`<`) is by total only, so two tanks can be
+    /// neither `<` nor `==` (same total, different split).
     static func == (lhs : FuelTanks, rhs : FuelTanks) -> Bool {
-        
-        return lhs.totalMeasurement == rhs.totalMeasurement
+        return lhs.leftMeasurement == rhs.leftMeasurement && lhs.rightMeasurement == rhs.rightMeasurement
     }
    
     func rounded(in unit : UnitType? = nil, rule: FloatingPointRoundingRule) -> FuelTanks {
