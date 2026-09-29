@@ -2,7 +2,8 @@
 
 > Status: **phase 1 done** (index + model, PR #10), and the per-flight
 > frequency timeline built on the index (PR #11, modernisation §Phase 3 step 0);
-> plan mode is specified (§The page, 2026-09-29) and next to build. The model was built,
+> **plan mode built** (phase 2, issue #13, 2026-09-29: `FrequencyBingo.swift`,
+> `FrequencyBingoView.swift`, `TestFrequencyBingo`); live mode next. The model was built,
 > tuned and validated in Python (`python/flightreconcile/freq.py`, `freq_cli.py`)
 > and is ported to Swift in `FrequencyModel.swift`, with the persistent index in
 > `FrequencyIndexOrganizer.swift`. The prerequisite has landed: nav.db is bundled,
@@ -29,7 +30,7 @@ every frequency was actually used. This feature turns that into a prediction:
 | Index storage | A dedicated `FrequencyIndexOrganizer` on the `AggregatedDataOrganizer` pattern (FMDB, versioned config table, delete-by-log-file-name) |
 | Index build | Incremental, hooked next to the existing call in `updateRecords` |
 | Version mismatch | **Drop and rebuild.** Do *not* copy `AggregatedDataOrganizer`'s behaviour of returning nil, which silently disables the feature |
-| Page placement | **Its own tool**, opened from the log list menu for now, through one `BingoLaunch` entry point so a flown flight or an import can open it (decided 2026-09-29; was a Stats tab) |
+| Page placement | **Its own tool**, opened from the log list menu for now, through one `BingoLaunch` entry point so a flown flight or an import can open it (decided 2026-09-29; was a Stats tab). Built: menu "Frequency Bingo", and "Bingo this route" in the Frequencies tab's list header |
 | Route model | **`RZFlight.Route`**, stored and shared as `FlightExchange` JSON, the format of flyfun-weather / forms / brief |
 | Radio | **Current / previous / next, pilot-driven**, like a COM active/standby pair. The pilot's current is the model's `current` input; the model never changes it |
 | Modes | **Plan** (route + altitude → ladder) and **Live** (GPS), one page |
@@ -358,21 +359,65 @@ the ladder looks wrong, fix it in `freq.py` first (parity rule).
 | Next box | `FrequencyModel.next(lat:lon:alt:trk:current:top: 2)` at the start of the selected rung, track from the route leg there |
 | Route resolution | `RoutePointResolver(airports:waypoints:).resolveRouteString(_:)` → `Route?`, over `AppDelegate.knownAirports` / `knownWaypoints` |
 
-**Current → rung.** Setting current selects the first rung at or after the
-selected one whose `freq` is current, then any whose `alternates` contain it;
-failing both, the selection stays.
+**Current → rung** (`FrequencyBingo.rungIndex`). Setting current selects the
+first rung at or after the selected one whose `freq` is current, then the
+nearest such rung before it, then the same two passes over the rungs'
+`alternates`; failing all, the selection stays. The backward pass was added
+when building: without it a flip-flop back after a mistake (current returns to
+the previous rung's frequency) left the selection, and the next box, on the
+later rung. Tapping a rung, or one of its "also likely", selects that rung
+directly.
 
-**Route from a flown flight.** Departure and destination from the
-`FlightSummary`; intermediate points from the active-waypoint legs
-(`FlightLeg.legs(byfields: [.AtvWpt])`), consecutive duplicates removed and
-airports at the ends dropped, resolved like a typed route. Cruise altitude: the
-90th percentile of altitude while flying, rounded to 500 ft.
+**Next box** (`FrequencyBingo.nextCandidates`): `next(... top: 3)` minus the
+current frequency; the second is shown when its probability is at least half
+the first's (`nearTieRatio`, the 60/40 case is 0.67). With nothing selected,
+next is asked at the start of the first rung.
 
-**Storage.** `Application Support/FrequencyBingo/`: `current.json` (a
-`FlightExchange` plus the radio: current, previous, selected rung) and
+**Route from a flown flight** (`FrequencyBingo.launch(logFileName:...)`).
+Departure and destination from the `FlightSummary` (`startAirport` /
+`endAirport`); intermediate points from `FlightSummary.route`, the
+active-waypoint value changes (the same as `FlightLeg.legs(byfields: [.AtvWpt])`,
+and available from Core Data without a parse), consecutive duplicates removed
+and leading / trailing copies of the departure or destination dropped, resolved
+like a typed route. Cruise altitude: the 90th percentile of `AltMSL` within
+`FlightSummary.flying` (from `frequencyScanRows()`), rounded to 500 ft; nil when
+the log is not parsed, and the screen then uses the last altitude. A flight
+whose route cannot be built opens the screen empty, never on the last route.
+
+**Unresolved names.** `RoutePointResolver` drops them silently, so the screen
+re-tokenises the typed string (`FrequencyBingo.tokens`, same `DCT` / `->` / `TO`
+filter) and lists the names `resolve(_:)` does not know. Candidate for RZFlight:
+a `rejectedWaypoints` on the resolver's result would remove the duplicated
+filter. Likewise `FrequencyBingo.route(_:cruiseAltitudeFt:)` rebuilds a `Route`
+to change its altitude because `Route` is immutable with private coordinate
+fields; a copy-with in RZFlight would replace it.
+
+**Storage** (`BingoStore`, `BingoState`). `Application Support/FrequencyBingo/`:
+`current.json` (`{"flight": FlightExchange, "radio": {current, previous},
+"selected_rung": n}`, the flight with `source.app = "flightlogstats"` and
+`source.flight_id` the log file name when it came from a flight) and
 `recent.json` (up to 10 `FlightExchange`, most recent first, deduplicated on the
 route string). Not `Documents/`: that folder is the log library mirrored to
 iCloud Drive.
+
+**The radio is not tied to a route.** A new route (typed, recent, or from a
+flight) keeps current and previous and clears only the selection: the radio is
+the pilot's, and relaunching must never lose it.
+
+**Ladder off main.** `FrequencyBingoViewModel.rebuild()` computes the rungs on
+its own serial queue (the model is read-only after init) and drops a result for
+an older route or altitude (`generation`). The model comes from
+`frequencyIndex.model()` on `AppDelegate.worker`, reloaded on
+`.frequencyIndexChanged`, observed with a token removed in `deinit`.
+
+**Map.** Rung paths are `FrequencyBingo.cut(route, fromNm:, toNm:)`, interpolated
+exactly as `sampleRoute` does so the cut lands where the ladder sampled.
+Unsettled bands are dashed. Numbered markers are `FrequencyTimelineMarker`,
+colours the Frequencies tab's palette; tapping a marker is tapping the rung.
+
+**Not built in v1**: the keypad on current (typed frequency), the route's fix
+names on the map, and "Bingo this route" on the Summary tab (the Frequencies
+tab has it).
 
 **Code layout**, following the Frequencies tab:
 - `FrequencyBingo.swift`, pure (Foundation, CoreLocation, RZFlight, Observation):
@@ -477,9 +522,9 @@ and reschedules itself until none are left. Every processed log is recorded in
 ## Phasing
 
 1. **Index + model**, with the fixture test. No UI.
-2. **Plan mode**: typed route or a flown flight's route, altitude stepper, the
-   radio (current / previous / next), the ladder and the map. Useful on the
-   ground on its own.
+2. ~~**Plan mode**~~ (issue #13): typed route or a flown flight's route,
+   altitude stepper, the radio (current / previous / next), the ladder and the
+   map. Useful on the ground on its own.
 2b. **Route import** (follow-on): FlyFun Weather and Autorouter as
    `FlightExchange`, clipboard ICAO FPL.
 3. **Live mode** — GPS, location permission and the position marker exist

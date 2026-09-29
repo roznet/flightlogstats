@@ -102,6 +102,10 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.tableView.reloadData()
                 self.updateButtons()
             },
+            UIAction(title: "Frequency Bingo", image: UIImage(systemName: "antenna.radiowaves.left.and.right")){
+                _ in
+                FrequencyBingoViewController.present(launch: BingoLaunch(), from: self.splitViewController ?? self)
+            },
             UIAction(title: "Settings", image: UIImage(systemName: "gearshape")){
                 _ in
                 let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
