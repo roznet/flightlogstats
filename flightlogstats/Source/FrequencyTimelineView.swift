@@ -18,9 +18,11 @@ import OSLog
 
 struct FrequencyTimelineView: View {
     let model : FrequencyTimelineViewModel
+    var live : LiveLocation = .shared
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var position : MapCameraPosition = .automatic
+    @State private var mapHeading : CLLocationDirection = 0.0
 
     /// cycled along the flight, so adjacent segments always contrast
     static let palette : [Color] = [.blue, .orange, .green, .purple, .red, .teal, .pink, .brown, .indigo, .mint]
@@ -98,7 +100,14 @@ struct FrequencyTimelineView: View {
                 }
                 .annotationTitles(.hidden)
             }
+            if let vector = self.live.vector {
+                OwnshipMapContent(vector: vector, mapHeading: self.mapHeading)
+            }
         }
+        .onMapCameraChange(frequency: .continuous) { context in
+            self.mapHeading = context.camera.heading
+        }
+        .ownshipLocate(self.live, position: self.$position)
     }
 
     private func strokeColor(_ row : FrequencyTimelineRow) -> Color {

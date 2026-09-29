@@ -17,6 +17,8 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Shows your current position and where you will be in one minute on the maps.</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.net.ro-z.flightlogstats</key>

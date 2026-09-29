@@ -42,8 +42,8 @@ Key exports: `FlightSummary`, `FlightLeg.legs(byfields:)`, `TimeRange`, `Trips`,
 ## UI
 
 ### ui-map-graphs
-Screen map (split view, log tab bar, stats tab bar), map track overlay and graphs (`GCSimpleGraphView`), one-way leg → map/graph linking, the SwiftUI Frequencies tab (per-flight COM1 timeline from the Bingo index, numbered handoff markers), `FlightLogViewModel` / `TableDataSource` / `DisplayContext` presentation pattern, observer leaks, accessibility gaps.
-Key exports: `MainSplitViewController`, `LogTabBarController`, `LogMapGraphsViewController`, `FrequencyTimelineViewController`, `FrequencyTimelineViewModel`, `FlightDataMapOverlay`, `FlightDataMapOverlayView`, `FlightLogViewModel`, `TableDataSource`, `DisplayContext`
+Screen map (split view, log tab bar, stats tab bar), map track overlay and graphs (`GCSimpleGraphView`), one-way leg → map/graph linking, the SwiftUI Frequencies tab (per-flight COM1 timeline from the Bingo index, numbered handoff markers), reusable live position (GPS locate toggle, aircraft icon, one-minute lead vector), `FlightLogViewModel` / `TableDataSource` / `DisplayContext` presentation pattern, observer leaks, accessibility gaps.
+Key exports: `MainSplitViewController`, `LogTabBarController`, `LogMapGraphsViewController`, `FrequencyTimelineViewController`, `FrequencyTimelineViewModel`, `LiveLocation`, `OwnshipMapContent`, `FlightDataMapOverlay`, `FlightDataMapOverlayView`, `FlightLogViewModel`, `TableDataSource`, `DisplayContext`
 → Full doc: ui-map-graphs.md
 
 ## Python lab
