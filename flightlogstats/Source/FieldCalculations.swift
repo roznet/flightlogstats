@@ -17,6 +17,8 @@ struct FieldCalculation {
     let inputs : [Field]
     let calcType : CalcType
     let requiredObservationCount : Int
+    /// when true, the seconds elapsed since the previous parsed row are appended to the inputs
+    let usesElapsed : Bool
     var output : Field { return self.outputs.first ?? .Lcl_Date }
     private let initial : Double
     private let calcFunc : ([Double]) -> Double
@@ -60,7 +62,8 @@ struct FieldCalculation {
         case doublesToDoublesArray
     }
     
-    init(output : Field, inputs: [Field], initial : Double = 0.0, calcFunc : @escaping ([Double])->Double){
+    init(output : Field, inputs: [Field], initial : Double = 0.0, usesElapsed : Bool = false, calcFunc : @escaping ([Double])->Double){
+        self.usesElapsed = usesElapsed
         self.outputs = [output]
         self.inputs = inputs
         self.calcFunc = calcFunc
@@ -72,6 +75,7 @@ struct FieldCalculation {
     }
 
     init(outputs : [Field], inputs: [Field], initial : Double = 0.0, calcFunc : @escaping ([Double])->[Double]){
+        self.usesElapsed = false
         self.outputs = outputs
         self.inputs = inputs
         self.calcFunc = { _ in return .nan}
@@ -84,6 +88,7 @@ struct FieldCalculation {
 
     
     init(stringOutput: Field, multiInputs: [Field], obsCount : Int, calcFunc : @escaping FuncTextMulti ){
+        self.usesElapsed = false
         self.outputs = [stringOutput]
         self.inputs = multiInputs
         self.calcFuncTextMulti = calcFunc
@@ -106,7 +111,7 @@ struct FieldCalculation {
         return self.calcFuncTextMulti(doublesArray,previous)
     }
     
-    private func doublesInput(line: [Double], fieldsMap: [Field:Int], previousLine : [Double]?) -> [Double] {
+    private func doublesInput(line: [Double], fieldsMap: [Field:Int], previousLine : [Double]?, elapsed : TimeInterval) -> [Double] {
         var doubles : [Double] = []
         for field in self.inputs {
             if self.outputs.contains(field) {
@@ -131,19 +136,23 @@ struct FieldCalculation {
                 }
             }
         }
+        if self.usesElapsed {
+            doubles.append(elapsed)
+        }
         return doubles
     }
     
-    func evaluateToArray(line: [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> [Double] {
+    func evaluateToArray(line: [Double], fieldsMap : [Field:Int], previousLine : [Double]?, elapsed : TimeInterval = 0.0) -> [Double] {
         guard self.calcType == .doublesToDoublesArray else { return self.outputs.map { _ in return .nan } }
         
-        return self.calcFuncArray(self.doublesInput(line: line, fieldsMap: fieldsMap, previousLine: previousLine))
+        return self.calcFuncArray(self.doublesInput(line: line, fieldsMap: fieldsMap, previousLine: previousLine, elapsed: elapsed))
     }
     
-    func evaluate(line : [Double], fieldsMap : [Field:Int], previousLine : [Double]?) -> Double{
+    /// - Parameter elapsed: seconds since the previous parsed row (0 on the first row)
+    func evaluate(line : [Double], fieldsMap : [Field:Int], previousLine : [Double]?, elapsed : TimeInterval = 0.0) -> Double{
         guard self.calcType == .doublesToDouble else { return .nan }
         
-        return self.calcFunc(self.doublesInput(line: line, fieldsMap: fieldsMap, previousLine: previousLine))
+        return self.calcFunc(self.doublesInput(line: line, fieldsMap: fieldsMap, previousLine: previousLine, elapsed: elapsed))
     }
     static var calculatedFields : [FieldCalculation] = [
         FieldCalculation(output: .FQtyT, inputs: [.FQtyL,.FQtyR]) {
@@ -191,10 +200,12 @@ struct FieldCalculation {
             let component = __cospi(diff/180.0) * -1.0
             return x[1] * component
         },
-        FieldCalculation(output: .FTotalizerT, inputs: [.FTotalizerT,.E1_FFlow]){
+        // integrate flow (per hour) over the time since the previous parsed row, so a
+        // sampled (quick) parse or a repeated timestamp does not skew the total
+        FieldCalculation(output: .FTotalizerT, inputs: [.FTotalizerT,.E1_FFlow], usesElapsed: true){
             x in
-            if x[1].isFinite {
-                return x[0] + (x[1]/3600.0)
+            if x[1].isFinite && x[2].isFinite && x[2] > 0.0 {
+                return x[0] + (x[1] * x[2] / 3600.0)
             }else{
                 return x[0]
             }

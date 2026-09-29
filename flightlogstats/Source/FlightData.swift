@@ -435,15 +435,22 @@ extension FlightData {
                 // match order with what was added for fields
                 doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
                 
+                // seconds since the previous kept row: the current date is already in
+                // data.dates. Time going backwards (log restart) counts as no time.
+                var elapsed : TimeInterval = 0.0
+                if data.dates.count > 1 {
+                    elapsed = max(0.0, data.dates[data.dates.count-1].timeIntervalSince(data.dates[data.dates.count-2]))
+                }
+
                 // first add all output of calculated double fields so they can
                 // also be used in doubleInputs
                 for calcField in FieldCalculation.calculatedFields {
                     if calcField.inputType == .doubles {
                         switch calcField.outputType {
                         case .double:
-                            doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                            doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
                         case .doubleArray:
-                            doubleLine.append(contentsOf:  calcField.evaluateToArray(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last))
+                            doubleLine.append(contentsOf:  calcField.evaluateToArray(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
                         case .string:
                             break
                         }
