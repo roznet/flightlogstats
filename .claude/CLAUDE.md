@@ -42,3 +42,11 @@ After changing a module that has a doc, sync that doc in the same change
 - nav.db is rebuilt with `python/make_nav_db.py` from the flyfun-apps nav.db.
 - Unit tests are hosted in the app (need a simulator). Run them before pushing a
   change to parsing or analysis.
+
+## Manual test hooks (keep them working)
+
+- DEBUG "Forget last" drops the newest log so the next import brings it back,
+  to re-test import/upload without a new flight. Never make it delete for good.
+- Launch args (`Source/MainSplitViewController.swift`): `-FLSImportFolder <path>`
+  opens the import sheet on a folder; `-FLSShowUploads YES` opens Uploads.
+- Landing a PR written without Xcode: `/land-pr <N>`.

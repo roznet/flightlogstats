@@ -11,3 +11,6 @@ python/venv
 __pycache__/
 
 .spm/
+
+# local build logs / derived data used by Claude sessions
+build/
