@@ -83,7 +83,7 @@ record-version re-derive mechanism, and the Python lab with its eval harnesses.
 | # | Phase | Job | Size | Outcome |
 |---|---|---|---|---|
 | 0 | Build, CI, hygiene, Savvy removal, fuel bugs | all | S | green build, tests in CI, core-job bugs fixed. **Done** (2026-09-29) apart from the CI review workflow |
-| 1 | Post-flight import + FlySto upload | 1 | M | one `+` flow: off-main import, one iCloud location, tombstones, real FlySto queue, Keychain, synced user state, land on newest flight |
+| 1 | Post-flight import + FlySto upload | 1 | M | one `+` flow: off-main import, one iCloud location, tombstones, real FlySto queue, Keychain, synced user state, land on newest flight. **Steps 1, 3, 4 built** 2026-09-30 (order 1 → 3 → 4 → 2); CloudKit user state + tombstones (step 2) next |
 | 2 | `FlightLogKit` package | 2, 3 | M | parsing, fuel and legs testable with `swift test`; home for the frequency index |
 | 3 | Frequency review + Bingo (#9) | 3 | M | per-flight frequency timeline from the index, then Bingo plan mode, then live. **Index + model merged** (PR #10); **timeline** merged (PR #11); plan mode and live mode built |
 | 4 | Post-flight fuel check | 2 | S | fuel card on the newest flight: used by totaliser vs tanks, landing fuel, refill to target |
@@ -142,9 +142,12 @@ only (which reads the aligned double frame), so it did not wait for C3.
 
 ### Phase 1: post-flight import + FlySto upload
 
-See `upload-and-import.md` (its phases 1-4). The user-visible result is the
-`+` flow above. Stays UIKit apart from the progress/uploads sheet, which can be
-the first SwiftUI screen.
+See `upload-and-import.md` (its steps 1-4, built in the order 1 → 3 → 4 → 2,
+decided 2026-09-29: the CloudKit schema is permanent once deployed, so it comes
+last). Steps 1, 3 and 4 built 2026-09-30: import off main into one iCloud Drive
+folder, a serial persisted FlySto queue with the credential in the Keychain, and
+the `+` sheet and Uploads screen in SwiftUI. Step 2 (CloudKit user state,
+tombstones) is next.
 
 ### Phase 2: `FlightLogKit`
 
@@ -222,7 +225,7 @@ rather than creating it.
 - Map: `MKPolyline` / `MKGradientPolylineRenderer` replace the custom renderer;
   once the Graphs tab is SwiftUI, a SwiftUI `Map` with `MapPolyline` as the
   Frequencies tab already does.
-- Order follows the core jobs: import/uploads sheet (phase 1) → frequency
+- Order follows the core jobs: import/uploads sheet (phase 1, done 2026-09-30) → frequency
   timeline (phase 3, done first: PR #11, the first SwiftUI screen) → fuel
   card (phase 4) → Settings → Graphs (Swift Charts) → list last. Stats and
   trips move only if they break.

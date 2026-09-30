@@ -1,7 +1,7 @@
 # UI: screens, map and graphs
 
 > As-built (reviewed 2026-09-27, Frequencies tab 2026-09-28, Frequency Bingo
-> 2026-09-29). UIKit, one storyboard, split view, plus one SwiftUI tab and one
+> 2026-09-29, import sheet and Uploads screen 2026-09-30). UIKit, one storyboard, split view, plus one SwiftUI tab and one
 > SwiftUI modal (Frequency Bingo). The Graphs map shows the flown
 > track only; there is no plan overlay, no annotations, no time cursor. Plan for
 > the next version: `plans/plan-vs-actual.md`.
@@ -23,7 +23,9 @@ MainSplitViewController (Main.storyboard initial, classic master/detail)
      StatsTabBarController (built in code) ─ Flights StatsTripsViewController
                                             ─ Details StatsDetailledViewController (stub)
 Modals (code): settings, bug report, UploadSettingsViewController popover,
-UIDocumentPicker, progress overlay, FrequencyBingoViewController (SwiftUI,
+UIDocumentPicker → PostFlightImportViewController (SwiftUI sheet),
+UploadsViewController (SwiftUI, More › Uploads), progress overlay,
+FrequencyBingoViewController (SwiftUI,
 "Frequency Bingo" in the More menu, or "Bingo this route" on the Frequencies
 tab; full screen, page sheet in compact width)
 ```
@@ -96,6 +98,40 @@ or `Settings`).
 - The Graphs tab's Comms grouping is still there; whether the timeline replaces
   it is the owner's call once it has been used.
 
+## Post-flight import sheet (`PostFlightImport.swift`)
+
+The `+` flow in one sheet (`plans/upload-and-import.md` §The post-flight flow),
+presented by the split view after the document picker. `@MainActor @Observable`
+`PostFlightImportModel` drives `FlightLogOrganizer.importLogs` and follows
+`UploadActivity`:
+
+- **SD card**: looking for new logs → (above 150 files) "Import all / Cancel" in
+  the sheet → copying n of N → "k new logs", or "No new logs on this card".
+- **Library**: "Saved to iCloud Drive" (or "on this device"), number of flights,
+  files that failed to copy.
+- **FlySto** (only when the import has flights): off, manual mode hint, Sign in
+  button when the queue paused, uploading n of N, then uploaded / failed with the
+  reason.
+- **Open latest flight** (bottom): selects the newest new flight in the detail
+  screen (`LogListTableViewController.openLog(name:)`) and closes the sheet.
+- Closing the sheet cancels nothing; closing it while it asks for a large import
+  answers Cancel. Progress steps arrive in their own tasks; one arriving after the
+  end is dropped.
+
+## Uploads screen (`UploadsView.swift`)
+
+More › Uploads. `UploadsModel` reloads `RecordUploadStore.overview()` on every
+`.newFileUploaded`. Sections: FlySto status (off, Sign in, uploading n of N,
+all uploaded), Waiting, Failed (reason, next retry). Actions menu: Retry all
+failed, Upload next N flights.
+
+The log list shows each log's FlySto status as the cell's accessory
+(`LogListTableViewCell.updateUploadStatus`): queued, uploaded, failed, nothing
+when never queued or FlySto is off; with an accessibility label.
+
+DEBUG: `-FLSImportFolder <path>` and `-FLSShowUploads YES` open the two screens
+at launch (`MainSplitViewController.viewDidAppear`), for the simulator.
+
 ## Frequency Bingo (`FrequencyBingo.swift`, `FrequencyBingoView.swift`)
 
 Plan and live modes of the Bingo tool, as specified in `future/frequency-bingo.md`
@@ -148,6 +184,7 @@ along the track on a rotated map) and applies `.ownshipLocate(live, position:)`.
 `FrequencyTimelineView`, `FrequencyTimelineViewModel`, `FrequencyTimeline`,
 `LiveLocation`, `OwnshipVector`, `OwnshipMapContent`, `ownshipLocate(_:position:)`,
 `FrequencyBingoViewController`, `FrequencyBingoView`, `FrequencyBingoViewModel`,
+`PostFlightImportViewController`, `PostFlightImportModel`, `UploadsViewController`, `UploadsModel`, `WindowReader`,
 `BingoLaunch`, `BingoRadio`, `BingoStore`,
 `StatsTabBarController`, `StatsTripsViewController`,
 `FlightLogViewModel`, `DisplayContext`, `ViewConfig`, `TableDataSource`,

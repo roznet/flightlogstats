@@ -1,119 +1,115 @@
 # Log import and iCloud sync
 
-> As-built (reviewed 2026-09-27, synced 2026-09-29). How a log gets from the SD card into the library,
-> how files and records are kept, and how iCloud sync works. Owner:
-> `FlightLogOrganizer`. Modernisation: `plans/upload-and-import.md`.
+> As-built (rewritten 2026-09-30 with phase 1 step 1 of `plans/upload-and-import.md`).
+> How a log gets from the SD card into the library, where files and records are
+> kept, and how other devices' logs arrive. Owners: `LogLibrary` (files) and
+> `FlightLogOrganizer` (records). The `+` sheet is in `ui-map-graphs.md`.
 
 ## Data flow
 
 ```
-SD card ──UIDocumentPicker (open in place, security scoped)──┐
-                                                             v
-   FlightLogOrganizer.search(in:)       coordinated, deep enumeration, classify by name
-   filterMissing / buildImportList      dedupe by file name, LogSelectionMethod
-   importFiles                          copy into app Documents/ (sync, on main)
-   addMissingRecordsFromLocal           scheduler: add(aircrafts:) + addMinimum
-       addMinimum                       FlightLogFileRecord + quick parse (1 row / 5 min)
-   updateRecords(count: 2)              worker: full parse, newest first, batches
-   syncCloud()                          Documents/ <-> iCloud Drive Documents/
+SD card ──UIDocumentPicker (open in place)──> PostFlightImportModel.start
+   FlightLogOrganizer.importLogs(from:selection:)      async, off main
+     known snapshot (names, system ids, newest date)    on worker
+     LogLibrary.importFiles                              any thread, holds the security scope
+       discover      one coordinated deep enumeration, each file once, hidden files skipped
+       filterMissing known record, or already in the folder (downloaded or not)
+       select        LogLibrary.Selection (import method setting)
+       confirm       above 150 new files, the sheet asks
+       copyIn        coordinated write into the library folder; rpt_ -> sys_<id>.json
+     addMissingRecordsFromLocal                          on worker
+       add(aircrafts:) + addMinimum (record + quick parse)
+       updateRecords(count: 2)                           full parse, batches, newest first
+   Uploads.uploadAfterImport(new logs)                   flights only, automatic mode
 ```
 
-## Decisions (as found)
+## Decisions
 
 | Area | Choice | Consequence |
 |---|---|---|
-| Source of truth | **Files**. Core Data is a cache of derived summaries, plus a few user inputs | Records can be rebuilt from files; user inputs cannot |
-| File identity | `lastPathComponent` (`log_YYMMDD_HHMMSS_<apt>.csv`) | No content hash; no Core Data uniqueness constraint |
+| Source of truth | **Files**. Core Data is a cache of derived summaries, plus user inputs and upload state | Records can be rebuilt from files; user inputs cannot |
+| One location | The library folder is the iCloud Drive container `Documents/` ("Flight Log Stats", `NSUbiquitousContainers`) when iCloud is on, the app's local `Documents/` otherwise (`FlightLogOrganizer.libraryFolder`) | No two-way copy; the Mac and `flightreconcile` see new logs without the app running |
+| Moving there | `openLibrary()` at launch (worker, before loading records): local-only logs and aircraft files move to iCloud Drive (`setUbiquitous`); a local copy of a file already there, downloaded or not, is **deleted** | A stale local copy cannot bring back a log deleted on another device. Files that fail to move stay local and are tried next launch |
+| File identity | `lastPathComponent` (`log_YYMMDD_HHMMSS_<apt>.csv`) | Size/hash identity from the plan is not built |
 | Classification | by name: `log_*.csv`, `rpt_*.csv`, `sys_*.json` (`String.logFileType`) | |
-| `rpt_` files | converted to `sys_<systemId>.json` via `AvionicsSystem`, never copied | aircraft identity = Garmin System ID, leading zeros stripped |
-| Local store | app `Documents/`, mirrored to the iCloud Drive container published as "Flight Log Stats" (`NSUbiquitousContainers`) | pilots can reach logs in Files |
-| Core Data | plain `NSPersistentContainer("FlightLogModel")`, local SQLite, `NSMergeByPropertyObjectTrumpMergePolicy` | **not synced** |
-| CloudKit | code present but disabled: `enableCloudKit = false`. Entitlements still declare `iCloud.net.ro-z.flightlogstats.records` | upload status, fuel entries and registrations are per device |
-| Aggregated store | `AggregatedDataOrganizer` (FMDB, 60 s buckets) | **disabled in production** (`aggregatedData = nil`), only tests use it |
-| Parse strategy | quick parse on add, full parse in batches of 2 later | list populates fast, details fill in |
+| `rpt_` files | converted to `sys_<systemId>.json` via `AvionicsSystem`, never copied | aircraft identity = Garmin System ID |
+| Security scope | started on the picked URLs for the whole import, copy included | no bookmarks (the old >150 path used unscoped ones) |
+| Threads | Core Data on `AppDelegate.worker` only (the scheduler queue is gone); record maps behind `synchronized(self)` for readers elsewhere | screens still read managed objects on main (see Gotchas) |
+| Core Data | plain `NSPersistentContainer("FlightLogModel")`, local SQLite, `NSMergeByPropertyObjectTrumpMergePolicy` | **not synced**; CloudKit user state is step 2 of the plan |
+| Parse strategy | quick parse on add, then `updateRecords`: one chain of batches at a time on worker, each batch re-dispatched so other worker work interleaves | a call while running only adds work; Rebuild Info queues every record |
+| iCloud downloads | a record whose file is only in iCloud is skipped (not marked error) and its download requested once | parsed when the watcher sees it arrive |
 | Record migration | `FlightLogFileRecord.currentVersion` (now 2); below it => `requiresParsing` | a bump re-parses the whole library |
 
 ## Core Data model
 
 `FlightLogModel.xcdatamodeld` (`usedWithCloudKit="YES"`, codegen `category`, all
-attributes optional, all delete rules Nullify). Current version **2**
-(`FlightLogModel 2.xcdatamodel`): version 1 without `FlightSavvyRecord` and
-`FlightLogFileRecord.savvy_record`, dropped with Savvy (`00c0366`). Stores
-migrate by inferred lightweight migration (the `NSPersistentStoreDescription`
-defaults); `testModelMigrationFromVersion1` opens a version 1 store with the
-current model. Keep every old version in the bundle: Core Data finds the source
-model there.
+attributes optional, all delete rules Nullify). Current version **3**:
+version 2 plus `FlightFlyStoRecord.attempts`, `last_error`, `next_retry` for the
+upload queue (`remote-upload.md`); version 2 dropped `FlightSavvyRecord`.
+Stores migrate by inferred lightweight migration; `testModelMigrationFromVersion1`
+opens a version 1 store with the current model. Keep every old version in the
+bundle.
 
 | Entity | Holds | Derived or user? |
 |---|---|---|
-| `FlightLogFileRecord` | `log_file_name`, `info_status`, `version`, times (engine/moving/flying), fuel start/end, `fuel_totalizer_total`, `route`, start/end ICAO, distance, max alt; to-one `aircraft_record`, `flysto_record`, `fuel_record` | derived |
+| `FlightLogFileRecord` | `log_file_name`, `info_status`, `version`, times, fuel start/end, totaliser, route, ICAOs, distance, max alt; to-one `aircraft_record`, `flysto_record`, `fuel_record` | derived |
 | `AircraftRecord` | `system_id`, `airframe_name`, `aircraft_identifier` (registration), `fuel_max`, `fuel_tab`, `gph` | mixed: registration and performance are user input |
 | `FlightFuelRecord` | added fuel L/R, target, totaliser start | user |
-| `FlightFlyStoRecord` | `upload_status`, `status_date`, `upload_response` (`{fileId}`) | service state |
+| `FlightFlyStoRecord` | `upload_status`, `status_date`, `upload_response` (`{fileId}`), `attempts`, `last_error`, `next_retry` | service state (the upload queue) |
 
-This split is the key fact for any redesign: **only the user and service state
-needs to sync**; everything else is reproducible from the CSVs.
+Only user and service state needs to sync; everything else is reproducible
+from the CSVs.
 
-## iCloud file sync
+## iCloud Drive
 
-`syncCloud()` resolves the ubiquity container, lists local files, and runs an
-`NSMetadataQuery` (`NSMetadataQueryUbiquitousDocumentsScope`) on main.
-`didFinishGathering` → `syncCloudLogic(localUrls:cloudUrls:)`:
-
-- local-only → plain `FileManager.copyItem` into the ubiquity folder
-  (uncoordinated write);
-- cloud-only → coordinated read, copy to `Documents/`, then
-  `addMissingRecordsFromLocal()`.
-
-Runs on every scene activation (`SceneDelegate.sceneDidBecomeActive`). No live
-`DidUpdate` handling, so changes arriving while the app is open are missed.
+- `watchLibrary()` (main, once, from `sceneDidBecomeActive`): one
+  `NSMetadataQuery` over the ubiquitous documents scope, kept running, observing
+  both `DidFinishGathering` and `DidUpdate` for that query only.
+- On each change (worker): logs and aircraft files not downloaded get
+  `startDownloadingUbiquitousItem` once; downloaded ones the library does not
+  know trigger `addMissingRecordsFromLocal`; otherwise pending parses resume.
+- `delete(info:)` removes the record and the file by a coordinated delete in the
+  library folder, so the log disappears on every device. An SD card that still
+  has the file imports it again (tombstones are step 2).
 
 ## Launch sequence
 
 `AppDelegate.didFinishLaunching` queues on `worker`: nav.db → `KnownAirports` /
-`KnownWaypoints`, then `loadFromContainer()` and `addMissingRecordsFromLocal()`.
-The serial queue guarantees airports exist before any parse needs
-`nearestAirport`.
+`KnownWaypoints`, then `openLibrary()` (resolve iCloud, move old local logs,
+remove `.csv.zip` litter), `loadFromContainer()`, `addMissingRecordsFromLocal()`,
+`Uploads.shared.start()`. The serial queue guarantees airports exist before any
+parse needs `nearestAirport`.
 
 ## Key exports
 
 | Symbol | Role |
 |---|---|
-| `FlightLogOrganizer.shared` | library singleton: container, `managedFlightLogs` (name → record), `managedAircrafts` (systemId → record) |
-| `search(in:completion:)` | security-scoped, coordinated discovery |
-| `filterMissing`, `buildImportList(urls:method:)`, `isSelected(url:in:)`, `importFiles` | dedupe, select, copy |
-| `importAndAddRecordsForFiles(urls:method:process:)` | picker entry point |
-| `addMissingRecordsFromLocal`, `add(aircrafts:)`, `addMinimum` | record creation |
-| `updateRecords(count:force:)` | batched full parse and version migration |
-| `syncCloud`, `syncCloudLogic` | iCloud Drive two-way copy |
-| `delete(info:)`, `deleteAndResetDatabase`, `deleteLocalFilesAndDatabase` | maintenance |
-| `LogSelectionMethod` | `.automatic`, `.selectedFile`, ... import scope |
+| `LogLibrary` | files: `discover(in:)`, `filterMissing`, `select`, `importFiles(from:selection:known:...)`, `copyIn`, `exists(name:in:)`, `delete(name:)`, `migrate(local:to:)`, `removeUploadArchives` |
+| `LogLibrary.Selection` | `.allMissingFromFolder`, `.sinceLatestImportedFile`, `.selectedFile([URL])`, `.afterDate` (alias `FlightLogOrganizer.LogSelectionMethod`) |
+| `LogLibrary.ImportProgress`, `ImportResult` | steps for the sheet: discovering, found, copying, copied, recorded |
+| `FlightLogOrganizer.shared` | records: `managedFlightLogs` (name → record), `managedAircrafts` (systemId → record), queries (`flightLogFileRecords(request:filter:)`, `first`, subscripts) |
+| `importLogs(from:selection:confirmLarge:progress:)` | the `+` import; returns the copy result and new record names |
+| `openLibrary`, `libraryFolder`, `watchLibrary` | one location, iCloud watcher |
+| `addMissingRecordsFromLocal`, `add(aircrafts:)`, `addMinimum` | record creation (worker) |
+| `updateRecords(count:force:)`, `isUpdatingRecords` | batched full parse |
+| `delete(info:)`, `deleteAndResetDatabase`, `deleteLocalFilesAndDatabase` | maintenance (the last two on worker) |
 | `FlightLogFileRecord` | `requiresParsing`, `parseAndUpdate(quick:)`, `updateFromFlightLog`, `ensure*Record` |
-| `FlightLogFile`, `FlightLogFileList` | file wrapper and sorted list |
-| `ProgressReport` (+ overlay / view controller) | progress model and bottom overlay |
-| `LogListTableViewController.addLog`, `documentPicker(_:didPickDocumentsAt:)` | UI entry |
+| `ProgressReport` (+ overlay) | parse progress in the list's bottom overlay |
 
 ## Gotchas
 
-- **Deleted logs come back.** `delete(info:)` removes the local file only; the
-  next `syncCloudLogic` copies it back from iCloud and re-creates the record.
-- **Import runs on main.** Search, coordination and copying are synchronous in
-  the picker callback; a full SD card freezes the UI.
-- **Security scope ends before a large import.** `search` stops access in a
-  `defer`; the ">150 files" path copies later through never-persisted minimal
-  bookmarks. Likely fails for an SD card on iOS (unverified on device).
-- **Double reporting.** The deep enumerator plus explicit `data_log` recursion
-  finds files twice; with several picked URLs, `completion` runs once per URL.
+- **Screens read managed objects on main** (list cells, summary, view model
+  reads) while worker writes them. Writes are confined to worker now; reads
+  move with the `@Observable` `FlightLogViewModel` (modernisation phase 6).
+- **Local copies are deleted at the first launch with iCloud on** when the same
+  name is in iCloud Drive; they were copies made by the old two-way sync.
+- A device without iCloud keeps its library local; when iCloud comes on later,
+  the next launch moves it.
 - **`.selectedFile` selects by path**: a found URL is selected if it is a picked
-  URL or lies under one (`FlightLogOrganizer.isSelected`, resolved and
-  standardised paths), so picking a folder, the Mac default, imports its logs
-  (I5, `26d469b`).
-- **Observers pile up.** `syncCloud(with:)` adds an `NSMetadataQuery` observer on
-  every activation and never stops the query.
-- **`updateRecords` state machine**: resets `currentState = .ready` right after
-  scheduling the next batch, defeating its own guard.
-- **Core Data threading.** `viewContext` is used from `worker`, `scheduler`, the
-  request queue and main. `-com.apple.CoreData.ConcurrencyDebug 1` should trap.
+  URL or lies under one (`LogLibrary.isSelected`), so picking a folder, the Mac
+  default, imports its logs.
 - **nav.db coverage.** Europe + North America only; `nearestAirport` has no
-  distance cutoff, so a flight outside coverage gets a wrong airport, not none.
-- **`Settings.databaseVersion`** is written, never read.
+  distance cutoff (C9).
+- `Settings.databaseVersion` was written, never read; no longer written.
+- DEBUG: `-FLSImportFolder <path>` opens the import sheet on a folder (simulator
+  testing without the document picker).

@@ -4,7 +4,8 @@
 > possible: Linux container). Mark items resolved with the commit; do not delete.
 > Items marked (inferred) are behaviour predicted from code, not observed.
 > Phase 0 fixes (2026-09-29) were also written without a local build; their
-> tests run in CI (`ios.yml`).
+> tests run in CI (`ios.yml`). Phase 1 steps 1, 3, 4 (2026-09-30) were built and
+> unit tested locally (simulator), not on a device with an SD card or FlySto.
 
 ## Build (blocking)
 
@@ -38,28 +39,28 @@
 
 | # | Issue |
 |---|---|
-| I1 | deleted logs are restored from iCloud on next sync |
-| I2 | import (search, coordinate, copy) runs synchronously on main |
-| I3 | security scope released before the ">150 files" deferred copy (inferred failure on device) |
-| I4 | files found twice (deep enumerator + explicit `data_log` recursion); completion per picked URL |
+| I1 | ~~deleted logs are restored from iCloud on next sync~~ Resolved for deletions: one library folder, a delete removes the iCloud Drive file, stale local copies removed at launch (`d6dec18`). Still open: an SD card that has the file imports it again (tombstones, step 2) |
+| I2 | ~~import (search, coordinate, copy) runs synchronously on main~~ Resolved: `importLogs` async, off main (`d6dec18`) |
+| I3 | ~~security scope released before the ">150 files" deferred copy~~ Resolved: the scope is held for the whole import, the confirmation happens inside it (`d6dec18`) |
+| I4 | ~~files found twice; completion per picked URL~~ Resolved: one deep enumeration, deduplicated (`d6dec18`) |
 | I5 | ~~`.selectedFile` with a folder picked imports nothing~~ Resolved: a picked folder selects the logs under it (`26d469b`) |
-| I6 | `NSMetadataQuery` observer added on every activation, query never stopped, no live updates |
-| I7 | `updateRecords` resets its state right after scheduling the next batch |
-| I8 | main-queue `viewContext` used from 4 queues; unsynchronised `managedFlightLogs` |
-| I9 | DEBUG "Delete last" / "Reset Database" trap on `dispatchPrecondition` |
+| I6 | ~~`NSMetadataQuery` observer added on every activation, no live updates~~ Resolved: one query started once, gathering and updates observed (`d6dec18`) |
+| I7 | ~~`updateRecords` resets its state right after scheduling the next batch~~ Resolved: one chain of batches at a time (`d6dec18`) |
+| I8 | main-queue `viewContext` used from 4 queues; unsynchronised `managedFlightLogs`. Partly resolved (`d6dec18`, `f1419fd`): writes on `worker` only (scheduler and request queues gone), record maps locked. Still open: screens read managed objects on main |
+| I9 | ~~DEBUG "Delete last" / "Reset Database" trap on `dispatchPrecondition`~~ Resolved: run on worker (`d6dec18`) |
 | I10 | Core Data not synced: user inputs and upload status are per device |
 
 ## Upload
 
 | # | Issue |
 |---|---|
-| U1 | `RequestQueue.Item` is a synchronous `Operation` wrapping async work: batch runs in parallel, completion fires early |
-| U2 | parallel FlySto token refresh on one refresh token (inferred credential wipe cascade) |
-| U3 | HTTP 400 classed as `denied`, wipes credentials |
-| U4 | OAuth state check disabled; tokens in UserDefaults. ~~Savvy token logged~~ (Savvy removed, `00c0366`) |
+| U1 | ~~`RequestQueue.Item` is a synchronous `Operation`: batch runs in parallel~~ Resolved: serial `UploadCoordinator` (`f1419fd`) |
+| U2 | ~~parallel FlySto token refresh on one refresh token~~ Resolved: refresh only when expired or after a 401, one at a time (`f1419fd`) |
+| U3 | ~~HTTP 400 classed as `denied`, wipes credentials~~ Resolved: permanent failure for that log, credential kept (`f1419fd`) |
+| U4 | ~~tokens in UserDefaults~~ Resolved: Keychain (`f1419fd`). A random state is sent, but a missing state is still allowed (FlySto's behaviour not verified). ~~Savvy token logged~~ (Savvy removed, `00c0366`) |
 | U5 | ~~Savvy: no retry, no token invalidation, no `.newFileUploaded` post~~ Resolved: Savvy removed (`00c0366`) |
-| U6 | viewing a log in automatic mode can open an auth screen unprompted |
-| U7 | `.csv.zip` files left in `Documents/` |
+| U6 | ~~viewing a log in automatic mode can open an auth screen unprompted~~ Resolved: no upload on display; sign in only from a button (`f1419fd`) |
+| U7 | ~~`.csv.zip` files left in `Documents/`~~ Resolved: zipped in a temporary folder; old ones removed at launch (`d6dec18`, `f1419fd`) |
 | U8 | ~~`secrets.sample.json` lacks `flysto.logFilesUrl`, `flightlogstats.bugreport`~~ Resolved (`c09955d`) |
 
 ## UI

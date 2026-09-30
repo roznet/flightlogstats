@@ -18,13 +18,13 @@ Key exports: `AppDelegate.worker`, `AppDelegate.knownAirports`, `AppDelegate.kno
 → Full doc: architecture.md
 
 ### log-import-sync
-SD card to library: document picker, discovery and dedupe by file name, copy into `Documents/`, quick then batched full parse, Core Data model (derived vs user fields), record versioning, iCloud Drive two-way copy via `NSMetadataQuery`. Core Data is local only (CloudKit disabled).
-Key exports: `FlightLogOrganizer`, `search(in:)`, `importAndAddRecordsForFiles`, `addMissingRecordsFromLocal`, `updateRecords(count:force:)`, `syncCloudLogic`, `FlightLogFileRecord`, `LogSelectionMethod`, `ProgressReport`
+SD card to library: the `+` import off main (`LogLibrary`: discovery, selection, coordinated copy holding the security scope), one library folder (iCloud Drive container, local only without iCloud; old local copies moved or removed at launch), iCloud Drive watcher (download, record), quick then batched full parse on worker, Core Data model (derived vs user fields, version 3), record versioning. Core Data is local only (CloudKit user state is step 2).
+Key exports: `LogLibrary`, `LogLibrary.Selection`, `ImportProgress`, `FlightLogOrganizer`, `importLogs(from:selection:)`, `openLibrary`, `watchLibrary`, `addMissingRecordsFromLocal`, `updateRecords(count:force:)`, `FlightLogFileRecord`, `ProgressReport`
 → Full doc: log-import-sync.md
 
 ### remote-upload
-FlySto (OAuth2, zipped POST) upload, per-log status records, the `RequestQueue`, triggers (manual, batch, "automatic" on display), error mapping, and why the queue actually runs in parallel. Savvy removed 2026-09-29 (stored token cleared at launch).
-Key exports: `RequestQueue`, `FlyStoRequest`, `FlyStoUploadRequest`, `FlyStoLogFilesRequest`, `FlightFlyStoRecord`, `RemoteServiceRecord.Status`, `Settings.removeObsoleteKeys`
+FlySto upload through a serial, persisted queue: `UploadCoordinator` over an `UploadService`, state in `FlightFlyStoRecord` (attempts, last error, next retry), failure classes (duplicate, auth pauses, transient backs off 1/5/30 min, permanent), triggers (after import, launch, network back, batch, per log; never on display), single-flight token refresh, Keychain credential, `ASWebAuthenticationSession` sign in. Savvy removed 2026-09-29.
+Key exports: `Uploads`, `UploadCoordinator`, `UploadService`, `UploadFailure`, `RecordUploadStore`, `UploadActivity`, `FlyStoService`, `FlyStoSignIn`, `KeychainStore`, `FlightFlyStoRecord`, `RemoteServiceRecord.Status`
 → Full doc: remote-upload.md
 
 ## Parsing & analysis
@@ -42,8 +42,8 @@ Key exports: `FlightSummary`, `FlightLeg.legs(byfields:)`, `TimeRange`, `Trips`,
 ## UI
 
 ### ui-map-graphs
-Screen map (split view, log tab bar, stats tab bar), map track overlay and graphs (`GCSimpleGraphView`), one-way leg → map/graph linking, the SwiftUI Frequencies tab (per-flight COM1 timeline from the Bingo index, numbered handoff markers), the Frequency Bingo screen (modal, `BingoLaunch`; plan mode, and live mode on the locate toggle), reusable live position (GPS locate toggle, aircraft icon, one-minute lead vector), `FlightLogViewModel` / `TableDataSource` / `DisplayContext` presentation pattern, observer leaks, accessibility gaps.
-Key exports: `MainSplitViewController`, `LogTabBarController`, `LogMapGraphsViewController`, `FrequencyTimelineViewController`, `FrequencyTimelineViewModel`, `FrequencyBingoViewController`, `FrequencyBingoViewModel`, `BingoLaunch`, `LiveLocation`, `OwnshipMapContent`, `FlightDataMapOverlay`, `FlightDataMapOverlayView`, `FlightLogViewModel`, `TableDataSource`, `DisplayContext`
+Screen map (split view, log tab bar, stats tab bar), map track overlay and graphs (`GCSimpleGraphView`), one-way leg → map/graph linking, the SwiftUI Frequencies tab (per-flight COM1 timeline from the Bingo index, numbered handoff markers), the Frequency Bingo screen (modal, `BingoLaunch`; plan mode, and live mode on the locate toggle), the post-flight import sheet and the Uploads screen (SwiftUI), per-row FlySto status, reusable live position (GPS locate toggle, aircraft icon, one-minute lead vector), `FlightLogViewModel` / `TableDataSource` / `DisplayContext` presentation pattern, observer leaks, accessibility gaps.
+Key exports: `MainSplitViewController`, `PostFlightImportViewController`, `PostFlightImportModel`, `UploadsViewController`, `UploadsModel`, `LogTabBarController`, `LogMapGraphsViewController`, `FrequencyTimelineViewController`, `FrequencyTimelineViewModel`, `FrequencyBingoViewController`, `FrequencyBingoViewModel`, `BingoLaunch`, `LiveLocation`, `OwnshipMapContent`, `FlightDataMapOverlay`, `FlightDataMapOverlayView`, `FlightLogViewModel`, `TableDataSource`, `DisplayContext`
 → Full doc: ui-map-graphs.md
 
 ## Python lab
@@ -64,6 +64,6 @@ Dated (2026-09-27) inventory of verified bugs: build (B), correctness (C), impor
 Not INDEX modules; linked here for discovery.
 
 - `plans/modernisation.md`: roadmap ordered by the app's core jobs (post-flight import + FlySto upload, fuel, frequencies): build/CI, import + upload, FlightLogKit, frequency review + Bingo, fuel check, plan vs actual, UI migration.
-- `plans/upload-and-import.md`: LogLibrary actor, derived vs CloudKit user-state stores, tombstones, FlySto-only `UploadCoordinator`, Mac Catalyst as the iCloud Drive hub.
+- `plans/upload-and-import.md`: phase 1; steps 1 (LogLibrary, one iCloud location), 3 (upload queue) and 4 (`+` sheet, Uploads screen) built 2026-09-30; step 2 (CloudKit user state, tombstones) next.
 - `plans/plan-vs-actual.md`: position relative to the plan; one `RouteTracker`, log replay and live GPS sources, Route tab; ForeFlight navlog deferred.
 - `future/frequency-bingo.md`: ATC frequency prediction from the pilot's own logs; index, model, per-flight timeline, plan mode and live mode built (standalone tool, `RZFlight.Route` / `FlightExchange` routes, current / previous / next radio, GPS ladder with handoff distance/ETA); confirmation taps next.

@@ -15,7 +15,7 @@
   the flown track with legs by waypoint / phase / comms / autopilot mode, and the
   frequency timeline (debounced COM1 segments from the Frequency Bingo index).
 - **Corpus views**: trips (away-from-base grouping) and monthly statistics.
-- **Upload**: FlySto (OAuth2) per log, manual or batch.
+- **Upload**: FlySto (OAuth2), serial persisted queue, after import, per log or batch.
 - **Lab**: `python/flightreconcile/` is where new analyses are prototyped
   (plan vs actual, corridor comparison, frequency prediction) before any Swift.
 
@@ -32,7 +32,7 @@
  Library  │ FlightLogOrganizer (singleton)                log-import-sync.md
           │   Core Data (NSPersistentContainer, local only)
           │   Documents/ <-> iCloud Drive Documents (NSMetadataQuery copy)
-          │ RequestQueue -> FlyStoRequest                  remote-upload.md
+          │ UploadCoordinator -> FlyStoService           remote-upload.md
  ─────────┼────────────────────────────────────────────────────────────────
  Parsing  │ CsvParser -> FlightData -> RZData DataFrame   log-parsing.md
  Analysis │ FlightSummary, FlightLeg, Trips, FuelAnalysis  analysis.md
@@ -65,15 +65,13 @@ GCD only, no async/await, no actors.
 
 | Queue | Owner | Used for |
 |---|---|---|
-| `AppDelegate.worker` | serial | de facto Core Data queue, full parses, nav.db load |
-| `FlightLogOrganizer.scheduler` | serial | adding new records (`addMinimum`) |
-| `FlightLogOrganizer.queue` | `OperationQueue` | `NSFileCoordinator` callbacks |
-| `RequestQueue.operationQueue` | `OperationQueue`, unbounded | uploads |
-| main | | UI, `NSMetadataQuery`, document picker import (synchronous) |
+| `AppDelegate.worker` | serial | the Core Data queue (all writes), record creation, full parses, nav.db load |
+| Swift concurrency | `LogLibrary.importFiles` task, `UploadCoordinator` and `FlyStoService` actors | import discovery and copy, uploads |
+| main | | UI, the iCloud Drive `NSMetadataQuery`, `UploadActivity` |
 
-`dispatchPrecondition(.onQueue(AppDelegate.worker))` guards many mutators, but
-the context is the main-queue `viewContext`, so the Core Data threading contract
-is violated by design. Change notification is `NotificationCenter` throughout
+`dispatchPrecondition(.onQueue(AppDelegate.worker))` guards the mutators. The
+context is still the main-queue `viewContext` and screens read managed objects
+on main, so the threading contract holds for writes only (I8). Change notification is `NotificationCenter` throughout
 (`.logFileRecordUpdated`, `.newLocalFilesDiscovered`, `.newFileUploaded`, ...).
 
 ## Dependencies that matter
@@ -95,7 +93,7 @@ declares them (for its tests), so SPM resolves them.
 | File | What |
 |---|---|
 | `AppDelegate.swift` | `AppDelegate.worker`, `.db`, `.knownAirports`, `.knownWaypoints`; nav.db load at launch |
-| `SceneDelegate.swift` | `syncCloud()` on activation, OAuth callback |
+| `SceneDelegate.swift` | `watchLibrary()` and upload drain on activation, OAuth callback |
 | `FlightLogOrganizer.swift` | the library singleton; see `log-import-sync.md` |
 | `Settings.swift` | `Settings.shared`, UserDefaults property wrappers incl. credentials |
 | `Log.swift` | `Logger.app/ui/sync/net` (RZLogger) |
