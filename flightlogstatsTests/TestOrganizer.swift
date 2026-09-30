@@ -220,6 +220,23 @@ class TestOrganizer: XCTestCase {
         }
         
         XCTAssertTrue(LibraryStore.needsLegacyMigration(directory: folder))
+        
+        // an earlier launch stopped after saving the copy, before renaming the old store:
+        // the copy runs again and adds nothing twice
+        let interrupted = LibraryStore.makeContainer(model: FlightLogOrganizer.managedObjectModel, directory: folder, cloudKit: false)
+        let firstCopy = LibraryStore.migrateLegacy(directory: folder, into: interrupted.viewContext)
+        XCTAssertEqual(firstCopy, LibraryStore.LegacyCopy(logs: 1, aircraft: 1, fuel: 1, uploads: 1))
+        for suffix in ["", "-wal", "-shm"] {
+            let backup = folder.appendingPathComponent(LibraryStore.legacyBackupName + suffix)
+            if FileManager.default.fileExists(atPath: backup.path) {
+                try FileManager.default.moveItem(at: backup, to: folder.appendingPathComponent(LibraryStore.legacyStoreName + suffix))
+            }
+        }
+        for store in interrupted.persistentStoreCoordinator.persistentStores {
+            try interrupted.persistentStoreCoordinator.remove(store)
+        }
+        XCTAssertTrue(LibraryStore.needsLegacyMigration(directory: folder))
+        
         let organizer = FlightLogOrganizer()
         organizer.persistentContainer = FlightLogOrganizer.makeLibraryContainer(directory: folder, cloudKit: false)
         XCTAssertEqual(organizer.persistentContainer.persistentStoreCoordinator.persistentStores.count, 2)
@@ -227,6 +244,11 @@ class TestOrganizer: XCTestCase {
             organizer.loadFromContainer()
         }
         XCTAssertEqual(organizer.count, 1)
+        let context = organizer.persistentContainer.viewContext
+        let counts = try ["FlightLogFileRecord", "AircraftRecord", "FlightFuelRecord", "FlightFlyStoRecord"].map {
+            try context.count(for: NSFetchRequest<NSManagedObject>(entityName: $0))
+        }
+        XCTAssertEqual(counts, [1, 1, 1, 1])
         let record = try XCTUnwrap(organizer[logName])
         XCTAssertEqual(record.recordStatus, .parsed)
         XCTAssertFalse(record.requiresParsing)

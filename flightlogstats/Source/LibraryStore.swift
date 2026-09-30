@@ -58,11 +58,10 @@ enum LibraryStore {
 
     //MARK: - Split of the old single store
 
-    /// True when the old single store is there and the new ones are not yet.
+    /// True while the old single store is still there: it is renamed only once its
+    /// copy is saved, so a copy interrupted (app stopped) runs again at the next launch.
     static func needsLegacyMigration(directory : URL) -> Bool {
-        let fm = FileManager.default
-        return fm.fileExists(atPath: directory.appendingPathComponent(Self.legacyStoreName).path)
-            && !fm.fileExists(atPath: directory.appendingPathComponent(Self.derivedStoreName).path)
+        return FileManager.default.fileExists(atPath: directory.appendingPathComponent(Self.legacyStoreName).path)
     }
 
     /// Model version 3, the last with one store, with plain managed objects: the record
@@ -85,7 +84,8 @@ enum LibraryStore {
 
     /// Copy the old store (model 1 to 3, migrated to 3 on open) into `context`, then move
     /// the old files aside as a backup. Derived records are copied too, so nothing is
-    /// parsed again.
+    /// parsed again. Records already in the new stores (a copy saved but not renamed
+    /// before the app stopped) are not copied twice.
     /// - Returns: what was copied, nil if the old store could not be read (it is left in place)
     static func migrateLegacy(directory : URL, into context : NSManagedObjectContext) -> LegacyCopy? {
         let url = directory.appendingPathComponent(Self.legacyStoreName)
@@ -132,18 +132,27 @@ enum LibraryStore {
             return (object.value(forKey: "log_file_record") as? NSManagedObject)?.value(forKey: "log_file_name") as? String
         }
 
-        for log in fetch("FlightLogFileRecord") where log.value(forKey: "log_file_name") != nil {
+        /// keys already in the new stores
+        func existing(_ entity : String, key : String) -> Set<String> {
+            let request = NSFetchRequest<NSManagedObject>(entityName: entity)
+            let objects = (try? context.fetch(request)) ?? []
+            return Set(objects.compactMap { $0.value(forKey: key) as? String })
+        }
+        
+        var logNames = existing("FlightLogFileRecord", key: "log_file_name")
+        for log in fetch("FlightLogFileRecord") {
+            guard let name = log.value(forKey: "log_file_name") as? String, logNames.insert(name).inserted else { continue }
             _ = insert("FlightLogFileRecord", from: log)
             copy.logs += 1
         }
-        var systemIds : Set<String> = []
+        var systemIds = existing("AircraftRecord", key: "system_id")
         for aircraft in fetch("AircraftRecord") {
             guard let systemId = aircraft.value(forKey: "system_id") as? String, systemIds.insert(systemId).inserted else { continue }
             _ = insert("AircraftRecord", from: aircraft)
             copy.aircraft += 1
         }
         for (entity, count) in [("FlightFuelRecord", \LegacyCopy.fuel), ("FlightFlyStoRecord", \LegacyCopy.uploads)] {
-            var names : Set<String> = []
+            var names = existing(entity, key: "log_file_name")
             for record in fetch(entity) {
                 guard let name = logName(record), names.insert(name).inserted else { continue }
                 let rv = insert(entity, from: record)

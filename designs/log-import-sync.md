@@ -87,7 +87,8 @@ logs newly hidden by another device, post `.localFileListChanged` and
 and 2), every record is copied into the new stores (derived records too, so
 nothing is re-parsed; per-log records get their log's name from the old
 relationship), and the old files are renamed `FlightLogModel-v3-backup.sqlite`.
-If the copy fails the old store is left in place and tried again next launch.
+The old file is renamed only after the copy is saved, so a copy that fails or is
+interrupted runs again next launch; records already copied are not copied twice.
 Tested by `testLegacyStoreSplit` from a version 1 store.
 
 ## iCloud Drive
