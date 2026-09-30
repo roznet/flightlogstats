@@ -13,7 +13,6 @@ import OSLog
 
 extension Notification.Name {
     static let flightLogViewModelChanged : Notification.Name = Notification.Name("Notification.Name.logViewModelChanged")
-    static let flightLogViewModelUploadFinished : Notification.Name = Notification.Name("Notification.Name.logViewModelUploadFinished")
 }
 
 class FlightLogViewModel {
@@ -285,58 +284,31 @@ class FlightLogViewModel {
     
     //MARK: - Servive Synchronization
     
-    private var flyStoRequest : FlyStoUploadRequest? = nil
     var flystoStatus : FlightFlyStoRecord.Status  { return self.flightLogFileRecord.flystoStatus }
     var flystoUpdateDate : Date? { return self.flightLogFileRecord.flystoUpdateDate }
     
-    func startServiceSynchronization(viewController : UIViewController, force : Bool = false) {
-        // don't bother if no network
-        guard RZSystemInfo.networkAvailable() else {
-            Logger.net.info("No network available, skipping uploads")
+    /// Queue this log for upload (a user action: the queue never signs in on its own).
+    func startServiceSynchronization(force : Bool = false) {
+        guard let name = self.flightLogFileRecord.log_file_name else { return }
+        Uploads.shared.upload(name, force: force)
+    }
+    
+    /// Open the log on FlySto; uploads it first if FlySto has no file id for it.
+    func openInFlySto() {
+        guard let receipt = self.flightLogFileRecord.flystoReceipt,
+              self.flightLogFileRecord.flystoLogFilesInformationAvailable else {
+            Logger.ui.info("Missing flySto fileId, uploading")
+            self.startServiceSynchronization(force: self.flystoStatus == .uploaded)
             return
         }
-        
-        if self.flightLogFileRecord.url != nil {
-            RequestQueue.shared.add(record: self.flightLogFileRecord, viewController: viewController, force: force, progress: self.progress)
-        }
-    }
-    private var flyStoLogFileRequest : FlyStoLogFilesRequest? = nil
-    
-    func startFlyStoLogFileUrl(viewController : UIViewController, first : Bool = true) {
-        var started = false
-        if (self.flystoStatus == .uploaded && !self.flightLogFileRecord.flystoLogFilesInformationAvailable) || self.flystoStatus == .ready {
-            guard first else { return };
-            
-            if let url = self.flightLogFileRecord.url {
-                Logger.ui.info("Missing flySto fileId, uploading")
-                self.progress?.update(state: .start, message: .uploadingFiles)
-                started = true
-                self.flyStoRequest = FlyStoUploadRequest(viewController: viewController, url: url)
-                self.flyStoRequest?.execute() {
-                    status,req in
-                    AppDelegate.worker.async {
-                        self.flightLogFileRecord.flyStoUploadCompletion(status: status, request: req)
-                        NotificationCenter.default.post(name: .flightLogViewModelUploadFinished, object: self)
-                        self.save()
-                        Logger.ui.info("should have flySto fileId, trying again")
-                        self.startFlyStoLogFileUrl(viewController: viewController, first: false)
-                    }
-                }
-            }
-        }
-        if (self.flystoStatus == .uploaded && self.flightLogFileRecord.flystoLogFilesInformationAvailable),
-           let req = self.flightLogFileRecord.flyStoLogFilesRequest(viewController: viewController) {
-            if !started {
-                self.progress?.update(state: .start, message: .uploadingFiles)
-            }
-            req.execute() { status, req in
-                if let req = req as? FlyStoLogFilesRequest,
-                   let url = req.url {
+        Task {
+            do {
+                if let url = try await FlyStoService.shared.logPage(for: receipt) {
                     Logger.ui.info("got flysto url: \(url)")
-                    DispatchQueue.main.async {
-                        UIApplication.shared.open(url)
-                    }
+                    await UIApplication.shared.open(url)
                 }
+            }catch{
+                Logger.net.error("Failed to find the FlySto page \(error.localizedDescription)")
             }
         }
     }

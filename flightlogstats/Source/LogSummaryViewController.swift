@@ -52,7 +52,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.updateUI()
             }
         }
-        NotificationCenter.default.addObserver(forName: .flightLogViewModelUploadFinished, object: nil, queue: nil){
+        NotificationCenter.default.addObserver(forName: .newFileUploaded, object: nil, queue: nil){
             notification in
             DispatchQueue.main.async{
                 self.updateUI()
@@ -83,10 +83,21 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
     // MARK: - Actions
     
     @IBAction func exportButton(_ sender: Any) {
-        if Settings.shared.flystoEnabled {
-            self.flightLogViewModel?.startServiceSynchronization(viewController: self)
-        }else{
+        guard Settings.shared.flystoEnabled else {
             self.showServiceConfigurationPopup()
+            return
+        }
+        Task {
+            // tapped by the user: the one place a sign in may be asked from this screen
+            if await FlyStoService.shared.state() == .needsSignIn {
+                do {
+                    try await Uploads.shared.signIn(from: self.view.window)
+                }catch{
+                    Logger.net.error("FlySto sign in failed \(error.localizedDescription)")
+                    return
+                }
+            }
+            self.flightLogViewModel?.startServiceSynchronization()
         }
     }
     
@@ -110,14 +121,7 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
     
     @IBAction func openFlySto(_ sender: Any) {
         if Settings.shared.flystoEnabled {
-            self.flightLogViewModel?.startFlyStoLogFileUrl(viewController: self)
-        }
-    }
-    func startAutomaticUploadIfNeeded() {
-        if Settings.shared.uploadMethod == .automatic, let viewModel = self.flightLogViewModel {
-            if viewModel.flightLogFileRecord.recordStatus == .parsed {
-                viewModel.startServiceSynchronization(viewController: self)
-            }
+            self.flightLogViewModel?.openInFlySto()
         }
     }
 
@@ -269,7 +273,6 @@ class LogSummaryViewController: UIViewController,ViewModelDelegate {
                 self.progressView.setProgress(0.0, animated: false)
                 self.progressView.isHidden = false
             }
-            self.startAutomaticUploadIfNeeded()
         }
     }
     

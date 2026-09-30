@@ -72,9 +72,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             },
             UIAction(title: "Upload next \(Settings.shared.uploadBatchCount) flights", image: UIImage(systemName: "square.and.arrow.up")){
                 _ in
-                let vc = (self.delegate as? UIViewController) ?? self
-                FlightLogOrganizer.shared.buildUploadList(viewController: vc)
-                self.tableView.reloadData()
+                Uploads.shared.uploadNextBatch()
             },
             UIAction(title: "Delete/Restore Logs", image: UIImage(systemName: "minus.circle")){
                 _ in
@@ -524,6 +522,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         let organizer = self.logFileOrganizer
         Task {
             let added = await organizer.importLogs(from: urls, selection: selection)
+            Uploads.shared.uploadAfterImport(added)
             if added.isEmpty {
                 self.progressReportOverlay?.removeOverlay()
             }

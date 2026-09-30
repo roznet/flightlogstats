@@ -10,13 +10,13 @@ import Foundation
 class RemoteServiceRecord {
     
     enum Status : String {
-        /// files with status pending should be uploaded when opportunity occurs in background upload
+        /// queued: uploaded by `UploadCoordinator` when it drains
         case pending
         /// ready is default, and nothing should happen automatically, but can be manually uploaded
         case ready
         /// already uploaded, nothing to do
         case uploaded
-        /// failed
+        /// failed: retried at `next_retry` if set, else on Retry all
         case failed
         
         var description : String {

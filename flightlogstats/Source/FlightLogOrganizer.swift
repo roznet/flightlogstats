@@ -629,25 +629,6 @@ class FlightLogOrganizer {
         Logger.app.info("Deleted \(count) out of \(names.count) files")
     }
 
-    //MARK: - Upload File management
-
-    func buildUploadList(viewController : UIViewController) {
-        let list = self.flightLogFileRecords(request: .flightsOnly){
-            record in
-            if (record.recordStatus == .quickParsed || record.recordStatus == .parsed) {
-                if Settings.shared.flystoEnabled && record.flystoStatus != .uploaded {
-                    return true
-                }
-            }
-            return false
-        }
-        let count = Settings.shared.uploadBatchCount
-        let todo = Array(list.prefix(min(count, list.count)))
-        Logger.ui.info("\(list.count) / \(self.count) potential to upload, will upload \(todo.count)")
-        RequestQueue.shared.add(records: todo, viewController: viewController)
-
-    }
-
     //MARK: - Aggregated Data
     /// Maintained full history of aggregatedData.
     /// When records are updated this will be update. Can be nil to disable the aggregation all together

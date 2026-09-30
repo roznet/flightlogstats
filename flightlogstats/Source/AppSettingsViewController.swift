@@ -47,6 +47,7 @@ class AppSettingsViewController: UIViewController {
     @IBAction func uiControlChanged(_ sender: Any) {
         if (sender as? UISwitch) == self.flyStoSwitch {
             Settings.shared.flystoEnabled = self.flyStoSwitch.isOn
+            Uploads.shared.drain()
         }else if (sender as? UIDatePicker) == self.datePicker {
             Settings.shared.importStartDate = self.datePicker.date
         }else if (sender as? UISwitch) == self.uploadMethodSwitch {

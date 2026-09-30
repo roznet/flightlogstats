@@ -13,7 +13,7 @@ import RZUtilsSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    public static let worker = DispatchQueue(label: "net.ro-z.flightlogstats.worker")
+    nonisolated public static let worker = DispatchQueue(label: "net.ro-z.flightlogstats.worker")
     public static let queue = OperationQueue()
     
     private let keepOrganizer = FlightLogOrganizer.shared
@@ -47,6 +47,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             FlightLogOrganizer.shared.openLibrary()
             FlightLogOrganizer.shared.loadFromContainer()
             FlightLogOrganizer.shared.addMissingRecordsFromLocal()
+            // what was queued before the app last stopped
+            Uploads.shared.start()
         }
         
         return true

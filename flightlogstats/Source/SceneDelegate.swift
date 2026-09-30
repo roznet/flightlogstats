@@ -37,6 +37,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // once: new logs from other devices arrive through the iCloud Drive query
         FlightLogOrganizer.shared.watchLibrary()
+        Uploads.shared.drain()
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     }
@@ -68,7 +69,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         for context in URLContexts {
-            if context.url.path == "/oauth/flysto" {
+            // the sign in callback, or its cancellation (no path, an error query)
+            if context.url.path == "/oauth/flysto" || (context.url.query ?? "").contains("error=") {
                 Logger.app.info("opening context \(context.url)")
                 OAuthSwift.handle(url: context.url)
             }else{

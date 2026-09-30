@@ -19,22 +19,18 @@ class UploadSettingsViewController: UIViewController {
     @IBOutlet weak var flystoSubStatusLabel: UILabel!
     
     @IBAction func logoutFlysto(_ sender: Any) {
-        FlyStoRequest.clearCredential()
+        Uploads.shared.signOut()
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
     }
     
     @IBAction func forceUpload(_ sender: Any) {
         self.dismiss(animated: true)
-        if let parent = self.summaryViewController {
-            self.flightLogViewModel?.startServiceSynchronization(viewController: parent,force: true)
-        }
+        self.flightLogViewModel?.startServiceSynchronization(force: true)
     }
     
     @IBAction func openInFlysto(_ sender: Any) {
         self.dismiss(animated: true)
-        if let parent = self.summaryViewController {
-            self.flightLogViewModel?.startFlyStoLogFileUrl(viewController: parent)
-        }
+        self.flightLogViewModel?.openInFlySto()
     }
     
     override func viewDidLoad() {
@@ -49,6 +45,7 @@ class UploadSettingsViewController: UIViewController {
     @IBAction func uiControlChanged(_ sender: Any) {
         if (sender as? UISwitch) == self.flystoSwitch {
             Settings.shared.flystoEnabled = self.flystoSwitch.isOn
+            Uploads.shared.drain()
         }
         NotificationCenter.default.post(name: .settingsViewControllerUpdate, object: self)
         self.viewFromSettings()
