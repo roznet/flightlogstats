@@ -131,11 +131,12 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             ]
 #if DEBUG
         menuItems.append(contentsOf: [
-            UIAction(title: "Delete last", image: UIImage(systemName: "minus.circle")){
+            UIAction(title: "Forget last (testing)", image: UIImage(systemName: "arrow.uturn.backward.circle")){
                 _ in
+                // replay the post-flight flow: the SD card imports and uploads it again
                 if let info = self.logFileOrganizer.first(request: .flightsOnly), let log_file_name = info.log_file_name {
-                    Logger.ui.info("Deleting \(log_file_name)")
-                    self.logFileOrganizer.delete(info: info)
+                    Logger.ui.info("Forgetting \(log_file_name)")
+                    self.logFileOrganizer.forget(info: info)
                 }
             },
             UIAction(title: "Rebuild Info", image: UIImage(systemName: "plus.circle")){

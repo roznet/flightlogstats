@@ -740,6 +740,27 @@ class FlightLogOrganizer : @unchecked Sendable {
         }
     }
     
+    /// Testing: make the library forget a log as if it had never been imported, so the
+    /// next import of a card that has it records and uploads it again. Removes the file,
+    /// the record and its fuel and FlySto records; leaves **no tombstone** (unlike
+    /// `delete(info:)`).
+    func forget(info : FlightLogFileRecord){
+        AppDelegate.worker.async {
+            guard let name = info.log_file_name else { return }
+            let context = self.persistentContainer.viewContext
+            let fuel = self.fuelRecord(logFileName: name)
+            let flysto = self.flyStoRecord(logFileName: name)
+            DispatchQueue.synchronized(self) {
+                _ = self.managedFuelRecords.removeValue(forKey: name)
+                _ = self.managedFlyStoRecords.removeValue(forKey: name)
+            }
+            if let fuel = fuel { context.delete(fuel) }
+            if let flysto = flysto { context.delete(flysto) }
+            self.library.delete(name: name)
+            self.removeRecords(names: [name])
+        }
+    }
+    
     /// Drop the derived records of deleted logs (worker only). Files are left alone: the
     /// device that deleted the log removed it from iCloud Drive.
     private func removeRecords(names : Set<String>) {

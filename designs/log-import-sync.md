@@ -124,7 +124,8 @@ parse needs `nearestAirport`.
 | `openLibrary`, `libraryFolder`, `watchLibrary` | one location, iCloud watcher |
 | `addMissingRecordsFromLocal`, `add(aircrafts:)`, `addMinimum` | record creation (worker) |
 | `updateRecords(count:force:)`, `isUpdatingRecords` | batched full parse |
-| `delete(info:)`, `isHidden(logFileName:)` | delete with a tombstone |
+| `delete(info:)`, `isHidden(logFileName:)` | delete with a tombstone (no UI yet) |
+| `forget(info:)` | testing (DEBUG › Forget last): file, record, fuel and FlySto records removed, **no tombstone**, so re-importing the card replays import and upload |
 | `reloadUserState`, `fuelRecord(logFileName:)`, `flyStoRecord(logFileName:)`, `existingAircraft(systemId:)` | user state (UserState store) |
 | `LibraryStore` | store descriptions, `makeContainer`, `migrateLegacy`, `deduplicate`, `HiddenLog` |
 | `initializeCloudKitSchema` | DEBUG: push the schema to CloudKit Development |

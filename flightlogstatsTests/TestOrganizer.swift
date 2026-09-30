@@ -358,12 +358,30 @@ class TestOrganizer: XCTestCase {
         XCTAssertNil(organizer[other])
         XCTAssertEqual(organizer.count, logs.count - 2)
         
+        // forget (testing) is not a deletion: the card brings the log back, with a fresh
+        // upload state
+        let forgotten = logs[2]
+        let record = try XCTUnwrap(organizer[forgotten])
+        AppDelegate.worker.sync {
+            record.flystoStatus = .uploaded
+            organizer.saveContext()
+        }
+        organizer.forget(info: record)
+        AppDelegate.worker.sync {}
+        XCTAssertNil(organizer[forgotten])
+        XCTAssertFalse(organizer.isHidden(logFileName: forgotten))
+        XCTAssertNil(organizer.flyStoRecord(logFileName: forgotten))
+        let back = await organizer.importLogs(from: [card], selection: .allMissingFromFolder)
+        XCTAssertEqual(back.added, [forgotten])
+        XCTAssertEqual(organizer[forgotten]?.flystoStatus, .ready)
+        
         // a new organizer on the same stores (next launch) keeps them deleted
         let relaunch = FlightLogOrganizer()
         relaunch.persistentContainer = organizer.persistentContainer
         relaunch.localFolder = library
         AppDelegate.worker.sync { relaunch.loadFromContainer() }
         XCTAssertEqual(relaunch.count, logs.count - 2)
+        XCTAssertNotNil(relaunch[forgotten])
         XCTAssertTrue(relaunch.isHidden(logFileName: deleted))
         XCTAssertTrue(relaunch.isHidden(logFileName: other))
     }
