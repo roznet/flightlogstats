@@ -43,6 +43,22 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
         
     }
     
+#if DEBUG
+    /// Development: `-FLSImportFolder <path>` opens the import sheet on a folder, and
+    /// `-FLSShowUploads YES` the Uploads screen, without the document picker.
+    private var debugLaunchDone = false
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard !self.debugLaunchDone, let list = self.logListController else { return }
+        self.debugLaunchDone = true
+        if let path = UserDefaults.standard.string(forKey: "FLSImportFolder") {
+            list.documentPicker(UIDocumentPickerViewController(forOpeningContentTypes: [.folder]), didPickDocumentsAt: [URL(fileURLWithPath: path)])
+        }else if UserDefaults.standard.bool(forKey: "FLSShowUploads") {
+            self.present(UploadsViewController(), animated: true)
+        }
+    }
+#endif
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 

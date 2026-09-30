@@ -117,9 +117,10 @@ class TestOrganizer: XCTestCase {
         try FileManager.default.copyItem(at: bundle.appendingPathComponent(TestLogLibrary.rpt), to: card.appendingPathComponent(TestLogLibrary.rpt))
         
         let steps = Steps()
-        let added = await organizer.importLogs(from: [card], selection: .allMissingFromFolder) { step in
+        let (result, added) = await organizer.importLogs(from: [card], selection: .allMissingFromFolder) { step in
             steps.append(step)
         }
+        XCTAssertEqual(Set(result.copiedLogs), Set(logs))
         XCTAssertEqual(Set(added), Set(logs))
         XCTAssertEqual(organizer.count, logs.count)
         XCTAssertEqual(organizer.aircraftCount, 1)
@@ -145,7 +146,8 @@ class TestOrganizer: XCTestCase {
         
         // importing again finds nothing new
         let again = await organizer.importLogs(from: [card], selection: .allMissingFromFolder)
-        XCTAssertTrue(again.isEmpty)
+        XCTAssertTrue(again.added.isEmpty)
+        XCTAssertTrue(again.result.copied.isEmpty)
         
         // deleting removes the record and the library file
         organizer.delete(info: flight)

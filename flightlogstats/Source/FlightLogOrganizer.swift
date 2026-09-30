@@ -20,7 +20,8 @@ extension Notification.Name {
 
 /// The library of records. Core Data is used on `AppDelegate.worker` only (the managed
 /// objects are still read from main by the screens); files go through `LogLibrary`.
-class FlightLogOrganizer {
+/// Sendable by convention: state changes on `worker`, record maps behind a lock.
+class FlightLogOrganizer : @unchecked Sendable {
     public static var shared : FlightLogOrganizer = {
         let organizer = FlightLogOrganizer()
         organizer.frequencyIndex = FrequencyIndexOrganizer(databaseName: "frequencyIndex.db")
@@ -737,12 +738,12 @@ class FlightLogOrganizer {
     ///   - confirmLarge: asked before copying more than `LogLibrary.largeImportCount` files
     ///   - progress: each step, on an arbitrary thread; ends with `.recorded`, or `.copied`
     ///     if nothing was copied
-    /// - Returns: the new log records' names
+    /// - Returns: what was copied, and the new log records' names
     @discardableResult
     func importLogs(from picked : [URL],
                     selection : LogSelectionMethod,
                     confirmLarge : @escaping @Sendable (Int) async -> Bool = { _ in true },
-                    progress : @escaping @Sendable (ImportProgress) -> Void = { _ in }) async -> [String] {
+                    progress : @escaping @Sendable (ImportProgress) -> Void = { _ in }) async -> (result : LogLibrary.ImportResult, added : [String]) {
         Logger.app.info("Starting import \(String(describing: selection))")
         let (library, known) = await withCheckedContinuation { continuation in
             AppDelegate.worker.async {
@@ -754,7 +755,7 @@ class FlightLogOrganizer {
         progress(.copied(result))
         guard !result.copied.isEmpty else {
             Logger.app.info("Import found no new files")
-            return []
+            return (result, [])
         }
         let added = await withCheckedContinuation { continuation in
             self.addMissingRecordsFromLocal { added in
@@ -762,7 +763,7 @@ class FlightLogOrganizer {
             }
         }
         progress(.recorded(added))
-        return added
+        return (result, added)
     }
 
     //MARK: - Watching iCloud Drive

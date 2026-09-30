@@ -227,6 +227,32 @@ final class RecordUploadStore : UploadStore, @unchecked Sendable {
         }
     }
 
+    /// A log waiting in the queue or failed, for the Uploads screen.
+    struct Row : Sendable, Identifiable, Equatable {
+        var id : String { self.name }
+        let name : String
+        let status : RemoteServiceRecord.Status
+        let reason : String?
+        let nextRetry : Date?
+        let date : Date?
+        /// start of the flight, when parsed
+        let start : Date?
+        let route : String?
+    }
+    
+    /// Queued and failed logs, newest first.
+    func overview() async -> [Row] {
+        return await self.onWorker {
+            self.organizer.flightLogFileRecords(request: .all).compactMap { log in
+                guard let name = log.log_file_name, let record = log.flysto_record,
+                      record.status == .pending || record.status == .failed else { return nil }
+                let route = [log.start_airport_icao, log.end_airport_icao].compactMap { $0 }.joined(separator: " → ")
+                return Row(name: name, status: record.status, reason: record.last_error, nextRetry: record.next_retry,
+                           date: record.status_date, start: log.start_time, route: route.isEmpty ? nil : route)
+            }
+        }
+    }
+    
     func failed() async -> [String] {
         return await self.onWorker {
             self.organizer.flightLogFileRecords(request: .all).compactMap { log in

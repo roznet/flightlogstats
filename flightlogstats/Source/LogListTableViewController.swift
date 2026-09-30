@@ -70,6 +70,10 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                 self.buildList()
                 self.tableView.reloadData()
             },
+            UIAction(title: "Uploads", image: UIImage(systemName: "icloud.and.arrow.up")){
+                _ in
+                self.present(UploadsViewController(), animated: true)
+            },
             UIAction(title: "Upload next \(Settings.shared.uploadBatchCount) flights", image: UIImage(systemName: "square.and.arrow.up")){
                 _ in
                 Uploads.shared.uploadNextBatch()
@@ -243,6 +247,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         self.buildList()
     }
     
+
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -517,17 +522,32 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     }
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        self.progressReportOverlay?.prepareOverlay(message: .addingFiles)
-        let selection = Self.importSelection(picked: urls)
-        let organizer = self.logFileOrganizer
-        Task {
-            let added = await organizer.importLogs(from: urls, selection: selection)
-            Uploads.shared.uploadAfterImport(added)
-            if added.isEmpty {
-                self.progressReportOverlay?.removeOverlay()
-            }
+        let model = PostFlightImportModel(organizer: self.logFileOrganizer)
+        model.openLog = { [weak self] name in
+            self?.openLog(name: name)
         }
-        controller.dismiss(animated: true)
+        model.start(picked: urls, selection: Self.importSelection(picked: urls))
+        let sheet = PostFlightImportViewController(model: model)
+        // from the split view: the list may be off screen on iPhone
+        let presenter = self.splitViewController ?? self
+        if controller.presentingViewController != nil {
+            controller.dismiss(animated: true) {
+                presenter.present(sheet, animated: true)
+            }
+        }else{
+            // the picker has already gone
+            presenter.present(sheet, animated: true)
+        }
+    }
+    
+    /// Show a log in the detail screen (the newest flight after an import).
+    func openLog(name : String) {
+        guard let info = self.logFileOrganizer[name] else { return }
+        self.ensureDelegate()
+        self.delegate?.selectlogInfo(info)
+        self.userInterfaceModeManager?.userInterfaceMode = .detail
+        self.updateButtons()
+        self.buildList()
     }
     
     /// The import method setting as a selection of the picked files

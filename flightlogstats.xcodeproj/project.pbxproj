@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42F0B1A0000000000000D043 /* UploadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D042 /* UploadsView.swift */; };
+		42F0B1A0000000000000D041 /* PostFlightImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D040 /* PostFlightImport.swift */; };
 		42F0B1A0000000000000D031 /* TestUploads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D030 /* TestUploads.swift */; };
 		42F0B1A0000000000000D027 /* Uploads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D026 /* Uploads.swift */; };
 		42F0B1A0000000000000D025 /* FlyStoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D024 /* FlyStoService.swift */; };
@@ -163,6 +165,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42F0B1A0000000000000D042 /* UploadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UploadsView.swift; path = Source/UploadsView.swift; sourceTree = "<group>"; };
+		42F0B1A0000000000000D040 /* PostFlightImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PostFlightImport.swift; path = Source/PostFlightImport.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D030 /* TestUploads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUploads.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D026 /* Uploads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Uploads.swift; path = Source/Uploads.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D024 /* FlyStoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlyStoService.swift; path = Source/FlyStoService.swift; sourceTree = "<group>"; };
@@ -635,6 +639,8 @@
 				42F0B1A0000000000000B012 /* FrequencyBingoView.swift */,
 				42F0B1A0000000000000C000 /* Ownship.swift */,
 				42F0B1A0000000000000C002 /* OwnshipMap.swift */,
+				42F0B1A0000000000000D042 /* UploadsView.swift */,
+				42F0B1A0000000000000D040 /* PostFlightImport.swift */,
 				42F0B1A0000000000000D026 /* Uploads.swift */,
 				42F0B1A0000000000000D024 /* FlyStoService.swift */,
 				42F0B1A0000000000000D022 /* UploadCoordinator.swift */,
@@ -851,6 +857,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4280C8BC280D460600A0FB32 /* LogListTableViewController.swift in Sources */,
+				42F0B1A0000000000000D043 /* UploadsView.swift in Sources */,
+				42F0B1A0000000000000D041 /* PostFlightImport.swift in Sources */,
 				42F0B1A0000000000000D027 /* Uploads.swift in Sources */,
 				42F0B1A0000000000000D025 /* FlyStoService.swift in Sources */,
 				42F0B1A0000000000000D023 /* UploadCoordinator.swift in Sources */,

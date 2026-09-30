@@ -64,6 +64,7 @@ class LogListTableViewCell: UITableViewCell {
         self.flightTime.isHidden = true
         self.identifier.isHidden = true
         self.fileNameIcon.isHidden = true
+        self.updateUploadStatus(info)
 
     }
     
@@ -170,4 +171,33 @@ class LogListTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
 
+    
+    /// FlySto status as the accessory: queued, uploaded or failed; nothing when never
+    /// queued or when FlySto is off.
+    func updateUploadStatus(_ info : FlightLogFileRecord) {
+        guard Settings.shared.flystoEnabled else {
+            self.accessoryView = nil
+            return
+        }
+        let symbol : (name : String, color : UIColor, label : String)?
+        switch info.flystoStatus {
+        case .uploaded:
+            symbol = ("checkmark.icloud", .systemGreen, "Uploaded to FlySto")
+        case .pending:
+            symbol = ("arrow.up.circle", .systemBlue, "Waiting to upload to FlySto")
+        case .failed:
+            symbol = ("exclamationmark.icloud", .systemOrange, "FlySto upload failed")
+        case .ready:
+            symbol = nil
+        }
+        guard let symbol = symbol else {
+            self.accessoryView = nil
+            return
+        }
+        let view = UIImageView(image: UIImage(systemName: symbol.name))
+        view.tintColor = symbol.color
+        view.isAccessibilityElement = true
+        view.accessibilityLabel = symbol.label
+        self.accessoryView = view
+    }
 }
