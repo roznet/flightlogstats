@@ -46,12 +46,6 @@ class MainSplitViewController : UISplitViewController,UISplitViewControllerDeleg
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        /* don't think necessary as when new file discovered it will do a sync already
-        NotificationCenter.default.addObserver(forName: .newLocalFilesDiscovered, object: nil, queue: nil){
-            _ in
-            FlightLogOrganizer.shared.syncCloud()
-        }
-         */
     }
     
     var userInterfaceMode : UserInterfaceMode = .detail {

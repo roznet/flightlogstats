@@ -144,12 +144,16 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             UIAction(title: "Reset Database", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Reset All")
-                self.logFileOrganizer.deleteAndResetDatabase()
+                AppDelegate.worker.async {
+                    self.logFileOrganizer.deleteAndResetDatabase()
+                }
             },
             UIAction(title: "Reset Files and Database", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Reset All")
-                self.logFileOrganizer.deleteLocalFilesAndDatabase()
+                AppDelegate.worker.async {
+                    self.logFileOrganizer.deleteLocalFilesAndDatabase()
+                }
             },
             UIAction(title: "Try Overlay", image: UIImage(systemName: "minus.circle")){
                 _ in
@@ -228,11 +232,6 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
             Logger.ui.info("New file uploaded, updating log list")
             self.buildList()
 
-        }
-        NotificationCenter.default.addObserver(forName: .noFileDiscovered, object: nil, queue: nil){
-            _ in
-            Logger.ui.info("No file discovered")
-            self.progressReportOverlay?.removeOverlay()
         }
         NotificationCenter.default.addObserver(forName: .ErrorOccured, object: AppDelegate.errorManager, queue: nil) {
             _ in
@@ -521,75 +520,37 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         self.progressReportOverlay?.prepareOverlay(message: .addingFiles)
-        var method : FlightLogOrganizer.LogSelectionMethod = .allMissingFromFolder
-        switch Settings.shared.importMethod {
-        case .selectedFile:
-            method = .selectedFile(urls)
-        case .sinceLastImport:
-            method = .sinceLatestImportedFile
-        case .fromDate:
-            method = .afterDate(Settings.shared.importStartDate)
-        case .automatic:
-            method = .allMissingFromFolder
-        case .last7d:
-            let ref = Date().addingTimeInterval(-7.0*24.0*60.0*60)
-            method = .afterDate(ref)
-        case .last24h:
-            let ref = Date().addingTimeInterval(-24.0*60.0*60)
-            method = .afterDate(ref)
-        }
-        FlightLogOrganizer.search(in: urls) {
-            result in
-            switch result {
-            case .success(let logurls):
-                let missing = self.logFileOrganizer.filterMissing(urls: logurls)
-                let importList = self.logFileOrganizer.buildImportList(urls: missing, method: method)
-                if importList.count > 150 {
-                    self.importLargeNumberOfLogs(urls: importList, method: method)
-                }else{
-                    Logger.ui.info("Starting search")
-                    self.logFileOrganizer.importAndAddRecordsForFiles(urls: importList, method: method)
-                }
-            case .failure(let error):
-                Logger.app.error("Failed to find url \(error.localizedDescription)")
+        let selection = Self.importSelection(picked: urls)
+        let organizer = self.logFileOrganizer
+        Task {
+            let added = await organizer.importLogs(from: urls, selection: selection)
+            if added.isEmpty {
+                self.progressReportOverlay?.removeOverlay()
             }
         }
-        
         controller.dismiss(animated: true)
+    }
+    
+    /// The import method setting as a selection of the picked files
+    static func importSelection(picked urls : [URL]) -> LogLibrary.Selection {
+        switch Settings.shared.importMethod {
+        case .selectedFile:
+            return .selectedFile(urls)
+        case .sinceLastImport:
+            return .sinceLatestImportedFile
+        case .fromDate:
+            return .afterDate(Settings.shared.importStartDate)
+        case .automatic:
+            return .allMissingFromFolder
+        case .last7d:
+            return .afterDate(Date().addingTimeInterval(-7.0*24.0*60.0*60))
+        case .last24h:
+            return .afterDate(Date().addingTimeInterval(-24.0*60.0*60))
+        }
     }
     
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
         controller.dismiss(animated: true)
     }
-    
-    func importLargeNumberOfLogs(urls: [URL], method: FlightLogOrganizer.LogSelectionMethod) {
-        Logger.ui.info("Checking user decision for large number")
-        let bookmarks = urls.bookmarks()
-        let importAll = UIAlertAction(title: "Import All Now", style: .default) {
-            action in
-            Logger.ui.info("user decided to import all")
-            self.logFileOrganizer.importAndAddRecordsForFiles(urls: bookmarks.urls(), method: method)
-        }
-        let settings = UIAlertAction(title: "Edit Import Method", style: .default) {
-            action in
-            Logger.ui.info("user decided to edit settings")
-            let storyboard : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(identifier: "appSettingsViewController")
-            vc.modalPresentationStyle = .fullScreen
-            self.present(vc, animated: true)
-        }
-        let cancel = UIAlertAction(title: "Abort", style: .cancel) {
-            action in
-            //
-            Logger.ui.info("user canceled")
-        }
-        let alert = UIAlertController(title: "Large Number of Files",
-                                      message: "There is a large number of files to import (\(urls.count)). This may take a while. Please confirm before proceeding?", preferredStyle: .alert)
-        alert.addAction(importAll)
-        alert.addAction(settings)
-        alert.addAction(cancel)
-        self.present(alert, animated: true)
-    }
 
 }
-

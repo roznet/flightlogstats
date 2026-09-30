@@ -102,121 +102,64 @@ class TestOrganizer: XCTestCase {
         }
         return ordered
     }
-    func runImportTest(organizer: FlightLogOrganizer, urls : [URL], bundeUrl : URL){
-        let writeableLocalUrl = organizer.localFolder
-        let startUrls = self.findLocalLogFiles(url: bundeUrl, types: [.log])
-        //var localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
-       
-        var orderedLogs = self.orderLogsByDate(urls: urls)
-        var one : URL? = nil
-        for url in orderedLogs {
-            if url.isLogFileTestFileToSkip{
-                continue
-            }
-            if url.isLogFile {
-                one = url
-                break
-            }
+    /// The `+` import: files copied into the library, records created, then fully parsed
+    /// in the background without blocking the caller.
+    func testImportCreatesRecordsAndParses() async throws {
+        let bundle = try XCTUnwrap(Bundle(for: type(of: self)).resourceURL)
+        let organizer = try XCTUnwrap(self.createOrganizerWithMemoryContainer(localFolderName: "testImport", cloudFolderName: nil))
+        let card = FileManager.default.temporaryDirectory.appendingPathComponent("testImportCard-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: card.appendingPathComponent("data_log"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: card) }
+        let logs = TestLogLibrary.logs
+        for name in logs {
+            try FileManager.default.copyItem(at: bundle.appendingPathComponent(name), to: card.appendingPathComponent("data_log").appendingPathComponent(name))
         }
-        guard let url = one else {
-            XCTAssertTrue(false)
-            return
+        try FileManager.default.copyItem(at: bundle.appendingPathComponent(TestLogLibrary.rpt), to: card.appendingPathComponent(TestLogLibrary.rpt))
+        
+        let steps = Steps()
+        let added = await organizer.importLogs(from: [card], selection: .allMissingFromFolder) { step in
+            steps.append(step)
         }
-       
-        // Import one file only
-        var someNew = organizer.importFiles(urls: urls, method: .selectedFile([url]))
-        XCTAssertTrue(someNew)
-        var localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
-        XCTAssertTrue(localUrls.count == 1)
-        XCTAssertEqual(localUrls.first!.lastPathComponent,url.lastPathComponent)
+        XCTAssertEqual(Set(added), Set(logs))
+        XCTAssertEqual(organizer.count, logs.count)
+        XCTAssertEqual(organizer.aircraftCount, 1)
+        XCTAssertTrue(organizer.libraryFolder == organizer.localFolder)
+        for name in logs {
+            XCTAssertTrue(FileManager.default.fileExists(atPath: organizer.localFolder.appendingPathComponent(name).path))
+        }
         
-        // now import everything since 2022
-        //unix time for 2022-01-01 00:00:00 is 1640995200
-        let date2022 = Date(timeIntervalSince1970: 1640995200)
-        someNew = organizer.importFiles(urls: urls, method: .afterDate(date2022))
-        XCTAssertTrue(someNew)
-        localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.rpt])
-        orderedLogs = self.orderLogsByDate(urls: localUrls)
-        XCTAssertEqual(orderedLogs.count, localUrls.count)
-        //Note we don't test sinceLatestImportedFile because here we don't update
-        //Records, so won't know which is latest date, we will test that case in syncCloud
+        // the full parse runs in batches on worker
+        let deadline = Date().addingTimeInterval(60)
+        while AppDelegate.worker.sync(execute: { organizer.isUpdatingRecords }) && Date() < deadline {
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        for record in organizer.flightLogFileRecords(request: .all) {
+            XCTAssertFalse(record.requiresParsing, record.log_file_name ?? "")
+        }
+        let flight = try XCTUnwrap(organizer[TestLogFileSamples.flight2.rawValue + ".csv"])
+        XCTAssertEqual(flight.recordStatus, .parsed)
+        XCTAssertNotNil(flight.aircraftRecord)
         
-        // Now import everything else
-        someNew = organizer.importFiles(urls: urls, method: .allMissingFromFolder)
-        XCTAssertTrue(someNew)
-        localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.rpt])
-        XCTAssertTrue(localUrls.count == startUrls.count)
+        let recorded = steps.all.contains { if case .recorded(let names) = $0 { return Set(names) == Set(logs) } else { return false } }
+        XCTAssertTrue(recorded)
         
+        // importing again finds nothing new
+        let again = await organizer.importLogs(from: [card], selection: .allMissingFromFolder)
+        XCTAssertTrue(again.isEmpty)
+        
+        // deleting removes the record and the library file
+        organizer.delete(info: flight)
+        AppDelegate.worker.sync {}
+        XCTAssertNil(organizer[flight.log_file_name ?? ""])
+        XCTAssertEqual(organizer.count, logs.count - 1)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: organizer.localFolder.appendingPathComponent(TestLogFileSamples.flight2.rawValue + ".csv").path))
     }
     
-    func testLogFileDiscovery() throws {
-        // This will test that:
-        //   1. we find list of files in local directory
-        //   2. logic if we remove one file from known ones that it identifies missing one
-        
-        guard let bundleUrl : URL = Bundle(for: type(of: self)).resourceURL
-        else {
-            XCTAssertTrue(false)
-            return
-        }
-        
-        guard let organizer = self.createOrganizerWithMemoryContainer(localFolderName: "testDiscovery", cloudFolderName: nil)
-        else {
-            XCTAssertTrue(false)
-            return
-        }
-        
-        
-        let expectation = XCTestExpectation(description: "found files")
-        FlightLogOrganizer.search(in: [bundleUrl],
-                                  completion:  {
-            result in
-            switch result {
-                
-            case .failure(let error):
-                Logger.test.error("failed to search \(error.localizedDescription)")
-                XCTAssertTrue(false)
-            case .success(let urls):
-                self.runImportTest(organizer: organizer, urls: urls, bundeUrl: bundleUrl)
-            }
-            expectation.fulfill()
-        })
-        self.wait(for: [expectation], timeout: TimeInterval(10.0))
-    }
-    
-    /// I5: with the `.selectedFile` method, a picked folder selects the logs inside it.
-    func testSelectedFolderImportsItsFiles() throws {
-        guard let bundleUrl : URL = Bundle(for: type(of: self)).resourceURL,
-              let organizer = self.createOrganizerWithMemoryContainer(localFolderName: "testSelectedFolder", cloudFolderName: nil)
-        else {
-            XCTFail()
-            return
-        }
-        
-        let expectation = XCTestExpectation(description: "found files")
-        FlightLogOrganizer.search(in: [bundleUrl]) {
-            result in
-            switch result {
-            case .failure(let error):
-                XCTFail("failed to search \(error.localizedDescription)")
-            case .success(let urls):
-                XCTAssertFalse(urls.isEmpty)
-                let folderList = organizer.buildImportList(urls: urls, method: .selectedFile([bundleUrl]))
-                XCTAssertEqual(folderList.count, urls.count)
-                
-                if let one = urls.first {
-                    let fileList = organizer.buildImportList(urls: urls, method: .selectedFile([one]))
-                    // search can report a file twice (I4), so compare as a set
-                    XCTAssertEqual(Set(fileList.map { $0.path }), [one.path])
-                }
-                
-                // a folder whose name only shares a prefix is not a parent
-                let sibling = URL(fileURLWithPath: bundleUrl.path + "x", isDirectory: true)
-                XCTAssertTrue(organizer.buildImportList(urls: urls, method: .selectedFile([sibling])).isEmpty)
-            }
-            expectation.fulfill()
-        }
-        self.wait(for: [expectation], timeout: TimeInterval(10.0))
+    final class Steps : @unchecked Sendable {
+        private let lock = NSLock()
+        private var steps : [FlightLogOrganizer.ImportProgress] = []
+        var all : [FlightLogOrganizer.ImportProgress] { self.lock.withLock { self.steps } }
+        func append(_ step : FlightLogOrganizer.ImportProgress) { self.lock.withLock { self.steps.append(step) } }
     }
     
     /// Savvy removal: a library saved with model version 1 (with `FlightSavvyRecord` and
@@ -365,87 +308,9 @@ class TestOrganizer: XCTestCase {
         
         return organizer
     }
-    func testOrganizerSyncCloud() throws {
-        // This will test that
-        //   1. logic of copying missing from from cloud works: cloud proxied by bundle path, and local by a testLocal folder initially empty
-        //   2. after copying form cloud (bundle path) the coredata container updated
-        
-        guard let bundleUrl = Bundle(for: type(of: self)).resourceURL
-        else {
-            XCTAssertTrue(false)
-            return
-        }
-        
-        guard let organizer = self.createOrganizerWithMemoryContainer(localFolderName: "testLocal", cloudFolderName: "testCloud"),
-              let writeableCloudUrl = organizer.cloudFolder
-        else {
-            XCTAssertTrue(false)
-            return
-        }
-        
-        // set up cloud folder to be bundle, should copy eveyrthing locally
-        let writeableLocalUrl = organizer.localFolder
-            
-        // first try to copy to local what is missing
-        organizer.copyMissingFilesToLocal(urls: [bundleUrl], method: .allMissingFromFolder, process: false)
-        
-        let startUrls = self.findLocalLogFiles(url: bundleUrl, types: [.log])
-        var localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
-        
-        // +1 because should have one aircraft file
-        XCTAssertEqual(startUrls.count+1, localUrls.count)
-        
-        var cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
-        XCTAssertEqual(cloudUrls.count, 0)// start with nothing
-        organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls)
-        cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
-        
-        XCTAssertEqual(localUrls.count, cloudUrls.count)
-        
-        // now remove one from localUrls, and assuming local is cloud, make sure syncCloud will copy missing over
-        
-        if let last = localUrls.last {
-            do {
-                Logger.test.info("Removing \(last.path)")
-                try FileManager.default.removeItem(at: last)
-                localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
-                cloudUrls = self.findLocalLogFiles(url: writeableCloudUrl, types: [.log,.aircraft,.rpt])
-                XCTAssertEqual(localUrls.count, cloudUrls.count - 1)
-                let fileCopiedExpectation = XCTestExpectation(description: "Added the files")
-                let recordAddedExpectation = XCTestExpectation(description: "Added the records")
-                organizer.syncCloudLogic(localUrls: localUrls, cloudUrls: cloudUrls){
-                    localUrls = self.findLocalLogFiles(url: writeableLocalUrl, types: [.log,.aircraft,.rpt])
-                    XCTAssertEqual(localUrls.count, cloudUrls.count)
-                    // +1 because should have one aircraft file
-                    fileCopiedExpectation.fulfill()
-                }
-                
-                NotificationCenter.default.addObserver(forName: .newLocalFilesDiscovered, object: organizer, queue: nil) {
-                    _ in
-                    XCTAssertEqual(cloudUrls.count, organizer.count+1)
-                    XCTAssertEqual(cloudUrls.count, organizer.flightLogFileRecords(request: .all).count+1) // +1 because one file is not a log but avionics system file
-                    recordAddedExpectation.fulfill()
-                }
-                self.wait(for: [recordAddedExpectation,fileCopiedExpectation], timeout: 50*60.0)
-            }catch{
-                XCTAssertTrue(false)
-            }
-        }else{
-            XCTAssertTrue(false)
-        }
-        
-        Logger.test.info("Cleaning test folders")
-        for writeableUrl in [writeableCloudUrl, writeableLocalUrl] {
-            guard self.prepareAndClearFolder(url: writeableUrl) else {
-                XCTAssertTrue(false)
-                return
-            }
-        }
-    }
-    
     func testOrganizer() {
         let expectation = self.expectation(description: "run organizer test")
-        FlightLogOrganizer.scheduler.async {
+        AppDelegate.worker.async {
             do {
                 try self.runTestOrganizer()
             }catch{
@@ -481,7 +346,7 @@ class TestOrganizer: XCTestCase {
         let log = FlightLogFile(url: url)!
         log.parse()
         organizer.addMinimum(flightLogFileList: FlightLogFileList(logs: [log]))
-        AppDelegate.worker.sync {
+        do {
             organizer.saveContext()
             
             XCTAssertEqual(organizer.count,1)

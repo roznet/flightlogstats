@@ -43,9 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Settings.removeObsoleteKeys()
 
         AppDelegate.worker.async {
-            //#warning("Don't checkin")
-            //FlightLogOrganizer.shared.deleteAndResetDatabase()
-            //FlightLogOrganizer.shared.deleteAndResetCloudDatabase()
+            // iCloud container and moving old local logs first: records point at the library
+            FlightLogOrganizer.shared.openLibrary()
             FlightLogOrganizer.shared.loadFromContainer()
             FlightLogOrganizer.shared.addMissingRecordsFromLocal()
         }

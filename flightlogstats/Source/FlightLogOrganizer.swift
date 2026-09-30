@@ -16,20 +16,17 @@ extension Notification.Name {
     static let localFileListChanged : Notification.Name = Notification.Name("Notification.Name.LocalFileListChanged")
     static let newLocalFilesDiscovered : Notification.Name = Notification.Name("Notification.Name.NewLocalFilesDiscovered")
     static let aircraftListChanged  : Notification.Name = Notification.Name("Notification.Name.AircraftListChanged")
-    static let noFileDiscovered : Notification.Name = Notification.Name("Notification.Name.NoFileDiscovered")
 }
 
+/// The library of records. Core Data is used on `AppDelegate.worker` only (the managed
+/// objects are still read from main by the screens); files go through `LogLibrary`.
 class FlightLogOrganizer {
-    enum OrganizerError : Error {
-        case failedToReadFolder
-    }
     public static var shared : FlightLogOrganizer = {
         let organizer = FlightLogOrganizer()
         organizer.frequencyIndex = FrequencyIndexOrganizer(databaseName: "frequencyIndex.db")
         return organizer
     }()
-    public static let scheduler = DispatchQueue(label: "net.ro-z.flightlogstats.scheduler")
-    
+
     //MARK: - Flight Log List management
    
     /// flight log records sorted most recent first
@@ -87,14 +84,14 @@ class FlightLogOrganizer {
         }
     }
 
-    var count : Int { return managedFlightLogs.count }
+    var count : Int { return DispatchQueue.synchronized(self) { self.managedFlightLogs.count } }
     
     subscript(_ name : String) -> FlightLogFileRecord? {
-        return self.managedFlightLogs[name]
+        return DispatchQueue.synchronized(self) { self.managedFlightLogs[name] }
     }
     
     subscript(log: FlightLogFile) -> FlightLogFileRecord? {
-        return self.managedFlightLogs[log.name]
+        return self[log.name]
     }
     
     func flight(following info: FlightLogFileRecord) -> FlightLogFileRecord? {
@@ -140,10 +137,10 @@ class FlightLogOrganizer {
 
     //MARK: - Aircraft management
     
-    var aircraftCount : Int { return self.managedAircrafts.count }
-    var aircraftRecords : [AircraftRecord] { return Array(self.managedAircrafts.values) }
+    var aircraftCount : Int { return DispatchQueue.synchronized(self) { self.managedAircrafts.count } }
+    var aircraftRecords : [AircraftRecord] { return DispatchQueue.synchronized(self) { Array(self.managedAircrafts.values) } }
     func aircraft(systemId : SystemId, airframeName : String? = nil) -> AircraftRecord {
-        if let rv = self.managedAircrafts[systemId] {
+        if let rv = DispatchQueue.synchronized(self, closure: { self.managedAircrafts[systemId] }) {
             return rv
         }else{
             dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
@@ -152,13 +149,15 @@ class FlightLogOrganizer {
             newAircraft.airframe_name = airframeName
             // set default performance
             newAircraft.aircraftPerformance = Settings.shared.aircraftPerformance
-            self.managedAircrafts[systemId] = newAircraft
+            DispatchQueue.synchronized(self) {
+                self.managedAircrafts[systemId] = newAircraft
+            }
             return newAircraft
         }
     }
     
-    var aircraftSystemIds : [SystemId] { return Array(self.managedAircrafts.keys) }
-    
+    var aircraftSystemIds : [SystemId] { return DispatchQueue.synchronized(self) { Array(self.managedAircrafts.keys) } }
+
     //MARK: - Progress management
     var progress : ProgressReport? = nil
 
@@ -167,28 +166,17 @@ class FlightLogOrganizer {
             self.progress = ProgressReport(message: .addingFiles, callback: callback)
         }
     }
-    
+
     //MARK: - containers
-    
-    enum UpdateState {
-        case ready
-        case complete
-        case updatingInfoFromData
-    }
-    
-    /// managed logs keyed of log_file_name
-    private var currentState : UpdateState = .complete
-    private var missingCount : Int = 0
-    private var doneCount : Int = 0
-    private let queue = OperationQueue()
 
     /// managed aircrafts keyed of system_id
     typealias SystemId = AvionicsSystem.SystemId
-    
+
     //MARK: - local records management
+    /// Mutated on `worker` only, read from anywhere through `synchronized(self)`
     private var managedFlightLogs : [String:FlightLogFileRecord] = [:]
     private var managedAircrafts : [SystemId:AircraftRecord] = [:]
-    
+
     /// Loaded once and shared by every container: each container loading its own copy
     /// makes the entity lookup for the record classes ambiguous (and crash on insert)
     static let managedObjectModel : NSManagedObjectModel = {
@@ -211,16 +199,15 @@ class FlightLogOrganizer {
                 let path = storeDescription.url?.path ?? ""
                 Logger.app.info("Loaded store \(storeDescription.type) \(path.truncated(limit: 64))")
                 container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                self.checkForUpdates()
             }
         }
         return container
     }
-    
+
     lazy var persistentContainer : NSPersistentContainer = {
         return self.createPersistentContainer()
     }()
-    
+
     func saveContext() {
         dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
         let context = persistentContainer.viewContext
@@ -233,7 +220,7 @@ class FlightLogOrganizer {
             }
         }
     }
-    
+
     func exportCsv() {
         let fields = FlightSummary.Field.allCases
         let fileUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("flights.csv")
@@ -243,7 +230,7 @@ class FlightLogOrganizer {
             csvString += ",\(field.rawValue)"
         }
         csvString += "\n"
-        for log in self.managedFlightLogs.values {
+        for log in self.flightLogFileRecords {
             if log.isFlight == false {
                 continue
             }
@@ -267,35 +254,32 @@ class FlightLogOrganizer {
         }
         
     }
-    
-    func checkForUpdates() {
-        Settings.shared.databaseVersion = 1
-    }
-    
+
     func loadFromContainer() {
         self.loadAircraftFromContainer()
-        self.loadAircraftFromCloudContainer()
         self.loadLogsFromContainer()
     }
-    
+
     private func loadLogsFromContainer() {
         let fetchRequest = FlightLogFileRecord.fetchRequest()
-        
+
         do {
             dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
             let fetchedInfo : [FlightLogFileRecord] = try self.persistentContainer.viewContext.fetch(fetchRequest)
             var added = 0
-            let existing = self.managedFlightLogs.count
+            let existing = self.count
             var needSave = false
             for info in fetchedInfo {
                 if let filename = info.log_file_name {
-                    if self.managedFlightLogs[filename] == nil {
+                    if self[filename] == nil {
                         added += 1
                         info.organizer = self
                         if info.updateForKnownIssues() {
                             needSave = true
                         }
-                        self.managedFlightLogs[filename] = info
+                        DispatchQueue.synchronized(self) {
+                            self.managedFlightLogs[filename] = info
+                        }
                     }
                 }
             }
@@ -312,17 +296,19 @@ class FlightLogOrganizer {
 
     private func loadAircraftFromContainer() {
         let fetchRequest = AircraftRecord.fetchRequest()
-        
+
         do {
             dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
             let fetchAircrafts : [AircraftRecord] = try self.persistentContainer.viewContext.fetch(fetchRequest)
             var added = 0
-            let existing = self.managedAircrafts.count
+            let existing = self.aircraftCount
             for aircraft in fetchAircrafts {
                 if let systemId = aircraft.system_id {
                     added += 1
                     aircraft.container = self
-                    self.managedAircrafts[systemId] = aircraft
+                    DispatchQueue.synchronized(self) {
+                        self.managedAircrafts[systemId] = aircraft
+                    }
                 }
             }
             NotificationCenter.default.post(name: .aircraftListChanged, object: self)
@@ -331,196 +317,189 @@ class FlightLogOrganizer {
             Logger.app.error("Failed to query for aircrafts \(error)")
         }
     }
-   
-    /// update record by parsing the log file and extracting summary information from the file
-    /// Will save the summary to the database.
-    /// If aggregatedData is not nil, will also update the aggregated data
+
+    //MARK: - Parsing records
+
+    /// true while a chain of batches is scheduled on `worker` (worker only)
+    private var updateRunning : Bool = false
+    /// true while records are being parsed (worker only)
+    var isUpdatingRecords : Bool {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        return self.updateRunning
+    }
+    /// records to re-parse whatever their state (Rebuild Info), newest first (worker only)
+    private var forcedNames : [String] = []
+    private var updateTotal : Int = 0
+    private var updateDone : Int = 0
+    /// files not downloaded from iCloud yet, already asked for (worker only)
+    private var downloadRequested : Set<String> = []
+
+    /// Parse the files of records that need it (new, quick parsed, older record version) and
+    /// save what they yield, newest first, `count` at a time on `worker` so other work
+    /// interleaves. One chain of batches runs at a time; a call while it runs only adds work.
     ///
     /// - Parameters:
-    ///   - count: maximum number of record to process
-    ///   - force: if true will parse and update logs for record even if already parsed
+    ///   - count: records per batch
+    ///   - force: re-parse every record, even those up to date (Rebuild Info)
     func updateRecords(count : Int = 1, force : Bool = false) {
-        guard currentState != .updatingInfoFromData else { return }
-        let firstMissingCheck : Bool = (currentState == .complete)
-        currentState = .updatingInfoFromData
         AppDelegate.worker.async {
-            var missing : [FlightLogFileRecord] = []
-            for (_,info) in self.managedFlightLogs {
-                if force || info.requiresParsing{
-                    if firstMissingCheck, let log_file_name = info.log_file_name {
-                        if !force {
-                            Logger.app.info("Will update info for \(log_file_name) status=\(info.recordStatus)")
-                        }
-                    }
-                    missing.append(info)
-                }
+            if force {
+                self.forcedNames = self.flightLogFileRecords.compactMap { $0.log_file_name }
             }
-            if !missing.isEmpty {
-                if firstMissingCheck {
-                    self.missingCount = missing.count
-                    self.doneCount = 0
-                    self.progress?.update(state: .start, message: .updatingInfo)
-                    
-                }
-                if missing.count > self.missingCount {
-                    self.missingCount = missing.count
-                }
-                
-                let reportParsingProgress : Bool = (force && count < 3 ) || self.missingCount < 3
-                var done : [String] = []
-                // do more recent first
-                missing.sort() { $1.log_file_name! < $0.log_file_name! }
-                for info in missing[..<min(count,missing.count)] {
-                    guard let log_file_name = info.log_file_name
-                    else {
-                        info.recordStatus = .error
-                        continue
-                    }
-                    
-                    if info.flightLog == nil {
-                        info.flightLog = self.flightLogFile(name: log_file_name)
-                    }
-                    
-                    if let flightLog = info.flightLog {
-                        // if not already parsed, we will clear it
-                        let logRequiredParsing = flightLog.requiresParsing
-                        // only report parsing progress if few missing, if many, just report overall progress
-                        // Note info may require parsing due to version change, while log may not if already
-                        // parsed
-                        if info.requiresParsing || force{
-                            Logger.app.info("Parsing \(log_file_name)")
-                            
-                            flightLog.parse(progress: reportParsingProgress ? self.progress : nil)
-                            do {
-                                try info.updateFromFlightLog(flightLog: flightLog)
-                                if let agg = self.aggregatedData {
-                                    agg.insertOrReplace(record: info)
-                                }
-                                self.frequencyIndex?.insertOrReplace(flightLog: flightLog)
-                            }catch{
-                                info.recordStatus = .error
-                                Logger.app.error("Failed to update log \(error.localizedDescription)")
-                            }
-                            
-                            NotificationCenter.default.post(name: .logFileRecordUpdated, object: info)
-                            //restore the state
-                            if logRequiredParsing {
-                                flightLog.clear()
-                            }
-                            done.append(log_file_name)
-                        }else{
-                            Logger.app.error("Skipping \(log_file_name) status=\(flightLog.logType)")
-                        }
-                    }else{
-                        info.recordStatus = .error
-                    }
-                    self.doneCount += 1
-                    if !reportParsingProgress {
-                        let percent = (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
-                        self.progress?.update(state: .progressing(percent), message: .updatingInfo)
-                    }
-                    if self.doneCount % 5 == 0 {
-                        NotificationCenter.default.post(name: .localFileListChanged, object: nil)
-                    }
-                }
-                let firstName = done.last ?? ""
-                Logger.app.info("Updated \(self.doneCount)/\(self.missingCount) info last=\(firstName)")
-                self.saveContext()
-                // need to switch state before starting next
-                if !reportParsingProgress {
-                    let percent = (Double(min(self.doneCount,self.missingCount))/Double(self.missingCount))
-                    self.progress?.update(state: .progressing(percent), message: .updatingInfo)
-                }
-                self.currentState = .ready
-                // if did something and not in force mode, schedule another batch
-                if force {
-                    self.progress?.update(state: .complete)
-                    self.currentState = .complete
-                }else{
-                    self.updateRecords(count: count, force: false)
-                    self.currentState = .ready
-                }
-            }else if self.backfillFrequencyIndex(count: count) > 0 {
-                // more may be left: same pattern as above, ready then schedule the next batch
-                self.currentState = .ready
-                self.updateRecords(count: count, force: false)
-            }else{
-                if firstMissingCheck {
-                    Logger.app.info("No logFile requires updating")
-                }
-                self.progress?.update(state: .complete)
-                if self.doneCount > 0 {
-                    NotificationCenter.default.post(name: .localFileListChanged, object: nil)
-                }
-                // nothing done, ready for more
-                self.currentState = .complete
-                //self.exportCsv()
+            guard !self.updateRunning else { return }
+            self.updateRunning = true
+            self.updateDone = 0
+            self.updateTotal = self.forcedNames.count + self.recordsRequiringParsing().count
+            if self.updateTotal > 0 {
+                Logger.app.info("Will parse \(self.updateTotal) logs")
+                self.progress?.update(state: .start, message: .updatingInfo)
             }
+            self.runUpdateBatch(count: count)
         }
     }
-    
-    func addMissingRecordsFromLocal(){
-        Self.search(in: [localFolder]){
-            result in
-            switch result {
-            case .failure(let error):
-                Logger.app.error("Failed to load local \(error.localizedDescription)")
-            case .success(let urls):
-                Self.scheduler.async {
-                    let logs = FlightLogFileList(urls: urls)
-                    self.add(aircrafts: urls)
-                    self.addMinimum(flightLogFileList: logs)
-                    self.updateRecords(count: 2)
-                }
+
+    /// records whose file needs parsing and is on this device, newest first
+    private func recordsRequiringParsing() -> [FlightLogFileRecord] {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        var rv : [FlightLogFileRecord] = []
+        for info in self.flightLogFileRecords where info.requiresParsing {
+            guard let name = info.log_file_name else { continue }
+            if self.isDownloaded(name: name) {
+                rv.append(info)
             }
         }
+        return rv.sorted { $1.log_file_name! < $0.log_file_name! }
     }
-    
-    func filterMissing(urls: [URL]) -> [URL] {
-        var rv : [URL] = []
-        for url in urls {
-            switch url.logFileType {
-            case .aircraft:
-                if let avionics = AvionicsSystem.from(jsonUrl: url),
-                   self.managedAircrafts[ avionics.systemId ] != nil {
-                    break
-                }else{
-                    rv.append(url)
-                }
-            case .log:
-                let filename = url.lastPathComponent
-                if self.managedFlightLogs[ filename ] == nil {
-                    rv.append(url)
-                }
-            case .rpt:
-                // always update rpt files
-                rv.append(url)
-            case .none:
-                break
+
+    /// True if the file is on this device; if it is only in iCloud, ask for it once. The
+    /// library watcher parses it when it arrives.
+    private func isDownloaded(name : String) -> Bool {
+        let url = self.libraryFolder.appendingPathComponent(name)
+        if FileManager.default.fileExists(atPath: url.path) {
+            return true
+        }
+        if !self.downloadRequested.contains(name) && LogLibrary.exists(name: name, in: self.libraryFolder) {
+            self.downloadRequested.insert(name)
+            do {
+                try FileManager.default.startDownloadingUbiquitousItem(at: url)
+                Logger.sync.info("Downloading \(name) from iCloud")
+            }catch{
+                Logger.sync.error("Failed to start download of \(name) \(error.localizedDescription)")
             }
         }
-        return rv
+        return false
     }
-    
+
+    private func runUpdateBatch(count : Int) {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        var batch : [FlightLogFileRecord] = []
+        while batch.count < count, let name = self.forcedNames.first {
+            self.forcedNames.removeFirst()
+            if let info = self[name], self.isDownloaded(name: name) {
+                batch.append(info)
+            }
+        }
+        if batch.count < count {
+            let names = Set(batch.compactMap { $0.log_file_name })
+            let missing = self.recordsRequiringParsing().filter { !names.contains($0.log_file_name!) }
+            batch.append(contentsOf: missing.prefix(count - batch.count))
+        }
+
+        if batch.isEmpty {
+            if self.backfillFrequencyIndex(count: count) > 0 {
+                AppDelegate.worker.async { self.runUpdateBatch(count: count) }
+                return
+            }
+            if self.updateDone > 0 {
+                Logger.app.info("Parsed \(self.updateDone) logs")
+                NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+            }
+            self.progress?.update(state: .complete)
+            self.updateRunning = false
+            return
+        }
+
+        for info in batch {
+            self.parse(record: info)
+            self.updateDone += 1
+            if self.updateDone % 5 == 0 {
+                NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+            }
+        }
+        self.saveContext()
+        if self.updateTotal > 0 {
+            let percent = Double(min(self.updateDone, self.updateTotal)) / Double(self.updateTotal)
+            self.progress?.update(state: .progressing(percent), message: .updatingInfo)
+        }
+        // next batch after whatever else was queued on worker
+        AppDelegate.worker.async { self.runUpdateBatch(count: count) }
+    }
+
+    private func parse(record info : FlightLogFileRecord) {
+        guard let name = info.log_file_name else {
+            info.recordStatus = .error
+            return
+        }
+        if info.flightLog == nil {
+            info.flightLog = self.flightLogFile(name: name)
+        }
+        guard let flightLog = info.flightLog else {
+            info.recordStatus = .error
+            return
+        }
+        // the log may be kept parsed by a screen: only clear what this parse loaded
+        let logRequiredParsing = flightLog.requiresParsing
+        Logger.app.info("Parsing \(name)")
+        flightLog.parse()
+        do {
+            try info.updateFromFlightLog(flightLog: flightLog)
+            if let agg = self.aggregatedData {
+                agg.insertOrReplace(record: info)
+            }
+            self.frequencyIndex?.insertOrReplace(flightLog: flightLog)
+        }catch{
+            info.recordStatus = .error
+            Logger.app.error("Failed to update log \(error.localizedDescription)")
+        }
+        NotificationCenter.default.post(name: .logFileRecordUpdated, object: info)
+        if logRequiredParsing {
+            flightLog.clear()
+        }
+    }
+
+    //MARK: - Adding records for files
+
+    /// Create records for files in the library that have none, then parse them.
+    /// - Parameter completion: called on `worker` with the names of the new log records
+    func addMissingRecordsFromLocal(completion : @escaping ([String]) -> Void = { _ in }){
+        AppDelegate.worker.async {
+            let urls = LogLibrary.discover(in: [self.libraryFolder])
+            self.add(aircrafts: urls)
+            let added = self.addMinimum(flightLogFileList: FlightLogFileList(urls: urls))
+            self.updateRecords(count: 2)
+            completion(added)
+        }
+    }
+
     func add(aircrafts: [URL]){
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
         var someNew : Int = 0
         var checked : Int = 0
         for url in aircrafts {
             if url.logFileType == .aircraft {
                 checked += 1
                 if let avionics = AvionicsSystem.from(jsonUrl: url) {
-                    if let aircraft = self.managedAircrafts[ avionics.systemId ]  {
+                    if let aircraft = DispatchQueue.synchronized(self, closure: { self.managedAircrafts[ avionics.systemId ] }) {
                         if aircraft.avionicsSystem != avionics {
                             aircraft.avionicsSystem = avionics
                             someNew += 1
                         }
                     }else{
-                        AppDelegate.worker.sync {
-                            Logger.app.info("Registering \(avionics)")
-                            dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-                            let aircraft = AircraftRecord(context: self.persistentContainer.viewContext)
-                            aircraft.avionicsSystem = avionics
-                            aircraft.aircraftPerformance = Settings.shared.aircraftPerformance
+                        Logger.app.info("Registering \(avionics)")
+                        let aircraft = AircraftRecord(context: self.persistentContainer.viewContext)
+                        aircraft.avionicsSystem = avionics
+                        aircraft.aircraftPerformance = Settings.shared.aircraftPerformance
+                        DispatchQueue.synchronized(self) {
                             self.managedAircrafts[avionics.systemId] = aircraft
                         }
                         someNew += 1
@@ -530,95 +509,87 @@ class FlightLogOrganizer {
         }
         if someNew > 0 {
             Logger.app.info("Found \(someNew) aircrafts to add")
-            AppDelegate.worker.sync {
-                self.saveContext()
-            }
+            self.saveContext()
             NotificationCenter.default.post(name: .aircraftListChanged, object: self)
         }else{
             Logger.app.info("No missing aircraft in \(checked) checked")
         }
     }
-    
-    
-    
+
     /// Add list of flights to the organizer if they are missing.
     /// update the list of record and do a quick parse to save the minimum of details
     /// will not update aggregatedData
     ///
     /// - Parameter flightLogFileList: list of file to add
-    /// - Returns: number of new flights added (0 if all already there)
+    /// - Returns: names of the new records (empty if all already there)
     @discardableResult
-    func addMinimum(flightLogFileList : FlightLogFileList, completion : @escaping () -> Void = {} ) -> Int{
-        dispatchPrecondition(condition: .onQueue(Self.scheduler))
-        var someNew : Int = 0
-        self.progress?.update(state: .start, message: .addingFiles)
-        var index : Double = 0.0
-        let indexTotal : Double = Double(flightLogFileList.count)
-        
+    func addMinimum(flightLogFileList : FlightLogFileList) -> [String] {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        var added : [String] = []
         var lastTime = Date()
-        
-        for flightLog in flightLogFileList.flightLogFiles {
+        let candidates = flightLogFileList.flightLogFiles.filter { $0.name.isFlightLogFile }
+        let indexTotal = Double(max(candidates.count, 1))
+        self.progress?.update(state: .start, message: .addingFiles)
+
+        for (idx,flightLog) in candidates.enumerated() {
             let filename = flightLog.name
-            if filename.isFlightLogFile {
-                if let existingRecord = self.managedFlightLogs[filename] {
-                    // replace if parsed or if flightlog not populated
-                    if flightLog.isParsed || existingRecord.flightLog == nil {
-                        existingRecord.flightLog = flightLog
-                    }
-                    index += 1.0
-                }else{
-                    AppDelegate.worker.sync {
-                        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-                        let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
-                        fileInfo.organizer = self
-                        fileInfo.log_file_name = filename
-                        fileInfo.flightLog = flightLog
-                        fileInfo.parseAndUpdate(quick: true)
-                        if fileInfo.recordStatus == .empty {
-                            Logger.app.info("Saving new empty record \(filename)")
-                        }else{
-                            Logger.app.info("Creating dependend \(fileInfo.recordStatus) record \(filename)")
-                            //fileInfo.ensureDependentRecords(delaySave: true)
-                        }
-                        DispatchQueue.synchronized(self){
-                            self.managedFlightLogs[ filename ] = fileInfo
-                            someNew += 1
-                            index += 1.0
-                        }
-                        if Date().timeIntervalSince(lastTime) > 1.0 {
-                            lastTime = Date()
-                            NotificationCenter.default.post(name: .localFileListChanged, object: self)
-                        }
-                    }
-                    self.progress?.update(state: .progressing(index / indexTotal), message: .addingFiles)
+            if let existingRecord = self[filename] {
+                // replace if parsed or if flightlog not populated
+                if flightLog.isParsed || existingRecord.flightLog == nil {
+                    existingRecord.flightLog = flightLog
                 }
+                continue
             }
+            // an iCloud file not downloaded yet gets its record when it arrives
+            guard FileManager.default.fileExists(atPath: flightLog.url.path) else { continue }
+            let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
+            fileInfo.organizer = self
+            fileInfo.log_file_name = filename
+            fileInfo.flightLog = flightLog
+            fileInfo.parseAndUpdate(quick: true)
+            Logger.app.info("Added \(fileInfo.recordStatus) record \(filename)")
+            DispatchQueue.synchronized(self) {
+                self.managedFlightLogs[ filename ] = fileInfo
+            }
+            added.append(filename)
+            if Date().timeIntervalSince(lastTime) > 1.0 {
+                lastTime = Date()
+                NotificationCenter.default.post(name: .localFileListChanged, object: self)
+            }
+            self.progress?.update(state: .progressing(Double(idx+1) / indexTotal), message: .addingFiles)
         }
         self.progress?.update(state: .complete, message: .addingFiles)
-        if someNew > 0 {
-            AppDelegate.worker.sync{
-                Logger.app.info("Added \(someNew) record for new local files")
-                self.saveContext()
-            }
+        if !added.isEmpty {
+            Logger.app.info("Added \(added.count) record for new local files")
+            self.saveContext()
             NotificationCenter.default.post(name: .localFileListChanged, object: self)
             NotificationCenter.default.post(name: .newLocalFilesDiscovered, object: self)
         }else{
             Logger.app.info("No missing local file in \(flightLogFileList.count) checked")
         }
-        return someNew
+        return added
     }
-    
+
+    //MARK: - Deleting
+
+    /// Remove the record and its file. The file is deleted from iCloud Drive too, so the log
+    /// does not come back from another device; it would still be imported again from an SD
+    /// card that has it.
     func delete(info : FlightLogFileRecord){
-        if let name = info.log_file_name {
-            self.managedFlightLogs.removeValue(forKey: name)
+        AppDelegate.worker.async {
+            guard let name = info.log_file_name else { return }
+            DispatchQueue.synchronized(self) {
+                _ = self.managedFlightLogs.removeValue(forKey: name)
+            }
             self.frequencyIndex?.delete(logFileName: name)
-            info.delete()
+            info.flightLog = nil
+            self.library.delete(name: name)
             self.persistentContainer.viewContext.delete(info)
             self.saveContext()
             NotificationCenter.default.post(name: .localFileListChanged, object: nil)
         }
     }
-    
+
     private func deletePersistentStores(for container:NSPersistentContainer){
         let coordinator = container.persistentStoreCoordinator
         for store in coordinator.persistentStores {
@@ -632,37 +603,34 @@ class FlightLogOrganizer {
             }
         }
     }
-    
+
     func deleteAndResetDatabase() {
         dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
         self.deletePersistentStores(for: self.persistentContainer)
         self.persistentContainer = self.createPersistentContainer()
 
-        self.managedFlightLogs = [:]
-        self.managedAircrafts = [:]
+        DispatchQueue.synchronized(self) {
+            self.managedFlightLogs = [:]
+            self.managedAircrafts = [:]
+        }
         self.frequencyIndex?.reset()
     }
-    
+
     func deleteLocalFilesAndDatabase() {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
         self.deleteAndResetDatabase()
-        do {
-            var count = 0
-            let files = try FileManager.default.contentsOfDirectory(atPath: self.localFolder.path)
-            for file in files{
-                if file.isFlightLogFile {
-                    count += 1
-                    try FileManager.default.removeItem(at: self.localFolder.appendingPathComponent(file))
-                }
-            }
-            Logger.app.info("Deleted \(count) out of \(files.count) files")
-        }catch{
-            Logger.app.error("Failed to look at content for delete \(error)")
+        let library = self.library
+        var count = 0
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: library.folder.path)) ?? []
+        for name in names where name.isFlightLogFile {
+            library.delete(name: name)
+            count += 1
         }
-        
+        Logger.app.info("Deleted \(count) out of \(names.count) files")
     }
-    
+
     //MARK: - Upload File management
-    
+
     func buildUploadList(viewController : UIViewController) {
         let list = self.flightLogFileRecords(request: .flightsOnly){
             record in
@@ -675,11 +643,11 @@ class FlightLogOrganizer {
         }
         let count = Settings.shared.uploadBatchCount
         let todo = Array(list.prefix(min(count, list.count)))
-        Logger.ui.info("\(list.count) / \(self.managedFlightLogs.count) potential to upload, will upload \(todo.count)")
+        Logger.ui.info("\(list.count) / \(self.count) potential to upload, will upload \(todo.count)")
         RequestQueue.shared.add(records: todo, viewController: viewController)
-        
+
     }
-    
+
     //MARK: - Aggregated Data
     /// Maintained full history of aggregatedData.
     /// When records are updated this will be update. Can be nil to disable the aggregation all together
@@ -697,8 +665,9 @@ class FlightLogOrganizer {
     private func backfillFrequencyIndex(count : Int) -> Int {
         guard let index = self.frequencyIndex else { return 0 }
         var todo : [FlightLogFileRecord] = []
-        for (_,info) in self.managedFlightLogs {
-            if let name = info.log_file_name, info.recordStatus == .parsed, !index.isIndexed(logFileName: name) {
+        for info in self.flightLogFileRecords {
+            if let name = info.log_file_name, info.recordStatus == .parsed, !index.isIndexed(logFileName: name),
+               FileManager.default.fileExists(atPath: self.libraryFolder.appendingPathComponent(name).path) {
                 todo.append(info)
             }
         }
@@ -721,536 +690,169 @@ class FlightLogOrganizer {
         Logger.app.info("Frequency index backfilled \(batch.count), \(todo.count - batch.count) left")
         return batch.count
     }
-    
-    //MARK: - Log Files discovery
+
+    //MARK: - Library folder
+
+    /// the app's own `Documents/`: the library when iCloud is off, and where logs lived
+    /// before they moved to iCloud Drive
     var localFolder : URL = { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0] }()
-    var cloudFolder : URL? = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
-    
+    /// the iCloud Drive container `Documents/`, set by `openLibrary()` when iCloud is on
+    var cloudFolder : URL? = nil
+    /// where the logs are: iCloud Drive when available, else local
+    var libraryFolder : URL { return self.cloudFolder ?? self.localFolder }
+    var library : LogLibrary { return LogLibrary(folder: self.libraryFolder) }
+
     func flightLogFile(name: String) -> FlightLogFile? {
-        return FlightLogFile(url: self.localFolder.appendingPathComponent(name))
+        return FlightLogFile(url: self.libraryFolder.appendingPathComponent(name))
     }
-    
-    static public func search(in urls: [URL], completion: (Result<[URL],Error>) -> Void){
-        for url in urls {
-            let requireAccess = url.startAccessingSecurityScopedResource()
-            defer {
-                if requireAccess {
-                    url.stopAccessingSecurityScopedResource()
-                }
-            }
-            
-            var error :NSError? = nil
-            NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &error){
-                (dirurl) in
-                var found : [URL] = []
-                
-                var isDirectory : ObjCBool = false
-                if FileManager.default.fileExists(atPath: dirurl.path, isDirectory: &isDirectory) {
-                    if isDirectory.boolValue{
-                        
-                        let keys : [URLResourceKey] = [.nameKey, .isDirectoryKey]
-                        
-                        guard let fileList = FileManager.default.enumerator(at: dirurl, includingPropertiesForKeys: keys) else {
-                            completion(Result.failure(OrganizerError.failedToReadFolder))
-                            return
-                        }
-                        
-                        for case let file as URL in fileList {
-                            if file.logFileType != .none {
-                                found.append(file)
-                            }
-                            if file.lastPathComponent == "data_log" && file.hasDirectoryPath {
-                                self.search(in: [file]) {
-                                    result in
-                                    switch result {
-                                    case .success(let more):
-                                        found.append(contentsOf: more)
-                                    case .failure(let error):
-                                        completion(.failure(error))
-                                    }
-                                }
-                            }
-                        }
-                    }else{
-                        if dirurl.logFileType != .none {
-                            found.append(dirurl)
-                        }
-                    }
-                }
-                completion(Result.success(found))
-            }
+
+    /// Resolve the iCloud Drive container and move the logs still only in local
+    /// `Documents/` into it. Blocking: `worker` only, before loading the records.
+    func openLibrary() {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        LogLibrary.removeUploadArchives(in: [self.localFolder])
+        guard let container = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
+            Logger.sync.info("iCloud not available, library in local Documents")
+            return
+        }
+        let cloud = container.appendingPathComponent("Documents")
+        do {
+            try FileManager.default.createDirectory(at: cloud, withIntermediateDirectories: true)
+        }catch{
+            Logger.sync.error("Failed to create iCloud Documents \(error.localizedDescription), library stays local")
+            return
+        }
+        self.cloudFolder = cloud
+        LogLibrary.removeUploadArchives(in: [cloud])
+        let migration = LogLibrary.migrate(local: self.localFolder, to: cloud)
+        if !migration.failed.isEmpty {
+            // the ones that failed stay local and are tried again next launch; their records
+            // point at the library, so they parse once moved
+            Logger.sync.error("\(migration.failed.count) files could not move to iCloud Drive")
         }
     }
 
-    
-    //MARK: - Update local file list
-    
-    private func copyLogFile(file : URL, dest : URL) -> Bool {
-        var someNew : Bool = false
-        if !FileManager.default.fileExists(atPath: dest.path) {
-            do {
-                try FileManager.default.copyItem(at: file, to: dest)
-                Logger.app.info("copied \(file.lastPathComponent) to \(dest.path.truncated(limit:64))")
-                someNew = true
-            } catch {
-                Logger.app.error("failed to copy \(file.lastPathComponent) to \(dest.path.truncated(limit: 96)) \(error)")
-            }
-        }else{
-            Logger.app.info("Already copied \(file.lastPathComponent)")
+    //MARK: - Import
+
+    typealias LogSelectionMethod = LogLibrary.Selection
+    typealias ImportProgress = LogLibrary.ImportProgress
+
+    /// What the library has, for an import to skip (worker only).
+    private func knownSnapshot() -> LogLibrary.Known {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        var known = LogLibrary.Known()
+        DispatchQueue.synchronized(self) {
+            known.logs = Set(self.managedFlightLogs.keys)
+            known.systemIds = Set(self.managedAircrafts.keys)
         }
-        return someNew
-    }
-    private func copyRptFile(file : URL, destFolder : URL ) -> Bool{
-        var someNew : Bool = false
-        if let avionics = AvionicsSystem(url: file),
-           let json = try? JSONEncoder().encode(avionics) {
-            let dest = destFolder.appendingPathComponent(avionics.uniqueFileName)
-            if !FileManager.default.fileExists(atPath: dest.path) {
-                do {
-                    try json.write(to: dest)
-                    Logger.app.info("Created \(dest.lastPathComponent) from \(file.lastPathComponent)")
-                    someNew = true
-                }catch{
-                    Logger.app.error("Failed to create \(dest.lastPathComponent) \(error)")
-                }
-            }else{
-                Logger.app.info("Already created \(dest.lastPathComponent)")
-            }
-        }else{
-            Logger.app.error("Failed to parse \(file.lastPathComponent)")
-        }
-        return someNew
-    }
-    
-    enum LogSelectionMethod {
-        case allMissingFromFolder // Automatically look for files missing in a folder
-        case sinceLatestImportedFile // Only import files after the latest imported file
-        case selectedFile([URL]) // Only import specified files
-        case afterDate(Date) // Only import files after the specified date
+        known.latestGuessedDate = self.first(request: .all)?.guessedDate
+        return known
     }
 
-    /// Main entry point to find files to import and copy them locally, typically an SD Card
-    /// optionally will process and create records in the database for new files
+    /// The `+` import, off main: find new files under `picked`, copy them into the library
+    /// and create their records (quick parse), then parse them fully in the background.
+    ///
     /// - Parameters:
-    ///   - urls: url to look for new file.
-    ///   - process: if true will also sync cloud and add to the database new files, use false for testing
-    func copyMissingFilesToLocal(urls : [URL], method : LogSelectionMethod, process : Bool = true) {
-        Logger.app.info("Starting import \(method)")
-        Self.search(in: urls ){
-            result in
-            switch result {
-            case .success(let logurls):
-                self.importAndAddRecordsForFiles(urls: logurls, method: method, process: process)
-            case .failure(let error):
-                Logger.app.error("Failed to find url \(error.localizedDescription)")
+    ///   - confirmLarge: asked before copying more than `LogLibrary.largeImportCount` files
+    ///   - progress: each step, on an arbitrary thread; ends with `.recorded`, or `.copied`
+    ///     if nothing was copied
+    /// - Returns: the new log records' names
+    @discardableResult
+    func importLogs(from picked : [URL],
+                    selection : LogSelectionMethod,
+                    confirmLarge : @escaping @Sendable (Int) async -> Bool = { _ in true },
+                    progress : @escaping @Sendable (ImportProgress) -> Void = { _ in }) async -> [String] {
+        Logger.app.info("Starting import \(String(describing: selection))")
+        let (library, known) = await withCheckedContinuation { continuation in
+            AppDelegate.worker.async {
+                continuation.resume(returning: (self.library, self.knownSnapshot()))
             }
         }
-    }
-    
-    func importAndAddRecordsForFiles(urls: [URL], method: LogSelectionMethod, process : Bool = true){
-        let someNew : Bool = self.importFiles(urls: urls, method: method)
-        if someNew {
-            if process {
-                Logger.app.info("Local File list has update")
-                self.addMissingRecordsFromLocal()
-                self.syncCloud()
-            }
-        }
-        else {
+        let result = await library.importFiles(from: picked, selection: selection, known: known,
+                                               confirmLarge: confirmLarge, progress: progress)
+        progress(.copied(result))
+        guard !result.copied.isEmpty else {
             Logger.app.info("Import found no new files")
-            NotificationCenter.default.post(name: .noFileDiscovered, object: self)
+            return []
         }
-    }
-    
-    func buildImportList(urls : [URL], method :LogSelectionMethod) -> [URL]{
-        var rv : [URL] = []
-        
-        for url in urls {
-            var shouldInclude = false
-            switch method {
-            case .afterDate(let from):
-                if let guessedDate = url.logFileGuessedDate,
-                   guessedDate >= from {
-                    shouldInclude = true
-                }
-            case .allMissingFromFolder:
-                shouldInclude = true
-            case .selectedFile(let selectedUrls):
-                shouldInclude = Self.isSelected(url: url, in: selectedUrls)
-            case .sinceLatestImportedFile:
-                if let first = self.first(request: .all) {
-                    if let guessedDate = url.logFileGuessedDate,
-                       let firstGuessedDate = first.guessedDate{
-                        shouldInclude = (guessedDate >= firstGuessedDate)
-                    }
-                }else{
-                    // If no log at all, import all
-                    shouldInclude = true
-                }
-            }
-            if shouldInclude {
-                rv.append(url)
+        let added = await withCheckedContinuation { continuation in
+            self.addMissingRecordsFromLocal { added in
+                continuation.resume(returning: added)
             }
         }
-        Logger.app.info("Found \(rv.count) new files out of \(urls.count)")
-        return rv
-    }
-    
-    /// True if `url` is one of `selectedUrls` or inside one of them: picking a folder
-    /// (the Mac picker default) selects every log found under it.
-    static func isSelected(url : URL, in selectedUrls : [URL]) -> Bool {
-        let path = url.resolvingSymlinksInPath().standardizedFileURL.path
-        for selected in selectedUrls {
-            var selectedPath = selected.resolvingSymlinksInPath().standardizedFileURL.path
-            if path == selectedPath {
-                return true
-            }
-            if !selectedPath.hasSuffix("/") {
-                selectedPath.append("/")
-            }
-            if path.hasPrefix(selectedPath) {
-                return true
-            }
-        }
-        return false
-    }
-    
-    /// Import (copy to local container) files missing according to selection Method
-    /// - Parameters:
-    ///   - urls: list of files to import
-    ///   - method: selection method
-    func importFiles(urls : [URL], method : LogSelectionMethod) -> Bool {
-        let destFolder = self.localFolder
-        var someNew : Bool = false
-        
-        let importList = self.buildImportList(urls: urls, method: method)
-
-        for url in importList {
-            if url.logFileType == .rpt {
-                if self.copyRptFile(file: url,destFolder: destFolder) {
-                    someNew = true
-                }
-            }else{
-                let dest = destFolder.appendingPathComponent(url.lastPathComponent)
-                if self.copyLogFile(file: url, dest: dest) {
-                    someNew = true
-                }
-            }
-        }
-        return someNew
-    }
-    
-    //MARK: - cloudKit Records management
-    
-    private static let enableCloudKit : Bool = false
-    
-    private func createPersistentCloudContainer() -> NSPersistentCloudKitContainer? {
-        guard Self.enableCloudKit else { return nil }
-        
-        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-        let container = NSPersistentCloudKitContainer(name: "FlightLogModel")
-
-        guard let cloudStoreDescription = container.persistentStoreDescriptions.first,
-              let url = cloudStoreDescription.url else { return nil }
-        
-        var path = url.deletingLastPathComponent().path
-        path.append("/FlightLogModelCloud.sqlite")
-        cloudStoreDescription.url = URL(fileURLWithPath: path)
-        cloudStoreDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "net.ro-z.flightlogstats.records")
-        
-        container.loadPersistentStores() {
-            (storeDescription,error) in
-            if let error = error {
-                Logger.app.error("Failed to load \(error.localizedDescription)")
-            }else{
-                let path = storeDescription.url?.path ?? ""
-                Logger.app.info("Loaded store \(storeDescription.type) \(path.truncated(limit: 64))")
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                self.checkForUpdates()
-            }
-        }
-        return container
-    }
-    
-    lazy var persistentCloudContainer : NSPersistentCloudKitContainer? = {
-        return self.createPersistentCloudContainer()
-    }()
-
-    func saveCloudContext() {
-        guard Self.enableCloudKit else { return }
-        
-        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-        
-        if let cloudContext = persistentCloudContainer?.viewContext,
-           cloudContext.hasChanges {
-            do {
-                try cloudContext.save()
-            }catch{
-                let nserror = error as NSError
-                Logger.app.error("Failed to save cloud contexts \(nserror)")
-            }
-        }
+        progress(.recorded(added))
+        return added
     }
 
-    private var managedCloudAircrafts : [SystemId:AircraftRecord] = [:]
-    // LogFilename to fuelrecord
-    private var managedCloudFuelRecords : [String:FlightFuelRecord] = [:]
-    
-    private func loadFromCloudContainer() {
-        self.loadAircraftFromCloudContainer()
-        self.loadFuelRecordsFromCloudContainer()
-        self.saveAircraftsToCloudContainer()
-    }
-    
-    private func saveAircraftsToCloudContainer() {
-        guard let cloudContainer = self.persistentCloudContainer else { return }
-        var needSave = false
-        for (systemId,aircraft) in self.managedAircrafts {
-            if self.managedCloudAircrafts[systemId] == nil {
-                let cloudAircraft = AircraftRecord(context: cloudContainer.viewContext)
-                cloudAircraft.setupAsCopy(of: aircraft)
-                needSave = true
-                self.managedCloudAircrafts[cloudAircraft.systemId] = cloudAircraft
-            }
-        }
-        if needSave {
-            self.saveCloudContext()
-        }
-    }
-    
-    private func loadAircraftFromCloudContainer() {
-        guard let cloudContainer = self.persistentCloudContainer else { return }
-        
-        let fetchRequest = AircraftRecord.fetchRequest()
-        
-        do {
-            let fetchAircrafts : [AircraftRecord] = try cloudContainer.viewContext.fetch(fetchRequest)
-            var added = 0
-            let existing = self.managedCloudAircrafts.count
-            for aircraft in fetchAircrafts {
-                if let systemId = aircraft.system_id {
-                    added += 1
-                    aircraft.container = self
-                    self.managedAircrafts[systemId] = aircraft
-                }
-            }
-            NotificationCenter.default.post(name: .aircraftListChanged, object: self)
-            Logger.app.info("Loaded \(fetchAircrafts.count) Aircrafts from Cloud: existing \(existing) added \(added)")
-        }catch{
-            Logger.app.error("Failed to query for aircrafts")
-        }
-    }
+    //MARK: - Watching iCloud Drive
 
-    private func loadFuelRecordsFromCloudContainer() {
-        guard let cloudContainer = self.persistentCloudContainer else { return }
-        
-        let fetchRequest = FlightFuelRecord.fetchRequest()
-        
-        do {
-            let fuelRecords : [FlightFuelRecord] = try cloudContainer.viewContext.fetch(fetchRequest)
-            var added = 0
-            let existing = self.managedCloudFuelRecords.count
-            for record in fuelRecords {
-                if let logFileName = record.log_file_name {
-                    added += 1
-                    record.container = self
-                    self.managedCloudFuelRecords[logFileName] = record
-                }
-            }
-            NotificationCenter.default.post(name: .aircraftListChanged, object: self)
-            Logger.app.info("Loaded \(fuelRecords.count) Aircrafts: existing \(existing) added \(added)")
-        }catch{
-            Logger.app.error("Failed to query for fuelRecord")
-        }
-    }
-    func deleteAndResetCloudDatabase() {
-        guard Self.enableCloudKit, let cloudContainer = self.persistentCloudContainer else { return }
-        
-        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-        
-        self.deletePersistentStores(for: cloudContainer)
-        self.persistentCloudContainer = self.createPersistentCloudContainer()
+    private var libraryQuery : NSMetadataQuery? = nil
+    private var libraryObservers : [NSObjectProtocol] = []
 
-        self.managedFlightLogs = [:]
-        self.managedAircrafts = [:]
-    }
-
-    //MARK: - sync with cloud drive files
-    private var cachedQuery : NSMetadataQuery? = nil
-    private var cachedLocalFlightLogList : FlightLogFileList? = nil
-    
-    func syncCloud() {
-        self.cloudFolder = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
-        guard cloudFolder != nil else {
-            Logger.sync.info("iCloud not setup, skipping sync")
-            return
-        }
-        self.progress?.update(state: .progressing(0.0), message: .iCloudSync)
-        Self.search(in: [localFolder]){
-            result in
-            switch result {
-            case .failure(let error):
-                Logger.sync.error("Failed to find files \(error.localizedDescription)")
-            case .success(let urls):
-                DispatchQueue.main.async {
-                    // this needs to run on the main thread
-                    self.syncCloud(with: FlightLogFileList(urls: urls))
-                }
-            }
-        }
-    }
-    
-    private func syncCloud(with local : FlightLogFileList ) {
-        // query for iCloud need to run on main queue
+    /// Follow the iCloud Drive folder: logs added on another device are downloaded, then
+    /// recorded. Started once (main thread), kept running while the app is up.
+    func watchLibrary() {
         dispatchPrecondition(condition: .onQueue(.main))
-        
-        self.cachedLocalFlightLogList = local
-        
-        if let already = self.cachedQuery?.isGathering, already {
-            Logger.sync.info("Query already gathering")
-            return
-        }else {
-            Logger.sync.info("Query starting")
-        }
-        // stop if already exists
-        self.cachedQuery?.stop()
-        self.cachedQuery = NSMetadataQuery()
-        if let query = self.cachedQuery {
-            NotificationCenter.default.addObserver(self, selector: #selector(didFinishGathering), name: .NSMetadataQueryDidFinishGathering, object: nil)
-            
-            query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
-            query.predicate = NSPredicate(format: "%K LIKE '*'", NSMetadataItemPathKey)
-            
-            if query.start() == false {
-                Logger.sync.error("Failed to start query for cloud files")
-            }
-        }
-        AppDelegate.worker.async {
-            self.loadFromCloudContainer()
-        }
-    }
-
-    @objc func didFinishGathering() {
-        if let query = self.cachedQuery {
-            
-            var cloudUrls : [URL] = []
-            
-            for item in query.results {
-                if let url = (item as? NSMetadataItem)?.value(forAttribute: NSMetadataItemURLKey) as? URL {
-                    cloudUrls.append(url)
-                }
-            }
-            
-            Logger.sync.info("Found \(cloudUrls.count) files on iCloud")
-            
-            self.progress?.update(state: .complete, message: .iCloudSync)
-            
-            Self.search(in: [self.localFolder]){
-                result in
-                switch result{
-                case .failure(let error):
-                    Logger.app.error("Failed to load local \(error.localizedDescription)")
-                case .success(let urls):
-                    AppDelegate.worker.async {
-                        self.syncCloudLogic(localUrls: urls, cloudUrls: cloudUrls)
-                    }
-
-                }
-            }
-        }
-    }
-    
-    func syncCloudLogic(localUrls : [URL], cloudUrls : [URL], completion : @escaping () -> Void = {  } ){
-        var existingInLocal : Set<String> = []
-        var existingInCloud : Set<String> = []
-        
-        // Gather what is in what to check what is missing
-        for cloudUrl in cloudUrls {
-            let lastComponent = cloudUrl.lastPathComponent
-            if lastComponent.logFileType != .none {
-                existingInCloud.insert(lastComponent)
-            }
-        }
-        
-        for localUrl in localUrls {
-            let lastComponent = localUrl.lastPathComponent
-            if lastComponent.logFileType != .none {
-                existingInLocal.insert(lastComponent)
-            }
-        }
-        // copy local to cloud
-        var copyLocalToCloud : [URL] = []
-        var copyCloudToLocal : [NSFileAccessIntent] = []
-        
-        for cloudUrl in cloudUrls {
-            let lastComponent = cloudUrl.lastPathComponent
-            if lastComponent.logFileType != .none {
-                if !existingInLocal.contains(lastComponent) {
-                    Logger.sync.info( "copy to local \(cloudUrl.lastPathComponent)")
-                    copyCloudToLocal.append(NSFileAccessIntent.readingIntent(with: cloudUrl))
-                }
-            }
-        }
-        
-        var copiedToCloud : Int = 0
-        
-        let totalCount = Double(localUrls.count + cloudUrls.count)
-        var done : Double = 0
-        
-        for localUrl in localUrls {
-            let lastComponent = localUrl.lastPathComponent
-            self.progress?.update(state: .progressing(done/totalCount), message: .iCloudSync)
-            done += 1.0
-            if lastComponent.logFileType != .none {
-                if !existingInCloud.contains(lastComponent) {
-                    copyLocalToCloud.append(localUrl)
-                    if let cloud = cloudFolder?.appendingPathComponent(localUrl.lastPathComponent) {
-                        copiedToCloud += 1
-                        Logger.sync.info( "copy to cloud \(localUrl.lastPathComponent)")
-                        do {
-                            if !FileManager.default.fileExists(atPath: cloud.path) {
-                                try FileManager.default.copyItem(at: localUrl, to: cloud)
-                            }else{
-                                Logger.sync.info("Already copied \(cloud.lastPathComponent), skipping")
-                            }
-                        }catch{
-                            Logger.sync.error("Failed to copy to cloud \(error.localizedDescription)")
-                        }
-                    }
-                }
-            }
-        }
-        
-        if copiedToCloud == 0 {
-            Logger.sync.info("Nothing new in local to copy to cloud")
-        }
-        if copyCloudToLocal.count > 0 {
-            let coordinator = NSFileCoordinator()
-            coordinator.coordinate(with: copyCloudToLocal, queue: self.queue){
-                error in
-                if error == nil {
-                    do {
-                        for intent in copyCloudToLocal {
-                            self.progress?.update(state: .progressing(done/totalCount), message: .iCloudSync)
-                            done += 1.0
-                            try FileManager.default.copyItem(at: intent.url, to: self.localFolder.appendingPathComponent(intent.url.lastPathComponent))
-                        }
-                        self.addMissingRecordsFromLocal()
-                    }catch{
-                        Logger.sync.error("Failed to copy from cloud \(error.localizedDescription)")
-                    }
-                }else{
-                    if let error = error {
-                        Logger.sync.error("Failed to coordinate \(error.localizedDescription)")
-                    }
-                }
-                completion()
-            }
+        guard self.libraryQuery == nil else { return }
+        let query = NSMetadataQuery()
+        query.searchScopes = [NSMetadataQueryUbiquitousDocumentsScope]
+        query.predicate = NSPredicate(format: "%K LIKE '*'", NSMetadataItemFSNameKey)
+        let handler : (Notification) -> Void = { [weak self] _ in self?.libraryQueryChanged() }
+        self.libraryObservers = [
+            NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: query, queue: .main, using: handler),
+            NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidUpdate, object: query, queue: .main, using: handler),
+        ]
+        if query.start() {
+            self.libraryQuery = query
         }else{
-            Logger.sync.info("Nothing new in cloud to copy to local")
-            completion()
+            Logger.sync.error("Failed to start iCloud Drive query")
+            for observer in self.libraryObservers {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            self.libraryObservers = []
         }
-        self.progress?.update(state: .complete, message: .iCloudSync)
+    }
+
+    private func libraryQueryChanged() {
+        guard let query = self.libraryQuery else { return }
+        query.disableUpdates()
+        var downloaded : Set<String> = []
+        var toDownload : [URL] = []
+        for item in query.results {
+            guard let item = item as? NSMetadataItem,
+                  let url = item.value(forAttribute: NSMetadataItemURLKey) as? URL else { continue }
+            let name = url.lastPathComponent
+            guard name.logFileType == .log || name.logFileType == .aircraft else { continue }
+            let status = item.value(forAttribute: NSMetadataUbiquitousItemDownloadingStatusKey) as? String
+            if status == NSMetadataUbiquitousItemDownloadingStatusCurrent {
+                downloaded.insert(name)
+            }else{
+                toDownload.append(url)
+            }
+        }
+        query.enableUpdates()
+
+        AppDelegate.worker.async {
+            for url in toDownload where !self.downloadRequested.contains(url.lastPathComponent) {
+                self.downloadRequested.insert(url.lastPathComponent)
+                try? FileManager.default.startDownloadingUbiquitousItem(at: url)
+            }
+            if !toDownload.isEmpty {
+                Logger.sync.info("\(toDownload.count) files downloading from iCloud")
+            }
+            let knownLogs = DispatchQueue.synchronized(self) { Set(self.managedFlightLogs.keys) }
+            let knownSystemIds = DispatchQueue.synchronized(self) { Set(self.managedAircrafts.keys) }
+            let newLogs = downloaded.filter { $0.isFlightLogFile && !knownLogs.contains($0) }
+            let newAircraft = downloaded.filter { $0.isAircraftSystemFile && !knownSystemIds.contains(($0 as NSString).deletingPathExtension.replacingOccurrences(of: "sys_", with: "")) }
+            let pending = self.recordsRequiringParsing()
+            if !newLogs.isEmpty || !newAircraft.isEmpty {
+                Logger.sync.info("iCloud Drive has \(newLogs.count) new logs")
+                self.addMissingRecordsFromLocal()
+            }else if !pending.isEmpty {
+                // downloads that finished for records waiting to be parsed
+                self.updateRecords(count: 2)
+            }
+        }
     }
 }
 

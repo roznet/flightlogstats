@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42F0B1A0000000000000D003 /* TestLogLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D002 /* TestLogLibrary.swift */; };
+		42F0B1A0000000000000D001 /* LogLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D000 /* LogLibrary.swift */; };
 		420247AF2840011300B7E52C /* log_small_sample.csv in Resources */ = {isa = PBXBuildFile; fileRef = 420247AD2840011300B7E52C /* log_small_sample.csv */; };
 		420247B02840011300B7E52C /* log_small_sample_fixed.csv in Resources */ = {isa = PBXBuildFile; fileRef = 420247AE2840011300B7E52C /* log_small_sample_fixed.csv */; };
 		4203FBC92905A503005B0530 /* ErrorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4203FBC82905A503005B0530 /* ErrorManager.swift */; };
@@ -162,6 +164,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42F0B1A0000000000000D002 /* TestLogLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestLogLibrary.swift; sourceTree = "<group>"; };
+		42F0B1A0000000000000D000 /* LogLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LogLibrary.swift; path = Source/LogLibrary.swift; sourceTree = "<group>"; };
 		420247AD2840011300B7E52C /* log_small_sample.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_small_sample.csv; sourceTree = "<group>"; };
 		420247AE2840011300B7E52C /* log_small_sample_fixed.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = log_small_sample_fixed.csv; sourceTree = "<group>"; };
 		4203FBC82905A503005B0530 /* ErrorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ErrorManager.swift; path = Source/ErrorManager.swift; sourceTree = "<group>"; };
@@ -467,6 +471,7 @@
 				42F0B1A0000000000000B004 /* TestFrequencyTimeline.swift */,
 				42F0B1A0000000000000B014 /* TestFrequencyBingo.swift */,
 				42F0B1A0000000000000C004 /* TestOwnship.swift */,
+				42F0B1A0000000000000D002 /* TestLogLibrary.swift */,
 				42F1E847284A3C2E00DB732A /* TestParsingCsv.swift */,
 				42F1E84F284A4D2800DB732A /* TestOrganizer.swift */,
 				423929102864D58800CD33C0 /* TestAnalysis.swift */,
@@ -636,6 +641,7 @@
 				42F0B1A0000000000000B012 /* FrequencyBingoView.swift */,
 				42F0B1A0000000000000C000 /* Ownship.swift */,
 				42F0B1A0000000000000C002 /* OwnshipMap.swift */,
+				42F0B1A0000000000000D000 /* LogLibrary.swift */,
 				42A7A0BE28154A2400DF4495 /* FlightLogFileRecord.swift */,
 				425A8DE1287094BD002DCB0C /* FlightFuelRecord.swift */,
 				421EE5BE290C53E600996EC6 /* AircraftRecord.swift */,
@@ -847,6 +853,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4280C8BC280D460600A0FB32 /* LogListTableViewController.swift in Sources */,
+				42F0B1A0000000000000D001 /* LogLibrary.swift in Sources */,
 				42B3843028609A3C009458CC /* FieldCalculations.swift in Sources */,
 				42606A1C288DC57600AE858C /* RZNumberWithUnitCollectionViewCell.swift in Sources */,
 				42A7A0C32815898C00DF4495 /* FlightLogFile+Field.swift in Sources */,
@@ -938,6 +945,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				42F1E850284A4D2800DB732A /* TestOrganizer.swift in Sources */,
+				42F0B1A0000000000000D003 /* TestLogLibrary.swift in Sources */,
 				4203FBD32905B0FE005B0530 /* TestAvionics.swift in Sources */,
 				423929112864D58800CD33C0 /* TestAnalysis.swift in Sources */,
 				42E83FEB283CB58E00869598 /* TestParsingLogFiles.swift in Sources */,
