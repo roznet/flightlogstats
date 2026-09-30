@@ -68,6 +68,8 @@ class FlightLogViewModel {
         }
         set {
             self.flightLogFileRecord.aircraftRecord?.aircraftPerformance = newValue
+            // a user edit: the latest one wins between devices
+            self.flightLogFileRecord.aircraftRecord?.modified = Date()
         }
     }
     

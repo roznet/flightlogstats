@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42F0B1A0000000000000D053 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D052 /* LibraryStore.swift */; };
 		42F0B1A0000000000000D043 /* UploadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D042 /* UploadsView.swift */; };
 		42F0B1A0000000000000D041 /* PostFlightImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D040 /* PostFlightImport.swift */; };
 		42F0B1A0000000000000D031 /* TestUploads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D030 /* TestUploads.swift */; };
@@ -165,6 +166,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42F0B1A0000000000000D052 /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LibraryStore.swift; path = Source/LibraryStore.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D042 /* UploadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UploadsView.swift; path = Source/UploadsView.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D040 /* PostFlightImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PostFlightImport.swift; path = Source/PostFlightImport.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D030 /* TestUploads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUploads.swift; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 		42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FlightLogModel.xcdatamodel; sourceTree = "<group>"; };
 		42D0A7A32E90000100A1B2C3 /* FlightLogModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "FlightLogModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		42F0B1A0000000000000D010 /* FlightLogModel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "FlightLogModel 3.xcdatamodel"; sourceTree = "<group>"; };
+		42F0B1A0000000000000D050 /* FlightLogModel 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "FlightLogModel 4.xcdatamodel"; sourceTree = "<group>"; };
 		42E83FEA283CB58E00869598 /* TestParsingLogFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestParsingLogFiles.swift; sourceTree = "<group>"; };
 		42E83FEC283CB5A800869598 /* BufferedStreamReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BufferedStreamReader.swift; path = Source/BufferedStreamReader.swift; sourceTree = "<group>"; };
 		42E912BE294F9204005D5675 /* AircraftSummaryDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AircraftSummaryDataSource.swift; path = Source/AircraftSummaryDataSource.swift; sourceTree = "<group>"; };
@@ -639,6 +642,7 @@
 				42F0B1A0000000000000B012 /* FrequencyBingoView.swift */,
 				42F0B1A0000000000000C000 /* Ownship.swift */,
 				42F0B1A0000000000000C002 /* OwnshipMap.swift */,
+				42F0B1A0000000000000D052 /* LibraryStore.swift */,
 				42F0B1A0000000000000D042 /* UploadsView.swift */,
 				42F0B1A0000000000000D040 /* PostFlightImport.swift */,
 				42F0B1A0000000000000D026 /* Uploads.swift */,
@@ -857,6 +861,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4280C8BC280D460600A0FB32 /* LogListTableViewController.swift in Sources */,
+				42F0B1A0000000000000D053 /* LibraryStore.swift in Sources */,
 				42F0B1A0000000000000D043 /* UploadsView.swift in Sources */,
 				42F0B1A0000000000000D041 /* PostFlightImport.swift in Sources */,
 				42F0B1A0000000000000D027 /* Uploads.swift in Sources */,
@@ -1426,8 +1431,9 @@
 				42E13B8D2813DBD200AF38AC /* FlightLogModel.xcdatamodel */,
 				42D0A7A32E90000100A1B2C3 /* FlightLogModel 2.xcdatamodel */,
 				42F0B1A0000000000000D010 /* FlightLogModel 3.xcdatamodel */,
+				42F0B1A0000000000000D050 /* FlightLogModel 4.xcdatamodel */,
 			);
-			currentVersion = 42F0B1A0000000000000D010 /* FlightLogModel 3.xcdatamodel */;
+			currentVersion = 42F0B1A0000000000000D050 /* FlightLogModel 4.xcdatamodel */;
 			name = FlightLogModel.xcdatamodeld;
 			path = Source/FlightLogModel.xcdatamodeld;
 			sourceTree = "<group>";

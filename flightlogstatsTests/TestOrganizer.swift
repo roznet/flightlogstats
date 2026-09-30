@@ -117,9 +117,9 @@ class TestOrganizer: XCTestCase {
         try FileManager.default.copyItem(at: bundle.appendingPathComponent(TestLogLibrary.rpt), to: card.appendingPathComponent(TestLogLibrary.rpt))
         
         let steps = Steps()
-        let (result, added) = await organizer.importLogs(from: [card], selection: .allMissingFromFolder) { step in
+        let (result, added) = await organizer.importLogs(from: [card], selection: .allMissingFromFolder, progress: { step in
             steps.append(step)
-        }
+        })
         XCTAssertEqual(Set(result.copiedLogs), Set(logs))
         XCTAssertEqual(Set(added), Set(logs))
         XCTAssertEqual(organizer.count, logs.count)
@@ -164,10 +164,10 @@ class TestOrganizer: XCTestCase {
         func append(_ step : FlightLogOrganizer.ImportProgress) { self.lock.withLock { self.steps.append(step) } }
     }
     
-    /// Savvy removal: a library saved with model version 1 (with `FlightSavvyRecord` and
-    /// `savvy_record`) opens with the current model by lightweight migration, keeping the
-    /// logs and their FlySto status.
-    func testModelMigrationFromVersion1() throws {
+    /// Step 2: a library saved in the single store of model version 1 (with Savvy) is
+    /// split into the Derived and UserState stores; the per-log records that only had a
+    /// relationship to their log get its name; the old store is kept as a backup.
+    func testLegacyStoreSplit() throws {
         guard let v1url = Bundle(for: FlightLogOrganizer.self).url(forResource: "FlightLogModel", withExtension: "mom", subdirectory: "FlightLogModel.momd"),
               let v1 = NSManagedObjectModel(contentsOf: v1url) else {
             XCTFail("no version 1 model in FlightLogModel.momd")
@@ -185,7 +185,7 @@ class TestOrganizer: XCTestCase {
         defer {
             try? FileManager.default.removeItem(at: folder)
         }
-        let storeUrl = folder.appendingPathComponent("FlightLogModel.sqlite")
+        let storeUrl = folder.appendingPathComponent(LibraryStore.legacyStoreName)
         let logName = "log_220417_125002_LFQA.csv"
         
         // an existing library, written with version 1
@@ -197,9 +197,20 @@ class TestOrganizer: XCTestCase {
         let oldContext = old.viewContext
         let log = NSEntityDescription.insertNewObject(forEntityName: "FlightLogFileRecord", into: oldContext)
         log.setValue(logName, forKey: "log_file_name")
+        log.setValue("parsed", forKey: "info_status")
+        log.setValue("123", forKey: "system_id")
+        log.setValue(Int32(2), forKey: "version")
+        let aircraft = NSEntityDescription.insertNewObject(forEntityName: "AircraftRecord", into: oldContext)
+        aircraft.setValue("123", forKey: "system_id")
+        aircraft.setValue("N122DR", forKey: "aircraft_identifier")
+        log.setValue(aircraft, forKey: "aircraft_record")
+        // no log_file_name of its own: only the relationship tells which log
         let flysto = NSEntityDescription.insertNewObject(forEntityName: "FlightFlyStoRecord", into: oldContext)
         flysto.setValue("uploaded", forKey: "upload_status")
         log.setValue(flysto, forKey: "flysto_record")
+        let fuel = NSEntityDescription.insertNewObject(forEntityName: "FlightFuelRecord", into: oldContext)
+        fuel.setValue(12.5, forKey: "added_fuel_left")
+        log.setValue(fuel, forKey: "fuel_record")
         let savvy = NSEntityDescription.insertNewObject(forEntityName: "FlightSavvyRecord", into: oldContext)
         savvy.setValue("uploaded", forKey: "upload_status")
         log.setValue(savvy, forKey: "savvy_record")
@@ -208,23 +219,153 @@ class TestOrganizer: XCTestCase {
             try old.persistentStoreCoordinator.remove(store)
         }
         
-        // opened as the app does
-        let current = FlightLogOrganizer.makePersistentContainer()
-        let description = NSPersistentStoreDescription(url: storeUrl)
-        XCTAssertTrue(description.shouldMigrateStoreAutomatically)
-        XCTAssertTrue(description.shouldInferMappingModelAutomatically)
-        current.persistentStoreDescriptions = [description]
-        current.loadPersistentStores { _, error in loadError = error }
-        XCTAssertNil(loadError)
-        
-        let records : [FlightLogFileRecord] = try current.viewContext.fetch(FlightLogFileRecord.fetchRequest())
-        XCTAssertEqual(records.count, 1)
-        XCTAssertEqual(records.first?.log_file_name, logName)
-        XCTAssertEqual(records.first?.flysto_record?.upload_status, "uploaded")
-        
-        for store in current.persistentStoreCoordinator.persistentStores {
-            try current.persistentStoreCoordinator.remove(store)
+        XCTAssertTrue(LibraryStore.needsLegacyMigration(directory: folder))
+        let organizer = FlightLogOrganizer()
+        organizer.persistentContainer = FlightLogOrganizer.makeLibraryContainer(directory: folder, cloudKit: false)
+        XCTAssertEqual(organizer.persistentContainer.persistentStoreCoordinator.persistentStores.count, 2)
+        AppDelegate.worker.sync {
+            organizer.loadFromContainer()
         }
+        XCTAssertEqual(organizer.count, 1)
+        let record = try XCTUnwrap(organizer[logName])
+        XCTAssertEqual(record.recordStatus, .parsed)
+        XCTAssertFalse(record.requiresParsing)
+        XCTAssertEqual(record.flystoStatus, .uploaded)
+        XCTAssertEqual(record.fuel_record?.added_fuel_left, 12.5)
+        XCTAssertEqual(record.aircraftRecord?.aircraft_identifier, "N122DR")
+        XCTAssertEqual(record.aircraftRecord?.flightRecords, [record])
+        XCTAssertNotNil(record.fuel_record?.uuid)
+        
+        // the user state went to the UserState store
+        let userStore = try XCTUnwrap(organizer.persistentContainer.persistentStoreCoordinator.persistentStores.first { $0.configurationName == LibraryStore.userStateConfiguration })
+        XCTAssertEqual(record.fuel_record?.objectID.persistentStore, userStore)
+        XCTAssertNotEqual(record.objectID.persistentStore, userStore)
+        
+        // the old store moved aside, not copied twice
+        XCTAssertFalse(FileManager.default.fileExists(atPath: storeUrl.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: folder.appendingPathComponent(LibraryStore.legacyBackupName).path))
+        XCTAssertFalse(LibraryStore.needsLegacyMigration(directory: folder))
+        for store in organizer.persistentContainer.persistentStoreCoordinator.persistentStores {
+            try organizer.persistentContainer.persistentStoreCoordinator.remove(store)
+        }
+    }
+    
+    /// A container with the app's two stores in a temporary folder, without CloudKit.
+    func makeSplitOrganizer(folder : URL, logs : URL? = nil) -> FlightLogOrganizer {
+        let organizer = FlightLogOrganizer()
+        organizer.persistentContainer = FlightLogOrganizer.makeLibraryContainer(directory: folder, cloudKit: false)
+        if let logs = logs {
+            organizer.localFolder = logs
+        }
+        return organizer
+    }
+    
+    /// Two devices each created the same per-log and aircraft records before syncing: every
+    /// device keeps the same one (later edit, uploaded first, then the smallest uuid).
+    func testDuplicatesFromTwoDevices() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("testDuplicates-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let organizer = self.makeSplitOrganizer(folder: folder)
+        let context = organizer.persistentContainer.viewContext
+        let name = "log_220417_125002_LFQA.csv"
+        let early = Date(timeIntervalSince1970: 1_700_000_000)
+        let late = early.addingTimeInterval(60)
+        
+        AppDelegate.worker.sync {
+            let fuelA = FlightFuelRecord(context: context)
+            fuelA.log_file_name = name; fuelA.uuid = "b"; fuelA.last_entered = early; fuelA.target_fuel = 50
+            let fuelB = FlightFuelRecord(context: context)
+            fuelB.log_file_name = name; fuelB.uuid = "c"; fuelB.last_entered = late; fuelB.target_fuel = 60
+            
+            // uploaded beats a later failure
+            let uploaded = FlightFlyStoRecord(context: context)
+            uploaded.log_file_name = name; uploaded.uuid = "z"; uploaded.status = .uploaded; uploaded.status_date = early
+            let failed = FlightFlyStoRecord(context: context)
+            failed.log_file_name = name; failed.uuid = "a"; failed.status = .failed; failed.status_date = late
+            
+            // no edit on either: the smallest uuid
+            for uuid in ["m", "k"] {
+                let aircraft = AircraftRecord(context: context)
+                aircraft.system_id = "123"; aircraft.uuid = uuid; aircraft.aircraft_identifier = uuid
+            }
+            organizer.saveContext()
+            organizer.loadFromContainer()
+        }
+        XCTAssertEqual(organizer.fuelRecord(logFileName: name)?.target_fuel, 60)
+        XCTAssertEqual(organizer.flyStoRecord(logFileName: name)?.status, .uploaded)
+        XCTAssertEqual(organizer.existingAircraft(systemId: "123")?.aircraft_identifier, "k")
+        // the losers are deleted from the store
+        let fuelCount = try context.count(for: FlightFuelRecord.fetchRequest())
+        let flystoCount = try context.count(for: FlightFlyStoRecord.fetchRequest())
+        let aircraftCount = try context.count(for: AircraftRecord.fetchRequest())
+        XCTAssertEqual([fuelCount, flystoCount, aircraftCount], [1, 1, 1])
+        
+        // the order the records come in does not change the choice
+        let a = FlightFuelRecord(context: context), b = FlightFuelRecord(context: context)
+        a.log_file_name = "x"; a.uuid = "1"
+        b.log_file_name = "x"; b.uuid = "2"
+        XCTAssertEqual(LibraryStore.deduplicate([a, b], key: { $0.log_file_name }, isBetter: LibraryStore.isBetter).kept["x"], a)
+        XCTAssertEqual(LibraryStore.deduplicate([b, a], key: { $0.log_file_name }, isBetter: LibraryStore.isBetter).kept["x"], a)
+        context.rollback()
+    }
+    
+    /// Tombstones: a deleted log is not imported again from an SD card that still has it,
+    /// and a deletion made on another device removes the record here.
+    func testDeletedLogsStayDeleted() async throws {
+        let bundle = try XCTUnwrap(Bundle(for: type(of: self)).resourceURL)
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("testHidden-\(UUID().uuidString)")
+        let library = folder.appendingPathComponent("library")
+        let card = folder.appendingPathComponent("card")
+        try FileManager.default.createDirectory(at: library, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: card, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let logs = TestLogLibrary.logs
+        for name in logs {
+            try FileManager.default.copyItem(at: bundle.appendingPathComponent(name), to: card.appendingPathComponent(name))
+        }
+        let organizer = self.makeSplitOrganizer(folder: folder, logs: library)
+        AppDelegate.worker.sync { organizer.loadFromContainer() }
+        
+        let first = await organizer.importLogs(from: [card], selection: .allMissingFromFolder)
+        XCTAssertEqual(Set(first.added), Set(logs))
+        let deleted = logs[0]
+        organizer.delete(info: try XCTUnwrap(organizer[deleted]))
+        AppDelegate.worker.sync {}
+        XCTAssertNil(organizer[deleted])
+        XCTAssertTrue(organizer.isHidden(logFileName: deleted))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: library.appendingPathComponent(deleted).path))
+        
+        // the card still has it
+        let again = await organizer.importLogs(from: [card], selection: .allMissingFromFolder)
+        XCTAssertTrue(again.result.copied.isEmpty)
+        XCTAssertNil(organizer[deleted])
+        
+        // another device deleted the second log: its tombstone arrives through CloudKit
+        let other = logs[1]
+        XCTAssertNotNil(organizer[other])
+        AppDelegate.worker.sync {
+            let context = organizer.persistentContainer.newBackgroundContext()
+            context.performAndWait {
+                let hidden = HiddenLog(context: context)
+                hidden.log_file_name = other
+                hidden.hidden_date = Date()
+                hidden.uuid = UUID().uuidString
+                try? context.save()
+            }
+            organizer.reloadUserState()
+        }
+        XCTAssertNil(organizer[other])
+        XCTAssertEqual(organizer.count, logs.count - 2)
+        
+        // a new organizer on the same stores (next launch) keeps them deleted
+        let relaunch = FlightLogOrganizer()
+        relaunch.persistentContainer = organizer.persistentContainer
+        relaunch.localFolder = library
+        AppDelegate.worker.sync { relaunch.loadFromContainer() }
+        XCTAssertEqual(relaunch.count, logs.count - 2)
+        XCTAssertTrue(relaunch.isHidden(logFileName: deleted))
+        XCTAssertTrue(relaunch.isHidden(logFileName: other))
     }
     
     /// Savvy removal: the stored Savvy token and switch are cleared at launch.

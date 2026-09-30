@@ -140,14 +140,22 @@ class FlightLogOrganizer : @unchecked Sendable {
     
     var aircraftCount : Int { return DispatchQueue.synchronized(self) { self.managedAircrafts.count } }
     var aircraftRecords : [AircraftRecord] { return DispatchQueue.synchronized(self) { Array(self.managedAircrafts.values) } }
+    /// the aircraft for a system id, if known
+    func existingAircraft(systemId : SystemId) -> AircraftRecord? {
+        return DispatchQueue.synchronized(self) { self.managedAircrafts[systemId] }
+    }
+    
+    /// the aircraft for a system id, created (worker only) if unknown
     func aircraft(systemId : SystemId, airframeName : String? = nil) -> AircraftRecord {
-        if let rv = DispatchQueue.synchronized(self, closure: { self.managedAircrafts[systemId] }) {
+        if let rv = self.existingAircraft(systemId: systemId) {
             return rv
         }else{
             dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
             let newAircraft = AircraftRecord(context: self.persistentContainer.viewContext)
+            newAircraft.uuid = UUID().uuidString
             newAircraft.system_id = systemId
             newAircraft.airframe_name = airframeName
+            newAircraft.container = self
             // set default performance
             newAircraft.aircraftPerformance = Settings.shared.aircraftPerformance
             DispatchQueue.synchronized(self) {
@@ -177,7 +185,44 @@ class FlightLogOrganizer : @unchecked Sendable {
     /// Mutated on `worker` only, read from anywhere through `synchronized(self)`
     private var managedFlightLogs : [String:FlightLogFileRecord] = [:]
     private var managedAircrafts : [SystemId:AircraftRecord] = [:]
-
+    /// user state per log, keyed by log file name (UserState store)
+    private var managedFuelRecords : [String:FlightFuelRecord] = [:]
+    private var managedFlyStoRecords : [String:FlightFlyStoRecord] = [:]
+    private var hiddenLogs : [String:HiddenLog] = [:]
+    
+    func fuelRecord(logFileName name : String) -> FlightFuelRecord? {
+        return DispatchQueue.synchronized(self) { self.managedFuelRecords[name] }
+    }
+    func flyStoRecord(logFileName name : String) -> FlightFlyStoRecord? {
+        return DispatchQueue.synchronized(self) { self.managedFlyStoRecords[name] }
+    }
+    /// deleted on some device: import and sync skip it
+    func isHidden(logFileName name : String) -> Bool {
+        return DispatchQueue.synchronized(self) { self.hiddenLogs[name] != nil }
+    }
+    var hiddenLogFileNames : Set<String> {
+        return DispatchQueue.synchronized(self) { Set(self.hiddenLogs.keys) }
+    }
+    
+    /// Register the fuel record of a log (worker only).
+    func register(fuelRecord : FlightFuelRecord, logFileName name : String) {
+        fuelRecord.log_file_name = name
+        fuelRecord.container = self
+        if fuelRecord.uuid == nil {
+            fuelRecord.uuid = UUID().uuidString
+        }
+        DispatchQueue.synchronized(self) { self.managedFuelRecords[name] = fuelRecord }
+    }
+    
+    /// Register the FlySto record of a log (worker only).
+    func register(flyStoRecord : FlightFlyStoRecord, logFileName name : String) {
+        flyStoRecord.log_file_name = name
+        if flyStoRecord.uuid == nil {
+            flyStoRecord.uuid = UUID().uuidString
+        }
+        DispatchQueue.synchronized(self) { self.managedFlyStoRecords[name] = flyStoRecord }
+    }
+    
     /// Loaded once and shared by every container: each container loading its own copy
     /// makes the entity lookup for the record classes ambiguous (and crash on insert)
     static let managedObjectModel : NSManagedObjectModel = {
@@ -185,30 +230,32 @@ class FlightLogOrganizer : @unchecked Sendable {
         return NSManagedObjectModel(contentsOf: url)!
     }()
 
+    /// A container without stores (tests add their own descriptions).
     static func makePersistentContainer() -> NSPersistentContainer {
         return NSPersistentContainer(name: "FlightLogModel", managedObjectModel: Self.managedObjectModel)
     }
-
-    private func createPersistentContainer() -> NSPersistentContainer {
-        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-        let container = Self.makePersistentContainer()
-        container.loadPersistentStores() {
-            (storeDescription,error) in
-            if let error = error {
-                Logger.app.error("Failed to load \(error.localizedDescription)")
-            }else{
-                let path = storeDescription.url?.path ?? ""
-                Logger.app.info("Loaded store \(storeDescription.type) \(path.truncated(limit: 64))")
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-            }
+    
+    /// the app's stores: Derived and UserState (CloudKit) in Application Support
+    static func makeLibraryContainer(directory : URL = NSPersistentContainer.defaultDirectoryURL(), cloudKit : Bool = true) -> NSPersistentContainer {
+        let needsLegacyCopy = LibraryStore.needsLegacyMigration(directory: directory)
+        let container = LibraryStore.makeContainer(model: Self.managedObjectModel, directory: directory, cloudKit: cloudKit)
+        if needsLegacyCopy {
+            _ = LibraryStore.migrateLegacy(directory: directory, into: container.viewContext)
         }
         return container
     }
 
+    private func createPersistentContainer() -> NSPersistentContainer {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        let container = Self.makeLibraryContainer()
+        self.observeRemoteChanges(of: container)
+        return container
+    }
+    
     lazy var persistentContainer : NSPersistentContainer = {
         return self.createPersistentContainer()
     }()
-
+    
     func saveContext() {
         dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
         let context = persistentContainer.viewContext
@@ -221,7 +268,60 @@ class FlightLogOrganizer : @unchecked Sendable {
             }
         }
     }
-
+    
+    /// Push the UserState schema to the CloudKit Development environment (DEBUG menu).
+    func initializeCloudKitSchema() {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        guard let container = self.persistentContainer as? NSPersistentCloudKitContainer else { return }
+        do {
+            try container.initializeCloudKitSchema(options: [])
+            Logger.app.info("CloudKit schema initialized")
+        }catch{
+            Logger.app.error("Failed to initialize the CloudKit schema \(error)")
+        }
+    }
+    
+    //MARK: - Changes from other devices
+    
+    private var remoteChangeObserver : NSObjectProtocol? = nil
+    /// a reload is queued on worker (worker only)
+    private var userStateReloadQueued = false
+    
+    /// CloudKit imports into the UserState store: reload the user state then.
+    private func observeRemoteChanges(of container : NSPersistentContainer) {
+        if let observer = self.remoteChangeObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        self.remoteChangeObserver = NotificationCenter.default.addObserver(forName: .NSPersistentStoreRemoteChange,
+                                                                           object: container.persistentStoreCoordinator,
+                                                                           queue: nil) { [weak self] _ in
+            AppDelegate.worker.async {
+                guard let self = self, !self.userStateReloadQueued else { return }
+                self.userStateReloadQueued = true
+                // changes come in bursts: one reload for the burst
+                AppDelegate.worker.asyncAfter(deadline: .now() + 1.0) {
+                    self.userStateReloadQueued = false
+                    self.reloadUserState()
+                }
+            }
+        }
+    }
+    
+    /// Fetch the user state again (edits, uploads, deletions from other devices), clean
+    /// up duplicates, drop the logs deleted elsewhere, and tell the screens.
+    func reloadUserState() {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        let hiddenBefore = self.hiddenLogFileNames
+        self.loadAircraftFromContainer()
+        self.loadUserStateFromContainer()
+        let newlyHidden = self.hiddenLogFileNames.subtracting(hiddenBefore)
+        if !newlyHidden.isEmpty {
+            self.removeRecords(names: newlyHidden)
+        }
+        NotificationCenter.default.post(name: .localFileListChanged, object: self)
+        NotificationCenter.default.post(name: .newFileUploaded, object: nil)
+    }
+    
     func exportCsv() {
         let fields = FlightSummary.Field.allCases
         let fileUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("flights.csv")
@@ -258,20 +358,67 @@ class FlightLogOrganizer : @unchecked Sendable {
 
     func loadFromContainer() {
         self.loadAircraftFromContainer()
+        self.loadUserStateFromContainer()
         self.loadLogsFromContainer()
     }
-
+    
+    /// fetch with current values (another device may have changed them)
+    private func fetchFresh<T : NSManagedObject>(_ request : NSFetchRequest<T>) -> [T] {
+        request.shouldRefreshRefetchedObjects = true
+        do {
+            return try self.persistentContainer.viewContext.fetch(request)
+        }catch{
+            Logger.app.error("Failed to fetch \(request.entityName ?? "") \(error)")
+            return []
+        }
+    }
+    
+    /// Delete the losing duplicates, save if any.
+    private func deleteDuplicates(_ duplicates : [NSManagedObject]) {
+        guard !duplicates.isEmpty else { return }
+        Logger.app.info("Removing \(duplicates.count) duplicate user records")
+        for object in duplicates {
+            self.persistentContainer.viewContext.delete(object)
+        }
+        self.saveContext()
+    }
+    
+    private func loadUserStateFromContainer() {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        let fuel = LibraryStore.deduplicate(self.fetchFresh(FlightFuelRecord.fetchRequest()),
+                                            key: { $0.log_file_name }, isBetter: LibraryStore.isBetter)
+        let flysto = LibraryStore.deduplicate(self.fetchFresh(FlightFlyStoRecord.fetchRequest()),
+                                              key: { $0.log_file_name }, isBetter: LibraryStore.isBetter)
+        let hidden = LibraryStore.deduplicate(self.fetchFresh(HiddenLog.fetchRequest()),
+                                              key: { $0.log_file_name }, isBetter: LibraryStore.isBetter)
+        for record in fuel.kept.values {
+            record.container = self
+        }
+        DispatchQueue.synchronized(self) {
+            self.managedFuelRecords = fuel.kept
+            self.managedFlyStoRecords = flysto.kept
+            self.hiddenLogs = hidden.kept
+        }
+        self.deleteDuplicates(fuel.duplicates + flysto.duplicates + hidden.duplicates)
+        Logger.app.info("Loaded user state: \(fuel.kept.count) fuel, \(flysto.kept.count) uploads, \(hidden.kept.count) deleted logs")
+    }
+    
     private func loadLogsFromContainer() {
         let fetchRequest = FlightLogFileRecord.fetchRequest()
-
+        
         do {
             dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
             let fetchedInfo : [FlightLogFileRecord] = try self.persistentContainer.viewContext.fetch(fetchRequest)
             var added = 0
             let existing = self.count
             var needSave = false
+            var hidden : [FlightLogFileRecord] = []
             for info in fetchedInfo {
                 if let filename = info.log_file_name {
+                    if self.isHidden(logFileName: filename) {
+                        hidden.append(info)
+                        continue
+                    }
                     if self[filename] == nil {
                         added += 1
                         info.organizer = self
@@ -284,11 +431,16 @@ class FlightLogOrganizer : @unchecked Sendable {
                     }
                 }
             }
-            NotificationCenter.default.post(name: .localFileListChanged, object: self)
-            if needSave {
-                Logger.app.info("Found corrections to be done")
+            // deleted on another device while this one was not running
+            for info in hidden {
+                self.persistentContainer.viewContext.delete(info)
+                needSave = true
             }
-            Logger.app.info("Loaded \(fetchedInfo.count) Logs: existing \(existing) added \(added) ")
+            if needSave {
+                self.saveContext()
+            }
+            NotificationCenter.default.post(name: .localFileListChanged, object: self)
+            Logger.app.info("Loaded \(fetchedInfo.count) Logs: existing \(existing) added \(added) hidden \(hidden.count)")
             self.updateRecords(count: 1)
         }catch let error{
             Logger.app.error("Failed to query for files \(error)")
@@ -296,29 +448,21 @@ class FlightLogOrganizer : @unchecked Sendable {
     }
 
     private func loadAircraftFromContainer() {
-        let fetchRequest = AircraftRecord.fetchRequest()
-
-        do {
-            dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
-            let fetchAircrafts : [AircraftRecord] = try self.persistentContainer.viewContext.fetch(fetchRequest)
-            var added = 0
-            let existing = self.aircraftCount
-            for aircraft in fetchAircrafts {
-                if let systemId = aircraft.system_id {
-                    added += 1
-                    aircraft.container = self
-                    DispatchQueue.synchronized(self) {
-                        self.managedAircrafts[systemId] = aircraft
-                    }
-                }
-            }
-            NotificationCenter.default.post(name: .aircraftListChanged, object: self)
-            Logger.app.info("Loaded \(fetchAircrafts.count) Aircrafts: existing \(existing) added \(added)")
-        }catch let error{
-            Logger.app.error("Failed to query for aircrafts \(error)")
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        let aircraft = LibraryStore.deduplicate(self.fetchFresh(AircraftRecord.fetchRequest()),
+                                                key: { $0.system_id }, isBetter: LibraryStore.isBetter)
+        for record in aircraft.kept.values {
+            record.container = self
         }
+        let existing = self.aircraftCount
+        DispatchQueue.synchronized(self) {
+            self.managedAircrafts = aircraft.kept
+        }
+        self.deleteDuplicates(aircraft.duplicates)
+        NotificationCenter.default.post(name: .aircraftListChanged, object: self)
+        Logger.app.info("Loaded \(aircraft.kept.count) Aircrafts: existing \(existing)")
     }
-
+   
     //MARK: - Parsing records
 
     /// true while a chain of batches is scheduled on `worker` (worker only)
@@ -543,6 +687,8 @@ class FlightLogOrganizer : @unchecked Sendable {
             }
             // an iCloud file not downloaded yet gets its record when it arrives
             guard FileManager.default.fileExists(atPath: flightLog.url.path) else { continue }
+            // deleted on some device: stays deleted
+            guard !self.isHidden(logFileName: filename) else { continue }
             let fileInfo = FlightLogFileRecord(context: self.persistentContainer.viewContext)
             fileInfo.organizer = self
             fileInfo.log_file_name = filename
@@ -573,22 +719,43 @@ class FlightLogOrganizer : @unchecked Sendable {
 
     //MARK: - Deleting
 
-    /// Remove the record and its file. The file is deleted from iCloud Drive too, so the log
-    /// does not come back from another device; it would still be imported again from an SD
-    /// card that has it.
+    /// Remove the record and its file, and leave a tombstone (`HiddenLog`, synced): the file
+    /// is deleted from iCloud Drive, other devices drop the record, and no import brings
+    /// the log back, even from an SD card that still has it. Its fuel and upload records
+    /// are kept.
     func delete(info : FlightLogFileRecord){
         AppDelegate.worker.async {
             guard let name = info.log_file_name else { return }
+            if !self.isHidden(logFileName: name) {
+                let hidden = HiddenLog(context: self.persistentContainer.viewContext)
+                hidden.log_file_name = name
+                hidden.hidden_date = Date()
+                hidden.uuid = UUID().uuidString
+                DispatchQueue.synchronized(self) {
+                    self.hiddenLogs[name] = hidden
+                }
+            }
+            self.library.delete(name: name)
+            self.removeRecords(names: [name])
+        }
+    }
+    
+    /// Drop the derived records of deleted logs (worker only). Files are left alone: the
+    /// device that deleted the log removed it from iCloud Drive.
+    private func removeRecords(names : Set<String>) {
+        dispatchPrecondition(condition: .onQueue(AppDelegate.worker))
+        for name in names {
+            guard let info = self[name] else { continue }
             DispatchQueue.synchronized(self) {
                 _ = self.managedFlightLogs.removeValue(forKey: name)
             }
             self.frequencyIndex?.delete(logFileName: name)
             info.flightLog = nil
-            self.library.delete(name: name)
             self.persistentContainer.viewContext.delete(info)
-            self.saveContext()
-            NotificationCenter.default.post(name: .localFileListChanged, object: nil)
+            Logger.app.info("Removed deleted log \(name)")
         }
+        self.saveContext()
+        NotificationCenter.default.post(name: .localFileListChanged, object: nil)
     }
 
     private func deletePersistentStores(for container:NSPersistentContainer){
@@ -613,6 +780,9 @@ class FlightLogOrganizer : @unchecked Sendable {
         DispatchQueue.synchronized(self) {
             self.managedFlightLogs = [:]
             self.managedAircrafts = [:]
+            self.managedFuelRecords = [:]
+            self.managedFlyStoRecords = [:]
+            self.hiddenLogs = [:]
         }
         self.frequencyIndex?.reset()
     }
@@ -726,6 +896,7 @@ class FlightLogOrganizer : @unchecked Sendable {
         DispatchQueue.synchronized(self) {
             known.logs = Set(self.managedFlightLogs.keys)
             known.systemIds = Set(self.managedAircrafts.keys)
+            known.hidden = Set(self.hiddenLogs.keys)
         }
         known.latestGuessedDate = self.first(request: .all)?.guessedDate
         return known
@@ -822,7 +993,7 @@ class FlightLogOrganizer : @unchecked Sendable {
             if !toDownload.isEmpty {
                 Logger.sync.info("\(toDownload.count) files downloading from iCloud")
             }
-            let knownLogs = DispatchQueue.synchronized(self) { Set(self.managedFlightLogs.keys) }
+            let knownLogs = DispatchQueue.synchronized(self) { Set(self.managedFlightLogs.keys).union(self.hiddenLogs.keys) }
             let knownSystemIds = DispatchQueue.synchronized(self) { Set(self.managedAircrafts.keys) }
             let newLogs = downloaded.filter { $0.isFlightLogFile && !knownLogs.contains($0) }
             let newAircraft = downloaded.filter { $0.isAircraftSystemFile && !knownSystemIds.contains(($0 as NSString).deletingPathExtension.replacingOccurrences(of: "sys_", with: "")) }

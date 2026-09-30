@@ -82,6 +82,38 @@ class FlightLogFileRecord: NSManagedObject {
         return self.aircraft_record
     }
     
+    //MARK: - User state (UserState store, linked by name)
+    
+    /// The aircraft, by `system_id`: the two stores cannot hold a relationship.
+    var aircraft_record : AircraftRecord? {
+        guard let systemId = self.system_id else { return nil }
+        return self.organizer?.existingAircraft(systemId: systemId)
+    }
+    
+    /// The fuel inputs of this log, by `log_file_name`.
+    var fuel_record : FlightFuelRecord? {
+        get {
+            guard let name = self.log_file_name else { return nil }
+            return self.organizer?.fuelRecord(logFileName: name)
+        }
+        set {
+            guard let name = self.log_file_name, let record = newValue else { return }
+            self.organizer?.register(fuelRecord: record, logFileName: name)
+        }
+    }
+    
+    /// The FlySto upload state of this log, by `log_file_name`.
+    var flysto_record : FlightFlyStoRecord? {
+        get {
+            guard let name = self.log_file_name else { return nil }
+            return self.organizer?.flyStoRecord(logFileName: name)
+        }
+        set {
+            guard let name = self.log_file_name, let record = newValue else { return }
+            self.organizer?.register(flyStoRecord: record, logFileName: name)
+        }
+    }
+    
     var requiresVersionUpdate : Bool { return self.version < Self.currentVersion }
     var requiresParsing : Bool {
         if self.log_file_name == "log_210617_063632_LOWG.csv" {
@@ -286,27 +318,20 @@ class FlightLogFileRecord: NSManagedObject {
     }
     
     
+    /// Create the aircraft of this log's `system_id` if it is not known yet.
     @discardableResult
     func ensureAircraftRecord() -> Bool {
-        var rv : Bool = false
-        if self.aircraft_record == nil, let container = self.organizer {
-            if let sysid = self.system_id {
-                self.aircraft_record = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
-                rv = true
-            }else{
-                let name = self.log_file_name ?? "<nofilename>"
-                Logger.app.warning("Unable to create aircraft record as no system_id found for \(name)")
-            }
+        guard let container = self.organizer else { return false }
+        guard let sysid = self.system_id else {
+            let name = self.log_file_name ?? "<nofilename>"
+            Logger.app.warning("Unable to create aircraft record as no system_id found for \(name)")
+            return false
         }
-        
-        if let sysid = self.system_id, let container = self.organizer, let recordId = self.aircraft_record?.system_id, recordId != sysid {
-            // update
-            let ac = container.aircraft(systemId: sysid)
-            self.aircraft_record = ac
-            rv = true
-        
+        if container.existingAircraft(systemId: sysid) == nil {
+            _ = container.aircraft(systemId: sysid, airframeName: self.airframe_name)
+            return true
         }
-        return rv
+        return false
     }
     
     @discardableResult

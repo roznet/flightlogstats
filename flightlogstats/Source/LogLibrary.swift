@@ -24,6 +24,8 @@ struct LogLibrary : Sendable {
     struct Known : Sendable {
         var logs : Set<String> = []
         var systemIds : Set<String> = []
+        /// deleted logs (tombstones): never imported again
+        var hidden : Set<String> = []
         /// guessed date of the newest log, for `.sinceLatestImportedFile`
         var latestGuessedDate : Date? = nil
     }
@@ -151,15 +153,15 @@ struct LogLibrary : Sendable {
         return found
     }
 
-    /// Drop files the library already has: logs by name (known record or file already in
-    /// the folder), aircraft files by system id. rpt files are always kept: they convert
+    /// Drop files the library already has: logs by name (known record, deleted log, or file
+    /// already in the folder), aircraft files by system id. rpt files are always kept: they convert
     /// to an aircraft file only if missing.
     static func filterMissing(_ urls : [URL], known : Known, in folder : URL) -> [URL] {
         return urls.filter { url in
             switch url.logFileType {
             case .log:
                 let name = url.lastPathComponent
-                return !known.logs.contains(name) && !Self.exists(name: name, in: folder)
+                return !known.logs.contains(name) && !known.hidden.contains(name) && !Self.exists(name: name, in: folder)
             case .aircraft:
                 if let avionics = AvionicsSystem.from(jsonUrl: url) {
                     return !known.systemIds.contains(avionics.systemId)

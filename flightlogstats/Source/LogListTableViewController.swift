@@ -157,6 +157,14 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                     self.logFileOrganizer.deleteLocalFilesAndDatabase()
                 }
             },
+            UIAction(title: "Initialize CloudKit Schema", image: UIImage(systemName: "icloud")){
+                _ in
+                // once per schema change, with an iCloud account; then deploy it to
+                // Production in the CloudKit console before shipping
+                AppDelegate.worker.async {
+                    self.logFileOrganizer.initializeCloudKitSchema()
+                }
+            },
             UIAction(title: "Try Overlay", image: UIImage(systemName: "minus.circle")){
                 _ in
                 Logger.app.info("Reset All")

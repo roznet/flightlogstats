@@ -58,16 +58,9 @@ class AircraftRecord: NSManagedObject {
     
     /// Flight records sorted most recent first
     var flightRecords : [FlightLogFileRecord] {
-        var rv : [FlightLogFileRecord] = []
-        if let flights = self.log_file_records {
-            for flight in flights {
-                if let record = flight as? FlightLogFileRecord {
-                    rv.append(record)
-                }
-            }
-        }
-        
-        return rv.sorted { $0.isNewer(than: $1) }
+        // linked by system id: the flights are in the other store
+        guard let container = self.container, let systemId = self.system_id else { return [] }
+        return container.flightLogFileRecords(request: .all) { $0.system_id == systemId }
     }
     
     //MARK: - setup
