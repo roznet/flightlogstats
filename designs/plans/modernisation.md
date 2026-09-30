@@ -11,6 +11,9 @@
 > `../future/frequency-bingo.md` §The page, next to build.
 > Updated 2026-09-29: the rest of phase 0 (fuel, import and parsing bugs,
 > hygiene, Savvy removal) in one PR; see §Phase 0 for what is left.
+> Updated 2026-09-29: deployment target raised to iOS 26.0 (for SwiftUI and
+> UIKit APIs, not for charts); §Phase 6 gains a Swift Charts plan for the
+> Graphs tab.
 
 ## The jobs the app is for
 
@@ -116,7 +119,8 @@ only (which reads the aligned double frame), so it did not wait for C3.
 - ~~Delete the four orphan sources (`DataFrame.swift`, `GroupBy.swift`,
   `ValueStats.swift`, `CategoricalStats.swift`) and `airports.py`; fix README~~
   (`c09955d`).
-- ~~Align deployment targets on one value~~ (all 18.6, 2026-09-28).
+- ~~Align deployment targets on one value~~ (all 18.6, 2026-09-28; all 26.0,
+  2026-09-29, see §Phase 6 *Deployment target*).
 - ~~CI modelled on flyfun-weather's `ios.yml`~~ (done 2026-09-28:
   `.github/workflows/ios.yml`, `macos-26`, Xcode 26.6 pinned because the image
   has no 27 yet, LFS checkout, unit target only, vacuous-pass guard). Still
@@ -212,12 +216,15 @@ rather than creating it.
 - Pattern: `@Observable` view model per screen, SwiftUI view in a
   `UIHostingController` inside the existing tab/split structure. Keep
   `UISplitViewController` until the list itself moves.
-- **Swift Charts** replaces `GCSimpleGraphView` screen by screen; when the last
-  one goes, drop rzutils-touch (and its broken manifest) entirely.
-- Map: `MKPolyline` / `MKGradientPolylineRenderer` replace the custom renderer.
+- **Swift Charts** replaces `GCSimpleGraphView` (the only user is the Graphs
+  tab); when it goes, drop rzutils-touch (and its broken manifest) entirely.
+  See *Graphs tab on Swift Charts* below.
+- Map: `MKPolyline` / `MKGradientPolylineRenderer` replace the custom renderer;
+  once the Graphs tab is SwiftUI, a SwiftUI `Map` with `MapPolyline` as the
+  Frequencies tab already does.
 - Order follows the core jobs: import/uploads sheet (phase 1) → frequency
   timeline (phase 3, done first: PR #11, the first SwiftUI screen) → fuel
-  card (phase 4) → Settings → list last. Stats and
+  card (phase 4) → Settings → Graphs (Swift Charts) → list last. Stats and
   trips move only if they break.
 - **Tables: keep the UIKit table engine** (`TableCollectionViewLayout` +
   `TableDataSource` + `RZNumberWithUnitGeometry`), decided 2026-09-27. SwiftUI
@@ -242,6 +249,64 @@ rather than creating it.
   geometry recompute on content-size change (Dynamic Type).
 - Mac Catalyst stays (the iCloud Drive sync hub): menu commands for import and
   upload; see `upload-and-import.md` §Mac Catalyst.
+
+#### Deployment target (decided 2026-09-29)
+
+iOS 26.0 for every target (app, unit and UI tests); Mac Catalyst therefore
+needs macOS 26, accepted for the Mac sync hub. Raised for the SwiftUI and
+UIKit APIs, not for charts: everything the Graphs tab needs is iOS 17-18, and
+what iOS 26 adds to Swift Charts is 3D (`Chart3D`, `SurfacePlot`), unused
+here. The Liquid Glass look comes from building with the iOS 26 SDK, not from
+the target. Worth using now that it is the floor:
+
+- **UIKit observation tracking** (on by default in iOS 26): a UIKit view
+  controller reading an `@Observable` model in `updateProperties()` /
+  `viewWillLayoutSubviews()` is refreshed when those properties change. That is
+  the fix for the racing `updateUI()` calls and the leaking
+  `.logFileRecordUpdated` observers on the screens that stay UIKit, once
+  `FlightLogViewModel` is `@Observable` on the main actor.
+- SwiftUI `WebView` (the bug report and app settings screens' web content) when
+  those screens move.
+
+#### Graphs tab on Swift Charts
+
+Replaces `GCSimpleGraphView` in `LogMapGraphsViewController`; the screen becomes
+SwiftUI (graph, map, grouping and style pickers), the legs table stays on the
+table engine through a `UIViewRepresentable`.
+
+- **Data, no conversion**: plot `FlightData.doubleDataFrame(for:)` columns
+  (`[Date]` indexes, `[Double]` values) directly with the vectorized
+  `LinePlot` / `PointPlot` (iOS 18). This removes the per-sample
+  `GCStatsDataPoint` objects built by rzutils' `DataFrame.dataSeries()` and
+  the `GCSimpleGraphDataHolder` / `GCSimpleGraphCachedDataSource` layer in
+  `FlightLogViewModel.graphDataSource` / `scatterDataSource`.
+- **Scatter**: request both fields in one `doubleDataFrame(for: [x, y])` call so
+  `dropna` keeps the same rows for both, then `zip` the values; no
+  `GCStatsDataSerie.reduce(toCommonRange:)` / `GCStatsInterpFunction`.
+- **Selected leg**: a `RectangleMark` band from `leg.start` to `leg.end`
+  instead of the 0/1 gradient series.
+- **Axes**: x as elapsed time since hobbs start and y in the field's display
+  unit, formatted in `chartXAxis` / `chartYAxis` from `DisplayContext` (today
+  `GCUnit` / `GCUnitElapsedSince` does it).
+- **Two fields, one chart** (decided 2026-09-29): Swift Charts has no second
+  y-axis, so the second series is rescaled into the first one's y range and a
+  trailing axis is labelled with its original values (`AxisMarks(position:
+  .trailing)` with values mapped back), as `GCSimpleGraphView` does today with
+  `axisForSerie`.
+- **Field choice unchanged** (decided 2026-09-29): tapping a legs-table column
+  adds its field, no field picker.
+- **New, cheap once on Charts**: scrubbing with `chartXSelection` (value
+  readout at a time), pan and zoom with `chartScrollableAxes` /
+  `chartXVisibleDomain`. The matching cursor on the map waits for
+  plan-vs-actual's replay (decided 2026-09-29), so "linking is one way" in
+  `../ui-map-graphs.md` stays open after this step.
+- **Tests**: the series building (fields → columns, leg band, scatter pairs)
+  lives in a pure `@Observable` view model, tested on the TestAssets logs as
+  the Frequencies tab is.
+- **Done when**: no `GCSimpleGraph*` / `GCStatsDataSerie` in the app, rzutils-touch
+  removed from the package list (`LogListTableViewController`'s
+  `import RZUtilsTouch` is unused), Graphs tab on iPhone and Mac Catalyst
+  checked by hand.
 
 ## Explicitly not doing
 

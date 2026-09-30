@@ -39,7 +39,7 @@ jobs:
       # Pinned so a runner-image bump can't change the compiler under us. The
       # image has no Xcode 27 yet; 26.6 is its newest. Move to 27 when it lands.
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
-      # Deployment target is iOS 18.6; OS=latest because the installed runtime
+      # Deployment target is iOS 26.0; OS=latest because the installed runtime
       # set moves with the image and an unavailable pin is a hard failure.
       DESTINATION: 'platform=iOS Simulator,name=iPhone 17,OS=latest'
 

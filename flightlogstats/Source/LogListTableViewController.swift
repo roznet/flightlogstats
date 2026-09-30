@@ -175,7 +175,7 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         let addButton = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(addLog(button:)))
         let moreFunctionButton = UIBarButtonItem(title: "More", image: UIImage(systemName: "ellipsis.circle"), menu: self.moreFunctionMenu())
         
-        let donebutton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(done(button:)))
+        let donebutton = UIBarButtonItem(title: "Done", style: .prominent, target: self, action: #selector(done(button:)))
         
         let rightButton = self.tableView.isEditing ? donebutton : moreFunctionButton
         

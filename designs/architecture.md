@@ -50,8 +50,8 @@ no module boundary between UI, storage and analysis: analysis types read
 
 | Item | Value |
 |---|---|
-| App target | `FlightLogStats`, iOS **18.6**, `SUPPORTS_MACCATALYST`, devices 1,2, version 3.0 |
-| Unit tests | `FlightLogStatsTests`, iOS 16.0, **hosted in the app** (`TEST_HOST`), XCTest |
+| App target | `FlightLogStats`, iOS **26.0** (Mac Catalyst: macOS 26), `SUPPORTS_MACCATALYST`, devices 1,2, version 3.0 |
+| Unit tests | `FlightLogStatsTests`, iOS 26.0, **hosted in the app** (`TEST_HOST`), XCTest |
 | UI tests | template stubs only |
 | Swift | `SWIFT_VERSION = 5.0`, no strict-concurrency flags |
 | Secrets | `flightlogstats/secrets.json` (gitignored, bundled); a build phase copies `secrets.sample.json` if missing |
