@@ -30,7 +30,8 @@ FlyStoSignIn (@MainActor)       ASWebAuthenticationSession sign in
 
 ## Queue
 
-State lives in each log's `FlightFlyStoRecord` (model version 3):
+State lives in each log's `FlightFlyStoRecord`, in the UserState store (synced by
+CloudKit, so every device knows what was uploaded):
 `upload_status` (`RemoteServiceRecord.Status`), `status_date`, `attempts`,
 `last_error`, `next_retry`, `upload_response` (`{fileId}`).
 
@@ -93,8 +94,10 @@ Decided inside the service (`FlyStoService.classify`), never by callers:
 
 - **No background execution**: uploads run while the app is in the foreground;
   the queue resumes at the next launch or activation.
-- **Per-device state** until step 2 (CloudKit user state): a second device may
-  upload again and gets 409 → uploaded.
+- **Upload state syncs, the credential does not** (decided 2026-09-30): the queue
+  and statuses are in the UserState store, the FlySto sign in stays per device in
+  its Keychain. A log queued on the iPad and drained by the Mac before sync
+  settles may be uploaded twice; FlySto answers 409 → uploaded.
 - **Not verified against FlySto from this machine**: the sign in page on Mac
   Catalyst and FlySto's handling of `state` need a check on a device.
 - Tests: `TestUploads` (fake service and in-memory store, classification,

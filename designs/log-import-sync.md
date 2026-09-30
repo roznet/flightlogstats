@@ -1,6 +1,6 @@
 # Log import and iCloud sync
 
-> As-built (rewritten 2026-09-30 with phase 1 step 1 of `plans/upload-and-import.md`).
+> As-built (rewritten 2026-09-30 with phase 1 steps 1 and 2 of `plans/upload-and-import.md`).
 > How a log gets from the SD card into the library, where files and records are
 > kept, and how other devices' logs arrive. Owners: `LogLibrary` (files) and
 > `FlightLogOrganizer` (records). The `+` sheet is in `ui-map-graphs.md`.
@@ -35,30 +35,60 @@ SD card ──UIDocumentPicker (open in place)──> PostFlightImportModel.star
 | `rpt_` files | converted to `sys_<systemId>.json` via `AvionicsSystem`, never copied | aircraft identity = Garmin System ID |
 | Security scope | started on the picked URLs for the whole import, copy included | no bookmarks (the old >150 path used unscoped ones) |
 | Threads | Core Data on `AppDelegate.worker` only (the scheduler queue is gone); record maps behind `synchronized(self)` for readers elsewhere | screens still read managed objects on main (see Gotchas) |
-| Core Data | plain `NSPersistentContainer("FlightLogModel")`, local SQLite, `NSMergeByPropertyObjectTrumpMergePolicy` | **not synced**; CloudKit user state is step 2 of the plan |
+| Core Data | `NSPersistentCloudKitContainer` with two stores (`LibraryStore`): **Derived** (local) and **UserState** (CloudKit `iCloud.net.ro-z.flightlogstats.records`), `NSMergeByPropertyObjectTrumpMergePolicy` | user state syncs, last writer wins per field; derived data never syncs |
 | Parse strategy | quick parse on add, then `updateRecords`: one chain of batches at a time on worker, each batch re-dispatched so other worker work interleaves | a call while running only adds work; Rebuild Info queues every record |
 | iCloud downloads | a record whose file is only in iCloud is skipped (not marked error) and its download requested once | parsed when the watcher sees it arrive |
 | Record migration | `FlightLogFileRecord.currentVersion` (now 2); below it => `requiresParsing` | a bump re-parses the whole library |
 
 ## Core Data model
 
-`FlightLogModel.xcdatamodeld` (`usedWithCloudKit="YES"`, codegen `category`, all
-attributes optional, all delete rules Nullify). Current version **3**:
-version 2 plus `FlightFlyStoRecord.attempts`, `last_error`, `next_retry` for the
-upload queue (`remote-upload.md`); version 2 dropped `FlightSavvyRecord`.
-Stores migrate by inferred lightweight migration; `testModelMigrationFromVersion1`
-opens a version 1 store with the current model. Keep every old version in the
-bundle.
+`FlightLogModel.xcdatamodeld`, codegen `category`, all attributes optional, no
+relationships (the two stores cannot relate). Current version **4**, with two
+configurations, each its own SQLite file in Application Support:
 
-| Entity | Holds | Derived or user? |
+| Store (configuration) | File | Entities | Synced |
+|---|---|---|---|
+| Derived | `FlightLogDerived.sqlite` | `FlightLogFileRecord` | no: rebuilt from the files |
+| UserState (`usedWithCloudKit`) | `FlightLogUserState.sqlite` | `AircraftRecord`, `FlightFuelRecord`, `FlightFlyStoRecord`, `HiddenLog` | CloudKit, history tracking, remote change notifications |
+
+| Entity | Holds | Linked by |
 |---|---|---|
-| `FlightLogFileRecord` | `log_file_name`, `info_status`, `version`, times, fuel start/end, totaliser, route, ICAOs, distance, max alt; to-one `aircraft_record`, `flysto_record`, `fuel_record` | derived |
-| `AircraftRecord` | `system_id`, `airframe_name`, `aircraft_identifier` (registration), `fuel_max`, `fuel_tab`, `gph` | mixed: registration and performance are user input |
-| `FlightFuelRecord` | added fuel L/R, target, totaliser start | user |
-| `FlightFlyStoRecord` | `upload_status`, `status_date`, `upload_response` (`{fileId}`), `attempts`, `last_error`, `next_retry` | service state (the upload queue) |
+| `FlightLogFileRecord` | `log_file_name`, `info_status`, `version`, `system_id`, times, fuel start/end, totaliser, route, ICAOs, distance, max alt | |
+| `AircraftRecord` | `system_id`, `airframe_name`, `aircraft_identifier` (registration), `fuel_max`, `fuel_tab`, `gph`, `modified` (last user edit), `uuid` | `system_id` |
+| `FlightFuelRecord` | added fuel L/R, target, totaliser start, `last_entered`, `uuid` | `log_file_name` |
+| `FlightFlyStoRecord` | `upload_status`, `status_date`, `upload_response` (`{fileId}`), `attempts`, `last_error`, `next_retry`, `uuid` | `log_file_name` |
+| `HiddenLog` | `log_file_name`, `hidden_date`, `uuid`: a deleted log (tombstone) | `log_file_name` |
 
-Only user and service state needs to sync; everything else is reproducible
-from the CSVs.
+`FlightLogFileRecord.aircraft_record`, `fuel_record`, `flysto_record` keep
+their old names as lookups in the organizer's maps (setting one registers it
+under the log's name).
+
+**CloudKit schema is permanent in Production**: fields can be added, never
+removed or renamed. Changing it: add attributes in a new model version, run
+DEBUG › Initialize CloudKit Schema with an iCloud account (Development), then
+deploy the schema to Production in the CloudKit console before a TestFlight or
+App Store build.
+
+**Duplicates.** Two devices can each create the record of the same log or
+aircraft before syncing. `LibraryStore.deduplicate` keeps one per key, chosen
+from synced values only so every device keeps the same: fuel by latest
+`last_entered`, FlySto uploaded first then latest `status_date`, aircraft by
+latest `modified`, tombstone by earliest date; ties by smallest `uuid`. The
+others are deleted, at load and after every remote change.
+
+**Remote changes.** `NSPersistentStoreRemoteChange` → one `reloadUserState()` on
+worker per burst (1 s): refetch with refreshed values, deduplicate, drop the
+logs newly hidden by another device, post `.localFileListChanged` and
+`.newFileUploaded`.
+
+**From the old single store.** Model versions 1 to 3 used one
+`FlightLogModel.sqlite`. At the first launch with version 4
+(`LibraryStore.migrateLegacy`), it is opened with model 3 (lightweight from 1
+and 2), every record is copied into the new stores (derived records too, so
+nothing is re-parsed; per-log records get their log's name from the old
+relationship), and the old files are renamed `FlightLogModel-v3-backup.sqlite`.
+If the copy fails the old store is left in place and tried again next launch.
+Tested by `testLegacyStoreSplit` from a version 1 store.
 
 ## iCloud Drive
 
@@ -68,9 +98,11 @@ from the CSVs.
 - On each change (worker): logs and aircraft files not downloaded get
   `startDownloadingUbiquitousItem` once; downloaded ones the library does not
   know trigger `addMissingRecordsFromLocal`; otherwise pending parses resume.
-- `delete(info:)` removes the record and the file by a coordinated delete in the
-  library folder, so the log disappears on every device. An SD card that still
-  has the file imports it again (tombstones are step 2).
+- `delete(info:)` leaves a `HiddenLog` tombstone, deletes the file by a
+  coordinated delete in the library folder, and drops the record. Other devices
+  drop theirs when the tombstone syncs; import, the watcher and `addMinimum` skip
+  hidden names, so an SD card that still has the file does not bring it back.
+  There is no restore yet.
 
 ## Launch sequence
 
@@ -92,7 +124,11 @@ parse needs `nearestAirport`.
 | `openLibrary`, `libraryFolder`, `watchLibrary` | one location, iCloud watcher |
 | `addMissingRecordsFromLocal`, `add(aircrafts:)`, `addMinimum` | record creation (worker) |
 | `updateRecords(count:force:)`, `isUpdatingRecords` | batched full parse |
-| `delete(info:)`, `deleteAndResetDatabase`, `deleteLocalFilesAndDatabase` | maintenance (the last two on worker) |
+| `delete(info:)`, `isHidden(logFileName:)` | delete with a tombstone |
+| `reloadUserState`, `fuelRecord(logFileName:)`, `flyStoRecord(logFileName:)`, `existingAircraft(systemId:)` | user state (UserState store) |
+| `LibraryStore` | store descriptions, `makeContainer`, `migrateLegacy`, `deduplicate`, `HiddenLog` |
+| `initializeCloudKitSchema` | DEBUG: push the schema to CloudKit Development |
+| `deleteAndResetDatabase`, `deleteLocalFilesAndDatabase` | maintenance (worker) |
 | `FlightLogFileRecord` | `requiresParsing`, `parseAndUpdate(quick:)`, `updateFromFlightLog`, `ensure*Record` |
 | `ProgressReport` (+ overlay) | parse progress in the list's bottom overlay |
 

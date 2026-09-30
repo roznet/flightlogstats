@@ -18,8 +18,8 @@ Key exports: `AppDelegate.worker`, `AppDelegate.knownAirports`, `AppDelegate.kno
 → Full doc: architecture.md
 
 ### log-import-sync
-SD card to library: the `+` import off main (`LogLibrary`: discovery, selection, coordinated copy holding the security scope), one library folder (iCloud Drive container, local only without iCloud; old local copies moved or removed at launch), iCloud Drive watcher (download, record), quick then batched full parse on worker, Core Data model (derived vs user fields, version 3), record versioning. Core Data is local only (CloudKit user state is step 2).
-Key exports: `LogLibrary`, `LogLibrary.Selection`, `ImportProgress`, `FlightLogOrganizer`, `importLogs(from:selection:)`, `openLibrary`, `watchLibrary`, `addMissingRecordsFromLocal`, `updateRecords(count:force:)`, `FlightLogFileRecord`, `ProgressReport`
+SD card to library: the `+` import off main (`LogLibrary`: discovery, selection, coordinated copy holding the security scope), one library folder (iCloud Drive container, local only without iCloud; old local copies moved or removed at launch), iCloud Drive watcher (download, record), quick then batched full parse on worker, Core Data model version 4 in two stores (Derived local, UserState synced by CloudKit; links by name, duplicate clean up, remote change reload), `HiddenLog` tombstones, one-time split of the old single store, record versioning.
+Key exports: `LogLibrary`, `LogLibrary.Selection`, `ImportProgress`, `LibraryStore`, `HiddenLog`, `FlightLogOrganizer`, `importLogs(from:selection:)`, `openLibrary`, `watchLibrary`, `addMissingRecordsFromLocal`, `updateRecords(count:force:)`, `FlightLogFileRecord`, `ProgressReport`
 → Full doc: log-import-sync.md
 
 ### remote-upload
@@ -64,6 +64,6 @@ Dated (2026-09-27) inventory of verified bugs: build (B), correctness (C), impor
 Not INDEX modules; linked here for discovery.
 
 - `plans/modernisation.md`: roadmap ordered by the app's core jobs (post-flight import + FlySto upload, fuel, frequencies): build/CI, import + upload, FlightLogKit, frequency review + Bingo, fuel check, plan vs actual, UI migration.
-- `plans/upload-and-import.md`: phase 1; steps 1 (LogLibrary, one iCloud location), 3 (upload queue) and 4 (`+` sheet, Uploads screen) built 2026-09-30; step 2 (CloudKit user state, tombstones) next.
+- `plans/upload-and-import.md`: phase 1, all four steps built 2026-09-30: LogLibrary and one iCloud location, CloudKit user state and tombstones, the upload queue, the `+` sheet and Uploads screen; open items listed there.
 - `plans/plan-vs-actual.md`: position relative to the plan; one `RouteTracker`, log replay and live GPS sources, Route tab; ForeFlight navlog deferred.
 - `future/frequency-bingo.md`: ATC frequency prediction from the pilot's own logs; index, model, per-flight timeline, plan mode and live mode built (standalone tool, `RZFlight.Route` / `FlightExchange` routes, current / previous / next radio, GPS ladder with handoff distance/ETA); confirmation taps next.

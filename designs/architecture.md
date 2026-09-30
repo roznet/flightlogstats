@@ -30,7 +30,7 @@
           │ Frequencies: SwiftUI in a UIHostingController, added in code
  ─────────┼────────────────────────────────────────────────────────────────
  Library  │ FlightLogOrganizer (singleton)                log-import-sync.md
-          │   Core Data (NSPersistentContainer, local only)
+          │   Core Data: Derived (local) + UserState (CloudKit)
           │   Documents/ <-> iCloud Drive Documents (NSMetadataQuery copy)
           │ UploadCoordinator -> FlyStoService           remote-upload.md
  ─────────┼────────────────────────────────────────────────────────────────

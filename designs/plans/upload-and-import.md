@@ -4,9 +4,9 @@
 > folded in the same day: **FlySto only (Savvy removed)**, Mac Catalyst stays.
 > Order changed 2026-09-29 to **1 → 3 → 4 → 2**: the CloudKit schema cannot be
 > changed once deployed, so it comes last, after the upload records settled.
-> **Steps 1, 3 and 4 built 2026-09-30** (`d6dec18`, `f1419fd`, `8834a25`), see
-> §As built; the as-built docs are `../log-import-sync.md` and
-> `../remote-upload.md`. Step 2 is next. Parent roadmap: `modernisation.md`
+> **All four steps built 2026-09-30** (`d6dec18`, `f1419fd`, `8834a25`,
+> `6eccd4e`), see §As built; the as-built docs are `../log-import-sync.md` and
+> `../remote-upload.md`. Parent roadmap: `modernisation.md`
 > (phase 1).
 
 This is the app's **primary job** (see `modernisation.md` §The jobs): after the
@@ -137,9 +137,7 @@ The Mac is where the library meets iCloud Drive and the Python lab, so:
 Built in the order 1 → 3 → 4, step 2 last:
 
 1. ~~**LogLibrary + one location** behind today's UI, fixing I1-I9~~ (`d6dec18`).
-2. **Store split + CloudKit UserState + migration.** Tombstones. Moves the
-   upload state (today in `FlightFlyStoRecord`, model version 3) into
-   `UploadRecord` in UserState. **Next.**
+2. ~~**Store split + CloudKit UserState + migration.** Tombstones~~ (`6eccd4e`).
 3. ~~**UploadCoordinator + FlySto service + Keychain**, fixing U1-U4, U6-U8~~ (`f1419fd`).
 4. ~~`+` sheet, Uploads screen and list status~~ (`8834a25`).
 5. Only if needed: background upload sessions.
@@ -157,20 +155,31 @@ Built in the order 1 → 3 → 4, step 2 last:
   local copies of files already there are deleted (so a stale copy cannot bring
   back a deletion from another device).
 - **Identity by name only**: the size + 64 KB hash is not built.
-- **Queue persisted in `FlightFlyStoRecord`** (model version 3: `attempts`,
-  `last_error`, `next_retry`) rather than a new `UploadRecord`, which comes with
-  the UserState store in step 2.
+- **No `UploadRecord` or new user entities**: the UserState store holds the
+  existing `AircraftRecord` (whole: registration and performance with the Garmin
+  identity), `FlightFuelRecord` and `FlightFlyStoRecord` (the queue, with
+  `attempts`, `last_error`, `next_retry`), plus `HiddenLog`. Same CloudKit record
+  types as the entity names; a `uuid` on each for the duplicate choice.
+- **Derived records are copied** from the old store, not re-parsed; the old
+  store is kept as `FlightLogModel-v3-backup.sqlite`.
+- **Last writer wins** per field for concurrent edits (decided 2026-09-30);
+  duplicates of a whole record are resolved by `LibraryStore.deduplicate`.
+- **FlySto credential per device** (decided 2026-09-30, after weighing a synced
+  Keychain item: a rotating refresh token shared by devices would race).
 - **No `HTTPClient` seam**: FlySto requests still go through OAuthSwift's client;
   its answers are classified by a pure function (`FlyStoService.classify`), tested,
   and the coordinator is tested against a fake service. OAuthSwift stays for
   token exchange and refresh (known to work with FlySto).
 - **Keychain item is device only** (not `kSecAttrSynchronizable`): each device
   signs in once, so two devices never refresh the same refresh token.
-- **Not built yet**: Mac Catalyst menu commands (Import, Upload pending), Files
-  "Open in" and Mac drag and drop as import sources, PKCE (open question).
+- **Not built yet**: restoring a deleted log, Mac Catalyst menu commands (Import,
+  Upload pending), Files "Open in" and Mac drag and drop as import sources, PKCE
+  (open question).
 - **Needs a device check**: SD card import (security scope on a real card),
   iCloud Drive move on an existing library, FlySto sign in on iOS and Mac
-  Catalyst (and whether FlySto returns `state`).
+  Catalyst (and whether FlySto returns `state`), CloudKit sync between two
+  devices (the simulator has no iCloud account; the schema must first be
+  initialized from a DEBUG build and deployed to Production for release builds).
 
 ## Gotchas to design for
 

@@ -39,7 +39,7 @@
 
 | # | Issue |
 |---|---|
-| I1 | ~~deleted logs are restored from iCloud on next sync~~ Resolved for deletions: one library folder, a delete removes the iCloud Drive file, stale local copies removed at launch (`d6dec18`). Still open: an SD card that has the file imports it again (tombstones, step 2) |
+| I1 | ~~deleted logs are restored from iCloud on next sync~~ Resolved for deletions: one library folder, a delete removes the iCloud Drive file, stale local copies removed at launch (`d6dec18`). A deleted log is not imported again either: `HiddenLog` tombstones, synced (`6eccd4e`) |
 | I2 | ~~import (search, coordinate, copy) runs synchronously on main~~ Resolved: `importLogs` async, off main (`d6dec18`) |
 | I3 | ~~security scope released before the ">150 files" deferred copy~~ Resolved: the scope is held for the whole import, the confirmation happens inside it (`d6dec18`) |
 | I4 | ~~files found twice; completion per picked URL~~ Resolved: one deep enumeration, deduplicated (`d6dec18`) |
@@ -48,7 +48,7 @@
 | I7 | ~~`updateRecords` resets its state right after scheduling the next batch~~ Resolved: one chain of batches at a time (`d6dec18`) |
 | I8 | main-queue `viewContext` used from 4 queues; unsynchronised `managedFlightLogs`. Partly resolved (`d6dec18`, `f1419fd`): writes on `worker` only (scheduler and request queues gone), record maps locked. Still open: screens read managed objects on main |
 | I9 | ~~DEBUG "Delete last" / "Reset Database" trap on `dispatchPrecondition`~~ Resolved: run on worker (`d6dec18`) |
-| I10 | Core Data not synced: user inputs and upload status are per device |
+| I10 | ~~Core Data not synced: user inputs and upload status are per device~~ Resolved: UserState store synced by CloudKit (`6eccd4e`) |
 
 ## Upload
 
