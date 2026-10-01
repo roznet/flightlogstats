@@ -8,6 +8,7 @@
 import XCTest
 import OAuthSwift
 import CoreData
+import Security
 @testable import FlightLogStats
 
 final class TestUploads: XCTestCase {
@@ -286,7 +287,17 @@ final class TestUploads: XCTestCase {
     }
 
     /// U4: the credential moves from UserDefaults to the Keychain.
-    func testKeychainStore() {
+    func testKeychainStore() throws {
+        // an unsigned build (CI, CODE_SIGNING_ALLOWED=NO) has no application identifier,
+        // so no Keychain at all
+        let probe : [String:Any] = [
+            kSecClass as String : kSecClassGenericPassword,
+            kSecAttrService as String : "net.ro-z.flightlogstats.test.probe",
+        ]
+        if SecItemCopyMatching(probe as CFDictionary, nil) == errSecMissingEntitlement {
+            throw XCTSkip("No Keychain in an unsigned build (errSecMissingEntitlement)")
+        }
+
         let keychain = KeychainStore(service: "net.ro-z.flightlogstats.test.\(UUID().uuidString)")
         XCTAssertNil(keychain.data(for: "credential"))
         XCTAssertTrue(keychain.set(Data("one".utf8), for: "credential"))

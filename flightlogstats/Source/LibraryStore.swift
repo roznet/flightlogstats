@@ -26,6 +26,21 @@ enum LibraryStore {
     static let derivedConfiguration = "Derived"
     static let userStateConfiguration = "UserState"
 
+    /// Off when the app hosts unit tests: an unsigned build (CI, CODE_SIGNING_ALLOWED=NO)
+    /// has no iCloud entitlement and CloudKit traps at launch, and tests should not sync
+    /// anyway. DEBUG `-FLSNoCloudKit YES` turns it off too (UI tests, unsigned runs).
+    static var cloudKitEnabled : Bool {
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            return false
+        }
+#if DEBUG
+        if UserDefaults.standard.bool(forKey: "FLSNoCloudKit") {
+            return false
+        }
+#endif
+        return true
+    }
+
     static func descriptions(directory : URL, cloudKit : Bool) -> [NSPersistentStoreDescription] {
         let derived = NSPersistentStoreDescription(url: directory.appendingPathComponent(Self.derivedStoreName))
         derived.configuration = Self.derivedConfiguration

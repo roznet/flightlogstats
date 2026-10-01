@@ -235,8 +235,11 @@ class FlightLogOrganizer : @unchecked Sendable {
         return NSPersistentContainer(name: "FlightLogModel", managedObjectModel: Self.managedObjectModel)
     }
     
-    /// the app's stores: Derived and UserState (CloudKit) in Application Support
-    static func makeLibraryContainer(directory : URL = NSPersistentContainer.defaultDirectoryURL(), cloudKit : Bool = true) -> NSPersistentContainer {
+    /// the app's stores: Derived and UserState (CloudKit unless `LibraryStore.cloudKitEnabled` is off) in Application Support
+    static func makeLibraryContainer(directory : URL = NSPersistentContainer.defaultDirectoryURL(), cloudKit : Bool = LibraryStore.cloudKitEnabled) -> NSPersistentContainer {
+        if !cloudKit {
+            Logger.app.info("Library stores without CloudKit")
+        }
         let needsLegacyCopy = LibraryStore.needsLegacyMigration(directory: directory)
         let container = LibraryStore.makeContainer(model: Self.managedObjectModel, directory: directory, cloudKit: cloudKit)
         if needsLegacyCopy {

@@ -49,4 +49,6 @@ After changing a module that has a doc, sync that doc in the same change
   to re-test import/upload without a new flight. Never make it delete for good.
 - Launch args (`Source/MainSplitViewController.swift`): `-FLSImportFolder <path>`
   opens the import sheet on a folder; `-FLSShowUploads YES` opens Uploads.
+- CloudKit is off when the app hosts unit tests, and with `-FLSNoCloudKit YES`
+  (`LibraryStore.cloudKitEnabled`): unsigned builds (CI) trap in CloudKit otherwise.
 - Landing a PR written without Xcode: `/land-pr <N>`.
