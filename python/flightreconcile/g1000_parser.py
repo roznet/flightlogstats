@@ -281,8 +281,10 @@ def _fuel(row):
 
 def parse_g1000(path: str) -> FlightLog:
     # Row 0 is the #airframe_info comment, row 1 is units, row 2 is the header.
+    # The G1000 can write a stray non UTF-8 byte in a field (e.g. AtvWpt "710\x80"),
+    # as the other log readers here, replace it rather than fail.
     df = pd.read_csv(path, skiprows=[0, 1], skipinitialspace=True,
-                     low_memory=False)
+                     low_memory=False, encoding_errors="replace")
     df.columns = [c.strip() for c in df.columns]
     rename = {k: v for k, v in _COLMAP.items() if k in df.columns}
     df = df.rename(columns=rename)

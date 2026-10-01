@@ -86,3 +86,8 @@ log directory. Caches under `~/.cache/flightreconcile` (pickles).
 - `g1000_parser.py` duplicates the Swift parser; differences are expected in
   edge cases (quoted fields, time jumps). Parity fixtures should use logs that
   avoid them, or both parsers should be fixed together.
+- **Stray non UTF-8 bytes.** The G1000 writes bytes like `0x80` in `AtvWpt`
+  (`710\x80`; 7 of the 18 fixtures). Every log reader here replaces them
+  (`errors="replace"`, `encoding_errors="replace"` in `read_csv`); strict UTF-8
+  fails the whole file. Still failing in `parse_g1000`: `dd/MM/yyyy` dates
+  (TEST1 fixture, all rows dropped) and empty files.
