@@ -156,35 +156,22 @@ public enum CsvParser {
         var ends : [Int] = []
         var lineCount : Int = 0
         var readCount : Int = 0
-        var chunk = [UInt8](repeating: 0, count: chunkSize)
-
-        func endField() {
-            ends.append(bytes.count)
-            bytes.append(0)
-        }
-        // false when the interpreter asked to stop
-        func endLine() -> Bool {
-            interpreter.process(row: CsvRow(bytes: bytes, ends: ends), readCount: readCount, lineCount: lineCount)
-            bytes.removeAll(keepingCapacity: true)
-            ends.removeAll(keepingCapacity: true)
-            lineCount += 1
-            if let maxLineCount = interpreter.maxLineCount, lineCount >= maxLineCount {
-                return false
-            }
-            return true
-        }
+        // no closures in the loop: captured vars are boxed on the heap, slow per byte
+        let chunk = UnsafeMutablePointer<UInt8>.allocate(capacity: chunkSize)
+        defer { chunk.deallocate() }
+        var stop = false
 
         reading: while true {
-            let length = chunk.withUnsafeMutableBufferPointer { inputStream.read($0.baseAddress!, maxLength: chunkSize) }
+            let length = inputStream.read(chunk, maxLength: chunkSize)
             if length < 0, let error = inputStream.streamError {
                 throw error
             }
             if length <= 0 {
                 break
             }
-            try chunk.withUnsafeBufferPointer { buffer in
+            do {
                 for position in 0..<length {
-                    let char = buffer[position]
+                    let char = chunk[position]
 
                     if state == .endOfLine {
                         state = .beginningOfLine
@@ -267,17 +254,22 @@ public enum CsvParser {
 
                     switch state {
                     case .endOfField:
-                        endField()
+                        ends.append(bytes.count)
+                        bytes.append(0)
                     case .endOfLine, .maybeEndOfLine:
-                        endField()
-                        readCount += position + 1
-                        let more = endLine()
-                        readCount -= position + 1
-                        if !more {
-                            state = .endOfLine
-                            return
+                        ends.append(bytes.count)
+                        bytes.append(0)
+                        interpreter.process(row: CsvRow(bytes: bytes, ends: ends), readCount: readCount + position + 1, lineCount: lineCount)
+                        bytes.removeAll(keepingCapacity: true)
+                        ends.removeAll(keepingCapacity: true)
+                        lineCount += 1
+                        if let maxLineCount = interpreter.maxLineCount, lineCount >= maxLineCount {
+                            stop = true
                         }
                     default:
+                        break
+                    }
+                    if stop {
                         break
                     }
                 }
@@ -291,12 +283,11 @@ public enum CsvParser {
         // last line without a line end
         switch state {
         case .beginningOfLine, .endOfLine, .maybeEndOfLine:
-            if !ends.isEmpty {
-                _ = endLine()
-            }
+            break
         default:
-            endField()
-            _ = endLine()
+            ends.append(bytes.count)
+            bytes.append(0)
+            interpreter.process(row: CsvRow(bytes: bytes, ends: ends), readCount: readCount, lineCount: lineCount)
         }
         interpreter.finished()
     }
