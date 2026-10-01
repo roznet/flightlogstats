@@ -11,6 +11,7 @@ import RZUtils
 import RZUtilsSwift
 import RZFlight
 import RZData
+import FastCsv
 
 class FlightData {
     // how often to report progress
@@ -185,6 +186,13 @@ extension FlightData {
         var latitudeIndex : Int? = nil
         var longitudeIndex : Int? = nil
 
+        // columns read as double and as category, in order, and where latitude and
+        // longitude land in the doubles of a row
+        var doubleColumns : [Int] = []
+        var categoryColumns : [Int] = []
+        var latitudeDoubleIndex : Int? = nil
+        var longitudeDoubleIndex : Int? = nil
+
         // keep default format in list as if bad data need to try again the same
         let extraDateFormats = [ "dd/MM/yyyy HH:mm:ss ZZ", "yyyy-MM-dd HH:mm:ss ZZ" ]
         let formatter = DateFormatter()
@@ -249,12 +257,24 @@ extension FlightData {
                 }
             }
         }
-        func process(line : [String], readCount : Int, lineCount : Int){
-            guard let first = line.first else { return }
-            
+        func process(row : CsvRow, readCount : Int, lineCount : Int){
+            guard row.count > 0 else { return }
+            let first = row[0]
+
             if totalSize > 0 {
                 progress?.update(state: .progressing(min(1.0,Double(readCount)/Double(totalSize))))
             }
+
+            if first.hasPrefix("#") || fields.count == 0 {
+                self.processHeader(line: row.strings)
+            }else if row.count == columnIsDouble.count {
+                self.processValues(row: row, lineCount: lineCount)
+            }
+        }
+
+        /// meta, units and field name lines
+        private func processHeader(line : [String]) {
+            guard let first = line.first else { return }
 
             if first.hasPrefix("#airframe") {
                 for val in line {
@@ -345,183 +365,186 @@ extension FlightData {
                         data.categoricalFields.append(field.output)
                     }
                 }
-            }else if line.count == columnIsDouble.count {
-                if lineCount % self.lineSamplingFrequency != 0 {
-                    return
-                }
-                
-                // Same date and offset columns as the previous row: offset its date by the
-                // difference in time of day, saves a lot of time vs date parsing
-                let secondsOfDay = FlightData.secondsOfDay(line[timeIndex])
-                var dateProxied = false
-                if let lastDate = data.dates.last,
-                   let secondsOfDay = secondsOfDay,
-                   let lastSecondsOfDay = self.lastSecondsOfDay,
-                   line[dateIndex] == self.lastDateString,
-                   line[offsetIndex] == self.lastOffsetString {
-                    data.dates.append(lastDate.addingTimeInterval(TimeInterval(secondsOfDay - lastSecondsOfDay)))
-                    dateProxied = true
-                }
-                if !dateProxied {
-                    let dateString = String(format: "%@ %@ %@", line[dateIndex], line[timeIndex], line[offsetIndex])
-                    if let date = formatter.date(from: dateString) {
-                        data.dates.append(date)
-                    }else{
-                        if dateString.replacingOccurrences(of: " ", with: "").isEmpty {
-                            // skip empty strings
-                            return
+
+                doubleColumns = columnIsDouble.indices.filter { columnIsDouble[$0] == .double }
+                categoryColumns = columnIsDouble.indices.filter { columnIsDouble[$0] == .category }
+                latitudeDoubleIndex = latitudeIndex.flatMap { doubleColumns.firstIndex(of: $0) }
+                longitudeDoubleIndex = longitudeIndex.flatMap { doubleColumns.firstIndex(of: $0) }
+            }
+        }
+
+        /// a row of values, as many columns as the units line
+        private func processValues(row : CsvRow, lineCount : Int) {
+            if lineCount % self.lineSamplingFrequency != 0 {
+                return
+            }
+
+            let dateColumn = row[dateIndex]
+            let timeColumn = row[timeIndex]
+            let offsetColumn = row[offsetIndex]
+
+            // Same date and offset columns as the previous row: offset its date by the
+            // difference in time of day, saves a lot of time vs date parsing
+            let secondsOfDay = FlightData.secondsOfDay(timeColumn)
+            var dateProxied = false
+            if let lastDate = data.dates.last,
+               let secondsOfDay = secondsOfDay,
+               let lastSecondsOfDay = self.lastSecondsOfDay,
+               dateColumn == self.lastDateString,
+               offsetColumn == self.lastOffsetString {
+                data.dates.append(lastDate.addingTimeInterval(TimeInterval(secondsOfDay - lastSecondsOfDay)))
+                dateProxied = true
+            }
+            if !dateProxied {
+                let dateString = String(format: "%@ %@ %@", dateColumn, timeColumn, offsetColumn)
+                if let date = formatter.date(from: dateString) {
+                    data.dates.append(date)
+                }else{
+                    if dateString.replacingOccurrences(of: " ", with: "").isEmpty {
+                        // skip empty strings
+                        return
+                    }
+                    
+                    // if first one try few other format
+                    if data.dates.count == 0{
+                        for fmt in extraDateFormats {
+                            formatter.dateFormat = fmt
+                            if let date = formatter.date(from: dateString) {
+                                data.dates.append(date)
+                                break
+                            }
                         }
-                        
-                        // if first one try few other format
-                        if data.dates.count == 0{
-                            for fmt in extraDateFormats {
-                                formatter.dateFormat = fmt
-                                if let date = formatter.date(from: dateString) {
-                                    data.dates.append(date)
-                                    break
-                                }
-                            }
-                            if data.dates.count == 0 {
-                                // never keep a row without its date: values and dates must stay aligned
-                                if skipped < 5 {
-                                    Logger.app.error("Failed to identify date format '\(dateString)'")
-                                }
-                                skipped += 1
-                                return
-                            }
-                        }else{
-                            // we already have dates, so
+                        if data.dates.count == 0 {
+                            // never keep a row without its date: values and dates must stay aligned
                             if skipped < 5 {
-                                let skipped = skipped
-                                Logger.app.error("Failed to parse date '\(dateString)' skipped=\(skipped)")
+                                Logger.app.error("Failed to identify date format '\(dateString)'")
                             }
                             skipped += 1
                             return
                         }
+                    }else{
+                        // we already have dates, so
+                        if skipped < 5 {
+                            let skipped = skipped
+                            Logger.app.error("Failed to parse date '\(dateString)' skipped=\(skipped)")
+                        }
+                        skipped += 1
+                        return
                     }
                 }
-                self.lastDateString = line[dateIndex]
-                self.lastOffsetString = line[offsetIndex]
-                self.lastSecondsOfDay = secondsOfDay
+            }
+            self.lastDateString = dateColumn
+            self.lastOffsetString = offsetColumn
+            self.lastSecondsOfDay = secondsOfDay
 
-                self.doubleLine.removeAll(keepingCapacity: true)
-                self.stringLine.removeAll(keepingCapacity: true)
-                
-                var coord = CLLocationCoordinate2D(latitude: .nan, longitude: .nan)
-                
-                for (idx,(val, isDouble)) in zip(line,columnIsDouble).enumerated() {
-                    switch isDouble {
+            self.doubleLine.removeAll(keepingCapacity: true)
+            self.stringLine.removeAll(keepingCapacity: true)
+
+            // parsed in FastCsv, optimised even in Debug; nan when not a number
+            row.doubles(at: doubleColumns, into: &doubleLine)
+            for idx in categoryColumns {
+                stringLine.append(row[idx])
+            }
+
+            var coord = CLLocationCoordinate2D(latitude: .nan, longitude: .nan)
+            if let idx = latitudeDoubleIndex {
+                coord.latitude = doubleLine[idx]
+            }
+            if let idx = longitudeDoubleIndex {
+                coord.longitude = doubleLine[idx]
+            }
+            if coord.latitude.isFinite && coord.longitude.isFinite {
+                data.coordinatesArray.append(coord)
+                let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
+                if let last = lastLocation {
+                    runningDistance += location.distance(from: last)
+                }
+                lastLocation = location
+
+            }else{
+                data.coordinatesArray.append(kCLLocationCoordinate2DInvalid)
+            }
+            // match order with what was added for fields
+            doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
+            
+            // seconds since the previous kept row: the current date is already in
+            // data.dates. Time going backwards (log restart) counts as no time.
+            var elapsed : TimeInterval = 0.0
+            if data.dates.count > 1 {
+                elapsed = max(0.0, data.dates[data.dates.count-1].timeIntervalSince(data.dates[data.dates.count-2]))
+            }
+
+            // first add all output of calculated double fields so they can
+            // also be used in doubleInputs
+            for calcField in FieldCalculation.calculatedFields {
+                if calcField.inputType == .doubles {
+                    switch calcField.outputType {
                     case .double:
-                        if let dbl = Double(val) {
-                            if idx == longitudeIndex {
-                                coord.longitude = dbl
-                            }
-                            if idx == latitudeIndex {
-                                coord.latitude = dbl
-                            }
-                            doubleLine.append(dbl)
-                        }else{
-                            doubleLine.append(.nan)
-                        }
-                    case .category:
-                        stringLine.append(val)
-                    case .ignore:
+                        doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
+                    case .doubleArray:
+                        doubleLine.append(contentsOf:  calcField.evaluateToArray(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
+                    case .string:
                         break
                     }
                 }
-                if coord.latitude.isFinite && coord.longitude.isFinite {
-                    data.coordinatesArray.append(coord)
-                    let location = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
-                    if let last = lastLocation {
-                        runningDistance += location.distance(from: last)
-                    }
-                    lastLocation = location
+            }
 
-                }else{
-                    data.coordinatesArray.append(kCLLocationCoordinate2DInvalid)
+            // Now build doubleArray inputs
+            for field in self.doubleInputs.keys {
+                if let idx = fieldsMap[field] {
+                    let val = doubleLine[idx]
+                    self.doubleInputs[field]?.append(val)
                 }
-                // match order with what was added for fields
-                doubleLine.append(runningDistance/1852.0) // in nautical miles to be consistant with other fields
-                
-                // seconds since the previous kept row: the current date is already in
-                // data.dates. Time going backwards (log restart) counts as no time.
-                var elapsed : TimeInterval = 0.0
-                if data.dates.count > 1 {
-                    elapsed = max(0.0, data.dates[data.dates.count-1].timeIntervalSince(data.dates[data.dates.count-2]))
+                if let count = self.doubleInputs[field]?.count, count > self.doubleInputsCount {
+                    self.doubleInputs[field]?.removeFirst()
                 }
-
-                // first add all output of calculated double fields so they can
-                // also be used in doubleInputs
-                for calcField in FieldCalculation.calculatedFields {
-                    if calcField.inputType == .doubles {
-                        switch calcField.outputType {
-                        case .double:
-                            doubleLine.append(calcField.evaluate(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
-                        case .doubleArray:
-                            doubleLine.append(contentsOf:  calcField.evaluateToArray(line: doubleLine, fieldsMap: fieldsMap, previousLine: data.values.last, elapsed: elapsed))
-                        case .string:
-                            break
-                        }
-                    }
-                }
-
-                // Now build doubleArray inputs
-                for field in self.doubleInputs.keys {
-                    if let idx = fieldsMap[field] {
-                        let val = doubleLine[idx]
-                        self.doubleInputs[field]?.append(val)
-                    }
-                    if let count = self.doubleInputs[field]?.count, count > self.doubleInputsCount {
-                        self.doubleInputs[field]?.removeFirst()
-                    }
-                }
-                
-                for calcField in FieldCalculation.calculatedFields {
-                    if calcField.inputType == .doublesArray {
-                        switch calcField.outputType {
-                        case .string:
-                            let previous = data.strings.last?[stringLine.count]
-                            let newVal = calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap, previous: previous)
-                            
-                            // If more than one observation, we will need to fill back the new value
-                            // this is assuming the calculation is a look back: for example
-                            // phase of flight, if altitude has gone up we are climbing, and mark climbing back to the
-                            // beginning of the inputs. if 1 observation don't do anything
-                            if calcField.requiredObservationCount > 1 {
-                                // reset when value changes
-                                var amountToFill : Int = 0
-                                // if value changed, restart array and fill all the value for the current inputs
-                                if let prevVal = previous, prevVal != newVal {
-                                    for field in self.doubleInputs.keys {
-                                        if let idx = fieldsMap[field] {
-                                            let val = doubleLine[idx]
-                                            if let cnt = self.doubleInputs[field]?.count, cnt > amountToFill {
-                                                amountToFill = cnt
-                                            }
-                                            self.doubleInputs[field] = [val]
+            }
+            
+            for calcField in FieldCalculation.calculatedFields {
+                if calcField.inputType == .doublesArray {
+                    switch calcField.outputType {
+                    case .string:
+                        let previous = data.strings.last?[stringLine.count]
+                        let newVal = calcField.evaluateToString(lines: self.doubleInputs, fieldsMap: fieldsMap, previous: previous)
+                        
+                        // If more than one observation, we will need to fill back the new value
+                        // this is assuming the calculation is a look back: for example
+                        // phase of flight, if altitude has gone up we are climbing, and mark climbing back to the
+                        // beginning of the inputs. if 1 observation don't do anything
+                        if calcField.requiredObservationCount > 1 {
+                            // reset when value changes
+                            var amountToFill : Int = 0
+                            // if value changed, restart array and fill all the value for the current inputs
+                            if let prevVal = previous, prevVal != newVal {
+                                for field in self.doubleInputs.keys {
+                                    if let idx = fieldsMap[field] {
+                                        let val = doubleLine[idx]
+                                        if let cnt = self.doubleInputs[field]?.count, cnt > amountToFill {
+                                            amountToFill = cnt
                                         }
+                                        self.doubleInputs[field] = [val]
                                     }
-                                }
-                                if amountToFill != 0 {
-                                    let cnt = data.strings.count
-                                    let downto = max(0,cnt - amountToFill)
-                                    for idx in downto..<cnt {
-                                        data.strings[idx][stringLine.count] = newVal
-                                    }
-                                    
                                 }
                             }
-                            stringLine.append(newVal)
-                        case .double,.doubleArray:
-                            break
+                            if amountToFill != 0 {
+                                let cnt = data.strings.count
+                                let downto = max(0,cnt - amountToFill)
+                                for idx in downto..<cnt {
+                                    data.strings[idx][stringLine.count] = newVal
+                                }
+                                
+                            }
                         }
-                            
+                        stringLine.append(newVal)
+                    case .double,.doubleArray:
+                        break
                     }
+                        
                 }
-
-                data.values.append(doubleLine)
-                data.strings.append(stringLine)
             }
+
+            data.values.append(doubleLine)
+            data.strings.append(stringLine)
         }
     }
     
@@ -558,8 +581,7 @@ extension FlightData {
 
         let parsingState = ParsingState(data: self, totalSize: totalSize, maxLineCount: maxLineCount,
                                         lineSamplingFrequency: lineSamplingFrequency, progress: progress)
-        let bufferedStreamReader = BufferedStreamReader(inputStream: inputStream)
-        try CsvParser.parse(bufferedStreamReader: bufferedStreamReader, interpreter: parsingState)
+        try CsvParser.parse(inputStream: inputStream, interpreter: parsingState)
     }
     
     private func convertDataFrameSlow() {

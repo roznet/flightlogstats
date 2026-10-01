@@ -8,9 +8,9 @@
 ## Pipeline
 
 ```
-InputStream ─ BufferedStreamReader (1 MB chunks, byte pop)
-            ─ CsvParser (byte state machine) ─ CsvInterpreter.process(line:)
-            ─ FlightData.ParsingState
+InputStream ─ FastCsv.CsvParser (1 MB chunks, byte state machine)
+            ─ CsvInterpreter.process(row: CsvRow)   fields kept as bytes
+            ─ FlightData.ParsingState               doubles via row.doubles(at:into:)
                  #airframe_info line  -> meta ([MetaField: String])
                  # units line         -> column kind: ignored / categorical / double
                  header line          -> FlightLogFile.Field(rawValue:) or .Unknown
@@ -60,8 +60,7 @@ deleted (`c09955d`).
 
 | File | Symbols |
 |---|---|
-| `BufferedStreamReader.swift` | `BufferedStreamReader` |
-| `CsvParser.swift` | `CsvParser`, `CsvInterpreter` |
+| `Packages/FastCsv/Sources/FastCsv/CsvParser.swift` | `CsvParser`, `CsvInterpreter`, `CsvRow` |
 | `FlightData.swift` | `FlightData`, `FlightData.ParsingState`, `doubleDataFrame`, `categoricalDataFrame`, `coordinateDataFrame(for:)`, `coordinateColumn`, `fieldsUnits`, `keptRows(dates:)`, `secondsOfDay(_:)` |
 | `FlightLogFile.swift` | `FlightLogFile.parse`, `quickParse`, `dataSerie`, `legs`, `mapOverlayView` |
 | `FlightLogFile+Field.swift` | `FlightLogFile.Field`, `MetaField`, `fieldDefinitions` |
@@ -88,7 +87,19 @@ deleted (`c09955d`).
   and a time lookup on coordinates is safe (C3, `ecbd8ee`). `count`,
   `firstCoordinate` and `lastCoordinate` still read the raw rows.
 - **Memory**: row-major and column-major copies are both held after conversion.
-- **Coupling**: field metadata and logging use `Bundle.main`, which blocks moving
-  the parser into a package until switched to `Bundle.module`.
+- **Speed, Debug vs Release.** The CSV loop is ~5x slower unoptimised and Swift
+  optimises per module, not per file (`@_optimize(speed)` does nothing at
+  `-Onone`). So the CSV layer is the local `FastCsv` package, built `-O` in Debug
+  too. Keep the per-field work behind `CsvRow` calls and nothing `@inlinable`:
+  inlined code would compile into the Debug app unoptimised. Measured on EGLL
+  (5.4 MB) by `TestParsingSpeed`, see the commit for numbers.
+- **Numbers from bytes.** `CsvRow.double(at:)` equals `Double(String)` bit for bit:
+  plain decimals take the exact Clinger fast path (mantissa ≤ 2^53, ≤ 22
+  decimals, one correctly rounded division), anything else falls back to
+  `Double(String)`. `strtod_l` is not bridged to Swift.
+- **Rows are views.** A `CsvRow` shares the parser's buffer; keeping one copies it
+  on the next line (copy on write), so it is safe but not free.
+- **Coupling**: field metadata and logging use `Bundle.main`, which keeps
+  `FlightData` and the interpreter in the app (only the CSV layer is a package).
 - `python/flightreconcile/g1000_parser.py` is a second, pandas-based parser of
   the same format. Keep it for the lab; parity fixtures keep the two honest.

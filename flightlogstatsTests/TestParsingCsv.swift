@@ -8,6 +8,7 @@
 import XCTest
 @testable import FlightLogStats
 import RZUtils
+import FastCsv
 import TabularData
 import OSLog
 
@@ -56,14 +57,14 @@ Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude,  AltInd,  IA
         var maxLineCount : Int? = nil
         var lines : [[String]] = []
         func start() {}
-        func process(line : [String], readCount : Int, lineCount : Int) { self.lines.append(line) }
+        func process(row : CsvRow, readCount : Int, lineCount : Int) { self.lines.append(row.strings) }
         func finished() {}
     }
 
     func csvLines(_ string : String) throws -> [[String]] {
         guard let stream = self.streamForString(string: string) else { XCTFail(); return [] }
         let collector = LineCollector()
-        try CsvParser.parse(bufferedStreamReader: BufferedStreamReader(inputStream: stream), interpreter: collector)
+        try CsvParser.parse(inputStream: stream, interpreter: collector)
         return collector.lines
     }
 
@@ -199,4 +200,34 @@ Lcl Date,  Lcl Time, UTCOfst,  AtvWpt,      Latitude,    Longitude
         }
     }
 
+}
+
+class TestParsingSpeed: XCTestCase {
+
+    private class NullInterpreter : CsvInterpreter {
+        var maxLineCount : Int? = nil
+        var fields : Int = 0
+        func start() {}
+        func process(row : CsvRow, readCount : Int, lineCount : Int) { self.fields += row.count }
+        func finished() {}
+    }
+
+    func testParseSpeed() throws {
+        guard let url = TestLogFileSamples.largeLog.url, let stream = InputStream(url: url) else { XCTFail(); return }
+
+        var start = Date()
+        let null = NullInterpreter()
+        try CsvParser.parse(inputStream: stream, interpreter: null)
+        let csv = Date().timeIntervalSince(start)
+
+        start = Date()
+        guard let data = FlightData(url: url) else { XCTFail(); return }
+        let parse = Date().timeIntervalSince(start)
+
+        start = Date()
+        let df = data.doubleDataFrame()
+        let convert = Date().timeIntervalSince(start)
+
+        print(String(format: "PARSESPEED csv %.3f parse %.3f convert %.3f rows %d fields %d", csv, parse, convert, df.count, null.fields))
+    }
 }

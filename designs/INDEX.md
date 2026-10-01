@@ -30,8 +30,8 @@ Key exports: `Uploads`, `UploadCoordinator`, `UploadService`, `UploadFailure`, `
 ## Parsing & analysis
 
 ### log-parsing
-Byte-level CSV parser into `FlightData` (row-major, lazily column-major via RZData `DataFrame`, all frames on the same kept rows), field enum + `logFileFields.json` metadata, calculated fields (wind, time-integrated totaliser, flight phase), exact date shortcut, quick vs full parse.
-Key exports: `CsvParser`, `BufferedStreamReader`, `FlightData`, `FlightData.keptRows`, `FlightLogFile`, `FlightLogFile.Field`, `FieldCalculation`, `AvionicsSystem`
+Byte-level CSV parser (local `FastCsv` package, optimised in Debug, numbers read from bytes) into `FlightData` (row-major, lazily column-major via RZData `DataFrame`, all frames on the same kept rows), field enum + `logFileFields.json` metadata, calculated fields (wind, time-integrated totaliser, flight phase), exact date shortcut, quick vs full parse.
+Key exports: `CsvParser`, `CsvRow`, `FlightData`, `FlightData.keptRows`, `FlightLogFile`, `FlightLogFile.Field`, `FieldCalculation`, `AvionicsSystem`
 → Full doc: log-parsing.md
 
 ### analysis

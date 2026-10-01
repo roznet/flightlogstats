@@ -81,6 +81,7 @@ on main, so the threading contract holds for writes only (I8). Change notificati
 | **rzutils** (`RZUtils`, `RZUtilsSwift`, `RZUtilsUniversal`, `RZData`) | `DataFrame`, `ValueStats`, `GCUnit`, logging | 1.0.31; all four products linked by the app |
 | **rzutils-touch** (`RZUtilsTouch`) | `GCSimpleGraphView` charts (ObjC) | 1.0.8 (tools 5.7); dropped with Swift Charts in phase 6 |
 | **rzflight** (`RZFlight`) | `KnownAirports`, `KnownWaypoints`, `RoutePointResolver`, `RunwayWindModel`, `pointFromBearingDistance` | branch `main` (past v2.0) while app-driven changes land; pin a release once they settle |
+| **FastCsv** (local, `Packages/FastCsv`) | `CsvParser`, `CsvRow`: the per-byte CSV loop | in repo; built `-O` in Debug too (`unsafeFlags`), optimisation being per module. `swift test --package-path Packages/FastCsv` |
 | OAuthSwift | FlySto OAuth2 | |
 | ZIPFoundation | zip before FlySto upload, bug report | |
 
