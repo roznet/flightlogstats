@@ -62,6 +62,7 @@ struct Settings {
         
         case flysto_credentials = "flysto.credentials"
         case flysto_enabled = "flysto.enabled"
+        case dropbox_enabled = "dropbox.enabled"
         
         case upload_method = "upload.method"
         
@@ -138,6 +139,10 @@ struct Settings {
     var flystoEnabled : Bool
     @CodableStorage(key: Key.flysto_credentials, defaultValue: nil)
     var flystoCredentials : OAuthSwiftCredential?
+
+    /// save each flight's summary to Dropbox
+    @UserStorage(key: Key.dropbox_enabled, defaultValue: false)
+    var dropboxEnabled : Bool
 
     
     @UserStorage(key: Key.common_bug_id, defaultValue: -1)

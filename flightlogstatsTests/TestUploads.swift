@@ -366,4 +366,168 @@ final class TestUploads: XCTestCase {
         let notUploaded = await store.notUploadedFlights(limit: 10)
         XCTAssertTrue(notUploaded.isEmpty)
     }
+
+    //MARK: - Dropbox
+
+    /// The Dropbox queue in a JSON file: queued, failed, saved, and the same after a reload.
+    func testFileUploadStore() async throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("dropbox-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        for name in self.names {
+            try Data("x".utf8).write(to: folder.appendingPathComponent(name))
+        }
+        let queueUrl = folder.appendingPathComponent("queue.json")
+        let store = FileUploadStore(url: queueUrl, folder: { folder })
+
+        let queued = await store.queue(self.names + ["log_missing.csv"], force: false)
+        XCTAssertEqual(queued.count, 4)
+        var due = await store.due(now: Date())
+        // newest first, and a log not on this device waits
+        XCTAssertEqual(due.map { $0.name }, self.names.sorted(by: >))
+        XCTAssertEqual(due.first?.file, folder.appendingPathComponent("log_c.csv"))
+
+        let retry = Date().addingTimeInterval(60)
+        await store.markFailed("log_c.csv", reason: "offline", attempts: 1, nextRetry: retry)
+        await store.markUploaded("log_b.csv", receipt: UploadReceipt(response: "/flights/b.json"))
+        due = await store.due(now: Date())
+        XCTAssertEqual(due.map { $0.name }, ["log_a.csv"])
+        let next = await store.nextRetry()
+        XCTAssertEqual(next, retry)
+
+        let reloaded = FileUploadStore(url: queueUrl, folder: { folder })
+        let saved = await reloaded.entry("log_b.csv")
+        XCTAssertEqual(saved?.status, .uploaded)
+        XCTAssertEqual(saved?.receipt, "/flights/b.json")
+        let failed = await reloaded.entry("log_c.csv")
+        XCTAssertEqual(failed?.lastError, "offline")
+        XCTAssertEqual(failed?.attempts, 1)
+        let requeued = await reloaded.queue(["log_b.csv"], force: false)
+        XCTAssertTrue(requeued.isEmpty)
+        let forced = await reloaded.queue(["log_b.csv"], force: true)
+        XCTAssertEqual(forced, ["log_b.csv"])
+    }
+
+    /// The coordinator drains the file store like the record store.
+    func testDropboxQueueThroughCoordinator() async throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("dropbox-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        for name in self.names {
+            try Data("x".utf8).write(to: folder.appendingPathComponent(name))
+        }
+        let service = FakeService()
+        await service.setScript("log_a.csv", [.failure(.permanent("Dropbox refused the file (409)"))])
+        let store = FileUploadStore(url: folder.appendingPathComponent("queue.json"), folder: { folder })
+        let coordinator = UploadCoordinator(service: service, store: store)
+        await coordinator.enqueue(self.names)
+        let calls = await service.calls
+        XCTAssertEqual(calls, self.names.sorted(by: >))
+        let refused = await store.entry("log_a.csv")
+        XCTAssertEqual(refused?.status, .failed)
+        XCTAssertNil(refused?.nextRetry)
+        let saved = await store.entry("log_c.csv")
+        XCTAssertEqual(saved?.status, .uploaded)
+    }
+
+    func testDropboxClassification() {
+        XCTAssertEqual(DropboxService.classify(status: 401, body: nil), .refreshAndRetry)
+        XCTAssertEqual(DropboxService.classify(status: 429, body: nil), .transient("Dropbox error 429"))
+        XCTAssertEqual(DropboxService.classify(status: 503, body: nil), .transient("Dropbox error 503"))
+        if case .permanent(let message) = DropboxService.classify(status: 409, body: "{\"error_summary\": \"path/insufficient_space/\"}") {
+            XCTAssertTrue(message.contains("insufficient_space"))
+        }else{
+            XCTFail("409 is this file's problem")
+        }
+        if case .permanent = DropboxService.classify(status: 400, body: nil) {}else{
+            XCTFail("400 is not retried")
+        }
+    }
+
+    func testDropboxRequests() throws {
+        // the API argument header is ASCII only
+        let arg = try DropboxService.apiArg(path: "/flights/2026-10-26_LFAT-EGTF_log_é.json")
+        XCTAssertTrue(arg.allSatisfy { $0.isASCII })
+        XCTAssertTrue(arg.contains("\\u00e9"))
+        XCTAssertTrue(arg.contains("\"mode\":\"overwrite\""))
+        XCTAssertTrue(arg.contains("\"path\":\"/flights/"))
+        let emoji = try DropboxService.apiArg(path: "/✈️.json")
+        XCTAssertTrue(emoji.allSatisfy { $0.isASCII })
+
+        let request = DropboxService.tokenRequest(["grant_type" : "refresh_token", "refresh_token" : "a+b/c=", "client_id" : "key"])
+        let body = String(data: try XCTUnwrap(request.httpBody), encoding: .utf8)
+        XCTAssertEqual(body, "client_id=key&grant_type=refresh_token&refresh_token=a%2Bb%2Fc%3D")
+
+        // a refresh answer keeps the refresh token we had
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let refreshed = DropboxService.TokenResponse(access_token: "new", expires_in: 14400, refresh_token: nil)
+        XCTAssertEqual(refreshed.credential(refreshToken: "old", now: now),
+                       DropboxService.Credential(accessToken: "new", refreshToken: "old", expiresAt: now.addingTimeInterval(14400)))
+        XCTAssertNil(refreshed.credential(now: now))
+        XCTAssertTrue(DropboxService.Credential(accessToken: "", refreshToken: "", expiresAt: now.addingTimeInterval(30)).isExpired(now: now))
+        XCTAssertFalse(DropboxService.Credential(accessToken: "", refreshToken: "", expiresAt: now.addingTimeInterval(3600)).isExpired(now: now))
+    }
+
+    /// RFC 7636 appendix B.
+    func testPKCEChallenge() {
+        XCTAssertEqual(DropboxSignIn.challenge(for: "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"),
+                       "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM")
+        let verifier = DropboxSignIn.randomString()
+        XCTAssertGreaterThanOrEqual(verifier.count, 43)
+        XCTAssertLessThanOrEqual(verifier.count, 128)
+    }
+
+    func testDropboxStateWithoutCredential() async {
+        let keychain = KeychainStore(service: "net.ro-z.flightlogstats.test.\(UUID().uuidString)")
+        let off = DropboxService(keychain: keychain, isEnabled: { false }, content: { _ in ("x.json", Data()) })
+        let offState = await off.state()
+        XCTAssertEqual(offState, .disabled)
+        let on = DropboxService(keychain: keychain, isEnabled: { true }, content: { _ in
+            XCTFail("no credential must not build the summary")
+            return ("x.json", Data())
+        })
+        let onState = await on.state()
+        XCTAssertEqual(onState, .needsSignIn)
+        do {
+            _ = try await on.upload(file: URL(fileURLWithPath: "/nothing.csv"))
+            XCTFail("no credential must not upload")
+        }catch let failure as UploadFailure {
+            XCTAssertEqual(failure, .auth("Sign in to Dropbox"))
+        }catch{
+            XCTFail("\(error)")
+        }
+    }
+
+    /// The summary of a real flight: times in order, durations, JSON round trip, file name.
+    func testFlightSummaryExport() throws {
+        let url = try XCTUnwrap(TestLogFileSamples.flight2.url)
+        let log = try XCTUnwrap(FlightLogFile(url: url))
+        log.parse()
+        let flight = try XCTUnwrap(log.flightSummary)
+        let export = FlightSummaryExport(logFile: log.name, summary: flight,
+                                         aircraft: .init(registration: "N123AB", airframe: "SR22T", systemId: "1"),
+                                         departureIcao: "LFQA", arrivalIcao: "LFAQ")
+        let times = export.timesUtc
+        let ordered = [times.logStart, times.engineOn, times.blockOff, times.takeoff,
+                       times.landing, times.blockOn, times.engineOff, times.logEnd].compactMap { $0 }
+        XCTAssertEqual(ordered.count, 8)
+        XCTAssertEqual(ordered, ordered.sorted())
+        let block = try XCTUnwrap(export.durations.blockMinutes)
+        let airborne = try XCTUnwrap(export.durations.airborneMinutes)
+        XCTAssertGreaterThan(airborne, 0)
+        XCTAssertGreaterThanOrEqual(block, airborne)
+        XCTAssertGreaterThan(export.fuelLiters.usedTotalizer, export.fuelUsGallons.usedTotalizer)
+        XCTAssertEqual(export.version, FlightSummaryExport.formatVersion)
+
+        let data = try export.json()
+        let json = try XCTUnwrap(String(data: data, encoding: .utf8))
+        XCTAssertTrue(json.contains("\"block_off\""))
+        XCTAssertTrue(json.contains("\"fuel_us_gallons\""))
+        XCTAssertEqual(try FlightSummaryExport.decoder.decode(FlightSummaryExport.self, from: data), export)
+
+        XCTAssertTrue(export.fileName.hasPrefix(try XCTUnwrap(export.date)))
+        XCTAssertTrue(export.fileName.hasSuffix("_log_220417_125002_LFQA.json"))
+        XCTAssertTrue(export.summary.contains("N123AB"))
+        XCTAssertTrue(export.clipboardText().hasPrefix(export.summary))
+    }
 }

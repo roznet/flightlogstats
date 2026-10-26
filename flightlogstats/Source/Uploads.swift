@@ -2,8 +2,8 @@
 //  Uploads.swift
 //  FlightLogStats
 //
-//  The app's upload queue: the coordinator over FlySto, persisted in the log records,
-//  and what the screens observe.
+//  The app's upload queues: FlySto (the log, persisted in the log records) and Dropbox
+//  (the flight summary, persisted in a file on this device), and what the screens observe.
 //
 
 import Foundation
@@ -19,7 +19,9 @@ extension Notification.Name {
 /// Upload progress and service state, for the screens.
 @MainActor @Observable
 final class UploadActivity {
+    /// FlySto
     static let shared = UploadActivity()
+    static let dropbox = UploadActivity()
 
     var snapshot = UploadCoordinator.Snapshot()
 
@@ -35,13 +37,23 @@ final class Uploads : @unchecked Sendable {
 
     let store : RecordUploadStore
     let coordinator : UploadCoordinator
+    let dropboxStore : FileUploadStore
+    let dropbox : UploadCoordinator
     private let monitor = NWPathMonitor()
 
-    init(organizer : FlightLogOrganizer = FlightLogOrganizer.shared, service : UploadService = FlyStoService.shared) {
+    init(organizer : FlightLogOrganizer = FlightLogOrganizer.shared, service : UploadService = FlyStoService.shared,
+         dropboxService : UploadService = DropboxService.shared,
+         dropboxQueue : URL = FileUploadStore.defaultUrl(name: "dropbox-uploads.json")) {
         self.store = RecordUploadStore(organizer: organizer)
         self.coordinator = UploadCoordinator(service: service, store: self.store, report: { snapshot in
             Task { @MainActor in
                 UploadActivity.shared.snapshot = snapshot
+            }
+        })
+        self.dropboxStore = FileUploadStore(url: dropboxQueue, folder: { organizer.libraryFolder })
+        self.dropbox = UploadCoordinator(service: dropboxService, store: self.dropboxStore, report: { snapshot in
+            Task { @MainActor in
+                UploadActivity.dropbox.snapshot = snapshot
             }
         })
     }
@@ -60,15 +72,23 @@ final class Uploads : @unchecked Sendable {
 
     func drain() {
         Task { await self.coordinator.drain() }
+        Task { await self.dropbox.drain() }
     }
 
-    /// New logs from an import: the flights are uploaded if uploads are automatic.
+    /// New logs from an import: the flights are uploaded to FlySto if uploads are
+    /// automatic, and their summaries saved to Dropbox if it is on.
     func uploadAfterImport(_ names : [String]) {
-        guard Settings.shared.flystoEnabled, Settings.shared.uploadMethod == .automatic else { return }
+        let flysto = Settings.shared.flystoEnabled && Settings.shared.uploadMethod == .automatic
+        let dropbox = Settings.shared.dropboxEnabled
+        guard flysto || dropbox else { return }
         Task {
             let flights = await self.store.flights(among: names)
-            if !flights.isEmpty {
+            guard !flights.isEmpty else { return }
+            if flysto {
                 await self.coordinator.enqueue(flights)
+            }
+            if dropbox {
+                await self.dropbox.enqueue(flights)
             }
         }
     }
@@ -106,6 +126,41 @@ final class Uploads : @unchecked Sendable {
             await self.coordinator.drain()
         }
     }
+
+    //MARK: - Dropbox
+
+    /// Save one log's summary to Dropbox, again even if already saved.
+    func saveToDropbox(_ name : String) {
+        Task { await self.dropbox.enqueue([name], force: true) }
+    }
+
+    /// Save the summary of every flight not saved yet.
+    func saveAllToDropbox() {
+        Task {
+            let names = await self.store.allFlights()
+            Logger.ui.info("Will save \(names.count) flight summaries to Dropbox")
+            await self.dropbox.enqueue(names)
+        }
+    }
+
+    func retryFailedDropbox() {
+        Task { await self.dropbox.retryFailed() }
+    }
+
+    /// Sign in (a user action), then save what waited for it.
+    @MainActor
+    func signInDropbox(from window : UIWindow?) async throws {
+        let signIn = DropboxSignIn()
+        try await signIn.signIn(from: window)
+        await self.dropbox.drain()
+    }
+
+    func signOutDropbox() {
+        Task {
+            await DropboxService.shared.signOut()
+            await self.dropbox.drain()
+        }
+    }
 }
 
 /// The queue kept in each log's `FlightFlyStoRecord` (status, attempts, error, next retry),
@@ -134,6 +189,16 @@ final class RecordUploadStore : UploadStore, @unchecked Sendable {
     func flights(among names : [String]) async -> [String] {
         return await self.onWorker {
             names.filter { self.organizer[$0]?.isFlight ?? false }
+        }
+    }
+
+    /// Every parsed flight, newest first.
+    func allFlights() async -> [String] {
+        return await self.onWorker {
+            let list = self.organizer.flightLogFileRecords(request: .flightsOnly) { record in
+                record.recordStatus == .quickParsed || record.recordStatus == .parsed
+            }
+            return list.compactMap { $0.log_file_name }
         }
     }
 

@@ -378,6 +378,44 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
     }
     
+    override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        guard TableSection(indexPath: indexPath) == .flights,
+              let info = self.flightInfo(at: indexPath), let name = info.log_file_name else { return nil }
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            var actions : [UIAction] = [
+                UIAction(title: "Copy Summary", image: UIImage(systemName: "doc.on.clipboard")) { _ in
+                    self.copySummary(info)
+                }
+            ]
+            if Settings.shared.dropboxEnabled {
+                actions.append(UIAction(title: "Save Summary to Dropbox", image: UIImage(systemName: "square.and.arrow.down.on.square")) { _ in
+                    Uploads.shared.saveToDropbox(name)
+                })
+            }
+            return UIMenu(children: actions)
+        }
+    }
+
+    /// The flight's summary (headline and JSON) on the clipboard, from a full parse.
+    func copySummary(_ info : FlightLogFileRecord) {
+        let folder = self.logFileOrganizer.libraryFolder
+        AppDelegate.worker.async {
+            let export = FlightSummaryExport.make(record: info, folder: folder)
+            DispatchQueue.main.async {
+                guard let export = export else {
+                    let alert = UIAlertController(title: "No Summary",
+                                                  message: "The log is not on this device yet, or has no flight data.",
+                                                  preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                    return
+                }
+                UIPasteboard.general.string = export.clipboardText()
+                Logger.ui.info("Copied summary of \(export.logFile)")
+            }
+        }
+    }
+
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let logCell = (cell as? LogListTableViewCell) {
             NotificationCenter.default.addObserver(forName: .logFileRecordUpdated, object: nil, queue: nil){
