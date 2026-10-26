@@ -383,8 +383,8 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
               let info = self.flightInfo(at: indexPath), let name = info.log_file_name else { return nil }
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
             var actions : [UIAction] = [
-                UIAction(title: "Copy Summary", image: UIImage(systemName: "doc.on.clipboard")) { _ in
-                    self.copySummary(info)
+                UIAction(title: "Share Summary…", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+                    self.shareSummary(info, at: indexPath)
                 }
             ]
             if Settings.shared.dropboxEnabled {
@@ -396,13 +396,13 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
     }
 
-    /// The flight's summary (headline and JSON) on the clipboard, from a full parse.
-    func copySummary(_ info : FlightLogFileRecord) {
+    /// The flight's summary in the share sheet (file, copy, mail, ...), from a full parse.
+    func shareSummary(_ info : FlightLogFileRecord, at indexPath : IndexPath) {
         let folder = self.logFileOrganizer.libraryFolder
         AppDelegate.worker.async {
             let export = FlightSummaryExport.make(record: info, folder: folder)
             DispatchQueue.main.async {
-                guard let export = export else {
+                guard let export = export, let share = try? FlightSummaryShare.items(for: export) else {
                     let alert = UIAlertController(title: "No Summary",
                                                   message: "The log is not on this device yet, or has no flight data.",
                                                   preferredStyle: .alert)
@@ -410,8 +410,21 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
                     self.present(alert, animated: true)
                     return
                 }
-                UIPasteboard.general.string = export.clipboardText()
-                Logger.ui.info("Copied summary of \(export.logFile)")
+                let controller = UIActivityViewController(activityItems: share.items, applicationActivities: nil)
+                controller.completionWithItemsHandler = { _, _, _, _ in
+                    try? FileManager.default.removeItem(at: share.file)
+                }
+                // a popover on iPad and Mac, from the row
+                if let popover = controller.popoverPresentationController {
+                    if let cell = self.tableView.cellForRow(at: indexPath) {
+                        popover.sourceView = cell
+                        popover.sourceRect = cell.bounds
+                    }else{
+                        popover.sourceView = self.view
+                        popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+                    }
+                }
+                self.present(controller, animated: true)
             }
         }
     }

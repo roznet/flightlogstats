@@ -130,7 +130,8 @@ connector, a logbook, an expense sheet) can read them.
 | `DropboxService`, `DropboxService.classify`, `apiArg`, `tokenRequest`, `Credential` | Dropbox |
 | `DropboxSignIn` | Dropbox PKCE sign in |
 | `FileUploadStore`, `FileUploadStore.Entry` | queue in a JSON file (Dropbox) |
-| `FlightSummaryExport`, `make(record:folder:)`, `json()`, `clipboardText()`, `fileName` | flight summary JSON (Dropbox, Copy Summary) |
+| `FlightSummaryExport`, `make(record:folder:)`, `json()`, `clipboardText()`, `fileName` | flight summary JSON (Dropbox, Share Summary) |
+| `FlightSummaryShare` | share sheet items: JSON file, text for Copy, headline for Mail/Messages |
 | `KeychainStore` | generic password storage |
 | `FlightLogFileRecord.flystoStatus`, `flystoLastError`, `flystoReceipt` | per-log accessors |
 | `BugReportViewController` | zips 24 h of logs to `Secrets["flightlogstats.bugreport"]` |

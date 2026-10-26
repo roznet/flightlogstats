@@ -3,12 +3,13 @@
 //  FlightLogStats
 //
 //  One flight's summary as JSON, for other tools (logbook, expenses, an assistant):
-//  saved to Dropbox and copied by the log list's Copy Summary.
+//  saved to Dropbox and shared from the log list's Share Summary.
 //
 
 import Foundation
 import OSLog
 import RZFlight
+import UIKit
 
 /// What a logbook or an expense sheet needs from a flight, from a full parse: times in
 /// UTC, durations, fuel in litres and US gallons, distance, airports.
@@ -182,7 +183,7 @@ struct FlightSummaryExport : Codable, Equatable {
         return try Self.encoder.encode(self)
     }
 
-    /// What Copy Summary puts on the clipboard: the headline, then the JSON.
+    /// Copied from the share sheet: the headline, then the JSON.
     func clipboardText() -> String {
         guard let data = try? self.json(), let json = String(data: data, encoding: .utf8) else {
             return self.summary
@@ -282,5 +283,60 @@ struct FlightSummaryExport : Codable, Equatable {
                     endTotal: self.rounded(end.total, places: 1),
                     usedTanks: self.rounded(used.total, places: 1),
                     usedTotalizer: self.rounded(totalizer.total, places: 1))
+    }
+}
+
+//MARK: - Share sheet
+
+/// The share sheet items of a summary: the JSON file for Save to Files, Mail, AirDrop;
+/// the headline and JSON as text for Copy; the headline as the body of a message.
+enum FlightSummaryShare {
+    /// The summary written to a temporary file named like its Dropbox copy.
+    /// - Returns: the items for `UIActivityViewController`, and the file to remove after
+    static func items(for export : FlightSummaryExport) throws -> (items : [Any], file : URL) {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("summary-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let file = folder.appendingPathComponent(export.fileName)
+        try export.json().write(to: file, options: .atomic)
+        return ([FileItem(file: file), TextItem(export: export)], folder)
+    }
+
+    /// The file, except for Copy, which takes the text instead.
+    final class FileItem : NSObject, UIActivityItemSource {
+        let file : URL
+        init(file : URL) { self.file = file }
+
+        func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+            return self.file
+        }
+
+        func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+            return activityType == .copyToPasteboard ? nil : self.file
+        }
+    }
+
+    /// Text where text helps: the headline and JSON for Copy, the headline for a mail or
+    /// message body; nothing elsewhere, so Save to Files saves only the JSON.
+    final class TextItem : NSObject, UIActivityItemSource {
+        let export : FlightSummaryExport
+        init(export : FlightSummaryExport) { self.export = export }
+
+        func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+            return self.export.summary
+        }
+
+        func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+            if activityType == .copyToPasteboard {
+                return self.export.clipboardText()
+            }
+            if activityType == .mail || activityType == .message {
+                return self.export.summary
+            }
+            return nil
+        }
+
+        func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+            return "Flight summary \(self.export.summary)"
+        }
     }
 }

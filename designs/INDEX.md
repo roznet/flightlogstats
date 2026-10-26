@@ -23,8 +23,8 @@ Key exports: `LogLibrary`, `LogLibrary.Selection`, `ImportProgress`, `LibrarySto
 → Full doc: log-import-sync.md
 
 ### remote-upload
-FlySto upload, and Dropbox save of each flight's summary JSON (`FlightSummaryExport`: UTC engine/block/airborne times, fuel, distance; app folder, PKCE sign in, device local `FileUploadStore` queue; also Copy Summary), through a serial, persisted queue: `UploadCoordinator` over an `UploadService`, state in `FlightFlyStoRecord` (attempts, last error, next retry), failure classes (duplicate, auth pauses, transient backs off 1/5/30 min, permanent), triggers (after import, launch, network back, batch, per log; never on display), single-flight token refresh, Keychain credential, `ASWebAuthenticationSession` sign in. Savvy removed 2026-09-29.
-Key exports: `Uploads`, `UploadCoordinator`, `UploadService`, `UploadFailure`, `RecordUploadStore`, `UploadActivity`, `FlyStoService`, `FlyStoSignIn`, `KeychainStore`, `FlightFlyStoRecord`, `RemoteServiceRecord.Status`, `DropboxService`, `DropboxSignIn`, `FileUploadStore`, `FlightSummaryExport`
+FlySto upload, and Dropbox save of each flight's summary JSON (`FlightSummaryExport`: UTC engine/block/airborne times, fuel, distance; app folder, PKCE sign in, device local `FileUploadStore` queue; also Share Summary), through a serial, persisted queue: `UploadCoordinator` over an `UploadService`, state in `FlightFlyStoRecord` (attempts, last error, next retry), failure classes (duplicate, auth pauses, transient backs off 1/5/30 min, permanent), triggers (after import, launch, network back, batch, per log; never on display), single-flight token refresh, Keychain credential, `ASWebAuthenticationSession` sign in. Savvy removed 2026-09-29.
+Key exports: `Uploads`, `UploadCoordinator`, `UploadService`, `UploadFailure`, `RecordUploadStore`, `UploadActivity`, `FlyStoService`, `FlyStoSignIn`, `KeychainStore`, `FlightFlyStoRecord`, `RemoteServiceRecord.Status`, `DropboxService`, `DropboxSignIn`, `FileUploadStore`, `FlightSummaryExport`, `FlightSummaryShare`
 → Full doc: remote-upload.md
 
 ## Parsing & analysis

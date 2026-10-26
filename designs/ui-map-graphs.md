@@ -14,7 +14,7 @@ MainSplitViewController (Main.storyboard initial, classic master/detail)
 │    └─ LogListTableViewController   "Display Statistics" row, flights / aircraft,
 │                                    search, "More" UIMenu (import, upload batch,
 │                                    rebuild, settings, bug report); row
-│                                    context menu: Copy Summary, Save Summary
+│                                    context menu: Share Summary, Save Summary
 │                                    to Dropbox
 └─ secondary, one of:
      LogTabBarController ─ Summary  LogSummaryViewController (4 tables, upload)
@@ -130,9 +130,12 @@ retry). The Dropbox counts come from `FileUploadStore.all`. Actions menu: Retry
 all failed, Upload next N flights, Save all flight summaries to Dropbox, Retry
 failed Dropbox saves, Sign out of Dropbox.
 
-Copy Summary (log list row context menu, right click on Mac): a full parse on
-the worker, then `FlightSummaryExport.clipboardText()` (headline line, then the
-JSON) on the pasteboard; an alert when the log is not on the device.
+Share Summary (log list row context menu, right click on Mac): a full parse on
+the worker, then a share sheet from the row (`FlightSummaryShare`): the JSON file
+(temporary, named like the Dropbox copy, removed when the sheet closes) for Save
+to Files, Mail, AirDrop; Copy takes `clipboardText()` (headline, then the JSON)
+instead of the file; Mail and Messages get the headline as body and subject. An
+alert when the log is not on the device.
 
 The log list shows each log's FlySto status as the cell's accessory
 (`LogListTableViewCell.updateUploadStatus`): queued, uploaded, failed, nothing
