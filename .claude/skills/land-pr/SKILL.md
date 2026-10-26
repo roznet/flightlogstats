@@ -29,13 +29,26 @@ gh pr view <N> --json title,body,headRefName,baseRefName,state,mergeable,files,c
 
 ## 2. Build until it compiles
 
+Pick a simulator by id: a `name=` destination resolves to `OS:latest` and fails
+when that device only exists on an older runtime.
+
 ```sh
-DEST='platform=iOS Simulator,name=iPhone 17'   # fall back to `xcrun simctl list devices available | grep iPhone | head -3`
-LOG=${CLAUDE_JOB_DIR:-build}/tmp; mkdir -p $LOG; DD=$LOG/dd   # shell state doesn't persist: repeat these in each call
+xcrun simctl list devices available | grep -E "iPhone 1[0-9]" | tail -4   # take one UDID
+```
+
+In a worktree session, a command that runs `xcodebuild` with `$VAR` paths is
+refused (it can't be shown not to be git), so write the UDID and the log folder
+(`$CLAUDE_JOB_DIR/tmp`, or `build/tmp`) out literally. Below, `<UDID>` and
+`<LOG>` stand for them.
+
+Don't pass `CODE_SIGNING_ALLOWED=NO`: an unsigned build has no keychain access
+and `TestUploads/testKeychainStore` fails. Simulator builds sign ad hoc.
+
+```sh
 xcodebuild build-for-testing -project flightlogstats.xcodeproj -scheme FlightLogStats \
-  -destination "$DEST" -derivedDataPath "$DD" -skipMacroValidation CODE_SIGNING_ALLOWED=NO \
-  > $LOG/build.log 2>&1; echo exit=$?
-grep -E " error:|\*\* BUILD" $LOG/build.log | sort -u | head -40
+  -destination 'id=<UDID>' -derivedDataPath <LOG>/dd -skipMacroValidation \
+  > <LOG>/build.log 2>&1; echo exit=$?
+grep -E " error:|\*\* .*(SUCCEEDED|FAILED)" <LOG>/build.log | sort -u | head -40
 ```
 
 Fix errors in the files the PR touched first. Typical blind-build failures:
@@ -49,12 +62,24 @@ CLAUDE.md, consider adding the API to the library (`~/Developer/public/rzflight`
 
 ```sh
 xcodebuild test-without-building -project flightlogstats.xcodeproj -scheme FlightLogStats \
-  -destination "$DEST" -derivedDataPath "$DD" -only-testing:FlightLogStatsTests \
-  > $LOG/test.log 2>&1; echo exit=$?
-grep -E " error:|failed \(|Executed [0-9]+ tests" $LOG/test.log | sort -u | tail -30
+  -destination 'id=<UDID>' -derivedDataPath <LOG>/dd -only-testing:FlightLogStatsTests \
+  > <LOG>/test.log 2>&1; echo exit=$?
 ```
 
-The full suite takes a minute or two. Iterate on a failure with
+Run it in the background: xcodebuild can hang after the last test, past the Bash
+timeout. Wait for `Test Suite 'Selected tests' (passed|failed)` in the log, then
+summarise. The log is huge, so only grep it, and kill a hung xcodebuild:
+
+```sh
+grep -E "Test Case .*failed \(|error: -\[" <LOG>/test.log | sort -u | head -20
+grep -cE "^Test Case .*passed" <LOG>/test.log
+```
+
+The per-suite `Executed N tests` lines are not the total; count the passed
+cases. `TestParsingLogFiles/testFlightLogFile` has failed once in a full run and
+passed alone (quick-parse start airport nil): rerun it alone before blaming the PR.
+
+The full suite takes a few minutes. Iterate on a failure with
 `-only-testing:FlightLogStatsTests/<TestClass>`, then re-run the whole suite
 once at the end. If the PR adds logic with no tests, add at least one.
 
@@ -80,7 +105,7 @@ unless asked. Install and seed the 10 most recent real flights:
 
 ```sh
 BID=net.ro-z.flightlogstats
-xcrun simctl boot "iPhone 17" 2>/dev/null; xcrun simctl install booted "$DD/Build/Products/Debug-iphonesimulator/FlightLogStats.app"
+xcrun simctl boot <UDID> 2>/dev/null; xcrun simctl install booted "<LOG>/dd/Build/Products/Debug-iphonesimulator/FlightLogStats.app"
 SRC=~/Library/Mobile\ Documents/iCloud~net~ro-z~flightlogstats/Documents
 DST=$(xcrun simctl get_app_container booted $BID data)/Documents
 xcrun simctl terminate booted $BID 2>/dev/null
@@ -89,7 +114,7 @@ xcrun simctl launch booted $BID
 ```
 
 `shot` means **one** screenshot of the changed screen
-(`xcrun simctl io booted screenshot $LOG/shot.png`, then Read it). Don't
+(`xcrun simctl io booted screenshot <LOG>/shot.png`, then Read it). Don't
 navigate the UI step by step with screenshots. If the screen can't be reached
 with a launch argument, say so and leave it to the user.
 
