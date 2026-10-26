@@ -378,6 +378,57 @@ class LogListTableViewController: UITableViewController, UIDocumentPickerDelegat
         }
     }
     
+    override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        guard TableSection(indexPath: indexPath) == .flights,
+              let info = self.flightInfo(at: indexPath), let name = info.log_file_name else { return nil }
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            var actions : [UIAction] = [
+                UIAction(title: "Share Summary…", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+                    self.shareSummary(info, at: indexPath)
+                }
+            ]
+            if Settings.shared.dropboxEnabled {
+                actions.append(UIAction(title: "Save Summary to Dropbox", image: UIImage(systemName: "square.and.arrow.down.on.square")) { _ in
+                    Uploads.shared.saveToDropbox(name)
+                })
+            }
+            return UIMenu(children: actions)
+        }
+    }
+
+    /// The flight's summary in the share sheet (file, copy, mail, ...), from a full parse.
+    func shareSummary(_ info : FlightLogFileRecord, at indexPath : IndexPath) {
+        let folder = self.logFileOrganizer.libraryFolder
+        AppDelegate.worker.async {
+            let export = FlightSummaryExport.make(record: info, folder: folder)
+            DispatchQueue.main.async {
+                guard let export = export, let share = try? FlightSummaryShare.items(for: export) else {
+                    let alert = UIAlertController(title: "No Summary",
+                                                  message: "The log is not on this device yet, or has no flight data.",
+                                                  preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                    return
+                }
+                let controller = UIActivityViewController(activityItems: share.items, applicationActivities: nil)
+                controller.completionWithItemsHandler = { _, _, _, _ in
+                    try? FileManager.default.removeItem(at: share.file)
+                }
+                // a popover on iPad and Mac, from the row
+                if let popover = controller.popoverPresentationController {
+                    if let cell = self.tableView.cellForRow(at: indexPath) {
+                        popover.sourceView = cell
+                        popover.sourceRect = cell.bounds
+                    }else{
+                        popover.sourceView = self.view
+                        popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+                    }
+                }
+                self.present(controller, animated: true)
+            }
+        }
+    }
+
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let logCell = (cell as? LogListTableViewCell) {
             NotificationCenter.default.addObserver(forName: .logFileRecordUpdated, object: nil, queue: nil){

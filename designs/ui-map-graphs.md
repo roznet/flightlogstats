@@ -13,7 +13,9 @@ MainSplitViewController (Main.storyboard initial, classic master/detail)
 ├─ primary: UINavigationController
 │    └─ LogListTableViewController   "Display Statistics" row, flights / aircraft,
 │                                    search, "More" UIMenu (import, upload batch,
-│                                    rebuild, settings, bug report)
+│                                    rebuild, settings, bug report); row
+│                                    context menu: Share Summary, Save Summary
+│                                    to Dropbox
 └─ secondary, one of:
      LogTabBarController ─ Summary  LogSummaryViewController (4 tables, upload)
                          ─ Fuel     LogFuelAnalysisViewController
@@ -122,8 +124,18 @@ presented by the split view after the document picker. `@MainActor @Observable`
 
 More › Uploads. `UploadsModel` reloads `RecordUploadStore.overview()` on every
 `.newFileUploaded`. Sections: FlySto status (off, Sign in, uploading n of N,
-all uploaded), Waiting, Failed (reason, next retry). Actions menu: Retry all
-failed, Upload next N flights.
+all uploaded), Dropbox (Save flight summaries toggle, Sign in, saving n of N or
+"n saved, m waiting", failed saves with reason), Waiting, Failed (reason, next
+retry). The Dropbox counts come from `FileUploadStore.all`. Actions menu: Retry
+all failed, Upload next N flights, Save all flight summaries to Dropbox, Retry
+failed Dropbox saves, Sign out of Dropbox.
+
+Share Summary (log list row context menu, right click on Mac): a full parse on
+the worker, then a share sheet from the row (`FlightSummaryShare`): the JSON file
+(temporary, named like the Dropbox copy, removed when the sheet closes) for Save
+to Files, Mail, AirDrop; Copy takes `clipboardText()` (headline, then the JSON)
+instead of the file; Mail and Messages get the headline as body and subject. An
+alert when the log is not on the device.
 
 The log list shows each log's FlySto status as the cell's accessory
 (`LogListTableViewCell.updateUploadStatus`): queued, uploaded, failed, nothing

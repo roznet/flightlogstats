@@ -10,6 +10,8 @@
 		42FC5C032E9A000100A1B2C3 /* FastCsv in Frameworks */ = {isa = PBXBuildFile; productRef = 42FC5C022E9A000100A1B2C3 /* FastCsv */; };
 		42F0B1A0000000000000D053 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D052 /* LibraryStore.swift */; };
 		42F0B1A0000000000000D043 /* UploadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D042 /* UploadsView.swift */; };
+		42F0B1A0000000000000D063 /* DropboxService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D062 /* DropboxService.swift */; };
+		42F0B1A0000000000000D061 /* FlightSummaryExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D060 /* FlightSummaryExport.swift */; };
 		42F0B1A0000000000000D041 /* PostFlightImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D040 /* PostFlightImport.swift */; };
 		42F0B1A0000000000000D031 /* TestUploads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D030 /* TestUploads.swift */; };
 		42F0B1A0000000000000D027 /* Uploads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F0B1A0000000000000D026 /* Uploads.swift */; };
@@ -168,6 +170,8 @@
 		42FC5C012E9A000100A1B2C3 /* FastCsv */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FastCsv; path = Packages/FastCsv; sourceTree = "<group>"; };
 		42F0B1A0000000000000D052 /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LibraryStore.swift; path = Source/LibraryStore.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D042 /* UploadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UploadsView.swift; path = Source/UploadsView.swift; sourceTree = "<group>"; };
+		42F0B1A0000000000000D062 /* DropboxService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DropboxService.swift; path = Source/DropboxService.swift; sourceTree = "<group>"; };
+		42F0B1A0000000000000D060 /* FlightSummaryExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlightSummaryExport.swift; path = Source/FlightSummaryExport.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D040 /* PostFlightImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PostFlightImport.swift; path = Source/PostFlightImport.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D030 /* TestUploads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUploads.swift; sourceTree = "<group>"; };
 		42F0B1A0000000000000D026 /* Uploads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Uploads.swift; path = Source/Uploads.swift; sourceTree = "<group>"; };
@@ -642,6 +646,8 @@
 				42F0B1A0000000000000C002 /* OwnshipMap.swift */,
 				42F0B1A0000000000000D052 /* LibraryStore.swift */,
 				42F0B1A0000000000000D042 /* UploadsView.swift */,
+				42F0B1A0000000000000D062 /* DropboxService.swift */,
+				42F0B1A0000000000000D060 /* FlightSummaryExport.swift */,
 				42F0B1A0000000000000D040 /* PostFlightImport.swift */,
 				42F0B1A0000000000000D026 /* Uploads.swift */,
 				42F0B1A0000000000000D024 /* FlyStoService.swift */,
@@ -862,6 +868,8 @@
 				4280C8BC280D460600A0FB32 /* LogListTableViewController.swift in Sources */,
 				42F0B1A0000000000000D053 /* LibraryStore.swift in Sources */,
 				42F0B1A0000000000000D043 /* UploadsView.swift in Sources */,
+				42F0B1A0000000000000D063 /* DropboxService.swift in Sources */,
+				42F0B1A0000000000000D061 /* FlightSummaryExport.swift in Sources */,
 				42F0B1A0000000000000D041 /* PostFlightImport.swift in Sources */,
 				42F0B1A0000000000000D027 /* Uploads.swift in Sources */,
 				42F0B1A0000000000000D025 /* FlyStoService.swift in Sources */,
